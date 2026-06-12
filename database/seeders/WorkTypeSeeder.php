@@ -2,16 +2,26 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\WorkType;
 
 class WorkTypeSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
+        $types = [
+            'Demo Produk',
+            'Survey',
+            'POC',
+            'Instalasi',
+            'Troubleshooting',
+            'Maintenance',
+        ];
+
+        foreach ($types as $type) {
+            WorkType::create([
+                'name' => $type,
+            ]);
+        }
     }
 }
