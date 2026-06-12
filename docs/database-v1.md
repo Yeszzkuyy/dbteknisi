@@ -97,3 +97,58 @@ Field:
 - Nama Pekerjaan
 - Satuan
 - Harga
+
+
+TABLE: customers
+
+- id
+- company_name
+- address
+- phone
+- email
+- notes
+
+--------------------------------
+
+TABLE: customer_contacts
+
+- id
+- customer_id
+- name
+- position
+- phone
+- email
+- is_primary
+
+--------------------------------
+
+TABLE: projects
+
+- id
+- customer_id
+- company_id
+- account_manager_id
+- project_name
+- work_type_id
+- pic_engineer_id
+- status
+- description
+
+--------------------------------
+
+TABLE: project_supports
+
+- id
+- project_id
+- user_id
+
+--------------------------------
+
+TABLE: project_documents
+
+- id
+- project_id
+- document_type
+- file_name
+- file_path
+- notes
