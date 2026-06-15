@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::resource('customers', CustomerController::class);
+
 Route::get('/', function () {
     return view('welcome');
 });
