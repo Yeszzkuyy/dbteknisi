@@ -6,5 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class AccountManager extends Model
 {
-    //
+    protected $fillable = [
+        'name',
+        'phone',
+        'email',
+    ];
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
 }

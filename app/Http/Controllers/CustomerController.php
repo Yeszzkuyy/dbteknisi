@@ -22,7 +22,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        //
+        return view('customers.create');
     }
 
     /**
@@ -30,7 +30,19 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required',
+            'address' => 'nullable',
+            'phone' => 'nullable',
+            'email' => 'nullable|email',
+            'notes' => 'nullable',
+        ]);
+
+        Customer::create($validated);
+
+        return redirect()
+            ->route('customers.index')
+            ->with('success', 'Customer berhasil ditambahkan');
     }
 
     /**
@@ -38,7 +50,9 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        //
+        $customer->load('contacts');
+
+        return view('customers.show', compact('customer'));
     }
 
     /**
@@ -46,7 +60,7 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
-        //
+        return view('customers.edit', compact('customer'));
     }
 
     /**
@@ -54,7 +68,19 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required',
+            'address' => 'nullable',
+            'phone' => 'nullable',
+            'email' => 'nullable|email',
+            'notes' => 'nullable',
+        ]);
+
+        $customer->update($validated);
+
+        return redirect()
+            ->route('customers.index')
+            ->with('success', 'Customer berhasil diupdate');
     }
 
     /**
@@ -62,6 +88,10 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        //
+        $customer->delete();
+
+        return redirect()
+            ->route('customers.index')
+            ->with('success', 'Customer berhasil dihapus');
     }
 }
