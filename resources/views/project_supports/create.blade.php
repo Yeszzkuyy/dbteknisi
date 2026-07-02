@@ -1,0 +1,45 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Detail Support Engineer
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Project</dt>
+                        <dd class="text-gray-900">{{ $projectSupport->project->project_name }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Engineer</dt>
+                        <dd class="text-gray-900">{{ $projectSupport->engineer->name }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Ditambahkan Pada</dt>
+                        <dd class="text-gray-900">{{ $projectSupport->created_at->format('d M Y, H:i') }}</dd>
+                    </div>
+                </dl>
+
+                <div class="mt-6 flex items-center gap-4">
+                    <form method="POST" action="{{ route('project-supports.destroy', $projectSupport) }}"
+                        onsubmit="return confirm('Hapus support engineer ini dari project?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700">
+                            Hapus
+                        </button>
+                    </form>
+                    <a href="{{ route('projects.show', $projectSupport->project) }}" class="text-sm text-gray-600 hover:underline">
+                        ← Kembali ke project
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</x-app-layout>

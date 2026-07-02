@@ -16,9 +16,9 @@ return new class extends Migration
     		$table->foreignId('customer_id')
           		->constrained()
           		->cascadeOnDelete();
-		$table->foreignId('company_id')
-          		->constrained()
-          		->cascadeOnDelete();
+		// $table->foreignId('company_id')
+          		// ->constrained()
+          		// ->cascadeOnDelete();
     		$table->foreignId('account_manager_id')
           		->nullable()
           		->constrained()

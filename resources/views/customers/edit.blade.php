@@ -1,40 +1,47 @@
-<h1>Edit Customer</h1>
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Edit Customer') }}
+        </h2>
+    </x-slot>
 
-<form action="{{ route('customers.update', $customer) }}" method="POST">
-    @csrf
-    @method('PUT')
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <form action="{{ route('customers.update', $customer) }}" method="POST" class="space-y-4">
+                    @csrf
+                    @method('PUT')
 
-    <p>
-        Nama
-        <br>
-        <input type="text" name="name" value="{{ $customer->name }}">
-    </p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nama</label>
+                        <input type="text" name="name" value="{{ $customer->name }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
 
-    <p>
-        Address
-        <br>
-        <textarea name="address">{{ $customer->address }}</textarea>
-    </p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Address</label>
+                        <textarea name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ $customer->address }}</textarea>
+                    </div>
 
-    <p>
-        Phone
-        <br>
-        <input type="text" name="phone" value="{{ $customer->phone }}">
-    </p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Phone</label>
+                        <input type="text" name="phone" value="{{ $customer->phone }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
 
-    <p>
-        Email
-        <br>
-        <input type="email" name="email" value="{{ $customer->email }}">
-    </p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" name="email" value="{{ $customer->email }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
 
-    <p>
-        Notes
-        <br>
-        <textarea name="notes">{{ $customer->notes }}</textarea>
-    </p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Notes</label>
+                        <textarea name="notes" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ $customer->notes }}</textarea>
+                    </div>
 
-    <button type="submit">
-        Update
-    </button>
-</form>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+                        Update
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

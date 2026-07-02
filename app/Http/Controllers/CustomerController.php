@@ -12,7 +12,13 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::latest()->get();
+        // Tarik data customer, hitung jumlah project, dan ambil kontak yang is_primary saja
+        $customers = Customer::withCount('projects')
+            ->with(['contacts' => function ($query) {
+                $query->where('is_primary', true);
+            }])
+            ->latest()
+            ->get();
 
         return view('customers.index', compact('customers'));
     }
@@ -50,7 +56,14 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        $customer->load('contacts');
+        // Load relasi projects dan contacts sekaligus
+        // Contacts diurutkan berdasarkan is_primary supaya PIC utama muncul di atas
+        $customer->load([
+            'projects',
+            'contacts' => function ($query) {
+                $query->orderBy('is_primary', 'desc')->latest();
+            }
+        ]);
 
         return view('customers.show', compact('customer'));
     }

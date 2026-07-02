@@ -38,7 +38,9 @@ class CustomerContactController extends Controller
             'phone' => 'nullable',
             'email' => 'nullable|email',
         ]);
-    
+
+        $validated['is_primary'] = $request->boolean('is_primary');
+
         $customer->contacts()->create($validated);
     
         return redirect()

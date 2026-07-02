@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // Pastikan ini ada
 
 class Customer extends Model
 {
+    use SoftDeletes; // Pastikan ini ada
+
     protected $fillable = [
         'name',
         'address',

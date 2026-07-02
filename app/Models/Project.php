@@ -3,32 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // <-- INI HARUS ADA DAN BENAR
 
 class Project extends Model
 {
+    use SoftDeletes;
+    
     protected $fillable = [
-        'customer_id',
-        'company_id',
-        'account_manager_id',
-        'work_type_id',
-        'pic_engineer_id',
-        'project_name',
-        'project_code',
-        'quotation_number',
-        'status',
-        'start_date',
-        'end_date',
-        'description',
-    ];
+    'customer_id',
+    'account_manager_id',
+    'work_type_id',
+    'pic_engineer_id',
+    'project_name',
+    'project_code',
+    'quotation_number',
+    'status',
+    'start_date',
+    'end_date',
+    'description',
+];
 
     public function customer()
     {
         return $this->belongsTo(Customer::class);
-    }
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
     }
 
     public function accountManager()
@@ -57,5 +54,17 @@ class Project extends Model
     public function documents()
     {
         return $this->hasMany(ProjectDocument::class);
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(ProjectActivity::class)
+            ->latest('activity_date');
+    }
+    public function tasks()
+    {
+        return $this->hasMany(
+            ProjectTask::class
+        );
     }
 }
