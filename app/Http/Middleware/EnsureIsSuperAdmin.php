@@ -15,6 +15,10 @@ class EnsureIsSuperAdmin
      */
    public function handle(Request $request, Closure $next): Response
     {
+        if (! $request->user()) {
+            return redirect()->route('login');
+        }
+
         if ($request->user()->id !== 1) {
             return back()->with('error', 'Halaman ini hanya bisa diakses oleh Super Admin.');
         }

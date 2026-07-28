@@ -2,141 +2,126 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use App\Models\Customer;
-// use App\Models\Company;
 use App\Models\AccountManager;
 use App\Models\WorkType;
 use App\Models\User;
-use App\Models\Project;
-use App\Models\ProjectActivity;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\Project\ProjectService;
 
 class ProjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-{
-    $projects = Project::with([
-            'customer',
-            // 'company',
-            'workType',
-            'picEngineer'
-        ])->latest()->get();
+    protected $projectService;
 
-        return view('projects.index', compact('projects'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function __construct(ProjectService $projectService)
     {
-        $customers = Customer::all();
-
-        $accountManagers = AccountManager::all();
-    
-        $workTypes = WorkType::all();
-    
-        $engineers = User::where('role', 'teknisi')->get();
-    
-        return view(
-            'projects.create',
-            compact(
-                'customers',
-                'accountManagers',
-                'workTypes',
-                'engineers'
-            )
-        );
+        $this->projectService = $projectService;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function index()
+    {
+        // Ambil project dengan status Open atau Progress
+        $projects = Project::with(['customer', 'workType']) // ← HAPUS picEngineer
+            ->whereIn('status', ['Open', 'Progress'])
+            ->latest()
+            ->get();
+
+        // Total semua project
+        $totalProjects = Project::count();
+
+        // Total project aktif
+        $activeProjects = Project::whereIn('status', ['Open', 'Progress'])->count();
+
+        return view('projects.index', compact('projects', 'totalProjects', 'activeProjects'));
+    }
+
+    public function create(Request $request)
+    {
+        $customerId = $request->query('customer_id');
+        
+        if (!$customerId) {
+            return redirect()->route('customers.index')
+                ->with('error', 'Silakan pilih customer terlebih dahulu.');
+        }
+        
+        $customer = Customer::findOrFail($customerId);
+        $workTypes = WorkType::all();
+        $accountManagers = AccountManager::all();
+        
+        return view('projects.create', compact('customer', 'workTypes', 'accountManagers'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_id' => 'required',
-            'account_manager_id' => 'nullable',
-            'work_type_id' => 'required',
-            'pic_engineer_id' => 'required',
-
-            'project_name' => 'required',
-
-            'project_code' => 'nullable',
-
-            'quotation_number' => 'nullable',
-
-            'status' => 'required',
-
-            'start_date' => 'nullable',
-
-            'end_date' => 'nullable',
-
-            'description' => 'nullable',
+            'customer_id' => 'required|exists:customers,id',
+            'name' => 'required|string|max:255',
+            'work_type_id' => 'required|exists:work_types,id',
+            'account_manager_id' => 'nullable|exists:account_managers,id',
+            'pic_engineer_id' => 'nullable|exists:users,id',
+            'description' => 'nullable|string',
         ]);
 
-        $project = Project::create($validated);
+        $project = $this->projectService->create($validated);
 
-        ProjectActivity::create([
-            'project_id'    => $project->id,
-            'user_id'       => Auth::id(),
-            'activity_date' => now(),
-            'title'         => 'Project Dibuat',
-            'description'   => 'Project baru berhasil dibuat',
-        ]);
         return redirect()
-            ->route('projects.index')
-            ->with('success', 'Project berhasil dibuat');
+            ->route('customers.show', $project->customer_id)
+            ->with('success', 'Project berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Project $project)
     {
         $project->load([
-            'customer',
-            // 'company',
-            'accountManager',
-            'workType',
-            'picEngineer',
-            'supports.engineer',
-            'documents',
-            'tasks.engineer',
-            'activities.user',
+            'customer', 
+            'workType', 
+            'accountManager', 
+            'tasks', 
+            'documents', 
+            'supports', 
+            'activities'
         ]);
-    
-        return view(
-            'projects.show',
-            compact('project')
-        );
+
+        return view('projects.show', compact('project'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Project $project)
     {
-        //
+        $customers = Customer::all();
+        $workTypes = WorkType::all();
+        $accountManagers = AccountManager::all();
+        $engineers = User::where('role', 'teknisi')->get();
+        
+        return view('projects.edit', compact('project', 'customers', 'workTypes', 'accountManagers', 'engineers'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Project $project)
     {
-        //
+        $validated = $request->validate([
+            'project_name' => 'required|string|max:255',
+            'customer_id' => 'required|exists:customers,id',
+            'work_type_id' => 'required|exists:work_types,id',
+            'account_manager_id' => 'nullable|exists:account_managers,id',
+            'pic_engineer' => 'required|string|max:255',
+            'support_technicians' => 'nullable|string|max:500',
+            'status' => 'nullable|string',
+            'progress' => 'nullable|integer|min:0|max:100',
+            'description' => 'nullable|string',
+        ]);
+    
+        $project->update($validated);
+    
+        return redirect()
+            ->route('projects.show', $project)
+            ->with('success', 'Project berhasil diupdate.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Project $project)
     {
-        //
+        $project->delete();
+
+        return redirect()
+            ->route('projects.index')
+            ->with('success', 'Project berhasil dihapus.');
     }
 }

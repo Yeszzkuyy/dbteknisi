@@ -1,0 +1,419 @@
+{
+  "nodes": [
+    {
+      "id": "readme_laravel_framework",
+      "label": "Laravel Framework",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_laravel_boost",
+      "label": "Laravel Boost",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_teknisi_tridaya_group",
+      "label": "Teknisi Tridaya Group Database V1",
+      "file_type": "document",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_customers_table",
+      "label": "Customers Table",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 102",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_customer_contacts_table",
+      "label": "Customer Contacts Table",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 113",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_projects_table",
+      "label": "Projects Table",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 125",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_project_supports_table",
+      "label": "Project Supports Table",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 139",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_project_documents_table",
+      "label": "Project Documents Table",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 147",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_account_managers",
+      "label": "Account Managers",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 22",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_engineers",
+      "label": "Engineers",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 29",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_activity_types",
+      "label": "Activity Types",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 38",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_companies",
+      "label": "Companies (NTI, MGK, TPS, WANI)",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_database-v1_document_categories",
+      "label": "Document Categories",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 76",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_erd-v1_entity_list",
+      "label": "ERD V1 Entity List",
+      "file_type": "document",
+      "source_file": "/var/www/dbteknisi/docs/erd-v1.md",
+      "source_location": "Line 1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_system-design-v1_system_name",
+      "label": "Database Engineer Tridaya Group System",
+      "file_type": "document",
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 5",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_system-design-v1_purpose",
+      "label": "System Purpose: Store Project History & Documents",
+      "file_type": "rationale",
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 9",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_system-design-v1_engineer_role",
+      "label": "Engineer Role (Full Access)",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 17",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_system-design-v1_prakerin_role",
+      "label": "Prakerin Role (View Only)",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 21",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_system-design-v1_menu_structure",
+      "label": "Menu Structure: Dashboard, Project, Customer, Dokumen, Master Data, Users, Settings",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 41",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_system-design-v1_scope_of_work",
+      "label": "Scope of Work: Survey, Demo, POC, Instalasi, Maintenance, Troubleshooting",
+      "file_type": "concept",
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 32",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "docs_database-v1_customers_table",
+      "target": "docs_database-v1_customer_contacts_table",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 113",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_database-v1_customers_table",
+      "target": "docs_database-v1_projects_table",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 125",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_database-v1_projects_table",
+      "target": "docs_database-v1_project_supports_table",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 139",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_database-v1_projects_table",
+      "target": "docs_database-v1_project_documents_table",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 147",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_database-v1_projects_table",
+      "target": "docs_database-v1_account_managers",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 55",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_database-v1_projects_table",
+      "target": "docs_database-v1_engineers",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 55",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_database-v1_projects_table",
+      "target": "docs_database-v1_companies",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 55",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_database-v1_projects_table",
+      "target": "docs_database-v1_activity_types",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 55",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_database-v1_project_documents_table",
+      "target": "docs_database-v1_document_categories",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/database-v1.md",
+      "source_location": "Line 76",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_erd-v1_entity_list",
+      "target": "docs_database-v1_teknisi_tridaya_group",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/erd-v1.md",
+      "source_location": "Line 1",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_system-design-v1_system_name",
+      "target": "docs_system-design-v1_purpose",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 5",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_system-design-v1_system_name",
+      "target": "docs_system-design-v1_menu_structure",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 41",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_system-design-v1_engineer_role",
+      "target": "docs_system-design-v1_prakerin_role",
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 17",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_system-design-v1_system_name",
+      "target": "docs_database-v1_teknisi_tridaya_group",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 5",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_system-design-v1_scope_of_work",
+      "target": "docs_database-v1_activity_types",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 32",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_system-design-v1_menu_structure",
+      "target": "docs_database-v1_projects_table",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 41",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_system-design-v1_menu_structure",
+      "target": "docs_database-v1_customers_table",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 41",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_system-design-v1_system_name",
+      "target": "docs_database-v1_companies",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/docs/system-design-v1.md",
+      "source_location": "Line 27",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_laravel_framework",
+      "target": "readme_laravel_boost",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/var/www/dbteknisi/README.md",
+      "source_location": "Line 33",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

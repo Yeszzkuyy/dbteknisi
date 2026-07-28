@@ -7,59 +7,54 @@ use Illuminate\Http\Request;
 
 class AccountManagerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        //
+        $accountManagers = AccountManager::latest()->get();
+        return view('settings.account-managers.index', compact('accountManagers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('settings.account-managers.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        AccountManager::create($validated);
+
+        return redirect()
+            ->route('account-managers.index')
+            ->with('success', 'Account Manager berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(AccountManager $accountManager)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(AccountManager $accountManager)
     {
-        //
+        return view('settings.account-managers.edit', compact('accountManager'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, AccountManager $accountManager)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $accountManager->update($validated);
+
+        return redirect()
+            ->route('account-managers.index')
+            ->with('success', 'Account Manager berhasil diupdate.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(AccountManager $accountManager)
     {
-        //
+        $accountManager->delete();
+        return redirect()
+            ->route('account-managers.index')
+            ->with('success', 'Account Manager berhasil dihapus.');
     }
 }

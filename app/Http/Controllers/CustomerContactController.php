@@ -3,80 +3,90 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerContact;
-use Illuminate\Http\Request;
 use App\Models\Customer;
+use Illuminate\Http\Request;
 
 class CustomerContactController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new contact.
      */
     public function create(Customer $customer)
     {
-        return view(
-            'customer_contacts.create',
-            compact('customer')
-        );
+        return view('customer_contacts.create', compact('customer'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created contact.
      */
     public function store(Request $request, Customer $customer)
     {
         $validated = $request->validate([
-            'name' => 'required',
-            'position' => 'nullable',
-            'phone' => 'nullable',
-            'email' => 'nullable|email',
+            'name' => 'required|string|max:255',
+            'position' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'is_primary' => 'nullable|boolean',
         ]);
 
-        $validated['is_primary'] = $request->boolean('is_primary');
+        // Jika di-set sebagai primary, hapus primary lama
+        if ($request->has('is_primary') && $request->is_primary) {
+            $customer->contacts()->update(['is_primary' => false]);
+        }
 
         $customer->contacts()->create($validated);
-    
+
         return redirect()
             ->route('customers.show', $customer)
-            ->with('success', 'PIC berhasil ditambahkan');
+            ->with('success', 'PIC berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(CustomerContact $customerContact)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing a contact.
      */
     public function edit(CustomerContact $customerContact)
     {
-        //
+        $customer = $customerContact->customer;
+        return view('customer_contacts.edit', compact('customerContact', 'customer'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified contact.
      */
     public function update(Request $request, CustomerContact $customerContact)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'position' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'is_primary' => 'nullable|boolean',
+        ]);
+
+        $customer = $customerContact->customer;
+
+        // Jika di-set sebagai primary, hapus primary lama
+        if ($request->has('is_primary') && $request->is_primary) {
+            $customer->contacts()->where('id', '!=', $customerContact->id)->update(['is_primary' => false]);
+        }
+
+        $customerContact->update($validated);
+
+        return redirect()
+            ->route('customers.show', $customer)
+            ->with('success', 'PIC berhasil diupdate.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified contact.
      */
     public function destroy(CustomerContact $customerContact)
     {
-        //
+        $customer = $customerContact->customer;
+        $customerContact->delete();
+
+        return redirect()
+            ->route('customers.show', $customer)
+            ->with('success', 'PIC berhasil dihapus.');
     }
 }

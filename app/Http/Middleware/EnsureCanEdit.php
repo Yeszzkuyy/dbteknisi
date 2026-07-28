@@ -15,6 +15,10 @@ class EnsureCanEdit
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (! $request->user()) {
+            return redirect()->route('login');
+        }
+
         if (! $request->user()->role->canEdit()) {
             return back()->with('error', 'Akun Prakerin hanya bisa melihat data, tidak bisa mengubah.');
         }

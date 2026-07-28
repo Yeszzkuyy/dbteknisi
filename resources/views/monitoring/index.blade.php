@@ -1,0 +1,286 @@
+<x-app-layout>
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">Dashboard Monitoring - Semua Divisi</h1>
+            <p class="text-slate-500 mt-1">
+                Overview lengkap aktivitas lintas divisi
+            </p>
+        </div>
+    </div>
+
+    {{-- Filter Bar --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <form method="GET" action="{{ route('monitoring.index') }}" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            {{-- Search Customer --}}
+            <div class="relative flex-1 max-w-md">
+                <label for="search" class="sr-only">Cari customer</label>
+                <input type="text"
+                       id="search"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Cari customer..."
+                       class="w-full px-4 py-2 pl-10 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+
+            {{-- Date Range --}}
+            <div class="flex gap-2">
+                <label for="date_from" class="sr-only">Dari tanggal</label>
+                <input type="date"
+                       id="date_from"
+                       name="date_from"
+                       value="{{ request('date_from') }}"
+                       class="px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                <span class="flex items-center text-slate-400">s/d</span>
+                <label for="date_to" class="sr-only">Sampai tanggal</label>
+                <input type="date"
+                       id="date_to"
+                       name="date_to"
+                       value="{{ request('date_to') }}"
+                       class="px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+            </div>
+
+            <button type="submit"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition whitespace-nowrap">
+                Filter
+            </button>
+
+            <a href="{{ route('monitoring.index') }}"
+               class="px-4 py-2 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition whitespace-nowrap">
+                Reset
+            </a>
+        </form>
+
+        {{-- Divisi Filter (Checkbox) --}}
+        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+            @foreach($divisiOptions as $divisi)
+                <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                    <input type="checkbox"
+                           name="divisi[]"
+                           value="{{ $divisi }}"
+                           {{ in_array($divisi, request('divisi', [])) ? 'checked' : '' }}
+                           class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    <span class="text-sm font-medium text-slate-700 capitalize">{{ $divisi }}</span>
+                </label>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Stats Grid --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+        {{-- Lead Masuk --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center gap-3">
+                <div class="p-3 rounded-xl bg-blue-50">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500">Lead Masuk</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ $stats['lead_masuk'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Meeting Bulan Ini --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center gap-3">
+                <div class="p-3 rounded-xl bg-green-50">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500">Meeting Bulan Ini</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ $stats['meeting_bulan_ini'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Invoice Outstanding --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center gap-3">
+                <div class="p-3 rounded-xl bg-orange-50">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500">Invoice Outstanding</p>
+                    <p class="text-2xl font-bold text-slate-800">Rp {{ number_format($stats['invoice_outstanding'] ?? 0, 0, ',', '.') }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Instalasi Proses --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center gap-3">
+                <div class="p-3 rounded-xl bg-purple-50">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500">Instalasi Proses</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ $stats['instalasi_proses'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Instalasi Selesai --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center gap-3">
+                <div class="p-3 rounded-xl bg-emerald-50">
+                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500">Instalasi Selesai</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ $stats['instalasi_selesai'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- PO Menunggu Proses --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <div class="flex items-center gap-3">
+                <div class="p-3 rounded-xl bg-amber-50">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500">PO Menunggu Proses</p>
+                    <p class="text-2xl font-bold text-slate-800">{{ $stats['po_menunggu'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Customer Progress List --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-200">
+            <h3 class="text-lg font-bold text-slate-800">Progress Tiap Customer</h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Customer</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Divisi Terakhir Update</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Waktu</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    @forelse($customers as $customer)
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-4 py-3">
+                                <div>
+                                    <p class="font-medium text-slate-900">{{ $customer->name }}</p>
+                                    @if($customer->company)
+                                        <p class="text-xs text-slate-500">{{ $customer->company }}</p>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium
+                                    @php
+                                        $statusColors = [
+                                            'Baru' => 'bg-slate-100 text-slate-800',
+                                            'Lead: new' => 'bg-blue-100 text-blue-800',
+                                            'Lead: contacted' => 'bg-blue-100 text-blue-800',
+                                            'Lead: qualified' => 'bg-purple-100 text-purple-800',
+                                            'Lead: proposal' => 'bg-orange-100 text-orange-800',
+                                            'Lead: won' => 'bg-green-100 text-green-800',
+                                            'Lead: lost' => 'bg-red-100 text-red-800',
+                                            'Meeting' => 'bg-green-100 text-green-800',
+                                            'Invoice: unpaid' => 'bg-red-100 text-red-800',
+                                            'Invoice: paid' => 'bg-green-100 text-green-800',
+                                            'Invoice: cancelled' => 'bg-slate-100 text-slate-800',
+                                            'PO: draft' => 'bg-slate-100 text-slate-800',
+                                            'PO: diproses' => 'bg-amber-100 text-amber-800',
+                                            'PO: selesai' => 'bg-green-100 text-green-800',
+                                            'PO: dibatalkan' => 'bg-red-100 text-red-800',
+                                            'Open' => 'bg-blue-100 text-blue-800',
+                                            'Progress' => 'bg-yellow-100 text-yellow-800',
+                                            'Done' => 'bg-green-100 text-green-800',
+                                            'Hold' => 'bg-orange-100 text-orange-800',
+                                            'Cancel' => 'bg-red-100 text-red-800',
+                                            'Maintenance' => 'bg-purple-100 text-purple-800',
+                                        ];
+                                    @endphp
+                                    {{ $statusColors[$customer->overall_status] ?? 'bg-slate-100 text-slate-800' }}">
+                                    {{ $customer->overall_status }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">
+                                @if($customer->latest_divisi)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+                                        @php
+                                            $divisiColors = [
+                                                'marketing' => 'bg-blue-100 text-blue-800',
+                                                'sales' => 'bg-green-100 text-green-800',
+                                                'teknisi' => 'bg-purple-100 text-purple-800',
+                                                'admin' => 'bg-orange-100 text-orange-800',
+                                            ];
+                                        @endphp
+                                        {{ $divisiColors[$customer->latest_divisi] ?? 'bg-slate-100 text-slate-800' }}">
+                                        <span class="w-1.5 h-1.5 rounded-full
+                                            @php
+                                                $divisiDots = [
+                                                    'marketing' => 'bg-blue-500',
+                                                    'sales' => 'bg-green-500',
+                                                    'teknisi' => 'bg-purple-500',
+                                                    'admin' => 'bg-orange-500',
+                                                ];
+                                            @endphp
+                                            {{ $divisiDots[$customer->latest_divisi] ?? 'bg-slate-500' }}"></span>
+                                        {{ ucfirst($customer->latest_divisi) }}
+                                    </span>
+                                @else
+                                    <span class="text-slate-400 text-sm">-</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-sm text-slate-500">
+                                @if($customer->latest_activity && isset($customer->latest_activity['date']) && $customer->latest_activity['date'])
+                                    {{ $customer->latest_activity['date']->diffForHumans() }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="px-4 py-3">
+                                <a href="{{ route('customers.show', $customer) }}"
+                                   class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    Lihat Detail
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-4 py-12 text-center text-slate-400">Tidak ada data customer.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Pagination --}}
+        @if($customers->hasPages())
+            <div class="p-4 border-t border-slate-200">
+                {{ $customers->links() }}
+            </div>
+        @endif
+    </div>
+</x-app-layout>

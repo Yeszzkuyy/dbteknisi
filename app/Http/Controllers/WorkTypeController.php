@@ -7,59 +7,53 @@ use Illuminate\Http\Request;
 
 class WorkTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $workTypes = WorkType::latest()->get();
+        return view('settings.work-types.index', compact('workTypes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('settings.work-types.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        WorkType::create($validated);
+
+        return redirect()
+            ->route('work-types.index')
+            ->with('success', 'Work Type berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(WorkType $workType)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(WorkType $workType)
     {
-        //
+        return view('settings.work-types.edit', compact('workType'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, WorkType $workType)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $workType->update($validated);
+
+        return redirect()
+            ->route('work-types.index')
+            ->with('success', 'Work Type berhasil diupdate.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(WorkType $workType)
     {
-        //
+        $workType->delete();
+        return redirect()
+            ->route('work-types.index')
+            ->with('success', 'Work Type berhasil dihapus.');
     }
 }

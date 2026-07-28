@@ -1,0 +1,5 @@
+/var/www/dbteknisi/README.md
+/var/www/dbteknisi/docs/database-v1.md
+/var/www/dbteknisi/docs/erd-v1.md
+/var/www/dbteknisi/docs/system-design-v1.md
+/var/www/dbteknisi/public/robots.txt

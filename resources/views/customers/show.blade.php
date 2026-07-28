@@ -1,104 +1,643 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Detail Client: {{ $customer->name }}
-        </h2>
-    </x-slot>
+    <div class="px-4 sm:px-6 lg:px-8">
+        
+        {{-- Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div class="min-w-0">
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 truncate">
+                    {{ $customer->name }}
+                </h1>
+                <p class="text-sm sm:text-base text-slate-500 mt-1 truncate">
+                    Detail Customer • {{ $customer->address ?? 'Alamat tidak tersedia' }}
+                </p>
+            </div>
+            <div class="flex gap-2 shrink-0">
+                @can('manage-sales')
+                    <a href="{{ route('customers.edit', $customer) }}" 
+                       class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium transition">
+                        Edit Customer
+                    </a>
+                @endcan
+                <a href="{{ route('customers.index') }}" 
+                   class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium transition">
+                    Kembali
+                </a>
+            </div>
+        </div>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        {{-- Tabs --}}
+        <div x-data="{ tab: 'overview' }" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6 border-l-4 border-indigo-500">
-                <h3 class="text-lg font-bold mb-4 text-gray-800">Informasi Perusahaan</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-500">Telepon Kantor</p>
-                        <p class="font-medium">{{ $customer->phone ?? '-' }}</p>
+            {{-- Tab Navigation --}}
+            <div class="border-b border-slate-200">
+                <nav class="flex gap-4 sm:gap-6 px-4 sm:px-6 overflow-x-auto whitespace-nowrap scrollbar-hide -mb-px" x-ref="tabs">
+                    <button @click="tab = 'overview'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'overview', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'overview' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        📋 Overview
+                    </button>
+                    <button @click="tab = 'projects'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'projects', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'projects' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        📁 Projects
+                    </button>
+                    <button @click="tab = 'contacts'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'contacts', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'contacts' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        👤 Contacts
+                    </button>
+                    <button @click="tab = 'documents'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'documents', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'documents' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        📄 Documents
+                    </button>
+                    @can('view-sales')
+                    <button @click="tab = 'meetings'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'meetings', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'meetings' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        🤝 Meetings
+                    </button>
+                    <button @click="tab = 'followups'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'followups', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'followups' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        📞 Follow Up
+                    </button>
+                    @endcan
+                    @can('view-admin')
+                    <button @click="tab = 'invoices'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'invoices', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'invoices' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        📋 Invoice
+                    </button>
+                    <button @click="tab = 'pos'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'pos', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'pos' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        📑 PO
+                    </button>
+                    <button @click="tab = 'payments'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'payments', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'payments' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        💳 Payment
+                    </button>
+                    @endcan
+                    <button @click="tab = 'activity'" 
+                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'activity', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'activity' }"
+                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                        📝 Activity
+                    </button>
+                </nav>
+            </div>
+
+            {{-- Tab Content --}}
+            <div class="p-6">
+                
+                {{-- TAB 1: OVERVIEW --}}
+                <div x-show="tab === 'overview'" x-transition>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Info Perusahaan --}}
+                        <div class="bg-slate-50 rounded-xl p-6">
+                            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Informasi Perusahaan</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-xs text-slate-400">Nama</p>
+                                    <p class="font-medium text-slate-800">{{ $customer->name }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Alamat</p>
+                                    <p class="font-medium text-slate-800">{{ $customer->address ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Telepon</p>
+                                    <p class="font-medium text-slate-800">{{ $customer->phone ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Email</p>
+                                    <p class="font-medium text-slate-800">{{ $customer->email ?? '-' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Statistik --}}
+                        <div class="bg-slate-50 rounded-xl p-6">
+                            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Statistik</h3>
+                            <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                                <div class="bg-white rounded-lg p-3 sm:p-4 text-center">
+                                    <p class="text-xl sm:text-2xl font-bold text-blue-600">{{ $customer->projects->count() }}</p>
+                                    <p class="text-[11px] sm:text-xs text-slate-500">Total Project</p>
+                                </div>
+                                <div class="bg-white rounded-lg p-4 text-center">
+                                    <p class="text-2xl font-bold text-green-600">
+                                        {{ $customer->projects->where('project_status_id', 5)->count() }}
+                                    </p>
+                                    <p class="text-xs text-slate-500">Project Selesai</p>
+                                </div>
+                                <div class="bg-white rounded-lg p-4 text-center">
+                                    <p class="text-2xl font-bold text-yellow-600">
+                                        {{ $customer->projects->where('project_status_id', '!=', 5)->where('project_status_id', '!=', 6)->count() }}
+                                    </p>
+                                    <p class="text-xs text-slate-500">Project Aktif</p>
+                                </div>
+                                <div class="bg-white rounded-lg p-4 text-center">
+                                    <p class="text-2xl font-bold text-purple-600">{{ $customer->contacts->count() }}</p>
+                                    <p class="text-xs text-slate-500">Total PIC</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Email Utama</p>
-                        <p class="font-medium">{{ $customer->email ?? '-' }}</p>
+
+                    {{-- Recent Activity --}}
+                    <div class="mt-6 bg-slate-50 rounded-xl p-6">
+                        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Aktivitas Terbaru</h3>
+                        @php
+                            $activities = App\Models\ProjectActivity::whereIn('project_id', $customer->projects->pluck('id'))
+                                ->with(['project', 'user'])
+                                ->latest()
+                                ->take(5)
+                                ->get();
+                        @endphp
+                        @forelse($activities as $activity)
+                            <div class="flex items-start gap-3 py-2 border-b border-slate-200 last:border-0">
+                                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-indigo-600 font-semibold text-xs">
+                                        {{ strtoupper(substr($activity->user?->name ?? 'U', 0, 1)) }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-slate-800">
+                                        <span class="font-semibold">{{ $activity->user?->name ?? 'System' }}</span>
+                                        {{ $activity->title ?? 'Activity' }}
+                                        <span class="text-xs text-slate-400">· {{ $activity->created_at->diffForHumans() }}</span>
+                                    </p>
+                                    <p class="text-xs text-slate-500">{{ $activity->project?->name ?? 'Project' }}</p>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-slate-400 text-sm text-center py-4">Belum ada aktivitas.</p>
+                        @endforelse
                     </div>
-                    <div class="md:col-span-2">
-                        <p class="text-sm text-gray-500">Alamat Lengkap</p>
-                        <p class="font-medium">{{ $customer->address ?? '-' }}</p>
+                </div>
+
+                {{-- TAB 2: PROJECTS --}}
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-800">Daftar Project</h3>
+                    @can('manage-teknisi')
+                        <a href="{{ route('projects.create', ['customer_id' => $customer->id]) }}" 
+                           class="inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-md hover:bg-blue-700 w-full sm:w-auto">
+                            + Tambah Project
+                        </a>
+                    @endcan
+                </div>
+                
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Nama Project</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Progress</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Tanggal Dibuat</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                @forelse($customer->projects as $project)
+                                    <tr class="hover:bg-slate-50">
+                                        {{-- Nama Project --}}
+                                        <td class="px-4 py-3 font-medium text-slate-800">{{ $project->project_name }}</td>
+                                        
+                                        {{-- Status --}}
+                                        <td class="px-4 py-3">
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full 
+                                                @if($project->status == 'Open')
+                                                    bg-blue-100 text-blue-700
+                                                @elseif($project->status == 'Progress')
+                                                    bg-yellow-100 text-yellow-700
+                                                @elseif($project->status == 'Pending')
+                                                    bg-orange-100 text-orange-700
+                                                @elseif($project->status == 'Hold')
+                                                    bg-red-100 text-red-700
+                                                @elseif($project->status == 'Done' || $project->status == 'Selesai')
+                                                    bg-green-100 text-green-700
+                                                @elseif($project->status == 'Cancel')
+                                                    bg-gray-100 text-gray-700
+                                                @else
+                                                    bg-gray-100 text-gray-700
+                                                @endif
+                                            ">
+                                                {{ $project->status ?? 'Open' }}
+                                            </span>
+                                        </td>
+                                        
+                                        {{-- Progress --}}
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-blue-600 rounded-full" style="width: {{ $project->progress ?? 0 }}%"></div>
+                                                </div>
+                                                <span class="text-xs text-slate-600">{{ $project->progress ?? 0 }}%</span>
+                                            </div>
+                                        </td>
+                                        
+                                        {{-- Tanggal Dibuat (ganti deadline) --}}
+                                        <td class="px-4 py-3 text-sm text-slate-600">{{ $project->created_at->format('d M Y') }}</td>
+                                        
+                                        {{-- Aksi --}}
+                                        <td class="px-4 py-3 text-right">
+                                            <div class="flex flex-wrap justify-end items-center gap-x-3 gap-y-1">
+                                                <a href="{{ route('projects.show', $project) }}" 
+                                                   class="text-blue-600 hover:text-blue-800 text-sm whitespace-nowrap">Detail</a>
+                                                @can('manage-teknisi')
+                                                    <a href="{{ route('projects.edit', $project) }}" 
+                                                       class="text-amber-600 hover:text-amber-800 text-sm whitespace-nowrap">Edit</a>
+                                                @endcan
+                                                @can('manage-teknisi')
+                                                    <form action="{{ route('projects.destroy', $project) }}" method="POST" 
+                                                          onsubmit="return confirm('Hapus project ini?')" class="inline-block m-0">
+                                                        @csrf @method('DELETE')
+                                                        <button class="text-red-600 hover:text-red-800 text-sm whitespace-nowrap">Hapus</button>
+                                                    </form>
+                                                @endcan
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-8 text-center text-slate-400">Belum ada project untuk customer ini.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
-                    @if($customer->notes)
-                    <div class="md:col-span-2 mt-2 p-3 bg-gray-50 rounded text-sm text-gray-700">
-                        <strong>Catatan:</strong> {{ $customer->notes }}
+                </div>
+
+                {{-- TAB 3: CONTACTS --}}
+                <div x-show="tab === 'contacts'" x-transition>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Daftar PIC / Customer Contacts</h3>
+                        @can('manage-sales')
+                            <a href="{{ route('customer-contacts.create', $customer) }}" 
+                               class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700">
+                                + Tambah PIC
+                            </a>
+                        @endcan
                     </div>
+                
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Nama</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Jabatan</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Phone & Email</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                @forelse($customer->contacts as $contact)
+                                    <tr class="{{ $contact->is_primary ? 'bg-indigo-50' : '' }}">
+                                        <td class="px-4 py-3 font-medium text-slate-800 align-middle">{{ $contact->name }}</td>
+                                        <td class="px-4 py-3 text-sm text-slate-600 align-middle">{{ $contact->position ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-sm text-slate-600 align-middle">
+                                            {{ $contact->phone ?? '-' }} <br>
+                                            <span class="text-xs text-slate-400">{{ $contact->email ?? '' }}</span>
+                                        </td>
+                                        <td class="px-4 py-3 align-middle">
+                                            @if($contact->is_primary)
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 font-bold">★ Primary PIC</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-right align-middle">
+                                            @can('manage-sales')
+                                                <a href="{{ route('customer-contacts.edit', $contact) }}" 
+                                                   class="text-amber-600 hover:text-amber-800 text-sm inline-block align-middle">Edit</a>
+                                            @endcan
+                                            @can('manage-sales')
+                                                <form action="{{ route('customer-contacts.destroy', $contact) }}" 
+                                                      method="POST" 
+                                                      onsubmit="return confirm('Hapus PIC ini?')"
+                                                      class="inline-block align-middle ml-2">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="text-red-600 hover:text-red-800 text-sm inline-block align-middle bg-transparent border-0 cursor-pointer p-0">
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            @endcan
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-8 text-center text-slate-400">Belum ada data PIC.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {{-- TAB 4: DOCUMENTS --}}
+                <div x-show="tab === 'documents'" x-transition>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Dokumen</h3>
+                        @can('manage-teknisi')
+                            @php
+                                $firstProject = $customer->projects->first();
+                            @endphp
+                            @if($firstProject)
+                                <a href="{{ route('project-documents.index', $firstProject) }}" 
+                                   class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">
+                                    + Kelola Dokumen
+                                </a>
+                            @else
+                                <span class="px-4 py-2 bg-gray-300 text-white text-xs rounded-md cursor-not-allowed">
+                                    Belum ada project
+                                </span>
+                            @endif
+                        @endcan
+                    </div>
+                    
+                    @php
+                        // Ambil semua project ID dari customer
+                        $projectIds = $customer->projects->pluck('id')->toArray();
+                        
+                        // Query dokumen berdasarkan project ID
+                        $documents = App\Models\ProjectDocument::whereIn('project_id', $projectIds)
+                            ->with(['project', 'category', 'uploader'])
+                            ->whereNull('deleted_at')
+                            ->latest()
+                            ->get();
+                    @endphp
+                
+                    @if($documents->isNotEmpty())
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($documents as $doc)
+                                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:shadow-md transition">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1 min-w-0">
+                                            {{-- Icon --}}
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
+                                                <p class="font-medium text-slate-800 text-sm truncate">{{ $doc->file_name }}</p>
+                                            </div>
+                                            <p class="text-xs text-slate-500">{{ $doc->project?->project_name ?? 'Project' }}</p>
+                                            <p class="text-xs text-slate-400">{{ $doc->category?->name ?? 'Uncategorized' }}</p>
+                                            <p class="text-xs text-slate-400 mt-1">{{ number_format($doc->file_size / 1024, 1) }} KB</p>
+                                            <p class="text-xs text-slate-400">Upload: {{ $doc->uploader?->name ?? '-' }}</p>
+                                        </div>
+                                        <div class="flex gap-2 flex-shrink-0 ml-2">
+                                            <a href="{{ route('project-documents.preview', $doc) }}" 
+                                               target="_blank"
+                                               class="text-indigo-600 hover:text-indigo-800 text-xs whitespace-nowrap">Preview</a>
+                                            <a href="{{ route('project-documents.download', $doc) }}" 
+                                               class="text-blue-600 hover:text-blue-800 text-xs">Download</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-slate-400 text-center py-8">
+                            Belum ada dokumen. 
+                            @if($customer->projects->isNotEmpty())
+                                <a href="{{ route('project-documents.index', $customer->projects->first()) }}" 
+                                   class="text-blue-600 hover:text-blue-800">
+                                    Upload dokumen sekarang
+                                </a>
+                            @else
+                                Buat project terlebih dahulu untuk upload dokumen.
+                            @endif
+                        </p>
                     @endif
                 </div>
-            </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">Daftar Project</h3>
+                {{-- TAB 5: MEETINGS --}}
+                @can('view-sales')
+                <div x-show="tab === 'meetings'" x-transition>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Daftar Meeting</h3>
+                        @can('manage-sales')
+                            <a href="{{ route('sales.meetings.create', ['customer_id' => $customer->id]) }}"
+                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">
+                                + Catat Meeting
+                            </a>
+                        @endcan
                     </div>
-
-                <table class="min-w-full divide-y divide-gray-200 border">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nama Project</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dibuat Pada</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        @forelse($customer->projects as $project)
-                        <tr>
-                            <td class="px-4 py-2 font-medium">{{ $project->name ?? 'Project ID: ' . $project->id }}</td>
-                            <td class="px-4 py-2 text-sm">{{ $project->created_at->format('d M Y') }}</td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="2" class="px-4 py-4 text-center text-gray-500 text-sm">Belum ada project untuk client ini.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">Daftar PIC / Customer Contacts</h3>
-                    <a href="{{ route('customer-contacts.create', $customer) }}" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700">
-                        + Tambah PIC
-                    </a>
+                    @php
+                        $meetings = $customer->meetings()->with('creator')->latest('meeting_date')->get();
+                    @endphp
+                    @if($meetings->isNotEmpty())
+                        @foreach($meetings as $meeting)
+                            <div class="border-b border-slate-100 py-4 last:border-0">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="font-semibold text-slate-800">{{ $meeting->meeting_date->format('d M Y') }}</p>
+                                        <p class="text-sm text-slate-500 mt-1">Peserta: {{ $meeting->participants ?? '-' }}</p>
+                                    </div>
+                                    <a href="{{ route('sales.meetings.show', $meeting) }}"
+                                       class="text-blue-600 hover:text-blue-800 text-sm">Detail</a>
+                                </div>
+                                @if($meeting->user_needs)
+                                    <p class="text-sm text-slate-600 mt-2">
+                                        <span class="font-medium">Kebutuhan:</span> {{ Str::limit($meeting->user_needs, 150) }}
+                                    </p>
+                                @endif
+                                @if($meeting->user_complaints)
+                                    <p class="text-sm text-slate-600 mt-1">
+                                        <span class="font-medium">Keluhan:</span> {{ Str::limit($meeting->user_complaints, 150) }}
+                                    </p>
+                                @endif
+                                <p class="text-xs text-slate-400 mt-2">oleh {{ $meeting->creator?->name ?? '-' }}</p>
+                            </div>
+                        @endforeach
+                    @else
+                        <p class="text-slate-400 text-center py-8">Belum ada meeting.</p>
+                    @endif
                 </div>
 
-                <table class="min-w-full divide-y divide-gray-200 border">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Jabatan</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Phone & Email</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        @forelse($customer->contacts as $contact)
-                        <tr class="{{ $contact->is_primary ? 'bg-indigo-50' : '' }}">
-                            <td class="px-4 py-2 font-medium">{{ $contact->name }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-600">{{ $contact->position ?? '-' }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-600">
-                                {{ $contact->phone ?? '-' }} <br>
-                                <span class="text-xs text-gray-400">{{ $contact->email ?? '' }}</span>
-                            </td>
-                            <td class="px-4 py-2">
-                                @if($contact->is_primary)
-                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 font-bold">★ Primary PIC</span>
-                                @endif
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="4" class="px-4 py-4 text-center text-gray-500 text-sm">Belum ada data PIC yang ditambahkan.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                {{-- TAB 6: FOLLOW UPS --}}
+                <div x-show="tab === 'followups'" x-transition>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Follow Up</h3>
+                        @can('manage-sales')
+                            <a href="{{ route('sales.follow-ups.create', ['customer_id' => $customer->id]) }}"
+                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">
+                                + Tambah Follow Up
+                            </a>
+                        @endcan
+                    </div>
+                    @php
+                        $followups = $customer->followUps()->with(['meeting', 'creator'])->latest('follow_up_date')->get();
+                    @endphp
+                    @if($followups->isNotEmpty())
+                        <div class="space-y-3">
+                            @foreach($followups as $fu)
+                                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <p class="text-sm text-slate-700">{{ $fu->description }}</p>
+                                            <div class="flex gap-3 mt-2 text-xs text-slate-400">
+                                                <span>{{ $fu->creator?->name ?? '-' }}</span>
+                                                @if($fu->follow_up_date)
+                                                    <span>· {{ $fu->follow_up_date->format('d M Y') }}</span>
+                                                @endif
+                                                @if($fu->meeting)
+                                                    <span>· Terkait Meeting {{ $fu->meeting->meeting_date->format('d M Y') }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-slate-400 text-center py-8">Belum ada follow up.</p>
+                    @endif
+                </div>
+                @endcan
 
+                {{-- TAB 7: INVOICES --}}
+                @can('view-admin')
+                <div x-show="tab === 'invoices'" x-transition>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Invoice</h3>
+                        @can('manage-admin')
+                            <a href="{{ route('admin.invoices.create', ['customer_id' => $customer->id]) }}"
+                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">+ Buat Invoice</a>
+                        @endcan
+                    </div>
+                    @php $custInvoices = $customer->invoices()->with('payments')->latest('issue_date')->get(); @endphp
+                    @if($custInvoices->isNotEmpty())
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">No Invoice</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Nominal</th><th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">Status</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    @foreach($custInvoices as $inv)
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-4 py-3 font-mono text-sm font-semibold text-slate-800">{{ $inv->invoice_number }}</td>
+                                        <td class="px-4 py-3 text-right font-mono text-slate-800">Rp {{ number_format($inv->amount, 0, ',', '.') }}</td>
+                                        <td class="px-4 py-3 text-center"><span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full @if($inv->status === 'paid') bg-green-100 text-green-700 @elseif($inv->status === 'cancelled') bg-red-100 text-red-700 @else bg-yellow-100 text-yellow-700 @endif">{{ $inv->status === 'paid' ? 'Lunas' : ($inv->status === 'cancelled' ? 'Dibatalkan' : 'Belum Bayar') }}</span></td>
+                                        <td class="px-4 py-3 text-right"><a href="{{ route('admin.invoices.show', $inv) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-slate-400 text-center py-8">Belum ada invoice.</p>
+                    @endif
+                </div>
+
+                {{-- TAB 8: PO --}}
+                <div x-show="tab === 'pos'" x-transition>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Purchase Order</h3>
+                        @can('manage-admin')
+                            <a href="{{ route('admin.pos.create', ['customer_id' => $customer->id]) }}"
+                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">+ Buat PO</a>
+                        @endcan
+                    </div>
+                    @php $custPos = $customer->purchaseOrders()->latest('issue_date')->get(); @endphp
+                    @if($custPos->isNotEmpty())
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">No PO</th><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Item</th><th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">Status</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    @foreach($custPos as $po)
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-4 py-3 font-mono text-sm font-semibold text-slate-800">{{ $po->po_number }}</td>
+                                        <td class="px-4 py-3 text-slate-600 max-w-xs truncate">{{ Str::limit($po->items, 60) }}</td>
+                                        <td class="px-4 py-3 text-center"><span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full @if($po->status === 'selesai') bg-green-100 text-green-700 @elseif($po->status === 'dibatalkan') bg-red-100 text-red-700 @elseif($po->status === 'diproses') bg-yellow-100 text-yellow-700 @else bg-slate-100 text-slate-600 @endif">{{ ucfirst($po->status) }}</span></td>
+                                        <td class="px-4 py-3 text-right"><a href="{{ route('admin.pos.show', $po) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-slate-400 text-center py-8">Belum ada PO.</p>
+                    @endif
+                </div>
+
+                {{-- TAB 9: PAYMENTS --}}
+                <div x-show="tab === 'payments'" x-transition>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Pembayaran</h3>
+                        @can('manage-admin')
+                            <a href="{{ route('admin.payments.create') }}"
+                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">+ Catat Pembayaran</a>
+                        @endcan
+                    </div>
+                    @php $custPayments = \App\Models\Payment::whereHas('invoice', fn($q) => $q->where('customer_id', $customer->id))->with('invoice')->latest('payment_date')->get(); @endphp
+                    @if($custPayments->isNotEmpty())
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
+                                    <tr><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Invoice</th><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Tgl Bayar</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Nominal</th><th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">Bukti</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    @foreach($custPayments as $pm)
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-4 py-3 font-mono text-sm text-slate-800">{{ $pm->invoice->invoice_number }}</td>
+                                        <td class="px-4 py-3 text-slate-600">{{ $pm->payment_date->format('d M Y') }}</td>
+                                        <td class="px-4 py-3 text-right font-mono text-slate-800">Rp {{ number_format($pm->amount, 0, ',', '.') }}</td>
+                                        <td class="px-4 py-3 text-center">@if($pm->proof_file)<a href="{{ asset('storage/' . $pm->proof_file) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">Lihat</a>@else - @endif</td>
+                                        <td class="px-4 py-3 text-right"><a href="{{ route('admin.payments.show', $pm) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-slate-400 text-center py-8">Belum ada pembayaran.</p>
+                    @endif
+                </div>
+                @endcan
+
+                {{-- TAB 10: ACTIVITY --}}
+                <div x-show="tab === 'activity'" x-transition>
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">Timeline Aktivitas</h3>
+                    
+                    @php
+                        $allActivities = App\Models\ProjectActivity::whereIn('project_id', $customer->projects->pluck('id'))
+                            ->with(['project', 'user'])
+                            ->latest()
+                            ->get();
+                    @endphp
+
+                    <div class="relative">
+                        <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-200"></div>
+                        @forelse($allActivities as $activity)
+                            <div class="relative pl-12 pb-6 last:pb-0">
+                                <div class="absolute left-2 top-1 w-5 h-5 rounded-full bg-indigo-500 border-4 border-white shadow-sm"></div>
+                                <div class="bg-slate-50 rounded-xl p-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="font-semibold text-sm text-slate-800">{{ $activity->user?->name ?? 'System' }}</span>
+                                        <span class="text-xs text-slate-400">{{ $activity->created_at->format('d M Y H:i') }}</span>
+                                    </div>
+                                    <p class="text-sm text-slate-700 mt-1">{{ $activity->title ?? 'Activity' }}</p>
+                                    <p class="text-xs text-slate-500">{{ $activity->project?->name ?? 'Project' }}</p>
+                                    @if($activity->description)
+                                        <p class="text-xs text-slate-400 mt-1">{{ $activity->description }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-slate-400 text-center py-8">Belum ada aktivitas.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+            </div>
         </div>
+
     </div>
 </x-app-layout>

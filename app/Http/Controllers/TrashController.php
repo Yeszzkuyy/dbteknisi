@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Models\Company;
 use App\Models\Project;
+use App\Models\ProjectDocument;
+use App\Models\ProjectTask;
 
 class TrashController extends Controller
 {
     /**
-     * Tampilkan halaman trash gabungan: Customer, Company, Project
+     * Tampilkan halaman trash gabungan: Customer, Project
      * yang sudah di-soft-delete.
      */
     public function index()
     {
         $customers = Customer::onlyTrashed()->latest('deleted_at')->get();
-
         $projects = Project::onlyTrashed()->latest('deleted_at')->get();
 
         return view(
@@ -26,7 +26,6 @@ class TrashController extends Controller
 
     /**
      * Restore Customer yang sudah di-soft-delete.
-     * Cascade restore ke projects + contacts ditangani CustomerObserver.
      */
     public function restoreCustomer(int $id)
     {
@@ -38,10 +37,8 @@ class TrashController extends Controller
             ->with('success', 'Customer "'.$customer->name.'" berhasil direstore');
     }
 
-
     /**
      * Restore Project yang sudah di-soft-delete.
-     * Cascade restore ke documents, tasks, supports ditangani ProjectObserver.
      */
     public function restoreProject(int $id)
     {

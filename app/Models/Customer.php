@@ -11,10 +11,16 @@ class Customer extends Model
 
     protected $fillable = [
         'name',
+        'company',
         'address',
         'phone',
         'email',
         'notes',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'string',
     ];
 
     public function contacts()
@@ -25,5 +31,30 @@ class Customer extends Model
     public function projects()
     {
         return $this->hasMany(Project::class);
+    }
+
+    public function meetings()
+    {
+        return $this->hasMany(Meeting::class);
+    }
+
+    public function followUps()
+    {
+        return $this->hasMany(FollowUp::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
+    public function leads()
+    {
+        return $this->hasMany(Lead::class);
     }
 }
