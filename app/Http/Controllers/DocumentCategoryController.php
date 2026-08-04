@@ -10,12 +10,12 @@ class DocumentCategoryController extends Controller
     public function index()
     {
         $categories = DocumentCategory::latest()->get();
-        return view('settings.document-categories.index', compact('categories'));
+        return view('admin-panel.document-categories.index', compact('categories'));
     }
 
     public function create()
     {
-        return view('settings.document-categories.create');
+        return view('admin-panel.document-categories.create');
     }
 
     public function store(Request $request)
@@ -27,13 +27,13 @@ class DocumentCategoryController extends Controller
         DocumentCategory::create($validated);
 
         return redirect()
-            ->route('document-categories.index')
+            ->route('admin-panel.document-categories.index')
             ->with('success', 'Document Category berhasil ditambahkan.');
     }
 
     public function edit(DocumentCategory $documentCategory)
     {
-        return view('settings.document-categories.edit', compact('documentCategory'));
+        return view('admin-panel.document-categories.edit', compact('documentCategory'));
     }
 
     public function update(Request $request, DocumentCategory $documentCategory)
@@ -45,7 +45,7 @@ class DocumentCategoryController extends Controller
         $documentCategory->update($validated);
 
         return redirect()
-            ->route('document-categories.index')
+            ->route('admin-panel.document-categories.index')
             ->with('success', 'Document Category berhasil diupdate.');
     }
 
@@ -53,7 +53,7 @@ class DocumentCategoryController extends Controller
     {
         $documentCategory->delete();
         return redirect()
-            ->route('document-categories.index')
+            ->route('admin-panel.document-categories.index')
             ->with('success', 'Document Category berhasil dihapus.');
     }
 }

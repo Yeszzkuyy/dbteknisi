@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Web App Engineer'),
+    'name' => env('APP_NAME', 'Tridaya App'),
 
     /*
     |--------------------------------------------------------------------------

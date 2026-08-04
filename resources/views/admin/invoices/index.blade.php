@@ -8,8 +8,8 @@
     </div>
 
     {{-- Tabs --}}
-    <div x-data="{ tab: '{{ $tab }}' }" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="border-b border-slate-200">
+    <div x-data="{ tab: '{{ $tab }}' }" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
+        <div class="border-b border-slate-200 dark:border-slate-600">
             <nav class="flex gap-4 sm:gap-6 px-4 sm:px-6 overflow-x-auto whitespace-nowrap -mb-px">
                 <a href="{{ route('admin.invoices.index') }}"
                    @click.prevent="tab = 'invoices'; $el.closest('a').click()"
@@ -46,17 +46,17 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-200">
-                        <thead class="bg-slate-50">
+                    <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                        <thead class="bg-slate-50 dark:bg-slate-700">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">No Invoice</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
-                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Nominal</th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">Status</th>
-                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">No Invoice</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Customer</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Nominal</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Status</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                             @forelse($invoices as $inv)
                                 <tr class="hover:bg-slate-50">
                                     <td class="px-4 py-3 font-mono text-sm font-semibold text-slate-800">{{ $inv->invoice_number }}</td>
@@ -105,17 +105,17 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-200">
-                        <thead class="bg-slate-50">
+                    <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                        <thead class="bg-slate-50 dark:bg-slate-700">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">No PO</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Item</th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">Status</th>
-                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">No PO</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Customer</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Item</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Status</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                             @forelse($pos as $po)
                                 <tr class="hover:bg-slate-50">
                                     <td class="px-4 py-3 font-mono text-sm font-semibold text-slate-800">{{ $po->po_number }}</td>
@@ -165,18 +165,18 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-slate-200">
-                        <thead class="bg-slate-50">
+                    <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                        <thead class="bg-slate-50 dark:bg-slate-700">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Invoice Terkait</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Tgl Bayar</th>
-                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Nominal</th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">Bukti</th>
-                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Invoice Terkait</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Customer</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Tgl Bayar</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Nominal</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Bukti</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                             @forelse($payments as $pm)
                                 <tr class="hover:bg-slate-50">
                                     <td class="px-4 py-3 font-mono text-sm font-semibold text-slate-800">{{ $pm->invoice->invoice_number }}</td>

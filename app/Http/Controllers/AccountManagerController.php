@@ -11,12 +11,12 @@ class AccountManagerController extends Controller
     public function index()
     {
         $accountManagers = AccountManager::latest()->get();
-        return view('settings.account-managers.index', compact('accountManagers'));
+        return view('admin-panel.account-managers.index', compact('accountManagers'));
     }
 
     public function create()
     {
-        return view('settings.account-managers.create');
+        return view('admin-panel.account-managers.create');
     }
 
     public function store(Request $request)
@@ -28,13 +28,13 @@ class AccountManagerController extends Controller
         AccountManager::create($validated);
 
         return redirect()
-            ->route('account-managers.index')
+            ->route('admin-panel.account-managers.index')
             ->with('success', 'Account Manager berhasil ditambahkan.');
     }
 
     public function edit(AccountManager $accountManager)
     {
-        return view('settings.account-managers.edit', compact('accountManager'));
+        return view('admin-panel.account-managers.edit', compact('accountManager'));
     }
 
     public function update(Request $request, AccountManager $accountManager)
@@ -46,7 +46,7 @@ class AccountManagerController extends Controller
         $accountManager->update($validated);
 
         return redirect()
-            ->route('account-managers.index')
+            ->route('admin-panel.account-managers.index')
             ->with('success', 'Account Manager berhasil diupdate.');
     }
 
@@ -54,7 +54,7 @@ class AccountManagerController extends Controller
     {
         $accountManager->delete();
         return redirect()
-            ->route('account-managers.index')
+            ->route('admin-panel.account-managers.index')
             ->with('success', 'Account Manager berhasil dihapus.');
     }
 }

@@ -8,7 +8,7 @@
             </h1>
 
             <p class="text-slate-500 mt-1">
-                Kelola seluruh data customer Web App Engineer.
+                Kelola seluruh data customer Tridaya App.
             </p>
         </div>
 
@@ -22,7 +22,7 @@
 
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600">
 
         <div class="p-5 border-b">
 
@@ -33,19 +33,19 @@
             >
 
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                    <thead class="bg-slate-50 dark:bg-slate-700">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Customer</th>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">PIC</th>
-                            <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Project</th>
-                            <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">Customer</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">PIC</th>
+                            <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">Project</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">Aksi</th>
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
 
                         @forelse($customers as $customer)
 

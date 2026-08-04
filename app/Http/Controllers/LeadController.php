@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectDocument;
 use App\Models\ProjectStatus;
+use App\Models\User;
 use App\Models\WorkType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -46,8 +47,9 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
         $sources = ['website', 'referral', 'cold_call', 'email', 'social_media', 'event', 'other'];
+        $users = User::orderBy('name')->get(['id', 'name']);
 
-        return view('leads.create', compact('customers', 'statuses', 'sources'));
+        return view('leads.create', compact('customers', 'statuses', 'sources', 'users'));
     }
 
     public function store(Request $request)
@@ -83,8 +85,9 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
         $sources = ['website', 'referral', 'cold_call', 'email', 'social_media', 'event', 'other'];
+        $users = User::orderBy('name')->get(['id', 'name']);
 
-        return view('leads.edit', compact('lead', 'customers', 'statuses', 'sources'));
+        return view('leads.edit', compact('lead', 'customers', 'statuses', 'sources', 'users'));
     }
 
     public function update(Request $request, Lead $lead)

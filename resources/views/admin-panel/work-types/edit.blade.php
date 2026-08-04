@@ -2,24 +2,24 @@
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800">Edit Account Manager</h1>
-                <p class="text-slate-500 mt-1">Edit: <span class="font-semibold text-slate-700">{{ $accountManager->name }}</span></p>
+                <h1 class="text-3xl font-bold text-slate-800">Edit Work Type</h1>
+                <p class="text-slate-500 mt-1">Edit: <span class="font-semibold text-slate-700">{{ $workType->name }}</span></p>
             </div>
-            <a href="{{ route('account-managers.index') }}" 
+            <a href="{{ route('admin-panel.work-types.index') }}" 
                class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
                 ← Kembali
             </a>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full max-w-2xl">
-            <form action="{{ route('account-managers.update', $accountManager) }}" method="POST">
+            <form action="{{ route('admin-panel.work-types.update', $workType) }}" method="POST">
                 @csrf
                 @method('PUT')
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Account Manager <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" value="{{ old('name', $accountManager->name) }}" required
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Work Type <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" value="{{ old('name', $workType->name) }}" required
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -29,7 +29,7 @@
                     <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
                         Update
                     </button>
-                    <a href="{{ route('account-managers.index') }}" 
+                    <a href="{{ route('admin-panel.work-types.index') }}" 
                        class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
                         Batal
                     </a>

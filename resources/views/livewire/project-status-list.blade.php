@@ -40,18 +40,18 @@
     </div>
 
     {{-- Tabel Status --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200">
-                <thead class="bg-slate-50">
+            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nama</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Warna</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Default</th>
-                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Nama</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Warna</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Default</th>
+                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                     @forelse($statuses as $status)
                         <tr class="hover:bg-slate-50 transition" wire:key="status-{{ $status->id }}">
                             <td class="px-6 py-4 font-medium text-slate-800">{{ $status->name }}</td>
@@ -126,7 +126,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="px-6 py-4 border-t border-slate-200">
+        <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-600">
             {{ $statuses->links() }}
         </div>
     </div>

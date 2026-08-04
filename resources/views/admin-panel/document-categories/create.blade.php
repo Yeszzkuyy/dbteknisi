@@ -5,14 +5,14 @@
                 <h1 class="text-3xl font-bold text-slate-800">Tambah Kategori Dokumen</h1>
                 <p class="text-slate-500 mt-1">Buat kategori dokumen baru</p>
             </div>
-            <a href="{{ route('document-categories.index') }}" 
+            <a href="{{ route('admin-panel.document-categories.index') }}" 
                class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
                 ← Kembali
             </a>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full max-w-2xl">
-            <form action="{{ route('document-categories.store') }}" method="POST">
+            <form action="{{ route('admin-panel.document-categories.store') }}" method="POST">
                 @csrf
 
                 <div class="space-y-4">
@@ -29,7 +29,7 @@
                     <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
                         Simpan
                     </button>
-                    <a href="{{ route('document-categories.index') }}" 
+                    <a href="{{ route('admin-panel.document-categories.index') }}" 
                        class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
                         Batal
                     </a>

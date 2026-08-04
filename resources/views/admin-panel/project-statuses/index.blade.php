@@ -5,25 +5,25 @@
                 <h1 class="text-3xl font-bold text-slate-800">Project Status</h1>
                 <p class="text-slate-500 mt-1">Kelola status project</p>
             </div>
-            <a href="{{ route('project-statuses.create') }}" 
+            <a href="{{ route('admin-panel.project-statuses.create') }}" 
                class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
                 + Tambah Status
             </a>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                    <thead class="bg-slate-50 dark:bg-slate-700">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Nama Status</th>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Warna</th>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Default</th>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Dibuat Pada</th>
-                            <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Nama Status</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Warna</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Default</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Dibuat Pada</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                         @forelse($statuses as $status)
                             <tr class="hover:bg-slate-50 transition">
                                 <td class="px-6 py-4 font-medium text-slate-800">{{ $status->name }}</td>
@@ -42,9 +42,9 @@
                                 <td class="px-6 py-4 text-slate-600">{{ $status->created_at->format('d M Y H:i') }}</td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex justify-end gap-3">
-                                        <a href="{{ route('project-statuses.edit', $status) }}" 
+                                        <a href="{{ route('admin-panel.project-statuses.edit', $status) }}" 
                                            class="text-amber-600 hover:text-amber-800">Edit</a>
-                                        <form action="{{ route('project-statuses.destroy', $status) }}" 
+                                        <form action="{{ route('admin-panel.project-statuses.destroy', $status) }}" 
                                               method="POST" 
                                               onsubmit="return confirm('Hapus status ini?')"
                                               class="inline">

@@ -12,21 +12,21 @@
         </div>
 
         {{-- Customer Trash --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
-            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                <h2 class="text-lg font-bold text-slate-800">Customer Terhapus</h2>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead class="bg-slate-50">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Nama Customer</th>
-                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Email</th>
-                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Dihapus Pada</th>
-                            <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden mb-6">
+    <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700">
+        <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200">Customer Terhapus</h2>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead class="bg-slate-50 dark:bg-slate-700">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Nama Customer</th>
+                    <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Email</th>
+                    <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Dihapus Pada</th>
+                    <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                         @forelse($customers as $customer)
                             <tr class="hover:bg-slate-50 transition">
                                 <td class="px-6 py-4 font-semibold text-slate-800">{{ $customer->name }}</td>
@@ -59,21 +59,21 @@
         </div>
 
         {{-- Project Trash --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-                <h2 class="text-lg font-bold text-slate-800">Project Terhapus</h2>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200">Project Terhapus</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full">
-                    <thead class="bg-slate-50">
+                    <thead class="bg-slate-50 dark:bg-slate-700">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Nama Project</th>
-                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Customer</th>
-                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Dihapus Pada</th>
-                            <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500">Aksi</th>
+                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Nama Project</th>
+                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Customer</th>
+                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Dihapus Pada</th>
+                            <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                         @forelse($projects as $project)
                             <tr class="hover:bg-slate-50 transition">
                                 <td class="px-6 py-4 font-semibold text-slate-800">{{ $project->project_name }}</td>

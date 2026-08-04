@@ -2,10 +2,10 @@
     $currentRoute = request()->route()->getName();
 @endphp
 
-<aside class="w-full h-full bg-white flex flex-col overflow-y-auto">
+<aside class="w-full h-full bg-[var(--sidebar-bg)] flex flex-col">
     {{-- Logo --}}
-    <div class="p-4 border-b border-slate-200 flex-shrink-0">
-        <h1 class="text-xl font-bold text-blue-600">Web App Engineer</h1>
+    <div class="p-4 border-b border-[var(--sidebar-border)] flex-shrink-0">
+        <h1 class="text-xl font-bold text-blue-600">Tridaya App</h1>
         <p class="text-xs text-slate-400 mt-0.5">3DY Group</p>
     </div>
 
@@ -36,12 +36,47 @@
             <span>Customer</span>
         </a>
 
-        <!-- Project -->
-        <a href="{{ route('projects.index') }}"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-            <x-icon name="folder" class="w-5 h-5" />
-            <span>Project</span>
-        </a>
+        {{-- Teknisi --}}
+        @can('view-teknisi')
+            <div x-data="{ open: false }">
+                <button @click="open = !open"
+                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                    <x-icon name="tools" class="w-5 h-5" />
+                    <span>Teknisi</span>
+                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div x-show="open" class="mt-1 ml-4 space-y-1">
+                    <a href="{{ route('projects.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                        Project
+                    </a>
+                </div>
+            </div>
+        @endcan
+
+        {{-- Marketing --}}
+        @can('view-marketing')
+            <div x-data="{ open: false }">
+                <button @click="open = !open"
+                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('leads*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                    <x-icon name="chart-bar" class="w-5 h-5" />
+                    <span>Marketing</span>
+                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div x-show="open" class="mt-1 ml-4 space-y-1">
+                    <a href="{{ route('leads.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('leads*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        Lead / Opportunity
+                    </a>
+                </div>
+            </div>
+        @endcan
 
         @can('view-sales')
             <div x-data="{ open: false }">
@@ -64,62 +99,10 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
                         Follow Up
                     </a>
-                </div>
-            </div>
-        @endcan
-
-        <!-- Activity -->
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50">
-            <x-icon name="activity" class="w-5 h-5" />
-            <span>Activity</span>
-        </a>
-
-        <!-- Reports -->
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50">
-            <x-icon name="chart-bar" class="w-5 h-5" />
-            <span>Reports</span>
-        </a>
-
-        <!-- Settings - Hanya Super Admin & Admin -->
-        @can('view-admin')
-            <div x-data="{ open: false }">
-                <button @click="open = !open" 
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50">
-                    <x-icon name="settings" class="w-5 h-5" />
-                    <span>Settings</span>
-                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" class="mt-1 ml-4 space-y-1">
-                    @can('manage-admin')
-                        <a href="{{ route('users.index') }}" 
-                           class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                            User Management
-                        </a>
-                    @endcan
-                    <a href="{{ route('account-managers.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Account Manager
-                    </a>
-                    <a href="{{ route('work-types.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Work Type
-                    </a>
-                    <a href="{{ route('document-categories.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Document Category
-                    </a>
-                    <a href="{{ route('project-statuses.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Project Status
+                    <a href="{{ route('projects.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                        Project
                     </a>
                 </div>
             </div>
@@ -156,6 +139,20 @@
             </div>
         @endcan
 
+        <!-- Activity -->
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50">
+            <x-icon name="activity" class="w-5 h-5" />
+            <span>Activity</span>
+        </a>
+
+        <!-- Reports -->
+        <a href="#"
+           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50">
+            <x-icon name="chart-bar" class="w-5 h-5" />
+            <span>Reports</span>
+        </a>
+
         <!-- Trash -->
         @can('view-admin')
             <a href="{{ route('trash.index') }}"
@@ -167,19 +164,56 @@
 
         {{-- Admin Panel (Super Admin only) --}}
         @can('manage-monitoring')
-            <a href="{{ route('admin-panel.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin-panel*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <span>Admin Panel</span>
-            </a>
+            <div x-data="{ open: false }">
+                <button @click="open = !open"
+                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin-panel*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span>Admin Panel</span>
+                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div x-show="open" class="mt-1 ml-4 space-y-1">
+                    <a href="{{ route('admin-panel.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.index') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                        User Management
+                    </a>
+                    <a href="{{ route('admin-panel.account-managers.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.account-managers.*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                        Account Manager
+                    </a>
+                    <a href="{{ route('admin-panel.work-types.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.work-types.*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                        Work Type
+                    </a>
+                    <a href="{{ route('admin-panel.document-categories.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.document-categories.*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                        Document Category
+                    </a>
+                    <a href="{{ route('admin-panel.project-statuses.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.project-statuses.*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                        Project Status
+                    </a>
+                    <a href="{{ route('admin-panel.audit-log') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.audit-log') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                        Audit Log
+                    </a>
+                </div>
+            </div>
         @endcan
     </nav>
 
     {{-- Logout --}}
-    <div class="p-3 border-t border-slate-200 flex-shrink-0">
+    <div class="p-3 border-t border-[var(--sidebar-border)] flex-shrink-0">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" 

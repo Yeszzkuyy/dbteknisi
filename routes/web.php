@@ -94,7 +94,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/projects/{project}/tasks', [ProjectTaskController::class, 'store'])->name('project-tasks.store');
         Route::delete('/project-tasks/{projectTask}', [ProjectTaskController::class, 'destroy'])->name('project-tasks.destroy');
 
-        Route::get('/projects/{project}/documents/create', [ProjectDocumentController::class, 'create'])->name('project-documents.create');
         Route::post('/projects/{project}/documents', [ProjectDocumentController::class, 'store'])->name('project-documents.store');
         Route::delete('/project-documents/{document}', [ProjectDocumentController::class, 'destroy'])->name('project-documents.destroy');
         Route::get('/project-documents/{document}/preview', [ProjectDocumentController::class, 'preview'])->name('project-documents.preview');
@@ -181,7 +180,26 @@ Route::middleware('auth')->group(function () {
     // ============================================
     // ADMIN PANEL — Super Admin only (settings, config)
     // ============================================
-    Route::middleware('permission:manage-monitoring')->group(function () {
+    Route::middleware('permission:manage-monitoring')->prefix('admin-panel')->name('admin-panel.')->group(function () {
+        Route::get('/', [AdminPanelController::class, 'index'])->name('index');
+        
+        // Users
+        Route::get('/users/create', [AdminPanelController::class, 'createUser'])->name('users.create');
+        Route::post('/users', [AdminPanelController::class, 'storeUser'])->name('users.store');
+        Route::get('/users/{user}/edit', [AdminPanelController::class, 'editUser'])->name('users.edit');
+        Route::put('/users/{user}', [AdminPanelController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{user}', [AdminPanelController::class, 'destroyUser'])->name('users.destroy');
+        
+        // Roles
+        Route::get('/roles/create', [AdminPanelController::class, 'createRole'])->name('roles.create');
+        Route::post('/roles', [AdminPanelController::class, 'storeRole'])->name('roles.store');
+        Route::get('/roles/{role}/edit', [AdminPanelController::class, 'editRole'])->name('roles.edit');
+        Route::put('/roles/{role}', [AdminPanelController::class, 'updateRole'])->name('roles.update');
+        Route::delete('/roles/{role}', [AdminPanelController::class, 'destroyRole'])->name('roles.destroy');
+        
+        // Audit Log
+        Route::get('/audit-log', [AdminPanelController::class, 'auditLog'])->name('audit-log');
+
         // Account Manager
         Route::get('/account-managers', [AccountManagerController::class, 'index'])->name('account-managers.index');
         Route::resource('account-managers', AccountManagerController::class)->except(['index']);
@@ -206,27 +224,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/project-statuses/{projectStatus}/edit', [ProjectStatusController::class, 'edit'])->name('project-statuses.edit');
         Route::put('/project-statuses/{projectStatus}', [ProjectStatusController::class, 'update'])->name('project-statuses.update');
         Route::delete('/project-statuses/{projectStatus}', [ProjectStatusController::class, 'destroy'])->name('project-statuses.destroy');
-    });
-
-    Route::middleware('permission:manage-monitoring')->prefix('admin-panel')->name('admin-panel.')->group(function () {
-        Route::get('/', [AdminPanelController::class, 'index'])->name('index');
-        
-        // Users
-        Route::get('/users/create', [AdminPanelController::class, 'createUser'])->name('users.create');
-        Route::post('/users', [AdminPanelController::class, 'storeUser'])->name('users.store');
-        Route::get('/users/{user}/edit', [AdminPanelController::class, 'editUser'])->name('users.edit');
-        Route::put('/users/{user}', [AdminPanelController::class, 'updateUser'])->name('users.update');
-        Route::delete('/users/{user}', [AdminPanelController::class, 'destroyUser'])->name('users.destroy');
-        
-        // Roles
-        Route::get('/roles/create', [AdminPanelController::class, 'createRole'])->name('roles.create');
-        Route::post('/roles', [AdminPanelController::class, 'storeRole'])->name('roles.store');
-        Route::get('/roles/{role}/edit', [AdminPanelController::class, 'editRole'])->name('roles.edit');
-        Route::put('/roles/{role}', [AdminPanelController::class, 'updateRole'])->name('roles.update');
-        Route::delete('/roles/{role}', [AdminPanelController::class, 'destroyRole'])->name('roles.destroy');
-        
-        // Audit Log
-        Route::get('/audit-log', [AdminPanelController::class, 'auditLog'])->name('audit-log');
     });
 });
 require __DIR__.'/auth.php';

@@ -10,12 +10,12 @@ class ProjectStatusController extends Controller
     public function index()
     {
         $statuses = ProjectStatus::latest()->get();
-        return view('settings.project-statuses.index', compact('statuses'));
+        return view('admin-panel.project-statuses.index', compact('statuses'));
     }
 
     public function create()
     {
-        return view('settings.project-statuses.create');
+        return view('admin-panel.project-statuses.create');
     }
 
     public function store(Request $request)
@@ -29,13 +29,13 @@ class ProjectStatusController extends Controller
         ProjectStatus::create($validated);
 
         return redirect()
-            ->route('project-statuses.index')
+            ->route('admin-panel.project-statuses.index')
             ->with('success', 'Project Status berhasil ditambahkan.');
     }
 
     public function edit(ProjectStatus $projectStatus)
     {
-        return view('settings.project-statuses.edit', compact('projectStatus'));
+        return view('admin-panel.project-statuses.edit', compact('projectStatus'));
     }
 
     public function update(Request $request, ProjectStatus $projectStatus)
@@ -49,7 +49,7 @@ class ProjectStatusController extends Controller
         $projectStatus->update($validated);
 
         return redirect()
-            ->route('project-statuses.index')
+            ->route('admin-panel.project-statuses.index')
             ->with('success', 'Project Status berhasil diupdate.');
     }
 
@@ -57,7 +57,7 @@ class ProjectStatusController extends Controller
     {
         $projectStatus->delete();
         return redirect()
-            ->route('project-statuses.index')
+            ->route('admin-panel.project-statuses.index')
             ->with('success', 'Project Status berhasil dihapus.');
     }
 }

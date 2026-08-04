@@ -37,20 +37,20 @@
     </div>
 
     {{-- Table --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200">
-                <thead class="bg-slate-50">
+            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase">Deskripsi</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase">Terkait Meeting</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase">Tanggal Follow Up</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase">Oleh</th>
-                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 uppercase">Aksi</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Customer</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Deskripsi</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Terkait Meeting</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Tanggal Follow Up</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Oleh</th>
+                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                     @forelse($followUps as $fu)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4 font-semibold text-slate-800">{{ $fu->customer->name }}</td>

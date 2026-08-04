@@ -5,14 +5,14 @@
                 <h1 class="text-3xl font-bold text-slate-800">Edit Project Status</h1>
                 <p class="text-slate-500 mt-1">Edit: <span class="font-semibold text-slate-700">{{ $projectStatus->name }}</span></p>
             </div>
-            <a href="{{ route('project-statuses.index') }}" 
+            <a href="{{ route('admin-panel.project-statuses.index') }}" 
                class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
                 ← Kembali
             </a>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full max-w-2xl">
-            <form action="{{ route('project-statuses.update', $projectStatus) }}" method="POST">
+            <form action="{{ route('admin-panel.project-statuses.update', $projectStatus) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -47,7 +47,7 @@
                     <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
                         Update
                     </button>
-                    <a href="{{ route('project-statuses.index') }}" 
+                    <a href="{{ route('admin-panel.project-statuses.index') }}" 
                        class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
                         Batal
                     </a>

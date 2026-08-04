@@ -1,45 +1,40 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-slate-800 leading-tight">
-            Detail Lead: {{ $lead->customer->name }}
-        </h2>
-    </x-slot>
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">Detail Lead: {{ $lead->customer->name }}</h1>
+            <p class="text-slate-500 mt-1">Informasi lengkap lead / opportunity</p>
+        </div>
+        <div class="flex gap-3">
+            @can('manage-marketing')
+                @if(!in_array($lead->status, ['won', 'lost']))
+                    <button type="button"
+                            onclick="openConvertModal()"
+                            class="px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition">
+                        Konversi ke Project
+                    </button>
+                @endif
+                <a href="{{ route('leads.edit', $lead) }}"
+                   class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                    Edit
+                </a>
+                <form action="{{ route('leads.destroy', $lead) }}" method="POST" class="inline">
+                    @csrf @method('DELETE')
+                    <button type="submit"
+                            onclick="return confirm('Hapus lead ini?')"
+                            class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">
+                        Hapus
+                    </button>
+                </form>
+            @endcan
+            <a href="{{ route('leads.index') }}"
+               class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium transition">
+                Kembali
+            </a>
+        </div>
+    </div>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-medium text-slate-900">Informasi Lead</h3>
-                    <div class="flex gap-3">
-                        @can('manage-marketing')
-                            @if(!in_array($lead->status, ['won', 'lost']))
-                                <button type="button"
-                                        onclick="openConvertModal()"
-                                        class="px-4 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 font-medium transition">
-                                    Konversi ke Project
-                                </button>
-                            @endif
-                            <a href="{{ route('leads.edit', $lead) }}"
-                               class="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 font-medium transition">
-                                Edit
-                            </a>
-                            <form action="{{ route('leads.destroy', $lead) }}" method="POST" class="inline">
-                                @csrf @method('DELETE')
-                                <button type="submit"
-                                        onclick="return confirm('Hapus lead ini?')"
-                                        class="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 font-medium transition">
-                                    Hapus
-                                </button>
-                            </form>
-                        @endcan
-                        <a href="{{ route('leads.index') }}"
-                           class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium transition">
-                            Kembali
-                        </a>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="text-sm font-medium text-slate-500">Customer</label>
                         <p class="mt-1 text-slate-900">{{ $lead->customer->name }}</p>
@@ -151,8 +146,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 </x-app-layout>
 
 @can('manage-marketing')

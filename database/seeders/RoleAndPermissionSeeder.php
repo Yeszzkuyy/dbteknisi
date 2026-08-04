@@ -82,8 +82,15 @@ class RoleAndPermissionSeeder extends Seeder
 
             if (in_array($oldRole, ['teknisi', 'engineer'])) {
                 $user->assignRole('teknisi');
+            } elseif ($oldRole === 'admin') {
+                $user->assignRole('admin');
+            } elseif ($oldRole === 'sales') {
+                $user->assignRole('sales');
+            } elseif ($oldRole === 'marketing') {
+                $user->assignRole('marketing');
+            } elseif ($oldRole === 'manager') {
+                $user->assignRole('manager');
             }
-            // User dengan role 'guest' atau lainnya tidak mendapat role apa pun
         }
 
         // === 4. Buat 1 akun Super Admin baru (placeholder) ===

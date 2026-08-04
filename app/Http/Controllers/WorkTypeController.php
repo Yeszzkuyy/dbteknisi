@@ -10,12 +10,12 @@ class WorkTypeController extends Controller
     public function index()
     {
         $workTypes = WorkType::latest()->get();
-        return view('settings.work-types.index', compact('workTypes'));
+        return view('admin-panel.work-types.index', compact('workTypes'));
     }
 
     public function create()
     {
-        return view('settings.work-types.create');
+        return view('admin-panel.work-types.create');
     }
 
     public function store(Request $request)
@@ -27,13 +27,13 @@ class WorkTypeController extends Controller
         WorkType::create($validated);
 
         return redirect()
-            ->route('work-types.index')
+            ->route('admin-panel.work-types.index')
             ->with('success', 'Work Type berhasil ditambahkan.');
     }
 
     public function edit(WorkType $workType)
     {
-        return view('settings.work-types.edit', compact('workType'));
+        return view('admin-panel.work-types.edit', compact('workType'));
     }
 
     public function update(Request $request, WorkType $workType)
@@ -45,7 +45,7 @@ class WorkTypeController extends Controller
         $workType->update($validated);
 
         return redirect()
-            ->route('work-types.index')
+            ->route('admin-panel.work-types.index')
             ->with('success', 'Work Type berhasil diupdate.');
     }
 
@@ -53,7 +53,7 @@ class WorkTypeController extends Controller
     {
         $workType->delete();
         return redirect()
-            ->route('work-types.index')
+            ->route('admin-panel.work-types.index')
             ->with('success', 'Work Type berhasil dihapus.');
     }
 }

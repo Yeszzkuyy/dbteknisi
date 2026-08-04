@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Forgot Password - {{ config('app.name', 'Web App Engineer') }}</title>
+    <title>Forgot Password - {{ config('app.name', 'Tridaya App') }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
@@ -149,7 +149,7 @@
                             class="accent-btn w-14 h-14 rounded-xl flex items-center justify-center text-xl font-bold"
                         >W</div>
                     </div>
-                    <h1 class="text-2xl font-bold">{{ config('app.name', 'Web App Engineer') }}</h1>
+                    <h1 class="text-2xl font-bold">{{ config('app.name', 'Tridaya App') }}</h1>
                     <p class="text-sm text-white/60 mt-1">Internal Engineer Management System</p>
                 </div>
 
@@ -202,7 +202,7 @@
             </div>
 
             <p class="text-center text-xs text-white/35 mt-6">
-                &copy; {{ date('Y') }} {{ config('app.name', 'Web App Engineer') }}. All rights reserved.
+                &copy; {{ date('Y') }} {{ config('app.name', 'Tridaya App') }}. All rights reserved.
             </p>
         </div>
     </div>

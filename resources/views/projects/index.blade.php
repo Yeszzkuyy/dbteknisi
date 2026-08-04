@@ -33,21 +33,21 @@
     </div>
 
     {{-- Tabel --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full">
-                <thead class="bg-slate-50">
+                <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Project</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Customer</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Jenis Pekerjaan</th>
+                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Project</th>
+                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Customer</th>
+                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Jenis Pekerjaan</th>
                         {{-- <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">PIC Engineer</th> --}}
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Status</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">Progress</th>
-                        <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500">Aksi</th>
+                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Status</th>
+                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Progress</th>
+                        <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                     @forelse($projects as $project)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4 font-semibold text-slate-800">{{ $project->project_name }}</td>

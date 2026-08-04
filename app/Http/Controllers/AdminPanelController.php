@@ -19,12 +19,8 @@ class AdminPanelController extends Controller
     public function index()
     {
         $users = User::with('roles')->paginate(15);
-        $roles = Role::with('permissions')->get();
         
-        // Sample audit log data since we don't have the model yet
-        $auditLogs = collect([]);
-        
-        return view('admin-panel.index', compact('users', 'roles', 'auditLogs'));
+        return view('admin-panel.index', compact('users'));
     }
 
     // ========== USER MANAGEMENT ==========
@@ -182,7 +178,7 @@ class AdminPanelController extends Controller
     
     public function auditLog()
     {
-        // Placeholder for audit log - would need AuditLog model
-        return view('admin-panel.audit-log');
+        $logs = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
+        return view('admin-panel.audit-log', compact('logs'));
     }
 }
