@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectActivity;
 use App\Models\ProjectDocument;
+use App\Enums\ProjectStatus;
 use App\Models\User;
 
 class DashboardController extends Controller
@@ -25,7 +26,7 @@ class DashboardController extends Controller
         $totalProjects = Project::count();
 
         // Project Aktif (Open + Progress)
-        $activeProjects = Project::whereIn('status', ['Open', 'Progress'])->count();
+        $activeProjects = Project::whereIn('status', [ProjectStatus::Open->value, ProjectStatus::OnProgress->value])->count();
 
         // Aktivitas Terbaru
         $activities = ProjectActivity::with(['project', 'user'])

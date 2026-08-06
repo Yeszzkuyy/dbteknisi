@@ -11,6 +11,7 @@ use App\Models\Invoice;
 use App\Models\PurchaseOrder;
 use App\Models\Payment;
 use App\Models\ProjectDocument;
+use App\Enums\ProjectStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -73,7 +74,7 @@ class MonitoringController extends Controller
         $invoiceOutstanding = $invoiceQuery->sum('amount');
 
         // Instalasi Proses (Teknisi) - projects with status Open/Progress
-        $instalasiProsesQuery = Project::whereIn('status', ['Open', 'Progress']);
+        $instalasiProsesQuery = Project::whereIn('status', [ProjectStatus::Open->value, ProjectStatus::OnProgress->value]);
         if ($request->filled('date_from')) {
             $instalasiProsesQuery->whereDate('start_date', '>=', $request->date_from);
         }
@@ -291,7 +292,7 @@ class MonitoringController extends Controller
         return [
             'marketing' => ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'],
             'sales' => ['meeting', 'followup'],
-            'teknisi' => ['Open', 'Progress', 'Done', 'Hold', 'Cancel', 'Maintenance'],
+            'teknisi' => array_map(fn ($case) => $case->value, ProjectStatus::cases()),
             'admin' => ['unpaid', 'paid', 'cancelled', 'draft', 'diproses', 'selesai', 'dibatalkan'],
         ];
     }

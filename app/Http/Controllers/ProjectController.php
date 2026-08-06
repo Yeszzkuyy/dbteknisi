@@ -9,6 +9,7 @@ use App\Models\WorkType;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\Project\ProjectService;
+use App\Enums\ProjectStatus;
 
 class ProjectController extends Controller
 {
@@ -23,7 +24,7 @@ class ProjectController extends Controller
     {
         // Ambil project dengan status Open atau Progress
         $projects = Project::with(['customer', 'workType']) // ← HAPUS picEngineer
-            ->whereIn('status', ['Open', 'Progress'])
+            ->whereIn('status', [ProjectStatus::Open->value, ProjectStatus::OnProgress->value])
             ->latest()
             ->get();
 
@@ -31,7 +32,7 @@ class ProjectController extends Controller
         $totalProjects = Project::count();
 
         // Total project aktif
-        $activeProjects = Project::whereIn('status', ['Open', 'Progress'])->count();
+        $activeProjects = Project::whereIn('status', [ProjectStatus::Open->value, ProjectStatus::OnProgress->value])->count();
 
         return view('projects.index', compact('projects', 'totalProjects', 'activeProjects'));
     }
@@ -59,7 +60,8 @@ class ProjectController extends Controller
             'name' => 'required|string|max:255',
             'work_type_id' => 'required|exists:work_types,id',
             'account_manager_id' => 'nullable|exists:account_managers,id',
-            'pic_engineer_id' => 'nullable|exists:users,id',
+            'pic_engineer' => 'required|string|max:255',
+            'support_technicians' => 'nullable|string|max:500',
             'description' => 'nullable|string',
         ]);
 
