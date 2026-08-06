@@ -55,9 +55,9 @@
                             <td class="px-6 py-4 text-slate-600">{{ $project->workType?->name ?? '-' }}</td>
                             {{-- <td class="px-6 py-4 text-slate-600">{{ $project->pic_engineer ?? '-' }}</td> --}}
                             <td class="px-6 py-4">
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $project->status ? $project->status->badgeClasses() : 'bg-slate-100 text-slate-600' }}">
-                                    {{ $project->status?->name ?? 'Open' }}
-                                </span>
+                                <x-status-badge :color="$project->status?->color ?? 'slate'">
+                                    {{ $project->status?->name ?? 'Belum Memulai' }}
+                                </x-status-badge>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">

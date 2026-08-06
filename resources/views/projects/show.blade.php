@@ -21,7 +21,7 @@
             <div><p class="text-xs text-slate-400">Nama Project</p><p class="font-medium">{{ $project->project_name }}</p></div>
             <div><p class="text-xs text-slate-400">Customer</p><p class="font-medium">{{ $project->customer?->name ?? '-' }}</p></div>
             <div><p class="text-xs text-slate-400">Jenis Pekerjaan</p><p class="font-medium">{{ $project->workType?->name ?? '-' }}</p></div>
-            <div><p class="text-xs text-slate-400">Status</p><span class="px-3 py-1 text-xs font-semibold rounded-full {{ $project->status ? $project->status->badgeClasses() : 'bg-slate-100 text-slate-600' }}">{{ $project->status?->name ?? 'Open' }}</span></div>
+            <div><p class="text-xs text-slate-400">Status</p><x-status-badge :color="$project->status?->color ?? 'slate'">{{ $project->status?->name ?? 'Belum Memulai' }}</x-status-badge></div>
             <div><p class="text-xs text-slate-400">Account Manager</p><p class="font-medium">{{ $project->accountManager?->name ?? '-' }}</p></div>
             <div>
                 <p class="text-xs text-slate-400">PIC Engineer</p>

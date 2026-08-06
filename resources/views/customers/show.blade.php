@@ -205,17 +205,9 @@
 
                                         {{-- Status --}}
                                         <td class="px-6 py-3">
-                                            @php
-                                                $projectStatusColor = match($project->status?->name) {
-                                                    'Open' => 'green',
-                                                    'On Progress', 'Pending' => 'yellow',
-                                                    'Hold' => 'orange',
-                                                    'Done' => 'green',
-                                                    'Cancelled' => 'slate',
-                                                    default => 'slate',
-                                                };
-                                            @endphp
-                                            <x-status-badge :color="$projectStatusColor">{{ $project->status?->name ?? 'Open' }}</x-status-badge>
+                                            <x-status-badge :color="$project->status?->color ?? 'slate'">
+                                                {{ $project->status?->name ?? 'Belum Memulai' }}
+                                            </x-status-badge>
                                         </td>
 
                                         {{-- Progress --}}
