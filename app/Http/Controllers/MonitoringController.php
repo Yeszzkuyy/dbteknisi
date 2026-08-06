@@ -74,7 +74,10 @@ class MonitoringController extends Controller
         $invoiceOutstanding = $invoiceQuery->sum('amount');
 
         // Instalasi Proses (Teknisi) - projects with status Open/Progress
-        $instalasiProsesQuery = Project::whereIn('status', [ProjectStatus::Open->value, ProjectStatus::OnProgress->value]);
+        $instalasiProsesQuery = Project::whereHas('status', fn ($q) => $q->whereIn('name', [
+            ProjectStatus::Open->value,
+            ProjectStatus::OnProgress->value,
+        ]));
         if ($request->filled('date_from')) {
             $instalasiProsesQuery->whereDate('start_date', '>=', $request->date_from);
         }
@@ -193,14 +196,7 @@ class MonitoringController extends Controller
 
         $projects = $customer->projects;
         foreach ($projects as $project) {
-            $statusName = 'Belum Memulai';
-            if ($project->status) {
-                if (is_object($project->status) && isset($project->status->name)) {
-                    $statusName = $project->status->name;
-                } elseif (is_string($project->status)) {
-                    $statusName = $project->status;
-                }
-            }
+            $statusName = $project->status?->name ?? 'Belum Memulai';
             $activities->push([
                 'type' => 'project',
                 'label' => 'Project: ' . $statusName,
@@ -248,11 +244,7 @@ class MonitoringController extends Controller
         $projects = $customer->projects;
         if ($projects->isNotEmpty()) {
             $latestProject = $projects->sortByDesc('start_date')->first();
-            $status = $latestProject->status;
-            if (is_object($status) && isset($status->name)) {
-                return $status->name;
-            }
-            return $status ?? 'Belum Memulai';
+            return $latestProject->status?->name ?? 'Belum Memulai';
         }
 
         $invoices = $customer->invoices;
@@ -292,7 +284,7 @@ class MonitoringController extends Controller
         return [
             'marketing' => ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'],
             'sales' => ['meeting', 'followup'],
-            'teknisi' => array_map(fn ($case) => $case->value, ProjectStatus::cases()),
+            'teknisi' => \App\Models\ProjectStatus::orderBy('sort_order')->pluck('name')->all(),
             'admin' => ['unpaid', 'paid', 'cancelled', 'draft', 'diproses', 'selesai', 'dibatalkan'],
         ];
     }

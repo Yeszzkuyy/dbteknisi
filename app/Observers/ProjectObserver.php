@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Project;
 use App\Models\ProjectActivity;
+use App\Models\ProjectStatus;
 use Illuminate\Support\Facades\Auth;
 
 class ProjectObserver
@@ -21,18 +22,18 @@ class ProjectObserver
 
     public function updated(Project $project): void
     {
-        if (! $project->wasChanged('status')) {
+        if (! $project->wasChanged('project_status_id')) {
             return;
         }
 
-        $oldStatus = $project->getOriginal('status');
+        $oldStatus = ProjectStatus::find($project->getOriginal('project_status_id'))?->name;
 
         ProjectActivity::create([
             'project_id'    => $project->id,
             'user_id'       => Auth::id(),
             'activity_date' => now(),
             'title'         => 'Status Diubah',
-            'description'   => "Status project diubah dari {$oldStatus->value} menjadi {$project->status->value}",
+            'description'   => "Status project diubah dari {$oldStatus} menjadi {$project->status?->name}",
         ]);
     }
 
