@@ -9,13 +9,21 @@
             </svg>
         </button>
 
+        {{-- LOGO --}}
+        <a href="{{ route('dashboard') }}" class="flex-shrink-0">
+            <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
+                 class="h-9 sm:h-11 w-auto object-contain bg-white rounded-lg p-0.5 dark:hidden">
+            <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
+                 class="h-9 sm:h-11 w-auto object-contain bg-white rounded-lg p-0.5 hidden dark:block">
+        </a>
+
         {{-- TITLE --}}
         <div>
             <h1 class="text-lg sm:text-xl font-bold text-slate-800">
                 {{ $pageTitle ?? 'Tridaya App' }}
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 hidden sm:block">
-                Internal Engineer Management • 3DY Group
+                Full Visibility. Zero Guesswork • 3DY Group
             </p>
         </div>
     </div>

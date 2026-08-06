@@ -5,8 +5,16 @@
 <aside class="w-full h-full bg-[var(--sidebar-bg)] flex flex-col">
     {{-- Logo --}}
     <div class="p-4 border-b border-[var(--sidebar-border)] flex-shrink-0">
-        <h1 class="text-xl font-bold text-blue-600">Tridaya App</h1>
-        <p class="text-xs text-slate-400 mt-0.5">3DY Group</p>
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+            <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
+                 class="h-10 w-auto object-contain bg-white rounded-lg p-0.5 dark:hidden">
+            <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
+                 class="h-10 w-auto object-contain bg-white rounded-lg p-0.5 hidden dark:block">
+            <div class="min-w-0">
+                <h1 class="text-xl font-bold text-blue-600 truncate">Tridaya App</h1>
+                <p class="text-xs text-slate-400 mt-0.5">3DY Group</p>
+            </div>
+        </a>
     </div>
 
     {{-- Menu --}}

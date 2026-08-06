@@ -184,9 +184,9 @@
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-4 py-3">
                                 <div>
-                                    <p class="font-medium text-slate-900">{{ $customer->name }}</p>
+                                    <p class="font-medium text-slate-900 dark:text-slate-100">{{ $customer->name }}</p>
                                     @if($customer->company)
-                                        <p class="text-xs text-slate-500">{{ $customer->company }}</p>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400">{{ $customer->company }}</p>
                                     @endif
                                 </div>
                             </td>

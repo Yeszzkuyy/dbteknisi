@@ -53,7 +53,7 @@
 
                                 <td class="px-6 py-4">
 
-                                    <div class="font-semibold text-slate-800">
+                                    <div class="font-semibold text-slate-800 dark:text-slate-100">
                                         {{ $customer->name }}
                                     </div>
 
@@ -67,7 +67,7 @@
 
                                     @if($customer->contacts->isNotEmpty())
 
-                                        <div class="font-medium">
+                                        <div class="font-medium dark:text-slate-100">
                                             {{ $customer->contacts->first()->name }}
                                         </div>
 

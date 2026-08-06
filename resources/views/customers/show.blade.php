@@ -4,7 +4,7 @@
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div class="min-w-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 truncate">
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100 truncate">
                     {{ $customer->name }}
                 </h1>
                 <p class="text-sm sm:text-base text-slate-500 mt-1 truncate">
@@ -95,30 +95,30 @@
                 <div x-show="tab === 'overview'" x-transition>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- Info Perusahaan --}}
-                        <div class="bg-slate-50 rounded-xl p-6">
+                        <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
                             <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Informasi Perusahaan</h3>
                             <div class="space-y-3">
                                 <div>
                                     <p class="text-xs text-slate-400">Nama</p>
-                                    <p class="font-medium text-slate-800">{{ $customer->name }}</p>
+                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->name }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Alamat</p>
-                                    <p class="font-medium text-slate-800">{{ $customer->address ?? '-' }}</p>
+                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->address ?? '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Telepon</p>
-                                    <p class="font-medium text-slate-800">{{ $customer->phone ?? '-' }}</p>
+                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->phone ?? '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Email</p>
-                                    <p class="font-medium text-slate-800">{{ $customer->email ?? '-' }}</p>
+                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->email ?? '-' }}</p>
                                 </div>
                             </div>
                         </div>
 
                         {{-- Statistik --}}
-                        <div class="bg-slate-50 rounded-xl p-6">
+                        <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
                             <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Statistik</h3>
                             <div class="grid grid-cols-2 gap-3 sm:gap-4">
                                 <div class="bg-white rounded-lg p-3 sm:p-4 text-center">
@@ -146,7 +146,7 @@
                     </div>
 
                     {{-- Recent Activity --}}
-                    <div class="mt-6 bg-slate-50 rounded-xl p-6">
+                    <div class="mt-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
                         <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Aktivitas Terbaru</h3>
                         @php
                             $activities = App\Models\ProjectActivity::whereIn('project_id', $customer->projects->pluck('id'))
@@ -163,7 +163,7 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-slate-800">
+                                    <p class="text-sm text-slate-800 dark:text-slate-100">
                                         <span class="font-semibold">{{ $activity->user?->name ?? 'System' }}</span>
                                         {{ $activity->title ?? 'Activity' }}
                                         <span class="text-xs text-slate-400">· {{ $activity->created_at->diffForHumans() }}</span>
@@ -178,80 +178,71 @@
                 </div>
 
                 {{-- TAB 2: PROJECTS --}}
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-                    <h3 class="text-base sm:text-lg font-bold text-slate-800">Daftar Project</h3>
-                    @can('manage-teknisi')
-                        <a href="{{ route('projects.create', ['customer_id' => $customer->id]) }}" 
-                           class="inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-md hover:bg-blue-700 w-full sm:w-auto">
-                            + Tambah Project
-                        </a>
-                    @endcan
-                </div>
-                
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                <div x-show="tab === 'projects'" x-transition>
+                    <x-section-header title="Daftar Project">
+                        @can('manage-teknisi')
+                            <x-add-button href="{{ route('projects.create', ['customer_id' => $customer->id]) }}">
+                                + Tambah Project
+                            </x-add-button>
+                        @endcan
+                    </x-section-header>
+
+                    @if($customer->projects->isNotEmpty())
+                        <x-data-table>
                             <thead class="bg-slate-50 dark:bg-slate-700">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Nama Project</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Status</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Progress</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Tanggal Dibuat</th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th>
+                                    <x-th>Nama Project</x-th>
+                                    <x-th>Status</x-th>
+                                    <x-th>Progress</x-th>
+                                    <x-th>Tanggal Dibuat</x-th>
+                                    <x-th class="text-right">Aksi</x-th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
-                                @forelse($customer->projects as $project)
-                                    <tr class="hover:bg-slate-50">
-                                        {{-- Nama Project --}}
-                                        <td class="px-4 py-3 font-medium text-slate-800">{{ $project->project_name }}</td>
-                                        
+                                @foreach($customer->projects as $project)
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+                                        <td class="px-6 py-3 font-medium text-slate-800 dark:text-slate-100">{{ $project->project_name }}</td>
+
                                         {{-- Status --}}
-                                        <td class="px-4 py-3">
-                                            <span class="px-3 py-1 text-xs font-semibold rounded-full 
-                                                @if($project->status == 'Open')
-                                                    bg-blue-100 text-blue-700
-                                                @elseif($project->status == 'Progress')
-                                                    bg-yellow-100 text-yellow-700
-                                                @elseif($project->status == 'Pending')
-                                                    bg-orange-100 text-orange-700
-                                                @elseif($project->status == 'Hold')
-                                                    bg-red-100 text-red-700
-                                                @elseif($project->status == 'Done' || $project->status == 'Selesai')
-                                                    bg-green-100 text-green-700
-                                                @elseif($project->status == 'Cancel')
-                                                    bg-gray-100 text-gray-700
-                                                @else
-                                                    bg-gray-100 text-gray-700
-                                                @endif
-                                            ">
-                                                {{ $project->status ?? 'Open' }}
-                                            </span>
+                                        <td class="px-6 py-3">
+                                            @php
+                                                $projectStatusColor = match($project->status) {
+                                                    'Open' => 'blue',
+                                                    'Progress' => 'yellow',
+                                                    'Pending' => 'orange',
+                                                    'Hold' => 'red',
+                                                    'Done', 'Selesai' => 'green',
+                                                    'Cancel' => 'slate',
+                                                    default => 'slate',
+                                                };
+                                            @endphp
+                                            <x-status-badge :color="$projectStatusColor">{{ $project->status ?? 'Open' }}</x-status-badge>
                                         </td>
-                                        
+
                                         {{-- Progress --}}
-                                        <td class="px-4 py-3">
+                                        <td class="px-6 py-3">
                                             <div class="flex items-center gap-2">
                                                 <div class="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
                                                     <div class="h-full bg-blue-600 rounded-full" style="width: {{ $project->progress ?? 0 }}%"></div>
                                                 </div>
-                                                <span class="text-xs text-slate-600">{{ $project->progress ?? 0 }}%</span>
+                                                <span class="text-xs text-slate-600 dark:text-slate-300">{{ $project->progress ?? 0 }}%</span>
                                             </div>
                                         </td>
-                                        
-                                        {{-- Tanggal Dibuat (ganti deadline) --}}
-                                        <td class="px-4 py-3 text-sm text-slate-600">{{ $project->created_at->format('d M Y') }}</td>
-                                        
+
+                                        {{-- Tanggal Dibuat --}}
+                                        <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300">{{ $project->created_at->format('d M Y') }}</td>
+
                                         {{-- Aksi --}}
-                                        <td class="px-4 py-3 text-right">
+                                        <td class="px-6 py-3 text-right">
                                             <div class="flex flex-wrap justify-end items-center gap-x-3 gap-y-1">
-                                                <a href="{{ route('projects.show', $project) }}" 
+                                                <a href="{{ route('projects.show', $project) }}"
                                                    class="text-blue-600 hover:text-blue-800 text-sm whitespace-nowrap">Detail</a>
                                                 @can('manage-teknisi')
-                                                    <a href="{{ route('projects.edit', $project) }}" 
+                                                    <a href="{{ route('projects.edit', $project) }}"
                                                        class="text-amber-600 hover:text-amber-800 text-sm whitespace-nowrap">Edit</a>
                                                 @endcan
                                                 @can('manage-teknisi')
-                                                    <form action="{{ route('projects.destroy', $project) }}" method="POST" 
+                                                    <form action="{{ route('projects.destroy', $project) }}" method="POST"
                                                           onsubmit="return confirm('Hapus project ini?')" class="inline-block m-0">
                                                         @csrf @method('DELETE')
                                                         <button class="text-red-600 hover:text-red-800 text-sm whitespace-nowrap">Hapus</button>
@@ -260,66 +251,62 @@
                                             </div>
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-4 py-8 text-center text-slate-400">Belum ada project untuk customer ini.</td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
-                        </table>
-                    </div>
+                        </x-data-table>
+                    @else
+                        <x-empty-state label="project" />
+                    @endif
                 </div>
 
                 {{-- TAB 3: CONTACTS --}}
                 <div x-show="tab === 'contacts'" x-transition>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Daftar PIC / Customer Contacts</h3>
+                    <x-section-header title="Daftar PIC / Customer Contacts">
                         @can('manage-sales')
-                            <a href="{{ route('customer-contacts.create', $customer) }}" 
-                               class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700">
+                            <x-add-button href="{{ route('customer-contacts.create', $customer) }}">
                                 + Tambah PIC
-                            </a>
+                            </x-add-button>
                         @endcan
-                    </div>
-                
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                    </x-section-header>
+
+                    @if($customer->contacts->isNotEmpty())
+                        <x-data-table>
                             <thead class="bg-slate-50 dark:bg-slate-700">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Nama</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Jabatan</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Phone & Email</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Status</th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th>
+                                    <x-th>Nama</x-th>
+                                    <x-th>Jabatan</x-th>
+                                    <x-th>Phone & Email</x-th>
+                                    <x-th>Status</x-th>
+                                    <x-th class="text-right">Aksi</x-th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
-                                @forelse($customer->contacts as $contact)
-                                    <tr class="{{ $contact->is_primary ? 'bg-indigo-50' : '' }}">
-                                        <td class="px-4 py-3 font-medium text-slate-800 align-middle">{{ $contact->name }}</td>
-                                        <td class="px-4 py-3 text-sm text-slate-600 align-middle">{{ $contact->position ?? '-' }}</td>
-                                        <td class="px-4 py-3 text-sm text-slate-600 align-middle">
+                                @foreach($customer->contacts as $contact)
+                                    <tr class="{{ $contact->is_primary ? 'bg-indigo-50 dark:bg-indigo-900/30' : '' }}">
+                                        <td class="px-6 py-3 font-medium text-slate-800 dark:text-slate-100 align-middle">{{ $contact->name }}</td>
+                                        <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300 align-middle">{{ $contact->position ?? '-' }}</td>
+                                        <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300 align-middle">
                                             {{ $contact->phone ?? '-' }} <br>
                                             <span class="text-xs text-slate-400">{{ $contact->email ?? '' }}</span>
                                         </td>
-                                        <td class="px-4 py-3 align-middle">
+                                        <td class="px-6 py-3 align-middle">
                                             @if($contact->is_primary)
-                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 font-bold">★ Primary PIC</span>
+                                                <x-status-badge color="green" icon="★">Primary PIC</x-status-badge>
                                             @endif
                                         </td>
-                                        <td class="px-4 py-3 text-right align-middle">
+                                        <td class="px-6 py-3 text-right align-middle">
                                             @can('manage-sales')
-                                                <a href="{{ route('customer-contacts.edit', $contact) }}" 
+                                                <a href="{{ route('customer-contacts.edit', $contact) }}"
                                                    class="text-amber-600 hover:text-amber-800 text-sm inline-block align-middle">Edit</a>
                                             @endcan
                                             @can('manage-sales')
-                                                <form action="{{ route('customer-contacts.destroy', $contact) }}" 
-                                                      method="POST" 
+                                                <form action="{{ route('customer-contacts.destroy', $contact) }}"
+                                                      method="POST"
                                                       onsubmit="return confirm('Hapus PIC ini?')"
                                                       class="inline-block align-middle ml-2">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" 
+                                                    <button type="submit"
                                                             class="text-red-600 hover:text-red-800 text-sm inline-block align-middle bg-transparent border-0 cursor-pointer p-0">
                                                         Hapus
                                                     </button>
@@ -327,36 +314,32 @@
                                             @endcan
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-4 py-8 text-center text-slate-400">Belum ada data PIC.</td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
-                        </table>
-                    </div>
+                        </x-data-table>
+                    @else
+                        <x-empty-state label="PIC" />
+                    @endif
                 </div>
                 
                 {{-- TAB 4: DOCUMENTS --}}
                 <div x-show="tab === 'documents'" x-transition>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Dokumen</h3>
+                    @php
+                        $firstProject = $customer->projects->first();
+                    @endphp
+                    <x-section-header title="Dokumen">
                         @can('manage-teknisi')
-                            @php
-                                $firstProject = $customer->projects->first();
-                            @endphp
                             @if($firstProject)
-                                <a href="{{ route('project-documents.index', $firstProject) }}" 
-                                   class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">
+                                <x-add-button href="{{ route('project-documents.index', $firstProject) }}">
                                     + Kelola Dokumen
-                                </a>
+                                </x-add-button>
                             @else
-                                <span class="px-4 py-2 bg-gray-300 text-white text-xs rounded-md cursor-not-allowed">
+                                <span class="inline-flex justify-center items-center px-4 py-2 bg-gray-300 text-white text-sm rounded-md cursor-not-allowed">
                                     Belum ada project
                                 </span>
                             @endif
                         @endcan
-                    </div>
+                    </x-section-header>
                     
                     @php
                         // Ambil semua project ID dari customer
@@ -369,20 +352,20 @@
                             ->latest()
                             ->get();
                     @endphp
-                
+
                     @if($documents->isNotEmpty())
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach($documents as $doc)
-                                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 hover:shadow-md transition">
+                                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 hover:shadow-md transition">
                                     <div class="flex items-start justify-between">
                                         <div class="flex-1 min-w-0">
                                             {{-- Icon --}}
                                             <div class="flex items-center gap-2 mb-1">
                                                 <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                 </svg>
-                                                <p class="font-medium text-slate-800 text-sm truncate">{{ $doc->file_name }}</p>
+                                                <p class="font-medium text-slate-800 dark:text-slate-100 text-sm truncate">{{ $doc->file_name }}</p>
                                             </div>
                                             <p class="text-xs text-slate-500">{{ $doc->project?->project_name ?? 'Project' }}</p>
                                             <p class="text-xs text-slate-400">{{ $doc->category?->name ?? 'Uncategorized' }}</p>
@@ -390,10 +373,10 @@
                                             <p class="text-xs text-slate-400">Upload: {{ $doc->uploader?->name ?? '-' }}</p>
                                         </div>
                                         <div class="flex gap-2 flex-shrink-0 ml-2">
-                                            <a href="{{ route('project-documents.preview', $doc) }}" 
+                                            <a href="{{ route('project-documents.preview', $doc) }}"
                                                target="_blank"
                                                class="text-indigo-600 hover:text-indigo-800 text-xs whitespace-nowrap">Preview</a>
-                                            <a href="{{ route('project-documents.download', $doc) }}" 
+                                            <a href="{{ route('project-documents.download', $doc) }}"
                                                class="text-blue-600 hover:text-blue-800 text-xs">Download</a>
                                         </div>
                                     </div>
@@ -401,32 +384,28 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-slate-400 text-center py-8">
-                            Belum ada dokumen. 
-                            @if($customer->projects->isNotEmpty())
-                                <a href="{{ route('project-documents.index', $customer->projects->first()) }}" 
-                                   class="text-blue-600 hover:text-blue-800">
+                        <x-empty-state label="dokumen" :description="$firstProject ? null : 'Buat project terlebih dahulu untuk upload dokumen.'">
+                            @if($firstProject)
+                                <a href="{{ route('project-documents.index', $firstProject) }}"
+                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                     Upload dokumen sekarang
                                 </a>
-                            @else
-                                Buat project terlebih dahulu untuk upload dokumen.
                             @endif
-                        </p>
+                        </x-empty-state>
                     @endif
                 </div>
 
                 {{-- TAB 5: MEETINGS --}}
                 @can('view-sales')
                 <div x-show="tab === 'meetings'" x-transition>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Daftar Meeting</h3>
+                    <x-section-header title="Daftar Meeting">
                         @can('manage-sales')
-                            <a href="{{ route('sales.meetings.create', ['customer_id' => $customer->id]) }}"
-                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">
+                            <x-add-button href="{{ route('sales.meetings.create', ['customer_id' => $customer->id]) }}">
                                 + Catat Meeting
-                            </a>
+                            </x-add-button>
                         @endcan
-                    </div>
+                    </x-section-header>
+
                     @php
                         $meetings = $customer->meetings()->with('creator')->latest('meeting_date')->get();
                     @endphp
@@ -435,19 +414,19 @@
                             <div class="border-b border-slate-100 py-4 last:border-0">
                                 <div class="flex items-start justify-between">
                                     <div>
-                                        <p class="font-semibold text-slate-800">{{ $meeting->meeting_date->format('d M Y') }}</p>
+                                        <p class="font-semibold text-slate-800 dark:text-slate-100">{{ $meeting->meeting_date->format('d M Y') }}</p>
                                         <p class="text-sm text-slate-500 mt-1">Peserta: {{ $meeting->participants ?? '-' }}</p>
                                     </div>
                                     <a href="{{ route('sales.meetings.show', $meeting) }}"
                                        class="text-blue-600 hover:text-blue-800 text-sm">Detail</a>
                                 </div>
                                 @if($meeting->user_needs)
-                                    <p class="text-sm text-slate-600 mt-2">
+                                    <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">
                                         <span class="font-medium">Kebutuhan:</span> {{ Str::limit($meeting->user_needs, 150) }}
                                     </p>
                                 @endif
                                 @if($meeting->user_complaints)
-                                    <p class="text-sm text-slate-600 mt-1">
+                                    <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">
                                         <span class="font-medium">Keluhan:</span> {{ Str::limit($meeting->user_complaints, 150) }}
                                     </p>
                                 @endif
@@ -455,28 +434,27 @@
                             </div>
                         @endforeach
                     @else
-                        <p class="text-slate-400 text-center py-8">Belum ada meeting.</p>
+                        <x-empty-state label="meeting" />
                     @endif
                 </div>
 
                 {{-- TAB 6: FOLLOW UPS --}}
                 <div x-show="tab === 'followups'" x-transition>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Follow Up</h3>
+                    <x-section-header title="Follow Up">
                         @can('manage-sales')
-                            <a href="{{ route('sales.follow-ups.create', ['customer_id' => $customer->id]) }}"
-                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">
+                            <x-add-button href="{{ route('sales.follow-ups.create', ['customer_id' => $customer->id]) }}">
                                 + Tambah Follow Up
-                            </a>
+                            </x-add-button>
                         @endcan
-                    </div>
+                    </x-section-header>
+
                     @php
                         $followups = $customer->followUps()->with(['meeting', 'creator'])->latest('follow_up_date')->get();
                     @endphp
                     @if($followups->isNotEmpty())
                         <div class="space-y-3">
                             @foreach($followups as $fu)
-                                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200">
                                     <div class="flex items-start justify-between">
                                         <div class="flex-1">
                                             <p class="text-sm text-slate-700">{{ $fu->description }}</p>
@@ -495,7 +473,7 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-slate-400 text-center py-8">Belum ada follow up.</p>
+                        <x-empty-state label="follow up" />
                     @endif
                 </div>
                 @endcan
@@ -503,109 +481,141 @@
                 {{-- TAB 7: INVOICES --}}
                 @can('view-admin')
                 <div x-show="tab === 'invoices'" x-transition>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Invoice</h3>
+                    <x-section-header title="Invoice">
                         @can('manage-admin')
-                            <a href="{{ route('admin.invoices.create', ['customer_id' => $customer->id]) }}"
-                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">+ Buat Invoice</a>
+                            <x-add-button href="{{ route('admin.invoices.create', ['customer_id' => $customer->id]) }}">
+                                + Buat Invoice
+                            </x-add-button>
                         @endcan
-                    </div>
+                    </x-section-header>
+
                     @php $custInvoices = $customer->invoices()->with('payments')->latest('issue_date')->get(); @endphp
                     @if($custInvoices->isNotEmpty())
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
-                                <thead class="bg-slate-50 dark:bg-slate-700">
-                                    <tr><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">No Invoice</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Nominal</th><th class="px-4 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Status</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th></tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
-                                    @foreach($custInvoices as $inv)
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="px-4 py-3 font-mono text-sm font-semibold text-slate-800">{{ $inv->invoice_number }}</td>
-                                        <td class="px-4 py-3 text-right font-mono text-slate-800">Rp {{ number_format($inv->amount, 0, ',', '.') }}</td>
-                                        <td class="px-4 py-3 text-center"><span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full @if($inv->status === 'paid') bg-green-100 text-green-700 @elseif($inv->status === 'cancelled') bg-red-100 text-red-700 @else bg-yellow-100 text-yellow-700 @endif">{{ $inv->status === 'paid' ? 'Lunas' : ($inv->status === 'cancelled' ? 'Dibatalkan' : 'Belum Bayar') }}</span></td>
-                                        <td class="px-4 py-3 text-right"><a href="{{ route('admin.invoices.show', $inv) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                        <x-data-table>
+                            <thead class="bg-slate-50 dark:bg-slate-700">
+                                <tr>
+                                    <x-th>No Invoice</x-th>
+                                    <x-th class="text-right">Nominal</x-th>
+                                    <x-th class="text-center">Status</x-th>
+                                    <x-th class="text-right">Aksi</x-th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
+                                @foreach($custInvoices as $inv)
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+                                        <td class="px-6 py-3 font-mono text-sm font-semibold text-slate-800 dark:text-slate-100">{{ $inv->invoice_number }}</td>
+                                        <td class="px-6 py-3 text-right font-mono text-slate-800 dark:text-slate-100">Rp {{ number_format($inv->amount, 0, ',', '.') }}</td>
+                                        <td class="px-6 py-3 text-center">
+                                            @php
+                                                $invBadgeColor = match($inv->status) {
+                                                    'paid' => 'green',
+                                                    'cancelled' => 'red',
+                                                    default => 'yellow',
+                                                };
+                                            @endphp
+                                            <x-status-badge :color="$invBadgeColor">{{ $inv->status === 'paid' ? 'Lunas' : ($inv->status === 'cancelled' ? 'Dibatalkan' : 'Belum Bayar') }}</x-status-badge>
+                                        </td>
+                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.invoices.show', $inv) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
                                     </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endforeach
+                            </tbody>
+                        </x-data-table>
                     @else
-                        <p class="text-slate-400 text-center py-8">Belum ada invoice.</p>
+                        <x-empty-state label="invoice" />
                     @endif
                 </div>
 
                 {{-- TAB 8: PO --}}
                 <div x-show="tab === 'pos'" x-transition>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Purchase Order</h3>
+                    <x-section-header title="Purchase Order">
                         @can('manage-admin')
-                            <a href="{{ route('admin.pos.create', ['customer_id' => $customer->id]) }}"
-                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">+ Buat PO</a>
+                            <x-add-button href="{{ route('admin.pos.create', ['customer_id' => $customer->id]) }}">
+                                + Buat PO
+                            </x-add-button>
                         @endcan
-                    </div>
+                    </x-section-header>
+
                     @php $custPos = $customer->purchaseOrders()->latest('issue_date')->get(); @endphp
                     @if($custPos->isNotEmpty())
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
-                                <thead class="bg-slate-50 dark:bg-slate-700">
-                                    <tr><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">No PO</th><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Item</th><th class="px-4 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Status</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th></tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
-                                    @foreach($custPos as $po)
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="px-4 py-3 font-mono text-sm font-semibold text-slate-800">{{ $po->po_number }}</td>
-                                        <td class="px-4 py-3 text-slate-600 max-w-xs truncate">{{ Str::limit($po->items, 60) }}</td>
-                                        <td class="px-4 py-3 text-center"><span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full @if($po->status === 'selesai') bg-green-100 text-green-700 @elseif($po->status === 'dibatalkan') bg-red-100 text-red-700 @elseif($po->status === 'diproses') bg-yellow-100 text-yellow-700 @else bg-slate-100 text-slate-600 @endif">{{ ucfirst($po->status) }}</span></td>
-                                        <td class="px-4 py-3 text-right"><a href="{{ route('admin.pos.show', $po) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                        <x-data-table>
+                            <thead class="bg-slate-50 dark:bg-slate-700">
+                                <tr>
+                                    <x-th>No PO</x-th>
+                                    <x-th>Item</x-th>
+                                    <x-th class="text-center">Status</x-th>
+                                    <x-th class="text-right">Aksi</x-th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
+                                @foreach($custPos as $po)
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+                                        <td class="px-6 py-3 font-mono text-sm font-semibold text-slate-800 dark:text-slate-100">{{ $po->po_number }}</td>
+                                        <td class="px-6 py-3 text-slate-600 dark:text-slate-300 max-w-xs truncate">{{ Str::limit($po->items, 60) }}</td>
+                                        <td class="px-6 py-3 text-center">
+                                            @php
+                                                $poBadgeColor = match($po->status) {
+                                                    'selesai' => 'green',
+                                                    'dibatalkan' => 'red',
+                                                    'diproses' => 'yellow',
+                                                    default => 'slate',
+                                                };
+                                            @endphp
+                                            <x-status-badge :color="$poBadgeColor">{{ ucfirst($po->status) }}</x-status-badge>
+                                        </td>
+                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.pos.show', $po) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
                                     </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endforeach
+                            </tbody>
+                        </x-data-table>
                     @else
-                        <p class="text-slate-400 text-center py-8">Belum ada PO.</p>
+                        <x-empty-state label="PO" />
                     @endif
                 </div>
 
                 {{-- TAB 9: PAYMENTS --}}
                 <div x-show="tab === 'payments'" x-transition>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800">Pembayaran</h3>
+                    <x-section-header title="Pembayaran">
                         @can('manage-admin')
-                            <a href="{{ route('admin.payments.create') }}"
-                               class="px-4 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700">+ Catat Pembayaran</a>
+                            <x-add-button href="{{ route('admin.payments.create') }}">
+                                + Catat Pembayaran
+                            </x-add-button>
                         @endcan
-                    </div>
+                    </x-section-header>
+
                     @php $custPayments = \App\Models\Payment::whereHas('invoice', fn($q) => $q->where('customer_id', $customer->id))->with('invoice')->latest('payment_date')->get(); @endphp
                     @if($custPayments->isNotEmpty())
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
-                                <thead class="bg-slate-50 dark:bg-slate-700">
-                                    <tr><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Invoice</th><th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Tgl Bayar</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Nominal</th><th class="px-4 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Bukti</th><th class="px-4 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th></tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
-                                    @foreach($custPayments as $pm)
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="px-4 py-3 font-mono text-sm text-slate-800">{{ $pm->invoice->invoice_number }}</td>
-                                        <td class="px-4 py-3 text-slate-600">{{ $pm->payment_date->format('d M Y') }}</td>
-                                        <td class="px-4 py-3 text-right font-mono text-slate-800">Rp {{ number_format($pm->amount, 0, ',', '.') }}</td>
-                                        <td class="px-4 py-3 text-center">@if($pm->proof_file)<a href="{{ asset('storage/' . $pm->proof_file) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">Lihat</a>@else - @endif</td>
-                                        <td class="px-4 py-3 text-right"><a href="{{ route('admin.payments.show', $pm) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                        <x-data-table>
+                            <thead class="bg-slate-50 dark:bg-slate-700">
+                                <tr>
+                                    <x-th>Invoice</x-th>
+                                    <x-th>Tgl Bayar</x-th>
+                                    <x-th class="text-right">Nominal</x-th>
+                                    <x-th class="text-center">Bukti</x-th>
+                                    <x-th class="text-right">Aksi</x-th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
+                                @foreach($custPayments as $pm)
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+                                        <td class="px-6 py-3 font-mono text-sm text-slate-800 dark:text-slate-100">{{ $pm->invoice->invoice_number }}</td>
+                                        <td class="px-6 py-3 text-slate-600 dark:text-slate-300">{{ $pm->payment_date->format('d M Y') }}</td>
+                                        <td class="px-6 py-3 text-right font-mono text-slate-800 dark:text-slate-100">Rp {{ number_format($pm->amount, 0, ',', '.') }}</td>
+                                        <td class="px-6 py-3 text-center">@if($pm->proof_file)<a href="{{ asset('storage/' . $pm->proof_file) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">Lihat</a>@else - @endif</td>
+                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.payments.show', $pm) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
                                     </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endforeach
+                            </tbody>
+                        </x-data-table>
                     @else
-                        <p class="text-slate-400 text-center py-8">Belum ada pembayaran.</p>
+                        <x-empty-state label="pembayaran" />
                     @endif
                 </div>
                 @endcan
 
                 {{-- TAB 10: ACTIVITY --}}
                 <div x-show="tab === 'activity'" x-transition>
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">Timeline Aktivitas</h3>
-                    
+                    <x-section-header title="Timeline Aktivitas" />
+
                     @php
                         $allActivities = App\Models\ProjectActivity::whereIn('project_id', $customer->projects->pluck('id'))
                             ->with(['project', 'user'])
@@ -613,27 +623,29 @@
                             ->get();
                     @endphp
 
-                    <div class="relative">
-                        <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-200"></div>
-                        @forelse($allActivities as $activity)
-                            <div class="relative pl-12 pb-6 last:pb-0">
-                                <div class="absolute left-2 top-1 w-5 h-5 rounded-full bg-indigo-500 border-4 border-white shadow-sm"></div>
-                                <div class="bg-slate-50 rounded-xl p-4">
-                                    <div class="flex items-center gap-3">
-                                        <span class="font-semibold text-sm text-slate-800">{{ $activity->user?->name ?? 'System' }}</span>
-                                        <span class="text-xs text-slate-400">{{ $activity->created_at->format('d M Y H:i') }}</span>
+                    @if($allActivities->isNotEmpty())
+                        <div class="relative">
+                            <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-200"></div>
+                            @foreach($allActivities as $activity)
+                                <div class="relative pl-12 pb-6 last:pb-0">
+                                    <div class="absolute left-2 top-1 w-5 h-5 rounded-full bg-indigo-500 border-4 border-white shadow-sm"></div>
+                                    <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4">
+                                        <div class="flex items-center gap-3">
+                                            <span class="font-semibold text-sm text-slate-800 dark:text-slate-100">{{ $activity->user?->name ?? 'System' }}</span>
+                                            <span class="text-xs text-slate-400">{{ $activity->created_at->format('d M Y H:i') }}</span>
+                                        </div>
+                                        <p class="text-sm text-slate-700 mt-1">{{ $activity->title ?? 'Activity' }}</p>
+                                        <p class="text-xs text-slate-500">{{ $activity->project?->name ?? 'Project' }}</p>
+                                        @if($activity->description)
+                                            <p class="text-xs text-slate-400 mt-1">{{ $activity->description }}</p>
+                                        @endif
                                     </div>
-                                    <p class="text-sm text-slate-700 mt-1">{{ $activity->title ?? 'Activity' }}</p>
-                                    <p class="text-xs text-slate-500">{{ $activity->project?->name ?? 'Project' }}</p>
-                                    @if($activity->description)
-                                        <p class="text-xs text-slate-400 mt-1">{{ $activity->description }}</p>
-                                    @endif
                                 </div>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 text-center py-8">Belum ada aktivitas.</p>
-                        @endforelse
-                    </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <x-empty-state label="aktivitas" />
+                    @endif
                 </div>
 
             </div>
