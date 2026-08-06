@@ -6,7 +6,6 @@ use App\Models\Project;
 use App\Models\Customer;
 use App\Models\AccountManager;
 use App\Models\WorkType;
-use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\Project\ProjectService;
 use App\Enums\ProjectStatus;
@@ -92,9 +91,8 @@ class ProjectController extends Controller
         $customers = Customer::all();
         $workTypes = WorkType::all();
         $accountManagers = AccountManager::all();
-        $engineers = User::where('role', 'teknisi')->get();
         
-        return view('projects.edit', compact('project', 'customers', 'workTypes', 'accountManagers', 'engineers'));
+        return view('projects.edit', compact('project', 'customers', 'workTypes', 'accountManagers'));
     }
 
     public function update(Request $request, Project $project)
