@@ -4,6 +4,7 @@ namespace App\Services\Project;
 
 use App\Models\Project;
 use App\Models\ProjectActivity;
+use App\Models\ProjectStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,8 @@ class ProjectService
                 'pic_engineer' => $data['pic_engineer'] ?? null, // ← text
                 'support_technicians' => $data['support_technicians'] ?? null, // ← text
                 'description' => $data['description'] ?? null,
-                'status' => 'Open',
+                'project_status_id' => $data['project_status_id']
+                    ?? ProjectStatus::where('is_default', true)->value('id'),
                 'progress' => 0,
             ]);
 
@@ -46,8 +48,8 @@ class ProjectService
                 'account_manager_id' => $data['account_manager_id'] ?? $project->account_manager_id,
                 'pic_engineer' => $data['pic_engineer'] ?? $project->pic_engineer,
                 'support_technicians' => $data['support_technicians'] ?? $project->support_technicians,
-                'status' => $data['status'] ?? $project->status,
                 'progress' => $data['progress'] ?? $project->progress,
+                'project_status_id' => $data['project_status_id'] ?? $project->project_status_id,
                 'description' => $data['description'] ?? $project->description,
             ]);
 

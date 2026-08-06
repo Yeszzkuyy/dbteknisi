@@ -20,7 +20,6 @@ class Project extends Model
         'project_name',
         'project_code',
         'quotation_number',
-        'status',
         'progress',
         'start_date',
         'end_date',
