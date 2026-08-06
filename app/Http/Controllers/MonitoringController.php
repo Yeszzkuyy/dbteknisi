@@ -87,7 +87,7 @@ class MonitoringController extends Controller
         $instalasiProses = $instalasiProsesQuery->count();
 
         // Instalasi Selesai (Teknisi) - projects with status Done
-        $instalasiSelesaiQuery = Project::where('status', 'Done');
+        $instalasiSelesaiQuery = Project::whereHas('status', fn ($q) => $q->where('name', 'Done'));
         if ($request->filled('date_from')) {
             $instalasiSelesaiQuery->whereDate('end_date', '>=', $request->date_from);
         }

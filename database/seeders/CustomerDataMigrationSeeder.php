@@ -23,7 +23,7 @@ class CustomerDataMigrationSeeder extends Seeder
 
             if ($projects->isEmpty()) {
                 $customer->status = 'lead';
-            } elseif ($projects->where('status', 'Done')->isNotEmpty()) {
+            } elseif ($projects->filter(fn ($p) => $p->status?->name === 'Done')->isNotEmpty()) {
                 $customer->status = 'selesai';
             } else {
                 $customer->status = 'instalasi';

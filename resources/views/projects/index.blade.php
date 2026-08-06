@@ -55,14 +55,8 @@
                             <td class="px-6 py-4 text-slate-600">{{ $project->workType?->name ?? '-' }}</td>
                             {{-- <td class="px-6 py-4 text-slate-600">{{ $project->pic_engineer ?? '-' }}</td> --}}
                             <td class="px-6 py-4">
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full 
-                                    @if($project->status == 'Open')
-                                        bg-blue-100 text-blue-700
-                                    @elseif($project->status == 'Progress')
-                                        bg-yellow-100 text-yellow-700
-                                    @endif
-                                ">
-                                    {{ $project->status ?? 'Open' }}
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $project->status ? $project->status->badgeClasses() : 'bg-slate-100 text-slate-600' }}">
+                                    {{ $project->status?->name ?? 'Open' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">
