@@ -78,13 +78,12 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                    <select name="status" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="Open" {{ $project->status == 'Open' ? 'selected' : '' }}>Open</option>
-                        <option value="Progress" {{ $project->status == 'Progress' ? 'selected' : '' }}>Progress</option>
-                        <option value="Pending" {{ $project->status == 'Pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="Hold" {{ $project->status == 'Hold' ? 'selected' : '' }}>Hold</option>
-                        <option value="Done" {{ $project->status == 'Done' ? 'selected' : '' }}>Done</option>
-                        <option value="Cancel" {{ $project->status == 'Cancel' ? 'selected' : '' }}>Cancel</option>
+                    <select name="project_status_id" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        @foreach ($statuses as $status)
+                            <option value="{{ $status->id }}" {{ (old('project_status_id', $project->project_status_id) == $status->id) ? 'selected' : '' }}>
+                                {{ $status->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
 

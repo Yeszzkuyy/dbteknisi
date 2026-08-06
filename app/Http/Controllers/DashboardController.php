@@ -26,7 +26,10 @@ class DashboardController extends Controller
         $totalProjects = Project::count();
 
         // Project Aktif (Open + Progress)
-        $activeProjects = Project::whereIn('status', [ProjectStatus::Open->value, ProjectStatus::OnProgress->value])->count();
+        $activeProjects = Project::whereHas('status', fn ($q) => $q->whereIn('name', [
+            ProjectStatus::Open->value,
+            ProjectStatus::OnProgress->value,
+        ]))->count();
 
         // Aktivitas Terbaru
         $activities = ProjectActivity::with(['project', 'user'])
