@@ -147,20 +147,6 @@
             </div>
         @endcan
 
-        <!-- Activity -->
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50">
-            <x-icon name="activity" class="w-5 h-5" />
-            <span>Activity</span>
-        </a>
-
-        <!-- Reports -->
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-slate-600 hover:bg-slate-50">
-            <x-icon name="chart-bar" class="w-5 h-5" />
-            <span>Reports</span>
-        </a>
-
         <!-- Trash -->
         @can('view-admin')
             <a href="{{ route('trash.index') }}"
