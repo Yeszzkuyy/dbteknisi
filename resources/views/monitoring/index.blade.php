@@ -210,10 +210,12 @@
                                             'PO: selesai' => 'bg-green-100 text-green-800',
                                             'PO: dibatalkan' => 'bg-red-100 text-red-800',
                                             'Open' => 'bg-blue-100 text-blue-800',
-                                            'Progress' => 'bg-yellow-100 text-yellow-800',
-                                            'Done' => 'bg-green-100 text-green-800',
+                                            'On Progress' => 'bg-yellow-100 text-yellow-800',
+                                            'Pending' => 'bg-orange-100 text-orange-800',
                                             'Hold' => 'bg-orange-100 text-orange-800',
-                                            'Cancel' => 'bg-red-100 text-red-800',
+                                            'Done' => 'bg-green-100 text-green-800',
+                                            'Cancelled' => 'bg-red-100 text-red-800',
+                                            'Warranty' => 'bg-purple-100 text-purple-800',
                                             'Maintenance' => 'bg-purple-100 text-purple-800',
                                         ];
                                     @endphp
