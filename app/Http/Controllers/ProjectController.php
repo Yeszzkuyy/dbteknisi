@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\ProjectStatus;
 use App\Models\Customer;
 use App\Models\AccountManager;
 use App\Models\WorkType;
 use Illuminate\Http\Request;
 use App\Services\Project\ProjectService;
-use App\Enums\ProjectStatus;
+use App\Enums\ProjectStatus as ProjectStatusEnum;
 
 class ProjectController extends Controller
 {
@@ -24,8 +25,8 @@ class ProjectController extends Controller
         // Ambil project dengan status Open atau Progress
         $projects = Project::with(['customer', 'workType', 'status'])
             ->whereHas('status', fn ($q) => $q->whereIn('name', [
-                ProjectStatus::Open->value,
-                ProjectStatus::OnProgress->value,
+                ProjectStatusEnum::Open->value,
+                ProjectStatusEnum::OnProgress->value,
             ]))
             ->latest()
             ->get();
@@ -35,8 +36,8 @@ class ProjectController extends Controller
 
         // Total project aktif
         $activeProjects = Project::whereHas('status', fn ($q) => $q->whereIn('name', [
-            ProjectStatus::Open->value,
-            ProjectStatus::OnProgress->value,
+            ProjectStatusEnum::Open->value,
+            ProjectStatusEnum::OnProgress->value,
         ]))->count();
 
         return view('projects.index', compact('projects', 'totalProjects', 'activeProjects'));

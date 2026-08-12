@@ -5,7 +5,7 @@
             <h1 class="text-3xl font-bold text-slate-800">Tambah Project</h1>
             <p class="text-slate-500 mt-1">Buat project baru untuk: <span class="font-semibold text-slate-700">{{ $customer->name }}</span></p>
         </div>
-        <a href="{{ route('customers.show', $customer) }}" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">Kembali</a>
+        <a href="{{ route('customers.show', $customer) }}" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition">Kembali</a>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full">

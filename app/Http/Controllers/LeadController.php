@@ -55,7 +55,9 @@ class LeadController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
+            'customer_mode' => 'required|in:new,existing',
+            'customer_name' => 'nullable|required_if:customer_mode,new|string|max:255',
+            'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'status' => 'required|in:new,contacted,qualified,proposal,won,lost',
             'source' => 'nullable|in:website,referral,cold_call,email,social_media,event,other',
             'notes' => 'nullable',
@@ -63,6 +65,12 @@ class LeadController extends Controller
             'expected_close_date' => 'nullable|date',
             'assigned_to' => 'nullable|exists:users,id',
         ]);
+
+        if ($validated['customer_mode'] === 'new') {
+            $validated['customer_id'] = Customer::create(['name' => $validated['customer_name']])->id;
+        }
+
+        unset($validated['customer_mode'], $validated['customer_name']);
 
         Lead::create($validated);
 
@@ -93,7 +101,9 @@ class LeadController extends Controller
     public function update(Request $request, Lead $lead)
     {
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
+            'customer_mode' => 'required|in:new,existing',
+            'customer_name' => 'nullable|required_if:customer_mode,new|string|max:255',
+            'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'status' => 'required|in:new,contacted,qualified,proposal,won,lost',
             'source' => 'nullable|in:website,referral,cold_call,email,social_media,event,other',
             'notes' => 'nullable',
@@ -101,6 +111,12 @@ class LeadController extends Controller
             'expected_close_date' => 'nullable|date',
             'assigned_to' => 'nullable|exists:users,id',
         ]);
+
+        if ($validated['customer_mode'] === 'new') {
+            $validated['customer_id'] = Customer::create(['name' => $validated['customer_name']])->id;
+        }
+
+        unset($validated['customer_mode'], $validated['customer_name']);
 
         $lead->update($validated);
 

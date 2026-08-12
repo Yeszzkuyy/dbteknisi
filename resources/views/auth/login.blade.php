@@ -172,13 +172,13 @@
                         x-data="{ logoFailed: false }"
                         class="mb-3"
                     >
-                        {{-- LOGO: ganti file di public/images/logo.png --}}
+                        {{-- LOGO: ganti file di public/images/logo/logo.png --}}
                         <img
                             x-show="!logoFailed"
                             x-on:error="logoFailed = true"
-                            src="{{ asset('images/logo.png') }}"
+                            src="{{ asset('images/logo/logo.png') }}"
                             alt="Logo"
-                            class="w-14 h-14 object-contain"
+                            class="h-16 w-auto object-contain"
                         >
                         <div
                             x-show="logoFailed"
@@ -187,7 +187,7 @@
                         >W</div>
                     </div>
                     <h1 class="text-2xl font-bold">Tridaya App</h1>
-                    <p class="text-sm text-white/60 mt-1">Internal Engineer Management System</p>
+                    <p class="text-sm text-white/60 mt-1">Full Visibility. Zero Guesswork</p>
                 </div>
 
                 <div class="text-center mb-6">

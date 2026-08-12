@@ -20,9 +20,7 @@ class AdminController extends Controller
     public function invoicesIndex(Request $request)
     {
         $invoices = $this->adminService->getInvoices($request->only(['search', 'status']));
-        $pos = $this->adminService->getPurchaseOrders($request->only(['search', 'status']));
-        $payments = $this->adminService->getPayments($request->only(['search']));
-        return view('admin.invoices.index', compact('invoices', 'pos', 'payments'));
+        return view('admin.invoices.index', compact('invoices'));
     }
 
     public function invoicesCreate()
@@ -94,10 +92,8 @@ class AdminController extends Controller
 
     public function posIndex(Request $request)
     {
-        $invoices = $this->adminService->getInvoices($request->only(['search', 'status']));
         $pos = $this->adminService->getPurchaseOrders($request->only(['search', 'status']));
-        $payments = $this->adminService->getPayments($request->only(['search']));
-        return view('admin.invoices.index', compact('invoices', 'pos', 'payments'));
+        return view('admin.pos.index', compact('pos'));
     }
 
     public function posCreate()
@@ -169,10 +165,8 @@ class AdminController extends Controller
 
     public function paymentsIndex(Request $request)
     {
-        $invoices = $this->adminService->getInvoices($request->only(['search', 'status']));
-        $pos = $this->adminService->getPurchaseOrders($request->only(['search', 'status']));
         $payments = $this->adminService->getPayments($request->only(['search']));
-        return view('admin.invoices.index', compact('invoices', 'pos', 'payments'));
+        return view('admin.payments.index', compact('payments'));
     }
 
     public function paymentsCreate(Request $request)

@@ -11,7 +11,7 @@
                     Download
                 </a>
                 <a href="{{ route('project-documents.index', $document->project) }}" 
-                   class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
+                   class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition">
                     ← Kembali
                 </a>
             </div>

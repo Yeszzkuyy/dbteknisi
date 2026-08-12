@@ -10,7 +10,7 @@
                 <a href="{{ route('projects.edit', $project) }}" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-medium transition">Edit Project</a>
             @endcan
             <a href="{{ route('customers.show', $project->customer_id) }}" 
-               class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
+               class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition">
                 ← Back
             </a>
         </div>
@@ -18,11 +18,11 @@
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div><p class="text-xs text-slate-400">Nama Project</p><p class="font-medium">{{ $project->project_name }}</p></div>
-            <div><p class="text-xs text-slate-400">Customer</p><p class="font-medium">{{ $project->customer?->name ?? '-' }}</p></div>
-            <div><p class="text-xs text-slate-400">Jenis Pekerjaan</p><p class="font-medium">{{ $project->workType?->name ?? '-' }}</p></div>
+            <div><p class="text-xs text-slate-400">Nama Project</p><p class="font-medium text-slate-800">{{ $project->project_name }}</p></div>
+            <div><p class="text-xs text-slate-400">Customer</p><p class="font-medium text-slate-800">{{ $project->customer?->name ?? '-' }}</p></div>
+            <div><p class="text-xs text-slate-400">Jenis Pekerjaan</p><p class="font-medium text-slate-800">{{ $project->workType?->name ?? '-' }}</p></div>
             <div><p class="text-xs text-slate-400">Status</p><x-status-badge :color="$project->status?->color ?? 'slate'">{{ $project->status?->name ?? 'Belum Memulai' }}</x-status-badge></div>
-            <div><p class="text-xs text-slate-400">Account Manager</p><p class="font-medium">{{ $project->accountManager?->name ?? '-' }}</p></div>
+            <div><p class="text-xs text-slate-400">Account Manager</p><p class="font-medium text-slate-800">{{ $project->accountManager?->name ?? '-' }}</p></div>
             <div>
                 <p class="text-xs text-slate-400">PIC Engineer</p>
                 <p class="font-medium text-slate-800">{{ $project->pic_engineer ?? '-' }}</p>

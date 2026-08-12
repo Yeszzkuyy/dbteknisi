@@ -34,7 +34,7 @@
                             Hapus
                         </button>
                     </form>
-                    <a href="{{ route('projects.show', $projectSupport->project) }}" class="text-sm text-gray-600 hover:underline">
+                    <a href="{{ route('projects.show', $projectSupport->project) }}" class="text-sm text-red-600 hover:underline">
                         ← Kembali ke project
                     </a>
                 </div>

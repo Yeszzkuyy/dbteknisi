@@ -9,7 +9,7 @@
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('customers.show', $project->customer_id) }}" 
-                   class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
+                   class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition">
                     ← Kembali
                 </a>
             </div>
@@ -42,7 +42,7 @@
                 {{-- Drag & Drop Zone --}}
                 <div class="mt-4">
                     <div class="relative border-2 border-dashed rounded-xl p-4 text-center transition-all duration-200"
-                         :class="dragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-500 hover:bg-blue-50'"
+                         :class="dragging ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/40 dark:border-blue-400' : 'border-slate-300 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/40'"
                          @dragover.prevent="dragging = true"
                          @dragenter.prevent="dragging = true"
                          @dragleave.prevent="dragging = false"

@@ -44,14 +44,14 @@
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
                     @forelse($users as $user)
-                        <tr class="hover:bg-slate-50">
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                             <td class="px-4 py-3">
-                                <p class="font-medium text-slate-900">{{ $user->name }}</p>
+                                <p class="font-medium text-slate-900 dark:text-slate-100">{{ $user->name }}</p>
                                 @if($user->id === auth()->id())
                                     <span class="text-xs text-blue-600">(Anda)</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-slate-600">{{ $user->email }}</td>
+                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ $user->email }}</td>
                             <td class="px-4 py-3">
                                 @forelse($user->roles as $role)
                                     <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mr-1 mb-1">{{ $role->name }}</span>
@@ -65,7 +65,7 @@
                                     {{ $user->trashed() ? 'Nonaktif' : 'Aktif' }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-sm text-slate-500">{{ $user->created_at->format('d M Y') }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ $user->created_at->format('d M Y') }}</td>
                             <td class="px-4 py-3 text-right">
                                 <a href="{{ route('admin-panel.users.edit', $user) }}"
                                    class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">Edit</a>
