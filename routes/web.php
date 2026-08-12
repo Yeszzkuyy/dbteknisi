@@ -20,6 +20,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\AdminPanelController;
 use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\TechnicianScheduleController;
+use App\Http\Controllers\TechnicianDashboardController;
 use App\Livewire\ProjectStatusList;
 use Illuminate\Support\Facades\Route;
 
@@ -105,6 +107,24 @@ Route::middleware('auth')->group(function () {
         Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
         Route::get('/projects/{project}/documents', [ProjectDocumentController::class, 'index'])->name('project-documents.index');
         Route::get('/project-documents/{document}/download', [ProjectDocumentController::class, 'download'])->name('project-documents.download');
+    });
+
+    // ============================================
+    // TEKNISI — Kalender & Jadwal (Google Calendar)
+    // ============================================
+    Route::middleware('permission:view-teknisi|manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+        Route::get('/dashboard', [TechnicianDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/kalender/events', [TechnicianScheduleController::class, 'events'])->name('kalender.events');
+        Route::get('/jadwal', [TechnicianScheduleController::class, 'jadwal'])->name('jadwal');
+    });
+
+    Route::middleware('permission:manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+        Route::post('/schedules', [TechnicianScheduleController::class, 'store'])->name('schedules.store');
+        Route::put('/schedules/{schedule}', [TechnicianScheduleController::class, 'update'])->name('schedules.update');
+        Route::delete('/schedules/{schedule}', [TechnicianScheduleController::class, 'destroy'])->name('schedules.destroy');
+        Route::get('/kalender/connect', [TechnicianScheduleController::class, 'connect'])->name('kalender.connect');
+        Route::get('/kalender/callback', [TechnicianScheduleController::class, 'callback'])->name('kalender.callback');
+        Route::delete('/kalender/disconnect', [TechnicianScheduleController::class, 'disconnect'])->name('kalender.disconnect');
     });
 
     // ============================================

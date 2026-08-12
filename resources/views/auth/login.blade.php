@@ -197,6 +197,42 @@
 
                 <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
 
+                @if ($kickedAt)
+                    <div
+                        x-data="{ kickedNotice: true }"
+                        x-show="kickedNotice"
+                        x-transition:leave="transition ease-out duration-300"
+                        x-transition:leave-start="opacity-100 translate-x-0"
+                        x-transition:leave-end="opacity-0 translate-x-4"
+                        class="mb-4 rounded-xl border border-amber-400/25 bg-amber-400/10 backdrop-blur-md px-4 py-3.5 flex items-start gap-3"
+                    >
+                        <div class="mt-0.5 shrink-0 w-8 h-8 rounded-lg bg-amber-400/15 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.84-2.83L13.84 4.83a2 2 0 00-3.68 0L3.23 16.17a2 2 0 001.84 2.83z" />
+                            </svg>
+                        </div>
+                        <div class="text-sm leading-snug min-w-0">
+                            <p class="font-semibold text-amber-200">Akun kamu baru saja login di perangkat lain</p>
+                            <p class="text-amber-100/70 text-xs mt-1">
+                                Sesi di perangkat ini diakhiri otomatis demi keamanan.
+                                @if ($kickedAt instanceof \DateTimeInterface || is_string($kickedAt))
+                                    <span class="inline-block">{{ \Illuminate\Support\Carbon::parse($kickedAt)->format('d M Y, H:i') }}</span>
+                                @endif
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            x-on:click="kickedNotice = false"
+                            class="ml-auto shrink-0 text-amber-200/50 hover:text-amber-200 transition"
+                            aria-label="Tutup notifikasi"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('login') }}" class="space-y-4">
                     @csrf
 

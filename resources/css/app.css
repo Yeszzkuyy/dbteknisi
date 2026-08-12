@@ -1,3 +1,136 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Kalender Teknisi (FullCalendar) */
+.teknisi-calendar .fc .fc-toolbar-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.teknisi-calendar .fc .fc-button {
+    border-radius: 0.75rem;
+    background-color: var(--card-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+    text-transform: none;
+    font-weight: 500;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.teknisi-calendar .fc .fc-button:hover {
+    background-color: var(--input-bg);
+}
+
+.teknisi-calendar .fc .fc-button-primary:not(:disabled).fc-button-active,
+.teknisi-calendar .fc .fc-button-primary:not(:disabled):active {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+}
+
+.teknisi-calendar .fc .fc-button-primary:not(:disabled).fc-button-active.fc-button-add-button,
+.teknisi-calendar .fc .fc-button-primary:not(:disabled):active.fc-button-add-button {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+.teknisi-calendar .fc .fc-col-header-cell-cushion,
+.teknisi-calendar .fc .fc-daygrid-day-number,
+.teknisi-calendar .fc .fc-timegrid-slot-label-cushion {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+.teknisi-calendar .fc .fc-daygrid-day.fc-day-today,
+.teknisi-calendar .fc .fc-timegrid-col.fc-day-today {
+    background-color: rgba(59, 130, 246, 0.06);
+}
+
+.teknisi-calendar .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    background-color: #3b82f6;
+    color: #fff;
+    border-radius: 9999px;
+    min-width: 1.7rem;
+    text-align: center;
+}
+
+.teknisi-calendar .fc-event {
+    border: none;
+    border-left: 3px solid rgba(0, 0, 0, 0.25);
+    border-radius: 0.5rem;
+    padding: 0.15rem 0.3rem;
+}
+
+.teknisi-calendar .fc-event-not-connected {
+    opacity: 0.55;
+    border-left: 3px dashed rgba(0, 0, 0, 0.3);
+}
+
+.teknisi-calendar .fc-event-card {
+    line-height: 1.25;
+    overflow: hidden;
+    color: #ffffff;
+    font-size: 0.7rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.teknisi-calendar .fc-event-time {
+    font-weight: 700;
+    font-size: 0.68rem;
+    color: #ffffff;
+    white-space: nowrap;
+}
+
+.teknisi-calendar .fc-event-title-text {
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.teknisi-calendar .fc-event-line {
+    font-size: 0.66rem;
+    font-weight: 500;
+    color: #f8fafc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.teknisi-calendar .fc-more-link {
+    font-weight: 600;
+    font-size: 0.7rem;
+}
+
+.teknisi-calendar .fc .fc-popover {
+    border-radius: 0.75rem;
+    border-color: var(--input-border);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+}
+
+.teknisi-calendar .fc-timegrid-event .fc-event-main {
+    padding: 0.15rem 0.3rem;
+}
+
+.teknisi-calendar .fc .fc-daygrid-day-frame {
+    cursor: pointer;
+}
+
+.teknisi-calendar .fc .fc-view-harness {
+    border-radius: 0.75rem;
+}
+
+.teknisi-calendar .fc .fc-scrollgrid {
+    border-color: var(--input-border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.teknisi-calendar .fc .fc-timegrid-now-indicator-line {
+    border-color: #3b82f6;
+}

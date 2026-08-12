@@ -46,9 +46,9 @@
 
         {{-- Teknisi --}}
         @can('view-teknisi')
-            <div x-data="{ open: false }">
+            <div x-data="{ open: {{ request()->routeIs('projects*') || request()->routeIs('teknisi.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('projects*') || request()->routeIs('teknisi.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <x-icon name="tools" class="w-5 h-5" />
                     <span>Teknisi</span>
                     <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,10 +56,20 @@
                     </svg>
                 </button>
                 <div x-show="open" class="mt-1 ml-4 space-y-1">
+                    <a href="{{ route('teknisi.dashboard') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('teknisi.dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                        Dashboard Teknisi
+                    </a>
                     <a href="{{ route('projects.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
                         Project
+                    </a>
+                    <a href="{{ route('teknisi.jadwal') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('teknisi.jadwal*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                        Jadwal
                     </a>
                 </div>
             </div>
