@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CustomerContactController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProfileController;
@@ -115,6 +116,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:view-teknisi|manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
         Route::get('/dashboard', [TechnicianDashboardController::class, 'index'])->name('dashboard');
         Route::get('/kalender/events', [TechnicianScheduleController::class, 'events'])->name('kalender.events');
+        Route::get('/jadwal/google-events', [CalendarController::class, 'googleEvents'])->name('google-events');
         Route::get('/jadwal', [TechnicianScheduleController::class, 'jadwal'])->name('jadwal');
     });
 

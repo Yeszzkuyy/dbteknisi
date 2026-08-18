@@ -12,10 +12,181 @@ use Google\Service\Calendar\EventDateTime;
 use Google\Service\Calendar\EventReminder;
 use Google\Service\Calendar\EventReminders;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class GoogleCalendarService
 {
     public const TIMEZONE = 'Asia/Jakarta';
+
+/**
+     * Cek apakah Google Calendar API dapat diakses (berdasarkan hasil request, bukan DB).
+     */
+    public function isApiReachable(): bool
+    {
+        try {
+            $this->upcomingEvents(1);
+
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Ambil event mendatang dari kalender publik via API key (read-only).
+     */
+    public function upcomingEvents(int $maxResults = 20, ?Carbon $from = null, ?Carbon $to = null): array
+    {
+        $params = [
+            'key' => config('services.google-calendar.api_key'),
+            'singleEvents' => 'true',
+            'maxResults' => $maxResults,
+            'orderBy' => 'startTime',
+        ];
+
+        if ($from) {
+            $params['timeMin'] = $from->toRfc3339String();
+        }
+
+        if ($to) {
+            $params['timeMax'] = $to->toRfc3339String();
+        }
+
+        $url = 'https://www.googleapis.com/calendar/v3/calendars/'.urlencode(config('services.google-calendar.calendar_id')).'/events';
+
+        Log::info('Google API request', ['url' => $url, 'params' => array_diff_key($params, ['key' => ''])]);
+
+        try {
+            $response = Http::get($url, $params);
+
+            $response->throw();
+
+            $items = $response->json('items', []);
+
+            Log::info('Google API response', [
+                'status' => $response->status(),
+                'total_items' => count($items),
+                'event_ids' => array_column($items, 'id'),
+            ]);
+
+            return collect($items)
+                ->map(fn (array $item) => [
+                    'id' => $item['id'] ?? null,
+                    'title' => $item['summary'] ?? '(Tanpa judul)',
+                    'start' => $this->parseEventTime($item['start'] ?? []),
+                    'end' => $this->parseEventTime($item['end'] ?? []),
+                    'location' => $item['location'] ?? '',
+                    'description' => $item['description'] ?? '',
+                ])
+                ->sortBy('start')
+                ->values()
+                ->take($maxResults)
+                ->all();
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengambil event Google Calendar', [
+                'calendar_id' => config('services.google-calendar.calendar_id'),
+                'message' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Sinkronkan event Google Calendar ke tabel technician_schedules.
+     * UPDATE jika google_event_id sudah ada, INSERT jika belum, tidak pernah duplikat.
+     */
+    public function syncFromGoogle(int $maxResults = 250): array
+    {
+        $events = $this->upcomingEvents(
+            $maxResults,
+            now()->subDays(30),
+            now()->addMonths(2),
+        );
+
+        $stats = ['created' => 0, 'updated' => 0, 'restored' => 0, 'skipped' => 0];
+        $owner = User::query()
+            ->whereHas('permissions', fn ($q) => $q->whereIn('name', ['manage-teknisi', 'manage-admin']))
+            ->orderBy('id')
+            ->first() ?? User::query()->orderBy('id')->first();
+
+        if (! $owner) {
+            Log::warning('Google sync: tidak ada user untuk pemilik jadwal, dilewati.');
+
+            return $stats;
+        }
+
+        foreach ($events as $event) {
+            $id = $event['id'];
+            if (! $id) {
+                $stats['skipped']++;
+
+                continue;
+            }
+
+            Log::info('Google sync: event.id diterima', ['id' => $id, 'title' => $event['title']]);
+
+            $schedule = TechnicianSchedule::withTrashed()->where('google_event_id', $id)->first();
+
+            Log::info('Google sync: google_event_id dicari di database', [
+                'google_event_id' => $id,
+                'found' => (bool) $schedule,
+            ]);
+
+            if (! $event['start'] && ! $event['end']) {
+                $stats['skipped']++;
+
+                continue;
+            }
+
+            $data = [
+                'user_id' => $owner->id,
+                'title' => $event['title'],
+                'description' => $event['description'] ?: null,
+                'location' => $event['location'] ?: null,
+                'start_at' => $event['start'],
+                'end_at' => $event['end'] ?? $event['start'],
+                'status' => 'scheduled',
+                'google_event_id' => $id,
+                'google_calendar_id' => config('services.google-calendar.calendar_id'),
+                'google_sync_status' => 'synced',
+                'google_sync_error' => null,
+            ];
+
+            if ($schedule) {
+                $schedule->update($data);
+                if ($schedule->trashed()) {
+                    $schedule->restore();
+                    $stats['restored']++;
+                    Log::info('Google sync: jadwal trash direstore', ['id' => $schedule->id, 'google_event_id' => $id]);
+                }
+                $stats['updated']++;
+                Log::info('Google sync: UPDATE jadwal', ['id' => $schedule->id, 'google_event_id' => $id]);
+            } else {
+                TechnicianSchedule::create($data);
+                $stats['created']++;
+                Log::info('Google sync: INSERT jadwal baru', ['google_event_id' => $id]);
+            }
+        }
+
+        Log::info('Google sync: selesai', $stats);
+
+        return $stats;
+    }
+
+    private function parseEventTime(array $time): ?Carbon
+    {
+        if (isset($time['dateTime'])) {
+            return Carbon::parse($time['dateTime'])->setTimezone(self::TIMEZONE);
+        }
+
+        if (isset($time['date'])) {
+            return Carbon::parse($time['date'])->setTimezone(self::TIMEZONE);
+        }
+
+        return null;
+    }
 
     private const STATUS_COLOR = [
         'scheduled' => 1,

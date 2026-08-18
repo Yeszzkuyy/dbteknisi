@@ -51,22 +51,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 click: () => window.teknisiSchedule.openCreate(new Date()),
             },
         },
-        events: (info, successCallback, failureCallback) => {
-            const params = new URLSearchParams({
-                start: info.startStr,
-                end: info.endStr,
-                search: document.getElementById('filter-search')?.value || '',
-            });
-            fetch(`${eventsUrl}?${params.toString()}`)
-                .then((r) => r.json())
-                .then((events) => successCallback(events.map((e) => ({
-                    ...e,
-                    backgroundColor: colorForTechnician(e.technician_user_id),
-                    borderColor: colorForTechnician(e.technician_user_id),
-                    textColor: '#ffffff',
-                }))))
-                .catch(failureCallback);
-        },
+        events: [
+            (info, successCallback, failureCallback) => {
+                const params = new URLSearchParams({
+                    start: info.startStr,
+                    end: info.endStr,
+                    search: document.getElementById('filter-search')?.value || '',
+                });
+                fetch(`${eventsUrl}?${params.toString()}`)
+                    .then((r) => r.json())
+                    .then((events) => successCallback(events.map((e) => ({
+                        ...e,
+                        backgroundColor: colorForTechnician(e.technician_user_id),
+                        borderColor: colorForTechnician(e.technician_user_id),
+                        textColor: '#ffffff',
+                    }))))
+                    .catch(failureCallback);
+            },
+            {
+                url: '/teknisi/jadwal/google-events',
+                method: 'GET',
+                failure: function (err) {
+                    console.error('Google Calendar gagal dimuat', err);
+                },
+            },
+        ],
         eventDisplay: 'block',
         eventContent: (arg) => {
             const ev = arg.event;
