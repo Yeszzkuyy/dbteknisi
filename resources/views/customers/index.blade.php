@@ -1,65 +1,151 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Daftar Client / Customer') }}
-        </h2>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+    <div class="flex items-center justify-between mb-6">
 
-                <a href="{{ route('customers.create') }}" class="inline-block mb-4 px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
-                    + Tambah Client
-                </a>
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">
+                Daftar Customer
+            </h1>
 
-                <table class="min-w-full divide-y divide-gray-200 border">
-                    <thead class="bg-gray-50">
+            <p class="text-slate-500 mt-1">
+                Kelola seluruh data customer Tridaya App.
+            </p>
+        </div>
+
+        {{-- GANTI: Cek permission 'create-clients' atau 'create-customers' --}}
+        @can('manage-sales')
+            <a href="{{ route('customers.create') }}"
+               class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                + Tambah Customer
+            </a>
+        @endcan
+
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600">
+
+        <div class="p-5 border-b">
+
+            <input
+                type="text"
+                placeholder="Cari nama customer..."
+                class="w-full md:w-96 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+            >
+
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                    <thead class="bg-slate-50 dark:bg-slate-700">
                         <tr>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nama Perusahaan</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Alamat</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">PIC Utama</th>
-                            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Jumlah Project</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">Customer</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">PIC</th>
+                            <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">Project</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
+
                         @forelse($customers as $customer)
-                        <tr>
-                            <td class="px-4 py-2 font-medium">{{ $customer->name }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-600">{{ Str::limit($customer->address, 40) }}</td>
-                            <td class="px-4 py-2">
-                                @if($customer->contacts->isNotEmpty())
-                                    <span class="font-semibold text-gray-800">{{ $customer->contacts->first()->name }}</span>
-                                    <br><span class="text-xs text-gray-500">{{ $customer->contacts->first()->phone }}</span>
-                                @else
-                                    <span class="text-xs text-red-500 italic">Belum ada PIC</span>
-                                @endif
-                            </td>
-                            <td class="px-4 py-2 text-center">
-                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 font-semibold">
-                                    {{ $customer->projects_count }} Project
-                                </span>
-                            </td>
-                            <td class="px-4 py-2 space-x-2 text-sm">
-                                <a href="{{ route('customers.show', $customer) }}" class="text-indigo-600 hover:underline font-medium">Detail</a>
-                                <a href="{{ route('customers.edit', $customer) }}" class="text-yellow-600 hover:underline">Edit</a>
-                                <form action="{{ route('customers.destroy', $customer) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus client ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:underline">Hapus</button>
-                                </form>
-                            </td>
-                        </tr>
+
+                            <tr class="hover:bg-slate-50 transition">
+
+                                <td class="px-6 py-4">
+
+                                    <div class="font-semibold text-slate-800 dark:text-slate-100">
+                                        {{ $customer->name }}
+                                    </div>
+
+                                    <div class="text-sm text-slate-500 mt-1">
+                                        {{ $customer->address }}
+                                    </div>
+
+                                </td>
+
+                                <td class="px-6 py-4">
+
+                                    @if($customer->contacts->isNotEmpty())
+
+                                        <div class="font-medium dark:text-slate-100">
+                                            {{ $customer->contacts->first()->name }}
+                                        </div>
+
+                                        <div class="text-sm text-slate-500">
+                                            {{ $customer->contacts->first()->phone }}
+                                        </div>
+
+                                    @else
+
+                                        <span class="text-slate-400 italic">
+                                            Belum ada PIC
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+
+                                    <span class="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
+
+                                        {{ $customer->projects_count }}
+
+                                    </span>
+
+                                </td>
+
+                                <td class="px-6 py-4">
+
+                                    <div class="flex justify-end gap-3">
+
+                                        <a href="{{ route('customers.show',$customer) }}"
+                                           class="text-blue-600 hover:text-blue-800">
+                                            Detail
+                                        </a>
+
+                                        {{-- GANTI: Cek permission 'edit-customers' --}}
+                                        @can('manage-sales')
+                                            <a href="{{ route('customers.edit',$customer) }}"
+                                               class="text-amber-600 hover:text-amber-800">
+                                                Edit
+                                            </a>
+                                        @endcan
+
+                                        {{-- GANTI: Cek permission 'delete-customers' --}}
+                                        @can('manage-sales')
+                                            <form
+                                                action="{{ route('customers.destroy',$customer) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Hapus customer ini?')"
+                                            >
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button
+                                                    class="text-red-600 hover:text-red-800"
+                                                >
+                                                    Hapus
+                                                </button>
+
+                                            </form>
+                                        @endcan
+                                    </div>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="5" class="px-4 py-4 text-center text-gray-500">Belum ada data client.</td>
-                        </tr>
+                            <tr>
+                                <td colspan="4" class="py-16 text-center text-slate-400">
+
+                                    Belum ada customer.
+
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
-
             </div>
         </div>
     </div>
+
 </x-app-layout>

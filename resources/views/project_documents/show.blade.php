@@ -45,7 +45,7 @@
                         class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
                         Lihat / Download File
                     </a>
-                    <a href="{{ route('projects.show', $projectDocument->project) }}" class="text-sm text-gray-600 hover:underline">
+                    <a href="{{ route('projects.show', $projectDocument->project) }}" class="text-sm text-red-600 hover:underline">
                         ← Kembali ke project
                     </a>
                 </div>

@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProjectDocument extends Model
 {
+    use SoftDeletes;
 
     protected $fillable = [
         'project_id',
-        'document_category_id',
         'file_name',
         'file_path',
         'notes',
         'uploaded_by',
+        'document_category_id',
     ];
 
     public function project()
@@ -21,19 +23,37 @@ class ProjectDocument extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function uploader()
-    {
-        return $this->belongsTo(
-            User::class,
-            'uploaded_by'
-        );
-    }
-
     public function category()
     {
-        return $this->belongsTo(
-            DocumentCategory::class,
-            'document_category_id'
-        );
+        return $this->belongsTo(DocumentCategory::class, 'document_category_id');
+    }
+
+    public function uploader()
+    {
+        return $this->belongsTo(User::class, 'uploaded_by');
+    }
+    public function getFileExtensionAttribute()
+    {
+        return strtolower(pathinfo($this->file_name, PATHINFO_EXTENSION));
+    }
+    
+    public function getIsImageAttribute()
+    {
+        return in_array($this->file_extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp']);
+    }
+    
+    public function getIsPdfAttribute()
+    {
+        return $this->file_extension === 'pdf';
+    }
+    
+    public function getIsOfficeAttribute()
+    {
+        return in_array($this->file_extension, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']);
+    }
+    
+    public function getIsVideoAttribute()
+    {
+        return in_array($this->file_extension, ['mp4', 'webm', 'ogg', 'mov', 'avi']);
     }
 }

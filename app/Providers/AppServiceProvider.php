@@ -3,10 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Customer;
-use App\Models\Company;
 use App\Models\Project;
 use App\Observers\CustomerObserver;
-use App\Observers\CompanyObserver;
 use App\Observers\ProjectObserver;
 use Illuminate\Support\ServiceProvider;
 

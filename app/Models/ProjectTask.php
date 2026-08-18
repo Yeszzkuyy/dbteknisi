@@ -3,35 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes; // ← Tambahkan
 
 class ProjectTask extends Model
 {
-    use SoftDeletes;
-    
+    use SoftDeletes; // ← Tambahkan
+
     protected $fillable = [
         'project_id',
+        'task_name',
         'assigned_to',
-        'title',
-        'description',
-        'status',
-        'start_date',
         'due_date',
-        'completed_at',
+        'status',
+        'priority',
+        'description',
+    ];
+
+    protected $casts = [
+        'due_date' => 'date',
     ];
 
     public function project()
     {
-        return $this->belongsTo(
-            Project::class
-        );
+        return $this->belongsTo(Project::class);
     }
 
-    public function engineer()
+    public function assignedEngineer()
     {
-        return $this->belongsTo(
-            User::class,
-            'assigned_to'
-        );
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 }

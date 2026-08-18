@@ -38,10 +38,12 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required',
+            'company' => 'nullable',
             'address' => 'nullable',
             'phone' => 'nullable',
             'email' => 'nullable|email',
             'notes' => 'nullable',
+            'status' => 'nullable|in:lead,deal,instalasi,selesai',
         ]);
 
         Customer::create($validated);
@@ -83,10 +85,12 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required',
+            'company' => 'nullable',
             'address' => 'nullable',
             'phone' => 'nullable',
             'email' => 'nullable|email',
             'notes' => 'nullable',
+            'status' => 'nullable|in:lead,deal,instalasi,selesai',
         ]);
 
         $customer->update($validated);

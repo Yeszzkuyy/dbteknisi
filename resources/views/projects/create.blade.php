@@ -1,91 +1,88 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Project') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form method="POST" action="{{ route('projects.store') }}" class="space-y-4">
-                    @csrf
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Project Name</label>
-                        <input type="text" name="project_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Customer</label>
-                        <select name="customer_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                            @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Account Manager</label>
-                        <select name="account_manager_id" id="account_manager_id" class="form-control">
-                            <option value="">-- Pilih Account Manager --</option>
-                            @foreach($accountManagers as $am)
-                                <option value="{{ $am->id }}">{{ $am->name }}</option> 
-                                {{-- ⚠️ Catatan: Pastikan '$am->name' sesuai dengan nama kolom nama AM di tabel kamu (misal: 'name' atau 'nama') --}}
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Work Type</label>
-                        <select name="work_type_id" id="work_type_id" class="form-control" required>
-                            <option value="">-- Pilih Work Type --</option>
-                            @foreach($workTypes as $type)
-                                <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                {{-- ⚠️ Catatan: Pastikan '$type->name' sesuai dengan nama kolom jenis pekerjaan di tabel kamu --}}
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">PIC Engineer</label>
-                        <select name="pic_engineer_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                            @foreach($engineers as $engineer)
-                            <option value="{{ $engineer->id }}">{{ $engineer->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Project Code</label>
-                        <input type="text" name="project_code" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Quotation Number</label>
-                        <input type="text" name="quotation_number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Status</label>
-                        <select name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                            <option value="Open">Open</option>
-                            <option value="On Progress">On Progress</option>
-                            <option value="Done">Done</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea name="description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
-                    </div>
-
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
-                        Simpan
-                    </button>
-                </form>
-            </div>
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800">Tambah Project</h1>
+            <p class="text-slate-500 mt-1">Buat project baru untuk: <span class="font-semibold text-slate-700">{{ $customer->name }}</span></p>
         </div>
+        <a href="{{ route('customers.show', $customer) }}" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition">Kembali</a>
     </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full">
+        <form action="{{ route('projects.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="customer_id" value="{{ $customer->id }}">
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Project <span class="text-red-500">*</span></label>
+                    <input type="text" name="name" value="{{ old('name') }}" required class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Pekerjaan <span class="text-red-500">*</span></label>
+                    <select name="work_type_id" required class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Pilih Jenis Pekerjaan</option>
+                        @foreach($workTypes as $workType)
+                            <option value="{{ $workType->id }}" {{ old('work_type_id') == $workType->id ? 'selected' : '' }}>{{ $workType->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('work_type_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Account Manager</label>
+                    <select name="account_manager_id" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Pilih Account Manager</option>
+                        @foreach($accountManagers as $am)
+                            <option value="{{ $am->id }}" {{ old('account_manager_id') == $am->id ? 'selected' : '' }}>{{ $am->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('account_manager_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                {{-- PIC Engineer --}}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        PIC Engineer <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           name="pic_engineer" 
+                           value="{{ old('pic_engineer') }}"
+                           required
+                           placeholder="Nama PIC Engineer yang bertanggung jawab"
+                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    @error('pic_engineer') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                {{-- Support Technicians --}}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Support Technicians <span class="text-slate-400 text-xs">(Opsional)</span>
+                    </label>
+                    <input type="text" 
+                           name="support_technicians" 
+                           value="{{ old('support_technicians') }}"
+                           placeholder="Nama support teknisi (pisahkan dengan koma jika lebih dari 1)"
+                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <p class="text-xs text-slate-400 mt-1">Contoh: Budi, Andi, Siti</p>
+                    @error('support_technicians') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Deskripsi</label>
+                    <textarea name="description" rows="3" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('description') }}</textarea>
+                    @error('description') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">Simpan Project</button>
+                <a href="{{ route('customers.show', $customer) }}" class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
 </x-app-layout>
+EOF

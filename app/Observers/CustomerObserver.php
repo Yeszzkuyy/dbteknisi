@@ -14,7 +14,8 @@ class CustomerObserver
 
     public function restored(Customer $customer): void
     {
-        $customer->projects()->onlyTrashed()->get()->each(fn ($project) => $project->restore());
-        $customer->contacts()->onlyTrashed()->get()->each(fn ($contact) => $contact->restore());
+        // ✅ Ganti onlyTrashed → withTrashed
+        $customer->projects()->withTrashed()->get()->each(fn ($project) => $project->restore());
+        $customer->contacts()->withTrashed()->get()->each(fn ($contact) => $contact->restore());
     }
 }

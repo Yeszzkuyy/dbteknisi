@@ -2,88 +2,105 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DocumentCategory;
 use App\Models\Project;
 use App\Models\ProjectDocument;
-use App\Models\ProjectActivity;
+use App\Models\DocumentCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectDocumentController extends Controller
 {
-    public function create(Project $project)
+    public function index(Project $project)
     {
-        $categories = DocumentCategory::orderBy('name')->get();
+        $documents = $project->documents()  // ← pakai relasi dari model Project
+            ->with(['category', 'uploader'])
+            ->latest()
+            ->get();
 
-        return view(
-            'project_documents.create',
-            compact('project', 'categories')
-        );
+        $categories = DocumentCategory::all();
+
+        return view('project_documents.index', compact('project', 'documents', 'categories'));
     }
 
     public function store(Request $request, Project $project)
     {
-        $validated = $request->validate([
-            'document_category_id' => 'required|exists:document_categories,id',
-            'file'                 => 'required|file|max:10240',
-            'notes'                => 'nullable',
+        $request->validate([
+            'file' => 'required|file|max:20480',
+            'document_category_id' => 'nullable|exists:document_categories,id',
+            'notes' => 'nullable|string|max:500',
         ]);
 
         $file = $request->file('file');
-        $path = $file->store('project-documents', 'public');
+        $originalName = $file->getClientOriginalName();
+        $path = $file->store('documents/' . $project->id, 'public');
 
         $project->documents()->create([
-            'document_category_id' => $validated['document_category_id'],
-            'file_name'            => $file->getClientOriginalName(),
-            'file_path'            => $path,
-            'notes'                => $validated['notes'] ?? null,
-            'uploaded_by'          => Auth::id(),
-        ]);
-
-        ProjectActivity::create([
-            'project_id'    => $project->id,
-            'user_id'       => auth()->id(),
-            'activity_date' => now(),
-            'title'         => 'Dokumen Diupload',
-            'description'   => $file->getClientOriginalName(),
+            'file_name' => $originalName,
+            'file_path' => $path,
+            'file_size' => $file->getSize(),
+            'notes' => $request->notes,
+            'document_category_id' => $request->document_category_id,
+            'uploaded_by' => auth()->id(),
         ]);
 
         return redirect()
-            ->route('projects.show', $project)
-            ->with('success', 'Dokumen berhasil diupload');
+            ->back()
+            ->with('success', 'Dokumen berhasil diupload.');
     }
 
-    public function show(ProjectDocument $projectDocument)
+    public function preview(ProjectDocument $document)
     {
-        $projectDocument->load(['project', 'uploader', 'category']);
-
-        return view(
-            'project_documents.show',
-            compact('projectDocument')
-        );
+        $filePath = storage_path('app/public/' . $document->file_path);
+        
+        if (!file_exists($filePath)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+    
+        $mimeType = $document->mime_type ?? mime_content_type($filePath);
+        $extension = strtolower(pathinfo($document->file_name, PATHINFO_EXTENSION));
+    
+        // Untuk gambar, PDF, video, audio → tampilkan langsung di browser
+        $inlineTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'mp4', 'webm', 'ogg', 'mp3', 'wav'];
+    
+        if (in_array($extension, $inlineTypes)) {
+            return response()->file($filePath, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . $document->file_name . '"'
+            ]);
+        }
+    
+        // Untuk Office (Word, Excel, PPT) → DOWNLOAD (karena Google Docs Viewer ga support IP lokal)
+        $officeTypes = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
+        if (in_array($extension, $officeTypes)) {
+            return Storage::disk('public')->download($document->file_path, $document->file_name);
+        }
+    
+        // Default: download
+        return Storage::disk('public')->download($document->file_path, $document->file_name);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProjectDocument $projectDocument)
+    public function download(ProjectDocument $document)
     {
-        //
+        // Cek apakah file ada di storage
+        if (!Storage::disk('public')->exists($document->file_path)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+    
+        return Storage::disk('public')->download($document->file_path, $document->file_name);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ProjectDocument $projectDocument)
+    public function destroy(ProjectDocument $document)
     {
-        //
-    }
+        // Hapus file dari storage kalau ada
+        if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
+            Storage::disk('public')->delete($document->file_path);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ProjectDocument $projectDocument)
-    {
-        //
+        // Force delete (hapus permanen dari database)
+        $document->forceDelete();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Dokumen berhasil dihapus.');
     }
 }
