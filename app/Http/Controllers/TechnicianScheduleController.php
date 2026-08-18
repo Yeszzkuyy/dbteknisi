@@ -47,7 +47,7 @@ class TechnicianScheduleController extends Controller
     {
         $technicians = User::orderBy('name')->get(['id', 'name']);
         $projects = Project::whereNotNull('project_name')->orderBy('project_name')->get(['id', 'project_name']);
-        $connected = $this->google->isConnected(auth()->user());
+        $connected = $this->google->isApiReachable();
 
         return view('teknisi.jadwal', compact('technicians', 'projects', 'connected'));
     }

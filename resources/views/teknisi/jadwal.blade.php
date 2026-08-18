@@ -14,26 +14,10 @@
                 <x-status-badge color="green" icon="✓">
                     Google Calendar Terhubung
                 </x-status-badge>
-                @can('manage-teknisi')
-                    <form action="{{ route('teknisi.kalender.disconnect') }}" method="POST"
-                          onsubmit="return confirm('Putuskan koneksi Google Calendar? Jadwal tetap tersimpan di aplikasi.')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="px-4 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium transition text-sm">
-                            Putuskan Koneksi
-                        </button>
-                    </form>
-                @endcan
             @else
                 <x-status-badge color="slate">
                     Google Calendar Belum Terhubung
                 </x-status-badge>
-                @can('manage-teknisi')
-                    <a href="{{ route('teknisi.kalender.connect') }}"
-                       class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
-                        Hubungkan Google Calendar
-                    </a>
-                @endcan
             @endif
         </div>
     </div>
