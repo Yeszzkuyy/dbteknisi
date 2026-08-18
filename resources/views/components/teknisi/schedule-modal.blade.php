@@ -45,6 +45,12 @@ document.addEventListener('alpine:init', () => {
                 this.scheduleId = old.schedule_id || null;
                 if (old.schedule_id) this.setTechnician();
             }
+
+            const self = this;
+            window.teknisiSchedule = {
+                openCreate: (date) => self.openCreate(date),
+                openDetail: (ev) => self.openDetail(ev),
+            };
         },
 
         jakartaDate(d) {
