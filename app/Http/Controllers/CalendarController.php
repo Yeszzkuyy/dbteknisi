@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Services\GoogleCalendarService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class CalendarController extends Controller
 {
-    public function googleEvents(GoogleCalendarService $calendar)
+    public function googleEvents(Request $request, GoogleCalendarService $calendar)
     {
+        $from = $request->query('start') ? Carbon::parse($request->query('start')) : null;
+        $to = $request->query('end') ? Carbon::parse($request->query('end')) : null;
+
         try {
-            $events = $calendar->upcomingEvents(20);
+            $events = $calendar->upcomingEvents(100, $from, $to);
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
