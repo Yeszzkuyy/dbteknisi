@@ -17,11 +17,6 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Company (jika berbeda)</label>
-                        <input type="text" name="company" value="{{ old('company') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    </div>
-
-                    <div>
                         <label class="block text-sm font-medium text-gray-700">Address</label>
                         <textarea name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
                     </div>

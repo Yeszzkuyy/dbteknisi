@@ -21,29 +21,17 @@
                 @method('PUT')
 
                 <div class="space-y-4">
-                    {{-- Nama --}}
+                    {{-- Nama Perusahaan --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            Nama <span class="text-red-500">*</span>
+                            Nama Perusahaan <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="name" 
-                               value="{{ old('name', $customer->name) }}" 
+                        <input type="text"
+                               name="name"
+                               value="{{ old('name', $customer->name) }}"
                                required
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                    </div>
-
-                    {{-- Company --}}
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">
-                            Company (jika berbeda)
-                        </label>
-                        <input type="text" 
-                               name="company" 
-                               value="{{ old('company', $customer->company) }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        @error('company') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     {{-- Address --}}

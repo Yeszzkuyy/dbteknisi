@@ -56,6 +56,9 @@ class CustomerController extends Controller
             'status' => 'nullable|in:lead,deal,instalasi,selesai',
         ]);
 
+        // Form customer hanya punya satu kolom nama; company = name supaya tampilan Lead/Monitoring konsisten
+        $validated['company'] ??= $validated['name'];
+
         Customer::create($validated);
 
         return redirect()
@@ -102,6 +105,8 @@ class CustomerController extends Controller
             'notes' => 'nullable',
             'status' => 'nullable|in:lead,deal,instalasi,selesai',
         ]);
+
+        $validated['company'] ??= $validated['name'];
 
         $customer->update($validated);
 
