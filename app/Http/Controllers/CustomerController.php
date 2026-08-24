@@ -27,8 +27,10 @@ class CustomerController extends Controller
             ->latest()
             ->get();
 
-        return view('customers.index', compact('customers'))
-            ->with('search', $request->string('search'));
+        return $request->ajax()
+            ? view('customers._list', compact('customers'))->render()
+            : view('customers.index', compact('customers'))
+                ->with('search', $request->string('search'));
     }
 
     /**
