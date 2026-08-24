@@ -7,6 +7,7 @@ use App\Models\ProjectStatus;
 use App\Models\Customer;
 use App\Models\AccountManager;
 use App\Models\WorkType;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\Project\ProjectService;
 use App\Enums\ProjectStatus as ProjectStatusEnum;
@@ -56,8 +57,9 @@ class ProjectController extends Controller
         $workTypes = WorkType::all();
         $accountManagers = AccountManager::all();
         $statuses = ProjectStatus::orderBy('sort_order')->get();
-        
-        return view('projects.create', compact('customer', 'workTypes', 'accountManagers', 'statuses'));
+        $technicians = User::role('teknisi')->orderBy('name')->get(['id', 'name']);
+
+        return view('projects.create', compact('customer', 'workTypes', 'accountManagers', 'statuses', 'technicians'));
     }
 
     public function store(Request $request)
@@ -68,10 +70,13 @@ class ProjectController extends Controller
             'work_type_id' => 'required|exists:work_types,id',
             'account_manager_id' => 'nullable|exists:account_managers,id',
             'pic_engineer' => 'required|string|max:255',
-            'support_technicians' => 'nullable|string|max:500',
+            'support_technicians' => 'nullable|array',
+            'support_technicians.*' => 'string|max:255',
             'project_status_id' => 'nullable|exists:project_statuses,id',
             'description' => 'nullable|string',
         ]);
+
+        $validated['support_technicians'] = implode(', ', array_filter($validated['support_technicians'] ?? []));
 
         $project = $this->projectService->create($validated);
 
@@ -101,24 +106,27 @@ class ProjectController extends Controller
         $workTypes = WorkType::all();
         $accountManagers = AccountManager::all();
         $statuses = ProjectStatus::orderBy('sort_order')->get();
-        
-        return view('projects.edit', compact('project', 'customers', 'workTypes', 'accountManagers', 'statuses'));
+        $technicians = User::role('teknisi')->orderBy('name')->get(['id', 'name']);
+
+        return view('projects.edit', compact('project', 'customers', 'workTypes', 'accountManagers', 'statuses', 'technicians'));
     }
 
     public function update(Request $request, Project $project)
     {
         $validated = $request->validate([
             'project_name' => 'required|string|max:255',
-            'customer_id' => 'required|exists:customers,id',
             'work_type_id' => 'required|exists:work_types,id',
             'account_manager_id' => 'nullable|exists:account_managers,id',
             'pic_engineer' => 'required|string|max:255',
-            'support_technicians' => 'nullable|string|max:500',
+            'support_technicians' => 'nullable|array',
+            'support_technicians.*' => 'string|max:255',
             'project_status_id' => 'nullable|exists:project_statuses,id',
             'progress' => 'nullable|integer|min:0|max:100',
             'description' => 'nullable|string',
         ]);
-    
+
+        $validated['support_technicians'] = implode(', ', array_filter($validated['support_technicians'] ?? []));
+
         $project->update($validated);
     
         return redirect()

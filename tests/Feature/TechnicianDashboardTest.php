@@ -79,6 +79,36 @@ class TechnicianDashboardTest extends TestCase
             ->assertDontSee('Jadwal Hari Ini');
     }
 
+    public function test_technician_matched_despite_case_whitespace_and_support_list(): void
+    {
+        $user = $this->authorizedUser();
+
+        $andi = User::factory()->create(['name' => 'Andi Pratama']);
+        $andi->assignRole('teknisi');
+        User::factory()->create(['name' => 'Sari'])->assignRole('teknisi');
+
+        $open = ProjectStatus::create(['name' => 'Open', 'color' => 'blue', 'sort_order' => 1]);
+
+        $this->actingAs($user);
+
+        // pic_engineer beda kapital/spasi, support_technicians berupa daftar koma
+        Project::create([
+            'customer_id' => Customer::create(['name' => 'PT ABC'])->id,
+            'work_type_id' => WorkType::create(['name' => 'Instalasi'])->id,
+            'project_status_id' => $open->id,
+            'pic_engineer' => ' andi pratama ',
+            'support_technicians' => 'Rudi, Sari ,Joko',
+            'project_name' => 'Instalasi Jaringan',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('teknisi.dashboard'))
+            ->assertOk()
+            ->assertSee('Andi Pratama')
+            ->assertSee('Sari')
+            ->assertSee('Instalasi Jaringan');
+    }
+
     public function test_technician_without_running_project_is_not_active(): void
     {
         $user = $this->authorizedUser();

@@ -49,16 +49,29 @@
                 </div>
 
                 {{-- PIC Engineer --}}
+                @php
+                    $selectedPic = old('pic_engineer', $project->pic_engineer);
+                    $selectedSupport = collect((array) old('support_technicians', $project->support_technicians))
+                        ->flatMap(fn ($v) => explode(',', (string) $v))
+                        ->map(fn ($v) => trim($v))
+                        ->filter()
+                        ->unique()
+                        ->values();
+                @endphp
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">
                         PIC Engineer <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" 
-                           name="pic_engineer" 
-                           value="{{ old('pic_engineer', $project->pic_engineer) }}"
-                           required
-                           placeholder="Nama PIC Engineer yang bertanggung jawab"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <select name="pic_engineer" required
+                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">- Pilih Teknisi -</option>
+                        @foreach($technicians as $tech)
+                            <option value="{{ $tech->name }}" {{ $selectedPic === $tech->name ? 'selected' : '' }}>{{ $tech->name }}</option>
+                        @endforeach
+                        @if($selectedPic && !$technicians->pluck('name')->contains($selectedPic))
+                            <option value="{{ $selectedPic }}" selected>{{ $selectedPic }} (data lama)</option>
+                        @endif
+                    </select>
                     @error('pic_engineer') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -67,12 +80,13 @@
                     <label class="block text-sm font-medium text-slate-700 mb-1">
                         Support Technicians <span class="text-slate-400 text-xs">(Opsional)</span>
                     </label>
-                    <input type="text" 
-                           name="support_technicians" 
-                           value="{{ old('support_technicians', $project->support_technicians) }}"
-                           placeholder="Nama support teknisi (pisahkan dengan koma jika lebih dari 1)"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <p class="text-xs text-slate-400 mt-1">Contoh: Budi, Andi, Siti</p>
+                    <select name="support_technicians[]" multiple size="{{ min(5, max(2, $technicians->count())) }}"
+                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        @foreach($technicians as $tech)
+                            <option value="{{ $tech->name }}" {{ $selectedSupport->contains($tech->name) ? 'selected' : '' }}>{{ $tech->name }}</option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-slate-400 mt-1">Tahan Ctrl/Cmd untuk memilih lebih dari satu.</p>
                     @error('support_technicians') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 

@@ -15,6 +15,7 @@ class Project extends Model
         'customer_id',
         'account_manager_id',
         'work_type_id',
+        'project_status_id',
         'pic_engineer', // ← ganti dari pic_engineer_id
         'support_technicians', // ← tambahkan
         'project_name',
