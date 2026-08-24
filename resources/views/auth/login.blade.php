@@ -197,7 +197,7 @@
 
                 <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
 
-                @if ($kickedAt)
+                @if ($kickedAt ?? null)
                     <div
                         x-data="{ kickedNotice: true }"
                         x-show="kickedNotice"
