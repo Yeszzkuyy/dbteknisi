@@ -179,21 +179,43 @@
             <x-section-header title="Teknisi Aktif" />
 
             @forelse($activeTechnicians as $technician)
-                <div class="flex items-center gap-3 py-3 border-b border-slate-100 last:border-0">
-                    <div class="relative shrink-0">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <span class="text-blue-600 font-semibold text-sm">{{ strtoupper(substr($technician->name, 0, 1)) }}</span>
-                        </div>
+                <div class="flex items-start gap-3 py-3 border-b border-slate-100 {{ $loop->last && $idleTechnicians->isEmpty() ? 'border-0' : '' }}">
+                    <div class="relative shrink-0 mt-0.5">
+                        <x-user-avatar :user="$technician" size="w-10 h-10" text="text-sm" />
                         <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-white"></span>
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-slate-800 text-sm truncate">{{ $technician->name }}</p>
-                        <p class="text-xs text-slate-500 mt-0.5 truncate">{{ $currentProjectByTechnician[$technician->id]->project_name }}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">{{ $projectsByTechnician[$technician->id]->count() }} project berjalan</p>
+                        <div class="mt-1 flex flex-col gap-0.5">
+                            @foreach($projectsByTechnician[$technician->id] as $project)
+                                <a href="{{ route('projects.show', $project) }}"
+                                   class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline truncate transition">
+                                    {{ $project->project_name }}
+                                </a>
+                            @endforeach
+                        </div>
                     </div>
                     <x-status-badge color="green">Aktif</x-status-badge>
                 </div>
             @empty
                 <x-empty-state label="teknisi aktif" description="Teknisi dianggap aktif saat memiliki project yang sedang berjalan." />
+            @endforelse
+
+            @if($idleTechnicians->isNotEmpty() && $activeTechnicians->isNotEmpty())
+                <p class="pt-4 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wide">Tidak Aktif</p>
+            @endif
+
+            @forelse($idleTechnicians as $technician)
+                <div class="flex items-center gap-3 py-3 border-b border-slate-100 last:border-0 opacity-60">
+                    <x-user-avatar :user="$technician" size="w-10 h-10" text="text-sm" />
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-slate-800 text-sm truncate">{{ $technician->name }}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Tidak ada project berjalan</p>
+                    </div>
+                    <x-status-badge color="slate">Idle</x-status-badge>
+                </div>
+            @empty
             @endforelse
         </div>
     </div>
