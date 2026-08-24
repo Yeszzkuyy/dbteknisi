@@ -65,5 +65,10 @@ class ProjectTechnicianSelectTest extends TestCase
         $project->refresh();
         $this->assertSame('Teknisi Satu, Teknisi Dua', $project->support_technicians);
         $this->assertSame($done->id, $project->project_status_id, 'Status project harus ikut tersimpan saat update.');
+
+        // Project berstatus non-aktif tidak boleh hilang dari daftar
+        $this->get(route('projects.index'))
+            ->assertOk()
+            ->assertSee('Project Uji Pilih Teknisi');
     }
 }

@@ -23,23 +23,21 @@ class ProjectController extends Controller
 
     public function index()
     {
-        // Ambil project dengan status Open atau Progress
+        // Semua project ditampilkan supaya perubahan status tidak membuat project "menghilang" dari daftar
         $projects = Project::with(['customer', 'workType', 'status'])
-            ->whereHas('status', fn ($q) => $q->whereIn('name', [
-                ProjectStatusEnum::Open->value,
-                ProjectStatusEnum::OnProgress->value,
-            ]))
             ->latest()
             ->get();
 
         // Total semua project
-        $totalProjects = Project::count();
+        $totalProjects = $projects->count();
 
         // Total project aktif
-        $activeProjects = Project::whereHas('status', fn ($q) => $q->whereIn('name', [
-            ProjectStatusEnum::Open->value,
-            ProjectStatusEnum::OnProgress->value,
-        ]))->count();
+        $activeProjects = $projects
+            ->filter(fn ($p) => in_array($p->status?->name, [
+                ProjectStatusEnum::Open->value,
+                ProjectStatusEnum::OnProgress->value,
+            ], true))
+            ->count();
 
         return view('projects.index', compact('projects', 'totalProjects', 'activeProjects'));
     }

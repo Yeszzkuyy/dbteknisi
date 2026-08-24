@@ -62,13 +62,17 @@
                     <label class="block text-sm font-medium text-slate-700 mb-1">
                         Support Technicians <span class="text-slate-400 text-xs">(Opsional)</span>
                     </label>
-                    <select name="support_technicians[]" multiple size="{{ min(5, max(2, $technicians->count())) }}"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         @foreach($technicians as $tech)
-                            <option value="{{ $tech->name }}" {{ in_array($tech->name, (array) old('support_technicians', [])) ? 'selected' : '' }}>{{ $tech->name }}</option>
+                            <label class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" name="support_technicians[]" value="{{ $tech->name }}"
+                                       class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                       {{ in_array($tech->name, (array) old('support_technicians', [])) ? 'checked' : '' }}>
+                                {{ $tech->name }}
+                            </label>
                         @endforeach
-                    </select>
-                    <p class="text-xs text-slate-400 mt-1">Tahan Ctrl/Cmd untuk memilih lebih dari satu.</p>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Centang teknisi pendukung (boleh lebih dari satu).</p>
                     @error('support_technicians') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 

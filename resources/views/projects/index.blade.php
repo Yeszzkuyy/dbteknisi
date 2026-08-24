@@ -3,8 +3,8 @@
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Daftar Project Aktif</h1>
-            <p class="text-slate-500 mt-1">Project dengan status Open atau Progress</p>
+            <h1 class="text-3xl font-bold text-slate-800">Daftar Project</h1>
+            <p class="text-slate-500 mt-1">Semua project, termasuk yang selesai atau di-hold</p>
         </div>
         <div class="flex gap-2">
             <a href="{{ route('customers.index') }}" 
