@@ -10,17 +10,25 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Tarik data customer, hitung jumlah project, dan ambil kontak yang is_primary saja
         $customers = Customer::withCount('projects')
             ->with(['contacts' => function ($query) {
                 $query->where('is_primary', true);
             }])
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $term = '%'.strtolower($request->string('search')).'%';
+                $query->where(function ($q) use ($term) {
+                    $q->whereRaw('LOWER(name) LIKE ?', [$term])
+                      ->orWhereRaw('LOWER(company) LIKE ?', [$term])
+                      ->orWhereRaw('LOWER(email) LIKE ?', [$term]);
+                });
+            })
             ->latest()
             ->get();
 
-        return view('customers.index', compact('customers'));
+        return view('customers.index', compact('customers'))
+            ->with('search', $request->string('search'));
     }
 
     /**

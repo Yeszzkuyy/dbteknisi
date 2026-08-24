@@ -25,13 +25,19 @@
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600">
 
         <div class="p-5 border-b">
-
-            <input
-                type="text"
-                placeholder="Cari nama customer..."
-                class="w-full md:w-96 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-            >
-
+            <form method="GET" action="{{ route('customers.index') }}" class="flex flex-col sm:flex-row gap-3">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Cari nama customer..."
+                    class="w-full md:w-96 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                >
+                <button type="submit"
+                        class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition whitespace-nowrap">
+                    Cari
+                </button>
+            </form>
         </div>
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
             <div class="overflow-x-auto">
