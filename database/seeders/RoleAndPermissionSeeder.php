@@ -106,5 +106,10 @@ class RoleAndPermissionSeeder extends Seeder
             ]
         );
         $superAdminUser->assignRole('super-admin');
+
+        // === 5. Kembalikan super-admin ke user yang punya kolom role=super-admin ===
+        // (seeder ini menghapus semua assignment role di atas, jadi pulihkan di sini)
+        User::where('role', 'super-admin')->get()
+            ->each(fn (User $u) => $u->assignRole('super-admin'));
     }
 }
