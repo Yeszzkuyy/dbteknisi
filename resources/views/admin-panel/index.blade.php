@@ -34,6 +34,7 @@
             <table class="w-full">
                 <thead class="bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
                     <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider w-16">Foto</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider">Nama</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider">Email</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider">Role</th>
@@ -45,6 +46,9 @@
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
                     @forelse($users as $user)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                            <td class="px-4 py-3">
+                                <x-user-avatar :user="$user" size="w-10 h-10" text="text-sm" clickable />
+                            </td>
                             <td class="px-4 py-3">
                                 <p class="font-medium text-slate-900 dark:text-slate-100">{{ $user->name }}</p>
                                 @if($user->id === auth()->id())
@@ -79,7 +83,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-12 text-center text-slate-400">Tidak ada data user.</td>
+                            <td colspan="7" class="px-4 py-12 text-center text-slate-400">Tidak ada data user.</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -78,6 +78,7 @@
 
         <div class="main-content">
             @include('layouts.partials.header')
+            @include('partials.avatar-lightbox')
 
             <div class="px-4 sm:px-6 lg:px-8 pt-5">
                 @if(session('success'))
