@@ -60,8 +60,10 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
+        $ptGroups = self::PT_GROUPS;
+        $salesUsers = User::role(['sales', 'marketing', 'manager'])->orderBy('name')->get(['id', 'name']);
 
-        return view('leads.create', compact('customers', 'segments', 'sources'));
+        return view('leads.create', compact('customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
     }
 
     public function store(Request $request)
