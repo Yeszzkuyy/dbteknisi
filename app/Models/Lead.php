@@ -29,6 +29,11 @@ class Lead extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    public function activities()
+    {
+        return $this->hasMany(LeadActivity::class);
+    }
+
     public function assignee()
     {
         return $this->belongsTo(User::class, 'assigned_to');
