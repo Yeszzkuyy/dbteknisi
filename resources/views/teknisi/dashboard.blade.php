@@ -89,9 +89,31 @@
         @endphp
 
         <div class="flex flex-col sm:flex-row items-center gap-8">
-            <div class="w-48 h-48 rounded-full shrink-0 relative" style="background: conic-gradient({{ $segments }})">
-                <div class="absolute inset-6 rounded-full bg-white flex flex-col items-center justify-center">
-                    <span class="text-3xl font-bold text-slate-800 tabular-nums">{{ $donePct }}%</span>
+            {{-- Donut progress: animasi muncul + angka menghitung naik saat halaman dibuka --}}
+            <div
+                x-data="{
+                    started: false,
+                    pct: 0,
+                    target: {{ $donePct }},
+                    animate() {
+                        this.started = true;
+                        if (this.target <= 0) return;
+                        const step = Math.max(1, Math.round(this.target / 30));
+                        const timer = setInterval(() => {
+                            this.pct = Math.min(this.target, this.pct + step);
+                            if (this.pct >= this.target) clearInterval(timer);
+                        }, 30);
+                    }
+                }"
+                x-init="setTimeout(() => animate(), 200)"
+                class="w-48 h-48 rounded-full shrink-0 relative transition-all duration-700 ease-out"
+                :class="started ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-75 -rotate-90'"
+                style="background: conic-gradient({{ $segments }})"
+            >
+                <div class="absolute inset-6 rounded-full bg-white dark:bg-slate-800 flex flex-col items-center justify-center">
+                    <span class="text-3xl font-bold text-slate-800 dark:text-slate-100 tabular-nums">
+                        <span x-text="pct">{{ $donePct }}</span>%
+                    </span>
                     <span class="text-xs text-slate-500 mt-1">Selesai</span>
                 </div>
             </div>
