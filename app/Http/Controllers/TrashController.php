@@ -49,4 +49,30 @@ class TrashController extends Controller
             ->route('trash.index')
             ->with('success', 'Project "'.$project->project_name.'" berhasil direstore');
     }
+
+    /**
+     * Hapus permanen Customer dari trash.
+     */
+    public function destroyCustomer(int $id)
+    {
+        $customer = Customer::onlyTrashed()->findOrFail($id);
+        $customer->forceDelete();
+
+        return redirect()
+            ->route('trash.index')
+            ->with('success', 'Customer "'.$customer->name.'" dihapus permanen');
+    }
+
+    /**
+     * Hapus permanen semua isi trash (Customer & Project).
+     */
+    public function clear()
+    {
+        Customer::onlyTrashed()->forceDelete();
+        Project::onlyTrashed()->forceDelete();
+
+        return redirect()
+            ->route('trash.index')
+            ->with('success', 'Trash berhasil dibersihkan');
+    }
 }

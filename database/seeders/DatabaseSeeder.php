@@ -39,5 +39,8 @@ class DatabaseSeeder extends Seeder
         DocumentCategory::firstOrCreate(['name' => 'Report Survey']);
         DocumentCategory::firstOrCreate(['name' => 'Report Instalasi']);
         DocumentCategory::firstOrCreate(['name' => 'Dokumen Pendukung']);
+
+        // 3. Data contoh (user per divisi, customer, project, aktivitas)
+        $this->call(SampleDataSeeder::class);
     }
 }

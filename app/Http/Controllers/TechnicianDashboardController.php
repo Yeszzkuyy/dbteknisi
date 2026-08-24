@@ -34,7 +34,7 @@ class TechnicianDashboardController extends Controller
     {
         $now = Carbon::now('Asia/Jakarta');
 
-        $technicians = User::role('teknisi')->orderBy('name')->get(['id', 'name']);
+        $technicians = User::role('teknisi')->orderBy('name')->get(['id', 'name', 'avatar']);
 
         $runningProjects = Project::with(['customer', 'status'])
             ->whereHas('status', fn ($q) => $q->whereIn('name', self::ACTIVE_STATUSES))
@@ -42,7 +42,7 @@ class TechnicianDashboardController extends Controller
 
         $doneProjects = Project::whereHas('status', fn ($q) => $q->where('name', 'Done'))->count();
 
-        [$activeTechnicians, $currentProjectByTechnician] = $this->activeTechnicians($technicians, $runningProjects);
+        [$activeTechnicians, $idleTechnicians, $projectsByTechnician] = $this->splitTechniciansByActivity($technicians, $runningProjects);
 
         $statusCounts = ProjectStatus::withCount('projects')
             ->orderBy('sort_order')
@@ -72,7 +72,8 @@ class TechnicianDashboardController extends Controller
             'runningProjects',
             'doneProjects',
             'activeTechnicians',
-            'currentProjectByTechnician',
+            'idleTechnicians',
+            'projectsByTechnician',
             'statusCounts',
             'totalProjects',
             'statusBadgeColors',
@@ -83,24 +84,28 @@ class TechnicianDashboardController extends Controller
         ));
     }
 
-    private function activeTechnicians($technicians, $runningProjects): array
+    private function splitTechniciansByActivity($technicians, $runningProjects): array
     {
-        $active = [];
-        $current = [];
+        // ponytail: name-matching against pic_engineer/support_technicians text columns; switch to a relation if matching drifts
+        $active = collect();
+        $idle = collect();
+        $projects = [];
 
         foreach ($technicians as $technician) {
             $name = strtolower($technician->name);
-            $project = $runningProjects->first(function ($p) use ($name) {
+            $matched = $runningProjects->filter(function ($p) use ($name) {
                 return strtolower((string) $p->pic_engineer) === $name
                     || str_contains(strtolower((string) $p->support_technicians), $name);
-            });
+            })->values();
 
-            if ($project) {
-                $active[] = $technician;
-                $current[$technician->id] = $project;
+            if ($matched->isNotEmpty()) {
+                $active->push($technician);
+                $projects[$technician->id] = $matched;
+            } else {
+                $idle->push($technician);
             }
         }
 
-        return [$active, $current];
+        return [$active, $idle, $projects];
     }
 }
