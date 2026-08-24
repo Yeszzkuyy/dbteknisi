@@ -9,8 +9,11 @@ class Lead extends Model
 {
     use SoftDeletes;
 
+    public const PT_GROUPS = ['NTI', 'MGK', 'TPS', 'WANI'];
+
     protected $fillable = [
         'customer_id',
+        'pt_group',
         'segment',
         'status',
         'source',

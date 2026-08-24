@@ -74,6 +74,9 @@ class LeadController extends Controller
             'customer_phone' => 'nullable|string|max:50',
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
+            'customer_contact_person' => 'nullable|string|max:255',
+            'pt_group' => 'required|in:'.implode(',', self::PT_GROUPS),
+            'assigned_to' => 'nullable|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
@@ -84,11 +87,16 @@ class LeadController extends Controller
         if ($validated['customer_mode'] === 'new') {
             $validated['customer_id'] = Customer::create([
                 'name' => $validated['customer_name'],
-                'company' => $validated['customer_company'] ?? null,
+                'company' => $validated['customer_company'] ?? $validated['customer_name'],
                 'email' => $validated['customer_email'] ?? null,
                 'phone' => $validated['customer_phone'] ?? null,
                 'address' => $validated['customer_address'] ?? null,
+                'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
+        } elseif (!empty($validated['customer_contact_person'])) {
+            Customer::whereKey($validated['customer_id'])->update([
+                'contact_person' => $validated['customer_contact_person'],
+            ]);
         }
 
         unset(
@@ -98,6 +106,7 @@ class LeadController extends Controller
             $validated['customer_email'],
             $validated['customer_phone'],
             $validated['customer_address'],
+            $validated['customer_contact_person'],
         );
 
         $validated['status'] ??= 'new';
@@ -124,8 +133,10 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
+        $ptGroups = self::PT_GROUPS;
+        $salesUsers = User::role(['sales', 'marketing', 'manager'])->orderBy('name')->get(['id', 'name']);
 
-        return view('leads.edit', compact('lead', 'customers', 'segments', 'sources'));
+        return view('leads.edit', compact('lead', 'customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
     }
 
     public function update(Request $request, Lead $lead)
@@ -138,6 +149,9 @@ class LeadController extends Controller
             'customer_phone' => 'nullable|string|max:50',
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
+            'customer_contact_person' => 'nullable|string|max:255',
+            'pt_group' => 'required|in:'.implode(',', self::PT_GROUPS),
+            'assigned_to' => 'nullable|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
@@ -148,11 +162,16 @@ class LeadController extends Controller
         if ($validated['customer_mode'] === 'new') {
             $validated['customer_id'] = Customer::create([
                 'name' => $validated['customer_name'],
-                'company' => $validated['customer_company'] ?? null,
+                'company' => $validated['customer_company'] ?? $validated['customer_name'],
                 'email' => $validated['customer_email'] ?? null,
                 'phone' => $validated['customer_phone'] ?? null,
                 'address' => $validated['customer_address'] ?? null,
+                'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
+        } elseif (!empty($validated['customer_contact_person'])) {
+            Customer::whereKey($validated['customer_id'])->update([
+                'contact_person' => $validated['customer_contact_person'],
+            ]);
         }
 
         unset(
@@ -162,6 +181,7 @@ class LeadController extends Controller
             $validated['customer_email'],
             $validated['customer_phone'],
             $validated['customer_address'],
+            $validated['customer_contact_person'],
         );
 
         $lead->fill($validated);
