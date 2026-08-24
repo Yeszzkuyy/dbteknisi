@@ -60,6 +60,8 @@
         .dark .text-slate-800,.dark .text-gray-900,.dark .text-slate-700,.dark .text-gray-700{color:var(--text-primary)!important}
         .dark .text-slate-600,.dark .text-gray-600{color:var(--text-secondary)!important}
         .dark .text-slate-500,.dark .text-gray-500{color:var(--text-muted)!important}
+        /* Teks tanpa class warna ikut var tema — jangan biarkan hitam bawaan browser di mode gelap */
+        html.dark body{color:var(--text-primary)}
         .dark th.text-slate-500,.dark th.text-slate-600{color:var(--text-secondary)!important}
         input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]):not([type=range]):not([type=hidden]),select,textarea{background-color:var(--input-bg)!important;border-color:var(--input-border)!important;color:var(--input-text)!important}
         input:focus,select:focus,textarea:focus{border-color:#3b82f6!important}

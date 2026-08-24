@@ -22,7 +22,7 @@
                                         {{ $customer->name }}
                                     </div>
 
-                                    <div class="text-sm text-slate-500 mt-1">
+                                    <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                         {{ $customer->address }}
                                     </div>
 
@@ -36,13 +36,13 @@
                                             {{ $customer->contacts->first()->name }}
                                         </div>
 
-                                        <div class="text-sm text-slate-500">
+                                        <div class="text-sm text-slate-500 dark:text-slate-400">
                                             {{ $customer->contacts->first()->phone }}
                                         </div>
 
                                     @else
 
-                                        <span class="text-slate-400 italic">
+                                        <span class="text-slate-400 dark:text-slate-500 italic">
                                             Belum ada PIC
                                         </span>
 
@@ -52,7 +52,7 @@
 
                                 <td class="px-6 py-4 text-center">
 
-                                    <span class="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold">
+                                    <span class="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 text-sm font-semibold">
 
                                         {{ $customer->projects_count }}
 
@@ -100,7 +100,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="py-16 text-center text-slate-400">
+                                <td colspan="4" class="py-16 text-center text-slate-400 dark:text-slate-500">
 
                                     Belum ada customer.
 
