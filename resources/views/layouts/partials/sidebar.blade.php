@@ -122,11 +122,13 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
                         Follow Up
                     </a>
-                    <a href="{{ route('projects.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                        Project
-                    </a>
+                    @if(auth()->user()->can('view-teknisi') || auth()->user()->can('view-sales'))
+                        <a href="{{ route('projects.index') }}"
+                           class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                            Project
+                        </a>
+                    @endif
                 </div>
             </div>
         @endcan

@@ -51,17 +51,32 @@ class DivisionAccessTest extends TestCase
         $res = $this->actingAs($u)->get('/sales/meetings')->assertOk();
         $html = $res->getContent();
 
-        foreach (['/customers', '/trash'] as $link) {
+        foreach (['/customers', '/trash', '/projects'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for sales");
         }
-        foreach (['/admin/invoices', '/leads"', '/monitoring'] as $link) {
+        foreach (['/admin/invoices', '/leads"'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for sales");
         }
 
         $this->actingAs($u)->get('/dashboard')->assertOk();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
-        $this->actingAs($u)->get('/projects')->assertForbidden();
+
+        // Sales read-only pada Project: boleh lihat, dilarang mengubah
+        $customer = \App\Models\Customer::create(['name' => 'Cust Sales']);
+        $workType = \App\Models\WorkType::create(['name' => 'Instalasi']);
+        $project = \App\Models\Project::create([
+            'customer_id' => $customer->id,
+            'work_type_id' => $workType->id,
+            'project_name' => 'Proj Sales',
+        ]);
+        $this->actingAs($u)->get('/projects')->assertOk();
+        $this->actingAs($u)->get('/projects/'.$project->id)->assertOk();
+        $this->actingAs($u)->post('/projects', [])->assertForbidden();
+        $this->actingAs($u)->put('/projects/'.$project->id, [])->assertForbidden();
+        $this->actingAs($u)->delete('/projects/'.$project->id)->assertForbidden();
+        $this->assertNotNull($project->fresh());
+
         $this->actingAs($u)->get('/teknisi/dashboard')->assertForbidden();
         $this->actingAs($u)->get('/admin/invoices')->assertForbidden();
         $this->actingAs($u)->get('/monitoring')->assertForbidden();
