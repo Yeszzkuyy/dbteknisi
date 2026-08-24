@@ -5,7 +5,7 @@
                 <h1 class="text-3xl font-bold text-slate-800">Edit Invoice</h1>
                 <p class="text-slate-500 mt-1">{{ $invoice->invoice_number }}</p>
             </div>
-            <a href="{{ route('admin.invoices.index') }}" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">Kembali</a>
+            <a href="{{ route('admin.invoices.index') }}" class="px-4 py-2.5 rounded-xl bg-blue-400 hover:bg-blue-500 text-white text-sm font-medium transition">Kembali</a>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">

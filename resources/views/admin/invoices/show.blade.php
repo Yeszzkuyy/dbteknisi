@@ -9,7 +9,7 @@
                 @can('manage-admin')
                     <a href="{{ route('admin.invoices.edit', $invoice) }}" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium transition">Edit</a>
                 @endcan
-                <a href="{{ route('admin.invoices.index') }}" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">Kembali</a>
+                <a href="{{ route('admin.invoices.index') }}" class="px-4 py-2.5 rounded-xl bg-blue-400 hover:bg-blue-500 text-white text-sm font-medium transition">Kembali</a>
             </div>
         </div>
 

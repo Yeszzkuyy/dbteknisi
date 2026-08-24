@@ -2,7 +2,7 @@
     <div>
         <div class="flex items-center justify-between mb-6">
             <div><h1 class="text-3xl font-bold text-slate-800">Detail Pembayaran</h1><p class="text-slate-500 mt-1">{{ $payment->invoice->invoice_number }}</p></div>
-            <a href="{{ route('admin.payments.index') }}" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">Kembali</a>
+            <a href="{{ route('admin.payments.index') }}" class="px-4 py-2.5 rounded-xl bg-blue-400 hover:bg-blue-500 text-white text-sm font-medium transition">Kembali</a>
         </div>
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">

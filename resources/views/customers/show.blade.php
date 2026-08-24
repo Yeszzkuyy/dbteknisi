@@ -19,7 +19,7 @@
                     </a>
                 @endcan
                 <a href="{{ route('customers.index') }}" 
-                   class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">
+                   class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-blue-400 hover:bg-blue-500 text-white text-sm font-medium transition">
                     Kembali
                 </a>
             </div>

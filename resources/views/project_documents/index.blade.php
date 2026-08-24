@@ -9,7 +9,7 @@
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('customers.show', $project->customer_id) }}" 
-                   class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition">
+                   class="px-5 py-2.5 rounded-xl bg-blue-400 hover:bg-blue-500 text-white font-medium transition">
                     ← Kembali
                 </a>
             </div>

@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">Perbarui informasi user dan role</p>
         </div>
         <a href="{{ route('admin-panel.index') }}"
-           class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition">
+           class="px-4 py-2 bg-blue-400 text-white rounded-xl hover:bg-blue-500 transition">
             Kembali
         </a>
     </div>
