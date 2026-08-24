@@ -56,7 +56,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/customer-contacts/{customerContact}', [CustomerContactController::class, 'destroy'])->name('customer-contacts.destroy');
     });
 
-    Route::middleware('permission:view-sales|manage-sales')->group(function () {
+    Route::middleware('permission:view-sales|manage-sales|view-customer')->group(function () {
         Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
         Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
     });
@@ -137,7 +137,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/trash/projects/{id}/restore', [TrashController::class, 'restoreProject'])->name('trash.restore-project');
     });
 
-    Route::middleware('permission:view-admin|manage-admin')->group(function () {
+    Route::middleware('permission:view-admin|manage-admin|view-trash')->group(function () {
         Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
     });
 

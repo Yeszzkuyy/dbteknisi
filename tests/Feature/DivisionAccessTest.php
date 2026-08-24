@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 
-class RoleMenuTest extends TestCase
+class DivisionAccessTest extends TestCase
 {
     use RefreshDatabase;
 
