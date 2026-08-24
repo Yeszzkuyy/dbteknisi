@@ -30,30 +30,37 @@ class RoleAndPermissionSeeder extends Seeder
             $permissions[] = "view-{$d}";
         }
 
+        // Izin lintas divisi: semua role boleh lihat Customer & Trash tanpa membuka menu divisi lain
+        $permissions[] = 'view-customer';
+        $permissions[] = 'view-trash';
+
         foreach ($permissions as $name) {
             Permission::create(['name' => $name, 'guard_name' => 'web']);
         }
 
         // === 2. Create Roles & Assign Permissions ===
-        // Tiap role hanya melihat divisinya sendiri; manager & super-admin melihat semua.
+        // Tiap role: divisinya sendiri + Dashboard, Monitoring, Customer, Trash.
+        // Manager & super-admin melihat semuanya.
+        $common = ['view-monitoring', 'view-customer', 'view-trash'];
+
         $marketing = Role::create(['name' => 'marketing', 'guard_name' => 'web']);
         $marketing->givePermissionTo([
-            'manage-marketing', 'view-marketing',
+            'manage-marketing', 'view-marketing', ...$common,
         ]);
 
         $sales = Role::create(['name' => 'sales', 'guard_name' => 'web']);
         $sales->givePermissionTo([
-            'manage-sales', 'view-sales',
+            'manage-sales', 'view-sales', ...$common,
         ]);
 
         $admin = Role::create(['name' => 'admin', 'guard_name' => 'web']);
         $admin->givePermissionTo([
-            'manage-admin', 'view-admin',
+            'manage-admin', 'view-admin', ...$common,
         ]);
 
         $teknisi = Role::create(['name' => 'teknisi', 'guard_name' => 'web']);
         $teknisi->givePermissionTo([
-            'manage-teknisi', 'view-teknisi',
+            'manage-teknisi', 'view-teknisi', ...$common,
         ]);
 
         $manager = Role::create(['name' => 'manager', 'guard_name' => 'web']);

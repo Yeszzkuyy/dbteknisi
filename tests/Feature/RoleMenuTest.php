@@ -19,40 +19,96 @@ class RoleMenuTest extends TestCase
         return $user;
     }
 
-    public function test_teknisi_sees_only_teknisi_menu()
+    /**
+     * Matriks: tiap divisi melihat Dashboard + Monitoring + divisinya +
+     * Customer + Trash, tapi TIDAK menu/halaman divisi lain.
+     */
+    public function test_teknisi_menu_and_access()
     {
         $u = $this->loginAs('teknisi');
         $res = $this->actingAs($u)->get('/teknisi/dashboard')->assertOk();
         $html = $res->getContent();
-        $this->assertStringContainsString('Teknisi', $html);
-        foreach (['/leads"', '/admin/invoices', '/customers', '/monitoring', '/trash'] as $link) {
+
+        // terlihat
+        foreach (['/teknisi/jadwal', '/monitoring', '/customers', '/trash'] as $link) {
+            $this->assertStringContainsString($link, $html, "$link should be visible for teknisi");
+        }
+        // tersembunyi
+        foreach (['/leads"', '/admin/invoices', '/sales/meetings'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for teknisi");
         }
-        // tidak bisa akses halaman divisi lain
+
+        // akses URL
+        $this->actingAs($u)->get('/dashboard')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertOk();
+        $this->actingAs($u)->get('/customers')->assertOk();
+        $this->actingAs($u)->get('/trash')->assertOk();
         $this->actingAs($u)->get('/leads')->assertForbidden();
         $this->actingAs($u)->get('/admin/invoices')->assertForbidden();
-        $this->actingAs($u)->get('/customers')->assertForbidden();
         $this->actingAs($u)->get('/sales/meetings')->assertForbidden();
     }
 
-    public function test_sales_sees_only_sales_menu()
+    public function test_sales_menu_and_access()
     {
         $u = $this->loginAs('sales');
         $res = $this->actingAs($u)->get('/sales/meetings')->assertOk();
         $html = $res->getContent();
-        $this->assertStringContainsString('Sales', $html);
-        $this->assertStringNotContainsString('Teknisi', $html);
+
+        foreach (['/sales/follow-ups', '/customers', '/trash', '/monitoring'] as $link) {
+            $this->assertStringContainsString($link, $html, "$link should be visible for sales");
+        }
+        foreach (['/projects"', '/admin/invoices', '/leads"'] as $link) {
+            $this->assertStringNotContainsString($link, $html, "$link should be hidden for sales");
+        }
+
+        $this->actingAs($u)->get('/dashboard')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertOk();
+        $this->actingAs($u)->get('/customers')->assertOk();
+        $this->actingAs($u)->get('/trash')->assertOk();
         $this->actingAs($u)->get('/projects')->assertForbidden();
         $this->actingAs($u)->get('/teknisi/dashboard')->assertForbidden();
+        $this->actingAs($u)->get('/admin/invoices')->assertForbidden();
     }
 
-    public function test_admin_sees_only_admin_menu()
+    public function test_admin_menu_and_access()
     {
         $u = $this->loginAs('admin');
         $res = $this->actingAs($u)->get('/admin/invoices')->assertOk();
         $html = $res->getContent();
-        $this->assertStringContainsString('Admin', $html);
-        $this->assertStringNotContainsString('Marketing', $html);
+
+        foreach (['/admin/invoices', '/admin/pos', '/admin/payments', '/trash', '/customers'] as $link) {
+            $this->assertStringContainsString($link, $html, "$link should be visible for admin");
+        }
+        foreach (['/leads"', '/projects"', '/sales/meetings'] as $link) {
+            $this->assertStringNotContainsString($link, $html, "$link should be hidden for admin");
+        }
+
+        $this->actingAs($u)->get('/dashboard')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertOk();
+        $this->actingAs($u)->get('/customers')->assertOk();
+        $this->actingAs($u)->get('/trash')->assertOk();
+        $this->actingAs($u)->get('/projects')->assertForbidden();
+        $this->actingAs($u)->get('/leads')->assertForbidden();
+    }
+
+    public function test_marketing_menu_and_access()
+    {
+        $u = $this->loginAs('marketing');
+        $res = $this->actingAs($u)->get('/leads')->assertOk();
+        $html = $res->getContent();
+
+        foreach (['/partners', '/customers', '/trash', '/monitoring'] as $link) {
+            $this->assertStringContainsString($link, $html, "$link should be visible for marketing");
+        }
+        foreach (['/admin/invoices', '/projects"', '/sales/meetings'] as $link) {
+            $this->assertStringNotContainsString($link, $html, "$link should be hidden for marketing");
+        }
+
+        $this->actingAs($u)->get('/dashboard')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertOk();
+        $this->actingAs($u)->get('/customers')->assertOk();
+        $this->actingAs($u)->get('/trash')->assertOk();
+        $this->actingAs($u)->get('/admin/invoices')->assertForbidden();
         $this->actingAs($u)->get('/projects')->assertForbidden();
     }
 
@@ -62,6 +118,7 @@ class RoleMenuTest extends TestCase
         $this->actingAs($u)->get('/projects')->assertOk();
         $this->actingAs($u)->get('/leads')->assertOk();
         $this->actingAs($u)->get('/customers')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertOk();
     }
 
     public function test_super_admin_sees_all()
@@ -69,6 +126,7 @@ class RoleMenuTest extends TestCase
         $u = $this->loginAs('super-admin');
         $this->actingAs($u)->get('/projects')->assertOk();
         $this->actingAs($u)->get('/admin-panel')->assertOk();
+        $this->actingAs($u)->get('/trash')->assertOk();
     }
 
     public function test_super_admin_bypasses_all_gates()

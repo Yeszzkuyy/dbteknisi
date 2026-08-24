@@ -1,3 +1,50 @@
+@php
+    $currentRoute = request()->route()->getName();
+@endphp
+
+<aside class="w-full h-full bg-[var(--sidebar-bg)] flex flex-col">
+    {{-- Logo --}}
+    <div class="p-4 border-b border-[var(--sidebar-border)] flex-shrink-0">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+            <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
+                 class="h-10 w-auto object-contain bg-white rounded-lg p-0.5 dark:hidden">
+            <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
+                 class="h-10 w-auto object-contain bg-white rounded-lg p-0.5 hidden dark:block">
+            <div class="min-w-0">
+                <h1 class="text-xl font-bold text-blue-600 truncate">Tridaya App</h1>
+                <p class="text-xs text-slate-400 mt-0.5">3DY Group</p>
+            </div>
+        </a>
+    </div>
+
+    {{-- Menu --}}
+    <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
+        <!-- Dashboard -->
+        <a href="{{ route('dashboard') }}"
+           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+            <x-icon name="grid" class="w-5 h-5" />
+            <span>Dashboard</span>
+        </a>
+
+        {{-- Monitoring (Manager & Super Admin) --}}
+        @can('view-monitoring')
+            <a href="{{ route('monitoring.index') }}"
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('monitoring*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>Monitoring</span>
+            </a>
+        @endcan
+
+        <!-- Customer -->
+        @can('view-sales')
+            <a href="{{ route('customers.index') }}"
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('customers*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                <x-icon name="users" class="w-5 h-5" />
+                <span>Customer</span>
+            </a>
+        @endcan
 
         {{-- Teknisi --}}
         @can('view-teknisi')
@@ -120,7 +167,7 @@
         @endcan
 
         <!-- Trash -->
-        @can('view-admin')
+        @can('view-trash')
             <a href="{{ route('trash.index') }}"
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('trash*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                 <x-icon name="trash" class="w-5 h-5" />
