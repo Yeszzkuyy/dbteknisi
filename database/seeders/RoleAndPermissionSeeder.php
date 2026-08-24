@@ -35,28 +35,25 @@ class RoleAndPermissionSeeder extends Seeder
         }
 
         // === 2. Create Roles & Assign Permissions ===
+        // Tiap role hanya melihat divisinya sendiri; manager & super-admin melihat semua.
         $marketing = Role::create(['name' => 'marketing', 'guard_name' => 'web']);
         $marketing->givePermissionTo([
             'manage-marketing', 'view-marketing',
-            'view-sales', 'view-teknisi', 'view-admin', 'view-monitoring',
         ]);
 
         $sales = Role::create(['name' => 'sales', 'guard_name' => 'web']);
         $sales->givePermissionTo([
             'manage-sales', 'view-sales',
-            'view-marketing', 'view-teknisi', 'view-admin', 'view-monitoring',
         ]);
 
         $admin = Role::create(['name' => 'admin', 'guard_name' => 'web']);
         $admin->givePermissionTo([
             'manage-admin', 'view-admin',
-            'view-marketing', 'view-sales', 'view-teknisi', 'view-monitoring',
         ]);
 
         $teknisi = Role::create(['name' => 'teknisi', 'guard_name' => 'web']);
         $teknisi->givePermissionTo([
             'manage-teknisi', 'view-teknisi',
-            'view-marketing', 'view-sales', 'view-admin', 'view-monitoring',
         ]);
 
         $manager = Role::create(['name' => 'manager', 'guard_name' => 'web']);
