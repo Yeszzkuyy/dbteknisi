@@ -24,6 +24,7 @@ class Project extends Model
         'start_date',
         'end_date',
         'description',
+        'deleted_by',
     ];
 
     protected $casts = [
@@ -36,6 +37,11 @@ class Project extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function deleter()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 
     // Relasi ke AccountManager

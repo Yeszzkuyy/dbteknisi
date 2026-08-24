@@ -4,75 +4,112 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Project;
-use App\Models\ProjectDocument;
-use App\Models\ProjectTask;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class TrashController extends Controller
 {
     /**
-     * Tampilkan halaman trash gabungan: Customer, Project
-     * yang sudah di-soft-delete.
+     * User biasa: hanya data yang dihapus oleh dirinya sendiri (query-level).
+     * Super Admin: seluruh trash, dengan info penghapus + filter per user.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::onlyTrashed()->latest('deleted_at')->get();
-        $projects = Project::onlyTrashed()->latest('deleted_at')->get();
+        $isSuperAdmin = auth()->user()->hasRole('super-admin');
 
-        return view(
-            'trash.index',
-            compact('customers', 'projects')
-        );
+        [$customers, $projects] = $isSuperAdmin
+            ? $this->allTrash($request)
+            : $this->ownTrash();
+
+        $users = $isSuperAdmin
+            ? User::whereIn('id', Customer::onlyTrashed()->pluck('deleted_by')
+                ->merge(Project::onlyTrashed()->pluck('deleted_by'))
+                ->filter()->unique())->orderBy('name')->get(['id', 'name'])
+            : null;
+
+        return view('trash.index', compact('customers', 'projects', 'users', 'isSuperAdmin'));
     }
 
-    /**
-     * Restore Customer yang sudah di-soft-delete.
-     */
+    private function ownTrash(): array
+    {
+        $userId = auth()->id();
+
+        return [
+            Customer::onlyTrashed()->where('deleted_by', $userId)->latest('deleted_at')->get(),
+            Project::onlyTrashed()->where('deleted_by', $userId)->latest('deleted_at')->get(),
+        ];
+    }
+
+    private function allTrash(Request $request): array
+    {
+        $customerQuery = Customer::onlyTrashed()->with('deleter')->latest('deleted_at');
+        $projectQuery = Project::onlyTrashed()->with('deleter')->latest('deleted_at');
+
+        if ($request->filled('user')) {
+            $customerQuery->where('deleted_by', $request->integer('user'));
+            $projectQuery->where('deleted_by', $request->integer('user'));
+        }
+
+        return [$customerQuery->get(), $projectQuery->get()];
+    }
+
     public function restoreCustomer(int $id)
     {
-        $customer = Customer::onlyTrashed()->findOrFail($id);
+        $customer = $this->findTrash(Customer::class, $id);
         $customer->restore();
 
-        return redirect()
-            ->route('trash.index')
-            ->with('success', 'Customer "'.$customer->name.'" berhasil direstore');
+        return redirect()->route('trash.index')
+            ->with('success', 'Customer "' . $customer->name . '" berhasil direstore');
     }
 
-    /**
-     * Restore Project yang sudah di-soft-delete.
-     */
     public function restoreProject(int $id)
     {
-        $project = Project::onlyTrashed()->findOrFail($id);
+        $project = $this->findTrash(Project::class, $id);
         $project->restore();
 
-        return redirect()
-            ->route('trash.index')
-            ->with('success', 'Project "'.$project->project_name.'" berhasil direstore');
+        return redirect()->route('trash.index')
+            ->with('success', 'Project "' . $project->project_name . '" berhasil direstore');
     }
 
-    /**
-     * Hapus permanen Customer dari trash.
-     */
     public function destroyCustomer(int $id)
     {
-        $customer = Customer::onlyTrashed()->findOrFail($id);
+        $customer = $this->findTrash(Customer::class, $id);
         $customer->forceDelete();
 
-        return redirect()
-            ->route('trash.index')
-            ->with('success', 'Customer "'.$customer->name.'" dihapus permanen');
+        return redirect()->route('trash.index')
+            ->with('success', 'Customer "' . $customer->name . '" dihapus permanen');
     }
 
     /**
-     * Hapus permanen semua isi trash (Customer & Project).
+     * User biasa: hanya miliknya. Super Admin: seluruh trash.
      */
     public function clear()
     {
-        Customer::onlyTrashed()->forceDelete();
-        Project::onlyTrashed()->forceDelete();
+        if (auth()->user()->hasRole('super-admin')) {
+            Customer::onlyTrashed()->forceDelete();
+            Project::onlyTrashed()->forceDelete();
+        } else {
+            $userId = auth()->id();
+            Customer::onlyTrashed()->where('deleted_by', $userId)->forceDelete();
+            Project::onlyTrashed()->where('deleted_by', $userId)->forceDelete();
+        }
 
-        return redirect()
-            ->route('trash.index')
+        return redirect()->route('trash.index')
             ->with('success', 'Trash berhasil dibersihkan');
+    }
+
+    /**
+     * Cari data di trash dengan pembatasan kepemilikan.
+     * Data milik orang lain = 404.
+     */
+    private function findTrash(string $model, int $id)
+    {
+        $query = $model::onlyTrashed()->whereKey($id);
+
+        if (!auth()->user()->hasRole('super-admin')) {
+            $query->where('deleted_by', auth()->id());
+        }
+
+        return $query->firstOrFail();
     }
 }

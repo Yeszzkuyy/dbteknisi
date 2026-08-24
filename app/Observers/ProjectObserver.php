@@ -39,6 +39,7 @@ class ProjectObserver
 
     public function deleted(Project $project): void
     {
+        $project->forceFill(['deleted_by' => auth()->id()])->saveQuietly();
         $project->documents()->get()->each(fn ($document) => $document->delete());
         $project->tasks()->get()->each(fn ($task) => $task->delete());
         $project->supports()->get()->each(fn ($support) => $support->delete());

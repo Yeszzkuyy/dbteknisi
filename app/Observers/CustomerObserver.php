@@ -8,6 +8,7 @@ class CustomerObserver
 {
     public function deleted(Customer $customer): void
     {
+        $customer->forceFill(['deleted_by' => auth()->id()])->saveQuietly();
         $customer->projects()->get()->each(fn ($project) => $project->delete());
         $customer->contacts()->get()->each(fn ($contact) => $contact->delete());
     }

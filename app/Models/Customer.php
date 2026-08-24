@@ -17,6 +17,7 @@ class Customer extends Model
         'email',
         'notes',
         'status',
+        'deleted_by',
     ];
 
     protected $casts = [
@@ -26,6 +27,11 @@ class Customer extends Model
     public function contacts()
     {
         return $this->hasMany(CustomerContact::class);
+    }
+
+    public function deleter()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 
     public function projects()

@@ -72,6 +72,28 @@ class ProfileAvatarTest extends TestCase
             ->assertSessionHasErrors('avatar');
     }
 
+    public function test_every_role_can_change_own_avatar(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+
+        foreach (['super-admin', 'admin', 'manager', 'sales', 'marketing', 'teknisi'] as $role) {
+            $user = User::factory()->create();
+            $user->assignRole($role);
+
+            $this->actingAs($user)
+                ->get(route('profile.edit'))
+                ->assertOk();
+
+            $this->actingAs($user)
+                ->post(route('profile.avatar.update'), ['avatar' => UploadedFile::fake()->image('avatar.png')])
+                ->assertRedirect(route('profile.edit'))
+                ->assertSessionHasNoErrors();
+
+            $user->refresh();
+            $this->assertNotNull($user->avatar, "Role {$role} gagal mengubah avatar.");
+        }
+    }
+
     public function test_avatar_max_size_is_5mb(): void
     {
         $this->seed(RoleAndPermissionSeeder::class);
