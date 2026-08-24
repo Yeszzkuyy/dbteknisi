@@ -15,8 +15,10 @@ class TrashController extends Controller
      */
     public function index()
     {
-        $customers = Customer::onlyTrashed()->latest('deleted_at')->get();
-        $projects = Project::onlyTrashed()->latest('deleted_at')->get();
+        $userId = auth()->id();
+
+        $customers = Customer::onlyTrashed()->where('deleted_by', $userId)->latest('deleted_at')->get();
+        $projects = Project::onlyTrashed()->where('deleted_by', $userId)->latest('deleted_at')->get();
 
         return view(
             'trash.index',
@@ -29,7 +31,7 @@ class TrashController extends Controller
      */
     public function restoreCustomer(int $id)
     {
-        $customer = Customer::onlyTrashed()->findOrFail($id);
+        $customer = Customer::onlyTrashed()->where('deleted_by', auth()->id())->findOrFail($id);
         $customer->restore();
 
         return redirect()
@@ -42,7 +44,7 @@ class TrashController extends Controller
      */
     public function restoreProject(int $id)
     {
-        $project = Project::onlyTrashed()->findOrFail($id);
+        $project = Project::onlyTrashed()->where('deleted_by', auth()->id())->findOrFail($id);
         $project->restore();
 
         return redirect()
@@ -55,7 +57,7 @@ class TrashController extends Controller
      */
     public function destroyCustomer(int $id)
     {
-        $customer = Customer::onlyTrashed()->findOrFail($id);
+        $customer = Customer::onlyTrashed()->where('deleted_by', auth()->id())->findOrFail($id);
         $customer->forceDelete();
 
         return redirect()
@@ -68,8 +70,10 @@ class TrashController extends Controller
      */
     public function clear()
     {
-        Customer::onlyTrashed()->forceDelete();
-        Project::onlyTrashed()->forceDelete();
+        $userId = auth()->id();
+
+        Customer::onlyTrashed()->where('deleted_by', $userId)->forceDelete();
+        Project::onlyTrashed()->where('deleted_by', $userId)->forceDelete();
 
         return redirect()
             ->route('trash.index')
