@@ -141,7 +141,7 @@
                         <img
                             x-show="!logoFailed"
                             x-on:error="logoFailed = true"
-                            src="{{ asset('images/logo.png') }}"
+                            src="{{ asset('images/logo/logo.png') }}"
                             alt="Logo"
                             class="w-14 h-14 object-contain"
                         >
