@@ -39,9 +39,9 @@ class RoleAndPermissionSeeder extends Seeder
         }
 
         // === 2. Create Roles & Assign Permissions ===
-        // Tiap role: divisinya sendiri + Dashboard, Monitoring, Customer, Trash.
-        // Manager & super-admin melihat semuanya.
-        $common = ['view-monitoring', 'view-customer', 'view-trash'];
+        // Tiap role: divisinya sendiri + Dashboard, Customer, Trash.
+        // Monitoring hanya manager & super-admin.
+        $common = ['view-customer', 'view-trash'];
 
         $marketing = Role::create(['name' => 'marketing', 'guard_name' => 'web']);
         $marketing->givePermissionTo([

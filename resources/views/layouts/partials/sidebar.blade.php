@@ -163,7 +163,7 @@
         @endcan
 
         <!-- Trash -->
-        @can('view-admin')
+        @can('view-trash')
             <a href="{{ route('trash.index') }}"
                class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('trash*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                 <x-icon name="trash" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
