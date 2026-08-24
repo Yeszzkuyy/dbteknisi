@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
+use App\Models\LeadActivity;
 use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectDocument;
@@ -14,6 +15,18 @@ use Illuminate\Support\Facades\Storage;
 
 class LeadController extends Controller
 {
+    public const SEGMENTS = ['end_user', 'vendor', 'system_integrator', 'kontraktor', 'other'];
+    public const SOURCES = ['whatsapp', 'email', 'telpon', 'canvasing', 'event', 'website', 'referral', 'social_media', 'other'];
+
+    public static function label(string $value): string
+    {
+        return match ($value) {
+            'end_user' => 'End User',
+            'system_integrator' => 'System Integrator',
+            default => ucfirst(str_replace('_', ' ', $value)),
+        };
+    }
+
     public function index(Request $request)
     {
         $query = Lead::with(['customer', 'assignee']);
@@ -37,7 +50,7 @@ class LeadController extends Controller
         $leads = $query->latest()->paginate(15)->withQueryString();
 
         $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
-        $sources = ['website', 'referral', 'cold_call', 'email', 'social_media', 'event', 'other'];
+        $sources = self::SOURCES;
 
         return view('leads.index', compact('leads', 'statuses', 'sources'));
     }
@@ -45,11 +58,10 @@ class LeadController extends Controller
     public function create()
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
-        $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
-        $sources = ['website', 'referral', 'cold_call', 'email', 'social_media', 'event', 'other'];
-        $users = User::orderBy('name')->get(['id', 'name']);
+        $segments = self::SEGMENTS;
+        $sources = self::SOURCES;
 
-        return view('leads.create', compact('customers', 'statuses', 'sources', 'users'));
+        return view('leads.create', compact('customers', 'segments', 'sources'));
     }
 
     public function store(Request $request)
@@ -57,22 +69,41 @@ class LeadController extends Controller
         $validated = $request->validate([
             'customer_mode' => 'required|in:new,existing',
             'customer_name' => 'nullable|required_if:customer_mode,new|string|max:255',
+            'customer_company' => 'nullable|string|max:255',
+            'customer_email' => 'nullable|email|max:255',
+            'customer_phone' => 'nullable|string|max:50',
+            'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
-            'status' => 'required|in:new,contacted,qualified,proposal,won,lost',
-            'source' => 'nullable|in:website,referral,cold_call,email,social_media,event,other',
+            'segment' => 'required|in:'.implode(',', self::SEGMENTS),
+            'source' => 'nullable|in:'.implode(',', self::SOURCES),
+            'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
-            'opportunity_value' => 'nullable|numeric|min:0',
-            'expected_close_date' => 'nullable|date',
-            'assigned_to' => 'nullable|exists:users,id',
+            'incoming_date' => 'nullable|date',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
-            $validated['customer_id'] = Customer::create(['name' => $validated['customer_name']])->id;
+            $validated['customer_id'] = Customer::create([
+                'name' => $validated['customer_name'],
+                'company' => $validated['customer_company'] ?? null,
+                'email' => $validated['customer_email'] ?? null,
+                'phone' => $validated['customer_phone'] ?? null,
+                'address' => $validated['customer_address'] ?? null,
+            ])->id;
         }
 
-        unset($validated['customer_mode'], $validated['customer_name']);
+        unset(
+            $validated['customer_mode'],
+            $validated['customer_name'],
+            $validated['customer_company'],
+            $validated['customer_email'],
+            $validated['customer_phone'],
+            $validated['customer_address'],
+        );
 
-        Lead::create($validated);
+        $validated['status'] ??= 'new';
+
+        $lead = Lead::create($validated);
+        $this->logActivity($lead, 'created');
 
         return redirect()
             ->route('leads.index')
@@ -81,7 +112,7 @@ class LeadController extends Controller
 
     public function show(Lead $lead)
     {
-        $lead->load(['customer', 'assignee', 'customer.projects.documents']);
+        $lead->load(['customer', 'activities.user', 'customer.projects.documents']);
         $documents = $lead->customer->projects->flatMap->documents;
         $projectStatuses = ProjectStatus::orderBy('sort_order')->get(['id', 'name']);
         $workTypes = WorkType::orderBy('name')->get(['id', 'name']);
@@ -91,11 +122,10 @@ class LeadController extends Controller
     public function edit(Lead $lead)
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
-        $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
-        $sources = ['website', 'referral', 'cold_call', 'email', 'social_media', 'event', 'other'];
-        $users = User::orderBy('name')->get(['id', 'name']);
+        $segments = self::SEGMENTS;
+        $sources = self::SOURCES;
 
-        return view('leads.edit', compact('lead', 'customers', 'statuses', 'sources', 'users'));
+        return view('leads.edit', compact('lead', 'customers', 'segments', 'sources'));
     }
 
     public function update(Request $request, Lead $lead)
@@ -103,22 +133,51 @@ class LeadController extends Controller
         $validated = $request->validate([
             'customer_mode' => 'required|in:new,existing',
             'customer_name' => 'nullable|required_if:customer_mode,new|string|max:255',
+            'customer_company' => 'nullable|string|max:255',
+            'customer_email' => 'nullable|email|max:255',
+            'customer_phone' => 'nullable|string|max:50',
+            'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
-            'status' => 'required|in:new,contacted,qualified,proposal,won,lost',
-            'source' => 'nullable|in:website,referral,cold_call,email,social_media,event,other',
+            'segment' => 'required|in:'.implode(',', self::SEGMENTS),
+            'source' => 'nullable|in:'.implode(',', self::SOURCES),
+            'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
-            'opportunity_value' => 'nullable|numeric|min:0',
-            'expected_close_date' => 'nullable|date',
-            'assigned_to' => 'nullable|exists:users,id',
+            'incoming_date' => 'nullable|date',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
-            $validated['customer_id'] = Customer::create(['name' => $validated['customer_name']])->id;
+            $validated['customer_id'] = Customer::create([
+                'name' => $validated['customer_name'],
+                'company' => $validated['customer_company'] ?? null,
+                'email' => $validated['customer_email'] ?? null,
+                'phone' => $validated['customer_phone'] ?? null,
+                'address' => $validated['customer_address'] ?? null,
+            ])->id;
         }
 
-        unset($validated['customer_mode'], $validated['customer_name']);
+        unset(
+            $validated['customer_mode'],
+            $validated['customer_name'],
+            $validated['customer_company'],
+            $validated['customer_email'],
+            $validated['customer_phone'],
+            $validated['customer_address'],
+        );
 
-        $lead->update($validated);
+        $lead->fill($validated);
+
+        $changes = [];
+        foreach ($validated as $field => $value) {
+            if ($lead->isDirty($field)) {
+                $changes[$field] = ['old' => $lead->getOriginal($field), 'new' => $value];
+            }
+        }
+
+        $lead->save();
+
+        if ($changes) {
+            $this->logActivity($lead, 'updated', $changes);
+        }
 
         return redirect()
             ->route('leads.index')
@@ -127,6 +186,7 @@ class LeadController extends Controller
 
     public function destroy(Lead $lead)
     {
+        $this->logActivity($lead, 'deleted');
         $lead->delete();
 
         return redirect()
@@ -153,10 +213,30 @@ class LeadController extends Controller
         ]);
 
         $lead->update(['status' => 'won']);
+        $this->logActivity($lead, 'converted');
 
         return redirect()
             ->route('projects.show', $project)
             ->with('success', 'Lead berhasil dikonversi ke Project');
+    }
+
+    public function activities()
+    {
+        $activities = LeadActivity::with(['lead.customer', 'user'])
+            ->latest()
+            ->paginate(20);
+
+        return view('leads.activities', compact('activities'));
+    }
+
+    private function logActivity(Lead $lead, string $action, ?array $changes = null): void
+    {
+        LeadActivity::create([
+            'lead_id' => $lead->id,
+            'user_id' => auth()->id(),
+            'action' => $action,
+            'changes' => $changes,
+        ]);
     }
 
     public function previewDocument(Lead $lead, ProjectDocument $document)

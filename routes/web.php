@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+    Route::delete('/profile/avatar', [ProfileController::class, 'removeAvatar'])->name('profile.avatar.remove');
 
     // ============================================
     // SALES — manage
@@ -56,7 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/customer-contacts/{customerContact}', [CustomerContactController::class, 'destroy'])->name('customer-contacts.destroy');
     });
 
-    Route::middleware('permission:view-sales|manage-sales')->group(function () {
+    Route::middleware('permission:view-sales|manage-sales|view-customer')->group(function () {
         Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
         Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
     });
@@ -103,7 +105,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/project-documents/{document}/preview', [ProjectDocumentController::class, 'preview'])->name('project-documents.preview');
     });
 
-    Route::middleware('permission:view-teknisi|manage-teknisi')->group(function () {
+    Route::middleware('permission:view-teknisi|manage-teknisi|view-sales')->group(function () {
         Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
         Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
         Route::get('/projects/{project}/documents', [ProjectDocumentController::class, 'index'])->name('project-documents.index');
@@ -137,7 +139,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/trash/projects/{id}/restore', [TrashController::class, 'restoreProject'])->name('trash.restore-project');
     });
 
-    Route::middleware('permission:view-admin|manage-admin')->group(function () {
+    Route::middleware('permission:view-admin|manage-admin|view-trash')->group(function () {
         Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
     });
 
@@ -195,6 +197,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:view-marketing|manage-marketing')->group(function () {
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
+        Route::get('/leads/activities', [LeadController::class, 'activities'])->name('leads.activities');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
         Route::get('/leads/{lead}/documents/{document}/preview', [LeadController::class, 'previewDocument'])->name('leads.documents.preview');
         Route::get('/leads/{lead}/documents/{document}/download', [LeadController::class, 'downloadDocument'])->name('leads.documents.download');

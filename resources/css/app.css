@@ -2,6 +2,145 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   Design tokens — satu kurva easing, bayangan ber-tint
+   ============================================================ */
+:root {
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --shadow-rest: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-lift: 0 12px 32px -12px rgba(15, 23, 42, 0.16), 0 4px 12px -6px rgba(15, 23, 42, 0.08);
+}
+
+.dark {
+    --shadow-rest: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-lift: 0 12px 32px -12px rgba(0, 0, 0, 0.55), 0 4px 12px -6px rgba(0, 0, 0, 0.35);
+}
+
+html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, 0.4) transparent;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.35);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: rgba(100, 116, 139, 0.6); }
+
+::selection { background: rgba(37, 99, 235, 0.18); }
+
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+button, a, [type="submit"] { -webkit-tap-highlight-color: transparent; }
+
+/* ============================================================
+   Kartu & permukaan — angkat halus saat hover
+   ============================================================ */
+.bg-white.shadow-sm { box-shadow: var(--shadow-rest); }
+
+main .bg-white {
+    transition:
+        transform 0.35s var(--ease-out),
+        box-shadow 0.35s var(--ease-out),
+        border-color 0.35s var(--ease-out);
+}
+
+@media (hover: hover) {
+    main .bg-white.shadow-sm:hover,
+    main .bg-white.shadow:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lift);
+    }
+}
+
+/* Tombol: tekan terasa fisik */
+button, [role="button"] {
+    transition:
+        transform 0.15s var(--ease-out),
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+button:active, [role="button"]:active { transform: scale(0.97); }
+
+/* Fokus ring lembut & konsisten */
+input:focus, select:focus, textarea:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+}
+
+/* Baris tabel ikut berdenyut halus */
+tbody tr { transition: background-color 0.2s ease; }
+
+/* ============================================================
+   Sidebar — indikator aktif & ikon bergeser
+   ============================================================ */
+.sidebar nav a { position: relative; }
+.sidebar nav a svg { transition: transform 0.25s var(--ease-out); }
+@media (hover: hover) {
+    .sidebar nav a:hover svg { transform: translateX(2px); }
+}
+.sidebar nav a[class*="bg-blue-50"]::before,
+.sidebar nav a[class*="bg-purple-50"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 22%;
+    bottom: 22%;
+    width: 3px;
+    border-radius: 9999px;
+    background: currentColor;
+    opacity: 0.75;
+}
+
+/* ============================================================
+   Animasi masuk — stagger lembut (hormati reduced motion)
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: none; }
+    }
+
+    main > * { animation: rise 0.55s var(--ease-out) backwards; }
+    main > :nth-child(1) { animation-delay: 0.02s; }
+    main > :nth-child(2) { animation-delay: 0.08s; }
+    main > :nth-child(3) { animation-delay: 0.14s; }
+    main > :nth-child(4) { animation-delay: 0.2s; }
+    main > :nth-child(n+5) { animation-delay: 0.26s; }
+
+    /* Stat grid: kartu muncul bergiliran */
+    main > .grid > * { animation: rise 0.55s var(--ease-out) backwards; }
+    main > .grid > :nth-child(1) { animation-delay: 0.1s; }
+    main > .grid > :nth-child(2) { animation-delay: 0.17s; }
+    main > .grid > :nth-child(3) { animation-delay: 0.24s; }
+    main > .grid > :nth-child(4) { animation-delay: 0.31s; }
+
+    /* Reveal saat scroll (dipicu IntersectionObserver di layout) */
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+    }
+    [data-reveal].in-view { opacity: 1; transform: none; }
+    [data-reveal][data-reveal-delay="1"] { transition-delay: 0.07s; }
+    [data-reveal][data-reveal-delay="2"] { transition-delay: 0.14s; }
+    [data-reveal][data-reveal-delay="3"] { transition-delay: 0.21s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
 /* Kalender Teknisi (FullCalendar) */
 .teknisi-calendar .fc .fc-toolbar-title {
     font-size: 1.15rem;

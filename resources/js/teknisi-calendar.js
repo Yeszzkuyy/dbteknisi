@@ -4,9 +4,14 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import idLocale from '@fullcalendar/core/locales/id';
 
-document.addEventListener('DOMContentLoaded', () => {
+function initCalendar() {
     const el = document.getElementById('teknisi-calendar');
     if (!el) return;
+    if (window.__teknisiCalendar && window.__teknisiCalendar.el === el) return;
+    if (window.__teknisiCalendar) {
+        window.__teknisiCalendar.instance.destroy();
+        window.__teknisiCalendar = null;
+    }
 
     const eventsUrl = el.dataset.eventsUrl;
 
@@ -105,5 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     calendar.render();
 
+    window.__teknisiCalendar = { el, instance: calendar };
     window.teknisiCalendar = { calendar };
-});
+}
+
+document.addEventListener('DOMContentLoaded', initCalendar);
+document.addEventListener('livewire:navigated', initCalendar);

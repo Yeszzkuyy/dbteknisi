@@ -11,7 +11,7 @@
     <link rel="apple-touch-icon" href="{{ asset('images/logo/logo.png') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
 
     <script>if(localStorage.getItem('dark-mode')==='true'||(!('dark-mode' in localStorage)&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}</script>
 
@@ -56,11 +56,11 @@
         .dark .hover\:bg-gray-50:hover{background-color:var(--card-bg-hover)!important}
         .dark .border-slate-200{border-color:var(--card-border)!important}
         .dark .border-slate-300{border-color:var(--input-border)!important}
-        .dark .text-slate-800,.dark .text-gray-900,.dark .text-slate-700{color:var(--text-primary)!important}
+        .dark .text-slate-900,.dark .text-gray-800{color:var(--text-primary)!important}
+        .dark .text-slate-800,.dark .text-gray-900,.dark .text-slate-700,.dark .text-gray-700{color:var(--text-primary)!important}
         .dark .text-slate-600,.dark .text-gray-600{color:var(--text-secondary)!important}
         .dark .text-slate-500,.dark .text-gray-500{color:var(--text-muted)!important}
         .dark th.text-slate-500,.dark th.text-slate-600{color:var(--text-secondary)!important}
-        .dark .shadow-sm{box-shadow:0 1px 3px 0 rgba(0,0,0,.3)!important}
         input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]):not([type=range]):not([type=hidden]),select,textarea{background-color:var(--input-bg)!important;border-color:var(--input-border)!important;color:var(--input-text)!important}
         input:focus,select:focus,textarea:focus{border-color:#3b82f6!important}
         input::placeholder,textarea::placeholder{color:var(--text-muted)!important}
@@ -78,6 +78,7 @@
 
         <div class="main-content">
             @include('layouts.partials.header')
+            @include('partials.avatar-lightbox')
 
             <div class="px-4 sm:px-6 lg:px-8 pt-5">
                 @if(session('success'))
@@ -107,6 +108,15 @@
             document.addEventListener('keydown',function(e){e.key==='Escape'&&s.classList.contains('open')&&close()});
             var t=document.getElementById('darkToggle');
             t&&t.addEventListener('click',function(){var d=document.documentElement.classList.toggle('dark');localStorage.setItem('dark-mode',d)});
+            // Reveal saat scroll — hormati prefers-reduced-motion
+            if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){
+                var io=new IntersectionObserver(function(entries){
+                    entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in-view');io.unobserve(en.target)}});
+                },{threshold:0.12});
+                document.querySelectorAll('[data-reveal]').forEach(function(el){io.observe(el)});
+            }else{
+                document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('in-view')});
+            }
         });
     </script>
 </body>

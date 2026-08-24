@@ -27,7 +27,7 @@
                 </form>
             @endcan
             <a href="{{ route('leads.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">
+               class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
                 Kembali
             </a>
         </div>
@@ -69,17 +69,12 @@
                     </div>
 
                     <div>
-                        <label class="text-sm font-medium text-slate-500">Nilai Opportunity</label>
-                        <p class="mt-1 text-slate-900 font-medium">{{ $lead->opportunity_value ? 'Rp ' . number_format($lead->opportunity_value, 0, ',', '.') : '-' }}</p>
+                        <label class="text-sm font-medium text-slate-500">Segment</label>
+                        <p class="mt-1 text-slate-900 font-medium">{{ $lead->segment ? \App\Http\Controllers\LeadController::label($lead->segment) : '-' }}</p>
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-slate-500">Target Tanggal Close</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->expected_close_date ? $lead->expected_close_date->format('d M Y') : '-' }}</p>
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-medium text-slate-500">PIC Marketing</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->assignee->name ?? '-' }}</p>
+                        <label class="text-sm font-medium text-slate-500">Tanggal Masuk</label>
+                        <p class="mt-1 text-slate-900">{{ $lead->incoming_date ? $lead->incoming_date->format('d M Y') : '-' }}</p>
                     </div>
                     <div>
                         <label class="text-sm font-medium text-slate-500">Dibuat pada</label>

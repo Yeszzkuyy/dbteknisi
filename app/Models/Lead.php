@@ -11,17 +11,17 @@ class Lead extends Model
 
     protected $fillable = [
         'customer_id',
+        'segment',
         'status',
         'source',
+        'kebutuhan',
         'notes',
-        'opportunity_value',
-        'expected_close_date',
+        'incoming_date',
         'assigned_to',
     ];
 
     protected $casts = [
-        'opportunity_value' => 'decimal:2',
-        'expected_close_date' => 'date',
+        'incoming_date' => 'date',
     ];
 
     public function customer()

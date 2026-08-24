@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">Perbarui informasi lead / opportunity</p>
         </div>
         <a href="{{ route('leads.show', $lead) }}"
-           class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
             Kembali
         </a>
     </div>
@@ -36,6 +36,36 @@
                     @error('customer_name')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label for="customer_company" class="block text-sm font-medium text-slate-700 mb-1">Nama Perusahaan</label>
+                            <input type="text" name="customer_company" id="customer_company" value="{{ old('customer_company') }}"
+                                   placeholder="cth: PT Maju Bersama"
+                                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="customer_email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                            <input type="email" name="customer_email" id="customer_email" value="{{ old('customer_email') }}"
+                                   placeholder="cth: info@majubersama.co.id"
+                                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            @error('customer_email')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">No. Telepon / WhatsApp</label>
+                            <input type="text" name="customer_phone" id="customer_phone" value="{{ old('customer_phone') }}"
+                                   placeholder="cth: 0812-3456-7890"
+                                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="customer_address" class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
+                            <input type="text" name="customer_address" id="customer_address" value="{{ old('customer_address') }}"
+                                   placeholder="cth: Jl. Jendral Sudirman No. 45, Jakarta"
+                                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
                 </div>
 
                 <div x-show="mode === 'existing'" x-cloak>
@@ -57,16 +87,19 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="status" class="block text-sm font-medium text-slate-700 mb-1">Status <span class="text-red-500">*</span></label>
-                    <select name="status" id="status" required
+                    <label for="segment" class="block text-sm font-medium text-slate-700 mb-1">Segment <span class="text-red-500">*</span></label>
+                    <select name="segment" id="segment" required
                             class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="new" {{ $lead->status == 'new' ? 'selected' : '' }}>New</option>
-                        <option value="contacted" {{ $lead->status == 'contacted' ? 'selected' : '' }}>Contacted</option>
-                        <option value="qualified" {{ $lead->status == 'qualified' ? 'selected' : '' }}>Qualified</option>
-                        <option value="proposal" {{ $lead->status == 'proposal' ? 'selected' : '' }}>Proposal</option>
-                        <option value="won" {{ $lead->status == 'won' ? 'selected' : '' }}>Won</option>
-                        <option value="lost" {{ $lead->status == 'lost' ? 'selected' : '' }}>Lost</option>
+                        <option value="">Pilih Segment</option>
+                        @foreach($segments as $segment)
+                            <option value="{{ $segment }}" {{ old('segment', $lead->segment) == $segment ? 'selected' : '' }}>
+                                {{ \App\Http\Controllers\LeadController::label($segment) }}
+                            </option>
+                        @endforeach
                     </select>
+                    @error('segment')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
@@ -75,8 +108,8 @@
                             class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         <option value="">Pilih Sumber</option>
                         @foreach($sources as $source)
-                            <option value="{{ $source }}" {{ $lead->source == $source ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_', ' ', $source)) }}
+                            <option value="{{ $source }}" {{ old('source', $lead->source) == $source ? 'selected' : '' }}>
+                                {{ \App\Http\Controllers\LeadController::label($source) }}
                             </option>
                         @endforeach
                     </select>
@@ -85,30 +118,17 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="opportunity_value" class="block text-sm font-medium text-slate-700 mb-1">Nilai Opportunity (Rp)</label>
-                    <input type="number" name="opportunity_value" id="opportunity_value" value="{{ $lead->opportunity_value }}"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                           step="0.01" min="0">
+                    <label for="kebutuhan" class="block text-sm font-medium text-slate-700 mb-1">Kebutuhan User</label>
+                    <textarea name="kebutuhan" id="kebutuhan" rows="3"
+                              placeholder="cth: Instalasi jaringan untuk kantor baru 3 lantai..."
+                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
                 </div>
 
                 <div>
-                    <label for="expected_close_date" class="block text-sm font-medium text-slate-700 mb-1">Target Tanggal Close</label>
-                    <input type="date" name="expected_close_date" id="expected_close_date" value="{{ $lead->expected_close_date?->format('Y-m-d') }}"
+                    <label for="incoming_date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Masuk</label>
+                    <input type="date" name="incoming_date" id="incoming_date" value="{{ old('incoming_date', $lead->incoming_date?->format('Y-m-d')) }}"
                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                 </div>
-            </div>
-
-            <div>
-                <label for="assigned_to" class="block text-sm font-medium text-slate-700 mb-1">PIC Marketing</label>
-                <select name="assigned_to" id="assigned_to"
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih PIC</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}" {{ $lead->assigned_to == $user->id ? 'selected' : '' }}>
-                            {{ $user->name }}
-                        </option>
-                    @endforeach
-                </select>
             </div>
 
             <div>

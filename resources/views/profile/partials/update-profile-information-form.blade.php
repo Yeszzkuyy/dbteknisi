@@ -13,9 +13,37 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
         @csrf
         @method('patch')
+
+        <div
+            x-data="{ preview: @js($user->avatar ? asset('storage/' . $user->avatar) : null) }"
+        >
+            <x-input-label for="avatar" :value="__('Foto Profil')" />
+
+            <div class="mt-2 flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full overflow-hidden shrink-0 ring-2 ring-slate-200 dark:ring-slate-700">
+                    <img x-show="preview" :src="preview" alt="{{ __('Foto Profil') }}" class="w-full h-full object-cover">
+                    <div x-show="!preview" class="w-full h-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                        <span class="text-xl font-semibold text-blue-600 dark:text-blue-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp,image/gif"
+                           class="sr-only"
+                           x-on:change="if ($event.target.files.length) { preview = URL.createObjectURL($event.target.files[0]) }" />
+                    <label for="avatar"
+                           class="inline-flex cursor-pointer items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition">
+                        Pilih Foto
+                    </label>
+                    <p class="mt-1.5 text-xs text-slate-500">JPG, PNG, WEBP, atau GIF. Maksimal 5MB.</p>
+                </div>
+            </div>
+
+            <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
+        </div>
 
         <div>
             <x-input-label for="name" :value="__('Name')" />
