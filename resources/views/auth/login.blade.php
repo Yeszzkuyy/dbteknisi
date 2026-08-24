@@ -1,3 +1,202 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Login - Tridaya App</title>
+
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        /* ==============================================================
+           CARA GANTI VIDEO BACKGROUND:
+           - Taruh file video di: public/videos/backgrounds/
+           - Edit array "videos" di x-data bawah (boleh kurang/lebih dari 5)
+           - Ganti angka 8000 di setInterval() untuk durasi (ms)
+
+           CARA GANTI WARNA TEMA (universal, cukup 1 tempat):
+           - Ubah nilai --accent di :root di bawah ini.
+           - Semua tombol/border/icon otomatis ikut warna itu.
+           - Overlay background dibuat NETRAL (hitam transparan),
+             jadi cocok dipasangkan video tema apapun tanpa nge-clash.
+           ============================================================== */
+
+        :root {
+            /* GANTI WARNA AKSEN DI SINI SAJA */
+            --accent: 37, 99, 235;        /* format: R, G, B (blue-600 = #2563EB) */
+            --accent-strong: 29, 78, 216; /* blue-700 = #1D4ED8 */
+
+            /* contoh warna lain yang bisa dipakai tinggal copy-paste ke atas:
+               ungu     : --accent: 168, 130, 255;  --accent-strong: 139, 92, 246;
+               hijau    : --accent: 74, 222, 128;   --accent-strong: 34, 197, 94;
+               oranye   : --accent: 251, 146, 60;   --accent-strong: 249, 115, 22;
+               merah muda: --accent: 244, 114, 182; --accent-strong: 236, 72, 153;
+               netral abu: --accent: 203, 213, 225; --accent-strong: 148, 163, 184;
+            */
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Figtree', sans-serif;
+        }
+
+        .bg-video-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            z-index: 1;
+        }
+
+        .bg-video-layer.is-active {
+            opacity: 1;
+        }
+
+        /* fallback netral, bukan ungu lagi, biar cocok video apapun */
+        .bg-fallback-gradient {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: linear-gradient(160deg, #1a1a1a 0%, #0a0a0a 60%, #000000 100%);
+        }
+
+        /* overlay netral: gradasi hitam transparan, tidak nge-tint warna apapun */
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.7));
+        }
+
+        .glass-card {
+            background: rgba(15, 15, 15, 0.55);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(var(--accent), 0.18);
+        }
+
+        .input-glass {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.14);
+            transition: border-color .2s ease;
+        }
+
+        .input-glass:focus-within {
+            border-color: rgba(var(--accent), 0.7);
+        }
+
+        .accent-text {
+            color: rgb(var(--accent));
+        }
+
+        .accent-icon {
+            color: rgba(var(--accent), 0.85);
+        }
+
+        .accent-btn {
+            background: linear-gradient(to right, rgb(var(--accent-strong)), rgb(var(--accent)));
+        }
+
+        .accent-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .accent-checkbox {
+            accent-color: rgb(var(--accent));
+        }
+    </style>
+</head>
+<body class="text-white antialiased">
+
+    <div
+        x-data="{
+            videos: {{ Illuminate\Support\Js::from([
+                'videos/backgrounds/scene-1.mp4',
+                'videos/backgrounds/scene-2.mp4',
+                'videos/backgrounds/scene-3.mp4',
+                'videos/backgrounds/scene-4.mp4',
+                'videos/backgrounds/scene-5.mp4',
+            ]) }},
+            activeIndex: 0,
+            reducedMotion: false,
+            timer: null,
+            init() {
+                this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (this.reducedMotion || this.videos.length <= 1) return;
+                this.timer = setInterval(() => {
+                    this.activeIndex = (this.activeIndex + 1) % this.videos.length;
+                }, 8000);
+            }
+        }"
+        class="relative min-h-screen w-full overflow-hidden flex items-center justify-center px-4 py-10"
+    >
+        <!-- fallback dasar netral, selalu tampil paling belakang -->
+        <div class="bg-fallback-gradient"></div>
+
+        <!-- layer video, hanya jalan kalau bukan reduced-motion -->
+        <template x-if="!reducedMotion">
+            <template x-for="(src, index) in videos" :key="index">
+                <video
+                    :src="'{{ asset('') }}' + src"
+                    class="bg-video-layer"
+                    :class="{ 'is-active': activeIndex === index }"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="auto"
+                    x-on:error="$el.style.display = 'none'"
+                ></video>
+            </template>
+        </template>
+
+        <!-- overlay netral biar teks kebaca, tidak nge-tint warna -->
+        <div class="bg-overlay"></div>
+
+        <!-- ============ CARD LOGIN ============ -->
+        <div class="relative z-10 w-full max-w-md">
+
+            <div class="glass-card rounded-2xl shadow-2xl p-5 sm:p-8">
+
+                <!-- Logo + Branding -->
+                <div class="flex flex-col items-center text-center mb-6">
+                    <div
+                        x-data="{ logoFailed: false }"
+                        class="mb-3"
+                    >
+                        {{-- LOGO: ganti file di public/images/logo/logo.png --}}
+                        <img
+                            x-show="!logoFailed"
+                            x-on:error="logoFailed = true"
+                            src="{{ asset('images/logo/logo.png') }}"
+                            alt="Logo"
+                            class="h-16 w-auto object-contain"
+                        >
+                        <div
+                            x-show="logoFailed"
+                            x-cloak
+                            class="accent-btn w-14 h-14 rounded-xl flex items-center justify-center text-xl font-bold"
+                        >W</div>
+                    </div>
+                    <h1 class="text-2xl font-bold">Tridaya App</h1>
+                    <p class="text-sm text-white/60 mt-1">Full Visibility. Zero Guesswork</p>
+                </div>
+
+                <div class="text-center mb-6">
+                    <h2 class="text-lg font-semibold">Welcome Back</h2>
+                    <p class="text-sm text-white/50 mt-1">Sign in to continue to your dashboard</p>
+                </div>
+
+                <x-auth-session-status class="mb-4 text-center" :status="session('status')" />
+
                 <form method="POST" action="{{ route('login') }}" class="space-y-4">
                     @csrf
 
