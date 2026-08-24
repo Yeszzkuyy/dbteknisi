@@ -30,33 +30,37 @@ class RoleAndPermissionSeeder extends Seeder
             $permissions[] = "view-{$d}";
         }
 
+        // Izin lintas divisi: semua role boleh lihat Customer & Trash tanpa membuka menu divisi lain
+        $permissions[] = 'view-customer';
+        $permissions[] = 'view-trash';
+
         foreach ($permissions as $name) {
             Permission::create(['name' => $name, 'guard_name' => 'web']);
         }
 
         // === 2. Create Roles & Assign Permissions ===
+        // Tiap role: divisinya sendiri + Dashboard, Monitoring, Customer, Trash.
+        // Manager & super-admin melihat semuanya.
+        $common = ['view-monitoring', 'view-customer', 'view-trash'];
+
         $marketing = Role::create(['name' => 'marketing', 'guard_name' => 'web']);
         $marketing->givePermissionTo([
-            'manage-marketing', 'view-marketing',
-            'view-sales', 'view-teknisi', 'view-admin', 'view-monitoring',
+            'manage-marketing', 'view-marketing', ...$common,
         ]);
 
         $sales = Role::create(['name' => 'sales', 'guard_name' => 'web']);
         $sales->givePermissionTo([
-            'manage-sales', 'view-sales',
-            'view-marketing', 'view-teknisi', 'view-admin', 'view-monitoring',
+            'manage-sales', 'view-sales', ...$common,
         ]);
 
         $admin = Role::create(['name' => 'admin', 'guard_name' => 'web']);
         $admin->givePermissionTo([
-            'manage-admin', 'view-admin',
-            'view-marketing', 'view-sales', 'view-teknisi', 'view-monitoring',
+            'manage-admin', 'view-admin', ...$common,
         ]);
 
         $teknisi = Role::create(['name' => 'teknisi', 'guard_name' => 'web']);
         $teknisi->givePermissionTo([
-            'manage-teknisi', 'view-teknisi',
-            'view-marketing', 'view-sales', 'view-admin', 'view-monitoring',
+            'manage-teknisi', 'view-teknisi', ...$common,
         ]);
 
         $manager = Role::create(['name' => 'manager', 'guard_name' => 'web']);
@@ -102,5 +106,10 @@ class RoleAndPermissionSeeder extends Seeder
             ]
         );
         $superAdminUser->assignRole('super-admin');
+
+        // === 5. Kembalikan super-admin ke user yang punya kolom role=super-admin ===
+        // (seeder ini menghapus semua assignment role di atas, jadi pulihkan di sini)
+        User::where('role', 'super-admin')->get()
+            ->each(fn (User $u) => $u->assignRole('super-admin'));
     }
 }
