@@ -50,16 +50,20 @@ class ProjectTechnicianSelectTest extends TestCase
             ->assertSee('Teknisi Satu')
             ->assertSee('Teknisi Dua');
 
-        // Update dengan beberapa support sekaligus
+        // Update dengan beberapa support sekaligus + ganti status project
+        $done = \App\Models\ProjectStatus::create(['name' => 'Done', 'color' => 'green', 'sort_order' => 2]);
+
         $this->put(route('projects.update', $project), [
             'project_name' => 'Project Uji Pilih Teknisi',
             'customer_id' => $project->customer_id,
             'work_type_id' => $project->work_type_id,
             'pic_engineer' => 'Teknisi Dua',
             'support_technicians' => ['Teknisi Satu', 'Teknisi Dua'],
+            'project_status_id' => $done->id,
         ])->assertRedirect();
 
         $project->refresh();
         $this->assertSame('Teknisi Satu, Teknisi Dua', $project->support_technicians);
+        $this->assertSame($done->id, $project->project_status_id, 'Status project harus ikut tersimpan saat update.');
     }
 }
