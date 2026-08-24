@@ -2,7 +2,7 @@
     <div>
         <div class="flex items-center justify-between mb-6">
             <div><h1 class="text-3xl font-bold text-slate-800">Edit PO</h1><p class="text-slate-500 mt-1">{{ $purchaseOrder->po_number }}</p></div>
-            <a href="{{ route('admin.pos.index') }}" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">Kembali</a>
+            <a href="{{ route('admin.pos.index') }}" class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">Kembali</a>
         </div>
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             <form action="{{ route('admin.pos.update', $purchaseOrder) }}" method="POST" class="space-y-6">

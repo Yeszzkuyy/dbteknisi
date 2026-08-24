@@ -4,7 +4,7 @@
             <div><h1 class="text-3xl font-bold text-slate-800">{{ $purchaseOrder->po_number }}</h1><p class="text-slate-500 mt-1">{{ $purchaseOrder->customer->name }}</p></div>
             <div class="flex gap-2">
                 @can('manage-admin')<a href="{{ route('admin.pos.edit', $purchaseOrder) }}" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium transition">Edit</a>@endcan
-                <a href="{{ route('admin.pos.index') }}" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">Kembali</a>
+                <a href="{{ route('admin.pos.index') }}" class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">Kembali</a>
             </div>
         </div>
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
