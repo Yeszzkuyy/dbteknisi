@@ -69,12 +69,12 @@
                     </div>
 
                     <div>
-                        <label class="text-sm font-medium text-slate-500">Nilai Opportunity</label>
-                        <p class="mt-1 text-slate-900 font-medium">{{ $lead->opportunity_value ? 'Rp ' . number_format($lead->opportunity_value, 0, ',', '.') : '-' }}</p>
+                        <label class="text-sm font-medium text-slate-500">Segment</label>
+                        <p class="mt-1 text-slate-900 font-medium">{{ $lead->segment ? \App\Http\Controllers\LeadController::label($lead->segment) : '-' }}</p>
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-slate-500">Target Tanggal Close</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->expected_close_date ? $lead->expected_close_date->format('d M Y') : '-' }}</p>
+                        <label class="text-sm font-medium text-slate-500">Tanggal Masuk</label>
+                        <p class="mt-1 text-slate-900">{{ $lead->incoming_date ? $lead->incoming_date->format('d M Y') : '-' }}</p>
                     </div>
 
                     <div>

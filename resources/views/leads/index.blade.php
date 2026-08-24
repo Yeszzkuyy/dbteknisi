@@ -72,8 +72,8 @@
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Customer</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Sumber</th>
-                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Nilai Opp.</th>
-                        <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Target Close</th>
+                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Kebutuhan</th>
+                        <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Tanggal Masuk</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -113,15 +113,15 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                @if($lead->opportunity_value)
-                                    <span class="font-medium text-slate-900">Rp {{ number_format($lead->opportunity_value, 0, ',', '.') }}</span>
+                                @if($lead->kebutuhan)
+                                    <span class="text-sm text-slate-700">{{ Str::limit($lead->kebutuhan, 40) }}</span>
                                 @else
                                     <span class="text-slate-400">-</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center">
-                                @if($lead->expected_close_date)
-                                    <span class="text-sm text-slate-700">{{ $lead->expected_close_date->format('d M Y') }}</span>
+                                @if($lead->incoming_date)
+                                    <span class="text-sm text-slate-700">{{ $lead->incoming_date->format('d M Y') }}</span>
                                 @else
                                     <span class="text-slate-400">-</span>
                                 @endif
