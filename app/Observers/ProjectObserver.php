@@ -39,6 +39,9 @@ class ProjectObserver
 
     public function deleted(Project $project): void
     {
+        if ($project->isForceDeleting()) {
+            return; // force delete tidak boleh di resurrect oleh saveQuietly
+        }
         $project->forceFill(['deleted_by' => auth()->id()])->saveQuietly();
         $project->documents()->get()->each(fn ($document) => $document->delete());
         $project->tasks()->get()->each(fn ($task) => $task->delete());

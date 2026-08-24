@@ -8,6 +8,9 @@ class CustomerObserver
 {
     public function deleted(Customer $customer): void
     {
+        if ($customer->isForceDeleting()) {
+            return; // force delete tidak boleh di resurrect oleh saveQuietly
+        }
         $customer->forceFill(['deleted_by' => auth()->id()])->saveQuietly();
         $customer->projects()->get()->each(fn ($project) => $project->delete());
         $customer->contacts()->get()->each(fn ($contact) => $contact->delete());

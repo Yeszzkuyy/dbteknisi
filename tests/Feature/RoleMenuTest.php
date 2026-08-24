@@ -20,8 +20,9 @@ class RoleMenuTest extends TestCase
     }
 
     /**
-     * Matriks: tiap divisi melihat Dashboard + Monitoring + divisinya +
+     * Matriks: tiap divisi melihat Dashboard + divisinya +
      * Customer + Trash, tapi TIDAK menu/halaman divisi lain.
+     * Monitoring hanya untuk manager & super-admin.
      */
     public function test_teknisi_menu_and_access()
     {
@@ -30,17 +31,17 @@ class RoleMenuTest extends TestCase
         $html = $res->getContent();
 
         // terlihat
-        foreach (['/teknisi/jadwal', '/monitoring', '/customers', '/trash'] as $link) {
+        foreach (['/teknisi/jadwal', '/customers', '/trash'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for teknisi");
         }
         // tersembunyi
-        foreach (['/leads"', '/admin/invoices', '/sales/meetings'] as $link) {
+        foreach (['/leads"', '/admin/invoices', '/sales/meetings', '/monitoring'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for teknisi");
         }
 
         // akses URL
         $this->actingAs($u)->get('/dashboard')->assertOk();
-        $this->actingAs($u)->get('/monitoring')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
         $this->actingAs($u)->get('/leads')->assertForbidden();
@@ -54,18 +55,19 @@ class RoleMenuTest extends TestCase
         $res = $this->actingAs($u)->get('/sales/meetings')->assertOk();
         $html = $res->getContent();
 
-        foreach (['/sales/follow-ups', '/customers', '/trash', '/monitoring'] as $link) {
+        foreach (['/sales/follow-ups', '/customers', '/trash'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for sales");
         }
-        foreach (['/projects"', '/admin/invoices', '/leads"'] as $link) {
+        foreach (['/admin/invoices', '/leads"', '/monitoring'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for sales");
         }
 
         $this->actingAs($u)->get('/dashboard')->assertOk();
-        $this->actingAs($u)->get('/monitoring')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
-        $this->actingAs($u)->get('/projects')->assertForbidden();
+        // Sales read-only pada Project: lihat boleh, mutasi 403
+        $this->actingAs($u)->get('/projects')->assertOk();
         $this->actingAs($u)->get('/teknisi/dashboard')->assertForbidden();
         $this->actingAs($u)->get('/admin/invoices')->assertForbidden();
     }
@@ -84,7 +86,7 @@ class RoleMenuTest extends TestCase
         }
 
         $this->actingAs($u)->get('/dashboard')->assertOk();
-        $this->actingAs($u)->get('/monitoring')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
         $this->actingAs($u)->get('/projects')->assertForbidden();
@@ -97,15 +99,15 @@ class RoleMenuTest extends TestCase
         $res = $this->actingAs($u)->get('/leads')->assertOk();
         $html = $res->getContent();
 
-        foreach (['/partners', '/customers', '/trash', '/monitoring'] as $link) {
+        foreach (['/partners', '/customers', '/trash'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for marketing");
         }
-        foreach (['/admin/invoices', '/projects"', '/sales/meetings'] as $link) {
+        foreach (['/admin/invoices', '/projects"', '/sales/meetings', '/monitoring'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for marketing");
         }
 
         $this->actingAs($u)->get('/dashboard')->assertOk();
-        $this->actingAs($u)->get('/monitoring')->assertOk();
+        $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
         $this->actingAs($u)->get('/admin/invoices')->assertForbidden();

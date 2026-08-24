@@ -19,7 +19,7 @@ class TrashTest extends TestCase
     {
         $this->seed(RoleAndPermissionSeeder::class);
         $user = User::factory()->create();
-        $user->givePermissionTo('view-admin', 'manage-admin');
+        $user->assignRole('super-admin');
 
         return $user;
     }
