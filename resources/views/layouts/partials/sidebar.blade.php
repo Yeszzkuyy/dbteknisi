@@ -97,6 +97,11 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
                         Data Partner
                     </a>
+                    <a href="{{ route('leads.activities') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('leads.activities') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                        Log Aktivitas
+                    </a>
                 </div>
             </div>
         @endcan

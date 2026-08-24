@@ -195,6 +195,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:view-marketing|manage-marketing')->group(function () {
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
+        Route::get('/leads/activities', [LeadController::class, 'activities'])->name('leads.activities');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
         Route::get('/leads/{lead}/documents/{document}/preview', [LeadController::class, 'previewDocument'])->name('leads.documents.preview');
         Route::get('/leads/{lead}/documents/{document}/download', [LeadController::class, 'downloadDocument'])->name('leads.documents.download');

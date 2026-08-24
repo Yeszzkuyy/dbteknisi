@@ -132,17 +132,6 @@
             </div>
 
             <div>
-                <label for="assigned_to" class="block text-sm font-medium text-slate-700 mb-1">PIC Marketing</label>
-                <select name="assigned_to" id="assigned_to"
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih PIC</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
                 <label for="notes" class="block text-sm font-medium text-slate-700 mb-1">Catatan</label>
                 <textarea name="notes" id="notes" rows="4"
                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"></textarea>

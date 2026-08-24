@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
+use App\Models\LeadActivity;
 use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectDocument;
@@ -59,9 +60,8 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
-        $users = User::orderBy('name')->get(['id', 'name']);
 
-        return view('leads.create', compact('customers', 'segments', 'sources', 'users'));
+        return view('leads.create', compact('customers', 'segments', 'sources'));
     }
 
     public function store(Request $request)
@@ -79,7 +79,6 @@ class LeadController extends Controller
             'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
             'incoming_date' => 'nullable|date',
-            'assigned_to' => 'nullable|exists:users,id',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -103,7 +102,8 @@ class LeadController extends Controller
 
         $validated['status'] ??= 'new';
 
-        Lead::create($validated);
+        $lead = Lead::create($validated);
+        $this->logActivity($lead, 'created');
 
         return redirect()
             ->route('leads.index')
@@ -112,7 +112,7 @@ class LeadController extends Controller
 
     public function show(Lead $lead)
     {
-        $lead->load(['customer', 'assignee', 'customer.projects.documents']);
+        $lead->load(['customer', 'activities.user', 'customer.projects.documents']);
         $documents = $lead->customer->projects->flatMap->documents;
         $projectStatuses = ProjectStatus::orderBy('sort_order')->get(['id', 'name']);
         $workTypes = WorkType::orderBy('name')->get(['id', 'name']);
@@ -124,9 +124,8 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
-        $users = User::orderBy('name')->get(['id', 'name']);
 
-        return view('leads.edit', compact('lead', 'customers', 'segments', 'sources', 'users'));
+        return view('leads.edit', compact('lead', 'customers', 'segments', 'sources'));
     }
 
     public function update(Request $request, Lead $lead)
@@ -144,7 +143,6 @@ class LeadController extends Controller
             'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
             'incoming_date' => 'nullable|date',
-            'assigned_to' => 'nullable|exists:users,id',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -166,7 +164,20 @@ class LeadController extends Controller
             $validated['customer_address'],
         );
 
-        $lead->update($validated);
+        $lead->fill($validated);
+
+        $changes = [];
+        foreach ($validated as $field => $value) {
+            if ($lead->isDirty($field)) {
+                $changes[$field] = ['old' => $lead->getOriginal($field), 'new' => $value];
+            }
+        }
+
+        $lead->save();
+
+        if ($changes) {
+            $this->logActivity($lead, 'updated', $changes);
+        }
 
         return redirect()
             ->route('leads.index')
@@ -175,6 +186,7 @@ class LeadController extends Controller
 
     public function destroy(Lead $lead)
     {
+        $this->logActivity($lead, 'deleted');
         $lead->delete();
 
         return redirect()
@@ -201,10 +213,30 @@ class LeadController extends Controller
         ]);
 
         $lead->update(['status' => 'won']);
+        $this->logActivity($lead, 'converted');
 
         return redirect()
             ->route('projects.show', $project)
             ->with('success', 'Lead berhasil dikonversi ke Project');
+    }
+
+    public function activities()
+    {
+        $activities = LeadActivity::with(['lead.customer', 'user'])
+            ->latest()
+            ->paginate(20);
+
+        return view('leads.activities', compact('activities'));
+    }
+
+    private function logActivity(Lead $lead, string $action, ?array $changes = null): void
+    {
+        LeadActivity::create([
+            'lead_id' => $lead->id,
+            'user_id' => auth()->id(),
+            'action' => $action,
+            'changes' => $changes,
+        ]);
     }
 
     public function previewDocument(Lead $lead, ProjectDocument $document)

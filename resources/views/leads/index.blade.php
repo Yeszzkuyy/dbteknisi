@@ -82,7 +82,6 @@
                         <tr class="hover:bg-slate-50">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-slate-900">{{ $lead->customer->name ?? 'N/A' }}</div>
-                                <div class="text-sm text-slate-500">PIC: {{ $lead->assignee->name ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <div>{{ $lead->customer->name ?? '-' }}</div>

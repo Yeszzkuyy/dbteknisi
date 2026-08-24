@@ -76,11 +76,6 @@
                         <label class="text-sm font-medium text-slate-500">Tanggal Masuk</label>
                         <p class="mt-1 text-slate-900">{{ $lead->incoming_date ? $lead->incoming_date->format('d M Y') : '-' }}</p>
                     </div>
-
-                    <div>
-                        <label class="text-sm font-medium text-slate-500">PIC Marketing</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->assignee->name ?? '-' }}</p>
-                    </div>
                     <div>
                         <label class="text-sm font-medium text-slate-500">Dibuat pada</label>
                         <p class="mt-1 text-slate-900">{{ $lead->created_at->format('d M Y H:i') }}</p>
