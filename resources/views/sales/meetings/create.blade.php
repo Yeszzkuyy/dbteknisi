@@ -6,7 +6,7 @@
                 <p class="text-slate-500 mt-1">Catat hasil meeting dengan customer.</p>
             </div>
             <a href="{{ route('sales.meetings.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-blue-400 hover:bg-blue-500 text-white text-sm font-medium transition">
+               class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
                 Kembali
             </a>
         </div>

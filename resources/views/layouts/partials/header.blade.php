@@ -1,4 +1,4 @@
-<header class="bg-white border-b border-slate-200 h-16 sm:h-20 flex items-center justify-between px-4 sm:px-8 lg:px-8">
+<header class="sticky top-0 z-30 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b border-slate-200/70 h-16 sm:h-20 flex items-center justify-between px-4 sm:px-8 lg:px-8">
     <div class="flex items-center gap-3">
         {{-- Hamburger, hanya tampil di mobile --}}
         <button id="hamburgerBtn" type="button"
@@ -77,18 +77,21 @@
         {{-- Dropdown Avatar --}}
         <div class="relative" x-data="{ open: false }">
             {{-- Avatar --}}
-            <button @click="open = !open" 
-                    class="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-semibold text-sm hover:ring-2 hover:ring-indigo-300 transition">
-                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+            <button @click="open = !open"
+                    class="rounded-full hover:ring-2 hover:ring-indigo-300 transition shrink-0">
+                <x-user-avatar :user="auth()->user()" size="w-10 h-10" text="text-sm" />
             </button>
 
             {{-- Dropdown Menu --}}
-            <div x-show="open" 
+            <div x-show="open"
                  @click.away="open = false"
                  x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50">
+                 x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 origin-top-right">
                 
                 {{-- Profil --}}
                 <a href="{{ route('profile.edit') }}" 

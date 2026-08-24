@@ -6,7 +6,7 @@
                 <p class="text-slate-500 mt-1">Edit: <span class="font-semibold text-slate-700">{{ $projectStatus->name }}</span></p>
             </div>
             <a href="{{ route('admin-panel.project-statuses.index') }}" 
-               class="px-5 py-2.5 rounded-xl bg-blue-400 hover:bg-blue-500 text-white font-medium transition">
+               class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition">
                 ← Kembali
             </a>
         </div>

@@ -21,16 +21,16 @@
     <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
         <!-- Dashboard -->
         <a href="{{ route('dashboard') }}"
-           class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-            <x-icon name="grid" class="w-5 h-5" />
+           class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+            <x-icon name="grid" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
             <span>Dashboard</span>
         </a>
 
         {{-- Monitoring (Manager & Super Admin) --}}
         @can('view-monitoring')
             <a href="{{ route('monitoring.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('monitoring*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('monitoring*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                <svg class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
                 <span>Monitoring</span>
@@ -38,10 +38,10 @@
         @endcan
 
         <!-- Customer -->
-        @can('view-customer')
+@can('view-customer')
             <a href="{{ route('customers.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('customers*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                <x-icon name="users" class="w-5 h-5" />
+               class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('customers*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                <x-icon name="users" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                 <span>Customer</span>
             </a>
         @endcan
@@ -51,7 +51,7 @@
             <div x-data="{ open: {{ request()->routeIs('projects*') || request()->routeIs('teknisi.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                         class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('projects*') || request()->routeIs('teknisi.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <x-icon name="tools" class="w-5 h-5" />
+                    <x-icon name="tools" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                     <span>Teknisi</span>
                     <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -79,7 +79,7 @@
 
         {{-- Marketing --}}
         @can('view-marketing')
-            <div x-data="{ open: false }">
+            <div x-data="{ open: {{ request()->routeIs('leads*') || request()->routeIs('partners*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                         class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('leads*') || request()->routeIs('partners*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <x-icon name="chart-bar" class="w-5 h-5" />
@@ -104,10 +104,10 @@
         @endcan
 
         @can('view-sales')
-            <div x-data="{ open: false }">
+            <div x-data="{ open: {{ request()->routeIs('sales.*') || request()->routeIs('projects*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                         class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('sales.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <x-icon name="calendar" class="w-5 h-5" />
+                    <x-icon name="calendar" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                     <span>Sales</span>
                     <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -137,10 +137,10 @@
 
         <!-- Admin: Invoice, PO, Payment -->
         @can('view-admin')
-            <div x-data="{ open: false }">
+            <div x-data="{ open: {{ request()->routeIs('admin.invoices.*') || request()->routeIs('admin.pos.*') || request()->routeIs('admin.payments.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                         class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.invoices.*') || request()->routeIs('admin.pos.*') || request()->routeIs('admin.payments.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <x-icon name="folder" class="w-5 h-5" />
+                    <x-icon name="folder" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                     <span>Admin</span>
                     <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -169,18 +169,18 @@
         <!-- Trash -->
         @can('view-trash')
             <a href="{{ route('trash.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('trash*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                <x-icon name="trash" class="w-5 h-5" />
+               class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('trash*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                <x-icon name="trash" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                 <span>Trash</span>
             </a>
         @endcan
 
         {{-- Admin Panel (Super Admin only) --}}
         @can('manage-monitoring')
-            <div x-data="{ open: false }">
+            <div x-data="{ open: {{ request()->routeIs('admin-panel*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                         class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin-panel*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
@@ -231,7 +231,7 @@
             @csrf
             <button type="submit" 
                     class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200">
-                <x-icon name="logout" class="w-5 h-5" />
+                <x-icon name="logout" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                 <span>Logout</span>
             </button>
         </form>
