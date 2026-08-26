@@ -86,7 +86,7 @@
                             <td class="px-6 py-4">
                                 <div>{{ $lead->customer->company ?? $lead->customer->name ?? '-' }}</div>
                                 <div class="text-sm text-slate-500">
-                                    @if($lead->pt_group)<span class="inline-flex px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 text-[11px] font-semibold mr-1">{{ $lead->pt_group }}</span>@endif
+                                    @if($lead->pt_group)<span class="inline-flex px-1.5 py-0.5 rounded {{ \App\Models\Lead::PT_COLORS[$lead->pt_group] ?? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' }} text-[11px] font-semibold mr-1">{{ $lead->pt_group }}</span>@endif
                                     {{ $lead->customer->contact_person ? 'PIC: '.$lead->customer->contact_person : '' }}
                                 </div>
                             </td>
