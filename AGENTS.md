@@ -12,6 +12,13 @@ ikuti aturan berikut supaya tidak saling menimpa kerjaan.
 | `/var/www/dbteknisi-mkt` | `feature/div-marketing` | Lead, partner |
 | `/var/www/dbteknisi-tek` | `feature/div-teknisi` | Dashboard/jadwal teknisi |
 | `/var/www/dbteknisi-user` | `feature/user-management-avatar` | User, role, menu, avatar |
+| `/var/www/dbteknisi-mon` | `feature/div-mon` | Monitoring (progress per customer) |
+
+Worktree baru juga butuh: `composer install`, symlink `.env`, dan
+`ln -s /var/www/dbteknisi/public/build /var/www/dbteknisi-<nama>/public/build`.
+
+Rencana pembagian berikutnya (buat worktree-nya saat mulai dikerjakan):
+`feature/div-cus` (Customer), `feature/div-trash` (Trash), `feature/div-panel` (Admin Panel).
 
 Butuh folder untuk topik baru?
 
