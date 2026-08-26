@@ -11,10 +11,10 @@
 
 <div
     x-data="{
-        options: {{ json_encode($options) }},
+        options: {{ json_encode($options, JSON_HEX_APOS | JSON_HEX_QUOT) }},
         selectedId: {{ $selected !== null ? json_encode($selected) : 'null' }},
-        selectedLabel: {{ $selectedLabel !== null ? json_encode($selectedLabel) : 'null' }},
-        query: {{ $selectedLabel !== null ? json_encode($selectedLabel) : '""' }},
+        selectedLabel: {{ $selectedLabel !== null ? json_encode($selectedLabel, JSON_HEX_APOS | JSON_HEX_QUOT) : 'null' }},
+        query: {{ $selectedLabel !== null ? json_encode($selectedLabel, JSON_HEX_APOS | JSON_HEX_QUOT) : '""' }},
         open: false,
         get filtered() {
             const q = this.query.toLowerCase();
