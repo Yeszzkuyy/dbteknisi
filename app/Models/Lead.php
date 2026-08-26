@@ -36,7 +36,8 @@ class Lead extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        // Lead tetap harus menampilkan customernya walau customer sudah soft-deleted
+        return $this->belongsTo(Customer::class)->withTrashed();
     }
 
     public function activities()
