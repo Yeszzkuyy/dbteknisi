@@ -30,23 +30,13 @@ class LeadController extends Controller
 
     public function index(Request $request)
     {
-        $query = Lead::with(['customer', 'assignee']);
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('source')) {
-            $query->where('source', $request->source);
-        }
-
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
+        $query = Lead::with(['customer', 'assignee'])
+            ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
+                fn ($c) => $c->where('name', 'like', '%'.$request->search.'%')))
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('source'), fn ($q) => $q->where('source', $request->source))
+            ->when($request->filled('date_from'), fn ($q) => $q->whereDate('incoming_date', '>=', $request->date_from))
+            ->when($request->filled('date_to'), fn ($q) => $q->whereDate('incoming_date', '<=', $request->date_to));
 
         $leads = $query->latest()->paginate(15)->withQueryString();
 
