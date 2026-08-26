@@ -80,11 +80,7 @@
                 </div>
                 @forelse($meeting->followUps as $followUp)
                     <div class="flex items-start gap-3 py-3 border-b border-slate-100 last:border-0">
-                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                            <span class="text-green-600 font-semibold text-xs">
-                                {{ strtoupper(substr($followUp->creator?->name ?? 'F', 0, 1)) }}
-                            </span>
-                        </div>
+                        <x-user-avatar :user="$followUp->creator" size="w-8 h-8" text="text-xs" />
                         <div class="flex-1">
                             <p class="text-sm text-slate-800">{{ $followUp->description }}</p>
                             <p class="text-xs text-slate-400 mt-1">

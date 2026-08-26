@@ -59,7 +59,8 @@
                     <li class="ml-6">
                         <span class="absolute -left-[9px] flex w-4 h-4 rounded-full" style="background: {{ $dotBg }}"></span>
 
-                        <div class="flex flex-wrap items-center gap-x-2 text-sm">
+                        <div class="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
+                            <x-user-avatar :user="$activity->user" size="w-7 h-7" text="text-xs" />
                             <span class="font-semibold text-slate-800">{{ $activity->user ? ($userNames[$activity->user_id] ?? $activity->user->name) : 'Sistem' }}</span>
                             <span class="text-slate-600">{{ $activity->actionLabel() }}</span>
                             @if($activity->lead && $activity->lead->customer)
