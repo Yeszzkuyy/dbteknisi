@@ -28,7 +28,7 @@
                 </div>
 
                 <div>
-                    <label for="incoming_date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Masuk</label>
+                    <label for="incoming_date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Masuk <span class="text-red-500">*</span></label>
                     <input type="date" name="incoming_date" id="incoming_date" required value="{{ old('incoming_date', now()->toDateString()) }}"
                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                 </div>
@@ -150,7 +150,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="assigned_to" class="block text-sm font-medium text-slate-700 mb-1">Sales</label>
+                    <label for="assigned_to" class="block text-sm font-medium text-slate-700 mb-1">Sales <span class="text-red-500">*</span></label>
                     <select name="assigned_to" id="assigned_to" required
                             class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         <option value="">Pilih Sales</option>
