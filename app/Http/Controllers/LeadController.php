@@ -272,7 +272,8 @@ class LeadController extends Controller
         $lastActivities = LeadActivity::selectRaw('user_id, max(created_at) as last_at')
             ->whereIn('user_id', $juniors->pluck('id'))
             ->groupBy('user_id')
-            ->pluck('last_at', 'user_id');
+            ->pluck('last_at', 'user_id')
+            ->map(fn ($v) => \Illuminate\Support\Carbon::parse($v));
 
         $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
 
