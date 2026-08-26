@@ -15,7 +15,7 @@
         @csrf
 
         {{-- Info Umum --}}
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
             <div>
                 <label for="pt_group" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                     PT <span class="text-red-500">*</span>
@@ -198,7 +198,7 @@
         </section>
 
         {{-- Penugasan --}}
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 pt-6 border-t border-slate-200">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 pt-6 border-t border-slate-200">
             <div>
                 <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                     Sales <span class="text-red-500">*</span>
