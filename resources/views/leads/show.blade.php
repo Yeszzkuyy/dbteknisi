@@ -36,12 +36,16 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="text-sm font-medium text-slate-500">Customer</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->customer->name }}</p>
+                        <label class="text-sm font-medium text-slate-500">PT</label>
+                        <p class="mt-1 text-slate-900 font-medium">{{ $lead->pt_group ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-sm font-medium text-slate-500">Perusahaan</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->customer->company ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900">{{ $lead->customer->company ?? $lead->customer->name }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-slate-500">PIC</label>
+                        <p class="mt-1 text-slate-900">{{ $lead->customer->contact_person ?? '-' }}</p>
                     </div>
 
                     <div>
@@ -64,7 +68,7 @@
                         </p>
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-slate-500">Sumber Lead</label>
+                        <label class="text-sm font-medium text-slate-500">Masuk by</label>
                         <p class="mt-1 text-slate-900">{{ $lead->source ? ucfirst(str_replace('_', ' ', $lead->source)) : '-' }}</p>
                     </div>
 

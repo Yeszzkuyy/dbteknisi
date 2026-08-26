@@ -84,10 +84,11 @@
                                 <div class="font-medium text-slate-900">{{ $lead->customer->name ?? 'N/A' }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div>{{ $lead->customer->name ?? '-' }}</div>
-                                @if($lead->customer->company)
-                                    <div class="text-sm text-slate-500">{{ $lead->customer->company }}</div>
-                                @endif
+                                <div>{{ $lead->customer->company ?? $lead->customer->name ?? '-' }}</div>
+                                <div class="text-sm text-slate-500">
+                                    @if($lead->pt_group)<span class="inline-flex px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 text-[11px] font-semibold mr-1">{{ $lead->pt_group }}</span>@endif
+                                    {{ $lead->customer->contact_person ? 'PIC: '.$lead->customer->contact_person : '' }}
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium

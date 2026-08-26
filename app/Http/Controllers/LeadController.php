@@ -60,7 +60,7 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
-        $ptGroups = self::PT_GROUPS;
+        $ptGroups = Lead::PT_GROUPS;
         $salesUsers = User::role(['sales', 'marketing', 'manager'])->orderBy('name')->get(['id', 'name']);
 
         return view('leads.create', compact('customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
@@ -77,7 +77,7 @@ class LeadController extends Controller
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
-            'pt_group' => 'required|in:'.implode(',', self::PT_GROUPS),
+            'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
             'assigned_to' => 'nullable|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
@@ -135,7 +135,7 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
-        $ptGroups = self::PT_GROUPS;
+        $ptGroups = Lead::PT_GROUPS;
         $salesUsers = User::role(['sales', 'marketing', 'manager'])->orderBy('name')->get(['id', 'name']);
 
         return view('leads.edit', compact('lead', 'customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
@@ -152,7 +152,7 @@ class LeadController extends Controller
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
-            'pt_group' => 'required|in:'.implode(',', self::PT_GROUPS),
+            'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
             'assigned_to' => 'nullable|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),

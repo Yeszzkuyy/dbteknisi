@@ -10,8 +10,9 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form action="{{ route('leads.store') }}" method="POST" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="pt_group" class="block text-sm font-medium text-slate-700 mb-1">PT <span class="text-red-500">*</span></label>
                     <select name="pt_group" id="pt_group" required
@@ -166,6 +167,17 @@
                 </div>
             </div>
 
-        
-    </div>
+            <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-slate-200">
+                <a href="{{ route('leads.index') }}"
+                   class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium transition">
+                    Batal
+                </a>
+                <button type="submit"
+                        class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                    Simpan Lead
+                </button>
+            </div>
+
+        </div>
+    </form>
 </x-app-layout>

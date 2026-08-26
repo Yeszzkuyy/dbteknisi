@@ -31,7 +31,7 @@ class LeadFormTest extends TestCase
             ->assertSee('Segment')
             ->assertSee('System Integrator')
             ->assertSee('Canvasing')
-            ->assertSee('Kebutuhan User')
+            ->assertSee('Kebutuhan')
             ->assertSee('Tanggal Masuk')
             ->assertDontSee('Nilai Opportunity');
     }
@@ -42,10 +42,11 @@ class LeadFormTest extends TestCase
             ->post(route('leads.store'), [
                 'customer_mode' => 'new',
                 'customer_name' => 'PT Uji Coba',
-                'customer_company' => 'PT Uji Coba',
                 'customer_email' => 'info@ujicoba.id',
-                'customer_phone' => '0812-3456-7890',
+                'customer_phone' => 'wa.me/6281234567890',
                 'customer_address' => 'Jl. Testing No. 1, Jakarta',
+                'customer_contact_person' => 'Budi PIC',
+                'pt_group' => 'NTI',
                 'segment' => 'system_integrator',
                 'source' => 'canvasing',
                 'kebutuhan' => 'Instalasi jaringan 3 lantai',
@@ -60,7 +61,9 @@ class LeadFormTest extends TestCase
         $this->assertSame('canvasing', $lead->source);
         $this->assertSame('new', $lead->status);
         $this->assertSame('2026-08-24', $lead->incoming_date->toDateString());
+        $this->assertSame('NTI', $lead->pt_group);
         $this->assertSame('info@ujicoba.id', $lead->customer->email);
+        $this->assertSame('Budi PIC', $lead->customer->contact_person);
         $this->assertSame('Jl. Testing No. 1, Jakarta', $lead->customer->address);
     }
 
@@ -72,6 +75,7 @@ class LeadFormTest extends TestCase
         $this->actingAs($user)->post(route('leads.store'), [
             'customer_mode' => 'existing',
             'customer_id' => $customer->id,
+            'pt_group' => 'NTI',
             'segment' => 'vendor',
             'kebutuhan' => 'Instalasi CCTV',
         ])->assertRedirect(route('leads.index'));
@@ -81,6 +85,7 @@ class LeadFormTest extends TestCase
         $this->actingAs($user)->put(route('leads.update', $lead), [
             'customer_mode' => 'existing',
             'customer_id' => $customer->id,
+            'pt_group' => 'TPS',
             'segment' => 'end_user',
             'kebutuhan' => 'Instalasi CCTV',
         ])->assertRedirect(route('leads.index'));
@@ -113,6 +118,7 @@ class LeadFormTest extends TestCase
             ->post(route('leads.store'), [
                 'customer_mode' => 'existing',
                 'customer_id' => $customer->id,
+                'pt_group' => 'MGK',
                 'segment' => 'bukan_segment',
             ])
             ->assertSessionHasErrors(['segment']);
