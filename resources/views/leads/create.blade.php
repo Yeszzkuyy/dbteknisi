@@ -10,7 +10,7 @@
         </a>
     </div>
 
-    <form action="{{ route('leads.store') }}" method="POST" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <form action="{{ route('leads.store') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -143,6 +143,17 @@
                 <textarea name="kebutuhan" id="kebutuhan" rows="3"
                           placeholder="cth: Kebutuhan Cisco IP Phone 780 Series, Cisco IP Phone 6800 series, dan Cisco IP conference phone dengan instalasi"
                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan') }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Lampiran (BOQ / Kebutuhan User)</label>
+                <input type="file" name="attachments[]" multiple
+                       accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt,.csv"
+                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 file:text-sm file:font-medium">
+                <p class="text-xs text-slate-400 mt-1">Maksimal 5 file, 10 MB per file (pdf, gambar, office, zip)</p>
+                @error('attachments.*')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -37,6 +37,11 @@ class Lead extends Model
         return $this->hasMany(LeadActivity::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(LeadDocument::class);
+    }
+
     public function assignee()
     {
         return $this->belongsTo(User::class, 'assigned_to');

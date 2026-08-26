@@ -209,6 +209,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/leads/{lead}/documents/{document}/preview', [LeadController::class, 'previewDocument'])->name('leads.documents.preview');
         Route::get('/leads/{lead}/documents/{document}/download', [LeadController::class, 'downloadDocument'])->name('leads.documents.download');
 
+        // Lampiran lead (BOQ awal / kebutuhan user)
+        Route::get('/leads/{lead}/attachments/{document}', [LeadController::class, 'showAttachment'])->name('leads.attachments.show');
+        Route::get('/leads/{lead}/attachments/{document}/download', [LeadController::class, 'downloadAttachment'])->name('leads.attachments.download');
+
         Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
     });
 

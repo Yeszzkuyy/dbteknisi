@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lead;
 use App\Models\LeadActivity;
+use App\Models\LeadDocument;
 use App\Models\Customer;
 use App\Models\Project;
 use App\Models\ProjectDocument;
@@ -84,6 +85,8 @@ class LeadController extends Controller
             'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
             'incoming_date' => 'required|date',
+            'attachments' => 'nullable|array|max:5',
+            'attachments.*' => 'file|max:10240|mimes:pdf,jpg,jpeg,png,gif,webp,doc,docx,xls,xlsx,ppt,pptx,zip,rar,txt,csv',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -114,6 +117,7 @@ class LeadController extends Controller
         $validated['status'] ??= 'new';
 
         $lead = Lead::create($validated);
+        $this->saveAttachments($request, $lead);
         $this->logActivity($lead, 'created');
 
         return redirect()
@@ -159,6 +163,8 @@ class LeadController extends Controller
             'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
             'incoming_date' => 'required|date',
+            'attachments' => 'nullable|array|max:5',
+            'attachments.*' => 'file|max:10240|mimes:pdf,jpg,jpeg,png,gif,webp,doc,docx,xls,xlsx,ppt,pptx,zip,rar,txt,csv',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -196,6 +202,7 @@ class LeadController extends Controller
         }
 
         $lead->save();
+        $this->saveAttachments($request, $lead);
 
         if ($changes) {
             $this->logActivity($lead, 'updated', $changes);
@@ -294,6 +301,39 @@ class LeadController extends Controller
         );
 
         return view('leads.monitoring', compact('summary', 'statuses'));
+    }
+
+    public function showAttachment(Lead $lead, LeadDocument $document)
+    {
+        if ($document->lead_id !== $lead->id || !Storage::disk('public')->exists($document->file_path)) {
+            abort(404);
+        }
+
+        return response()->file(Storage::disk('public')->path($document->file_path), [
+            'Content-Type' => $document->mime_type ?? 'application/octet-stream',
+            'Content-Disposition' => 'inline; filename="'.$document->file_name.'"',
+        ]);
+    }
+
+    public function downloadAttachment(Lead $lead, LeadDocument $document)
+    {
+        if ($document->lead_id !== $lead->id) {
+            abort(404);
+        }
+
+        return Storage::disk('public')->download($document->file_path, $document->file_name);
+    }
+
+    private function saveAttachments(Request $request, Lead $lead): void
+    {
+        foreach ($request->file('attachments', []) as $file) {
+            $path = $file->store("leads/{$lead->id}", 'public');
+            $lead->documents()->create([
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'mime_type' => $file->getClientMimeType(),
+            ]);
+        }
     }
 
     private function logActivity(Lead $lead, string $action, ?array $changes = null): void
