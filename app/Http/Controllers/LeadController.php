@@ -259,32 +259,39 @@ class LeadController extends Controller
 
     public function monitoring()
     {
-        $juniors = User::role('marketing')
-            ->orderBy('name')
-            ->get(['id', 'name']);
+        $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
+
+        $groups = collect([
+            'Marketing' => User::role('marketing')->orderBy('name')->get(['id', 'name']),
+            'Sales' => User::role('sales')->orderBy('name')->get(['id', 'name']),
+        ]);
+
+        $ids = $groups->flatten()->pluck('id');
 
         $counts = Lead::selectRaw('assigned_to, status, count(*) as total')
-            ->whereIn('assigned_to', $juniors->pluck('id'))
+            ->whereIn('assigned_to', $ids)
             ->groupBy('assigned_to', 'status')
             ->get()
             ->groupBy('assigned_to');
 
         $lastActivities = LeadActivity::selectRaw('user_id, max(created_at) as last_at')
-            ->whereIn('user_id', $juniors->pluck('id'))
+            ->whereIn('user_id', $ids)
             ->groupBy('user_id')
             ->pluck('last_at', 'user_id')
             ->map(fn ($v) => \Illuminate\Support\Carbon::parse($v));
 
-        $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
-
-        $summary = $juniors->map(fn ($u) => (object) [
+        $buildRow = fn ($u) => (object) [
             'user' => $u,
             'counts' => collect($statuses)->mapWithKeys(
                 fn ($s) => [$s => optional($counts->get($u->id))->firstWhere('status', $s)->total ?? 0]
             ),
             'total' => $counts->get($u->id)?->sum('total') ?? 0,
             'lastActivityAt' => $lastActivities->get($u->id),
-        ]);
+        ];
+
+        $summary = $groups->mapWithKeys(
+            fn ($users, $division) => [$division => $users->map($buildRow)]
+        );
 
         return view('leads.monitoring', compact('summary', 'statuses'));
     }

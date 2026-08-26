@@ -38,7 +38,9 @@ class MarketingMonitoringTest extends TestCase
         $this->actingAs($lead)->get(route('leads.monitoring'))
             ->assertOk()
             ->assertSee($junior->name)
-            ->assertDontSee('Adi Sales')
+            ->assertSee('Marketing')
+            ->assertSee('Sales')
+            ->assertSee('Adi Sales')
             ->assertSee(route('leads.activities', ['user' => $junior->id]));
     }
 
