@@ -119,6 +119,12 @@ class LeadAttachmentTest extends TestCase
 
         $this->assertDatabaseMissing('lead_documents', ['id' => $doc->id]);
         Storage::disk('public')->assertMissing('leads/1/boq.pdf');
+
+        $this->assertDatabaseHas('lead_activities', [
+            'lead_id' => $lead->id,
+            'user_id' => $user->id,
+            'action' => 'attachment_deleted',
+        ]);
     }
 
     public function test_cannot_delete_attachment_via_other_lead(): void

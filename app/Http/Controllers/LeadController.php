@@ -333,6 +333,10 @@ class LeadController extends Controller
         Storage::disk('public')->delete($document->file_path);
         $document->delete();
 
+        $this->logActivity($lead, 'attachment_deleted', [
+            'file' => ['old' => $document->file_name, 'new' => null],
+        ]);
+
         return back()->with('success', 'Lampiran berhasil dihapus');
     }
 

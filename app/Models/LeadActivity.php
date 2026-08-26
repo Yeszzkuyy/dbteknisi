@@ -29,6 +29,7 @@ class LeadActivity extends Model
 
     public const FIELD_LABELS = [
         'pt_group' => 'PT',
+        'file' => 'Lampiran',
         'assigned_to' => 'Sales',
         'customer_id' => 'Customer',
         'segment' => 'Segment',
@@ -45,6 +46,7 @@ class LeadActivity extends Model
             'created' => 'Menambahkan lead',
             'updated' => 'Mengubah lead',
             'deleted' => 'Menghapus lead',
+            'attachment_deleted' => 'Menghapus lampiran lead',
             'converted' => 'Mengonversi lead menjadi Project',
             default => $this->action,
         };
