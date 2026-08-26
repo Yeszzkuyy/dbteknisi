@@ -23,4 +23,12 @@ class Partner extends Model
         'partner' => 'Partner',
         'distributor' => 'Distributor',
     ];
+
+    public const TYPE_DOTS = [
+        'supplier' => '#3b82f6',
+        'vendor' => '#a855f7',
+        'kontraktor' => '#f97316',
+        'partner' => '#22c55e',
+        'distributor' => '#eab308',
+    ];
 }
