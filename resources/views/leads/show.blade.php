@@ -109,6 +109,14 @@
                                            class="text-xs font-medium text-blue-600 hover:underline">Lihat</a>
                                         <a href="{{ route('leads.attachments.download', [$lead, $doc]) }}"
                                            class="text-xs font-medium text-slate-600 hover:underline">Download</a>
+                                        @can('manage-marketing')
+                                            <form action="{{ route('leads.attachments.destroy', [$lead, $doc]) }}" method="POST"
+                                                  onsubmit="return confirm('Yakin hapus lampiran ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-xs font-medium text-red-500 hover:underline">Hapus</button>
+                                            </form>
+                                        @endcan
                                     </div>
                                 </div>
                             @endforeach

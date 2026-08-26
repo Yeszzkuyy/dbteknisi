@@ -324,6 +324,18 @@ class LeadController extends Controller
         return Storage::disk('public')->download($document->file_path, $document->file_name);
     }
 
+    public function destroyAttachment(Lead $lead, LeadDocument $document)
+    {
+        if ($document->lead_id !== $lead->id) {
+            abort(404);
+        }
+
+        Storage::disk('public')->delete($document->file_path);
+        $document->delete();
+
+        return back()->with('success', 'Lampiran berhasil dihapus');
+    }
+
     private function saveAttachments(Request $request, Lead $lead): void
     {
         foreach ($request->file('attachments', []) as $file) {

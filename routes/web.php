@@ -212,6 +212,9 @@ Route::middleware('auth')->group(function () {
         // Lampiran lead (BOQ awal / kebutuhan user)
         Route::get('/leads/{lead}/attachments/{document}', [LeadController::class, 'showAttachment'])->name('leads.attachments.show');
         Route::get('/leads/{lead}/attachments/{document}/download', [LeadController::class, 'downloadAttachment'])->name('leads.attachments.download');
+        Route::delete('/leads/{lead}/attachments/{document}', [LeadController::class, 'destroyAttachment'])
+            ->middleware('permission:manage-marketing')
+            ->name('leads.attachments.destroy');
 
         Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
     });

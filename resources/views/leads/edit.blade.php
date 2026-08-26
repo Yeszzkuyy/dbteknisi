@@ -191,9 +191,15 @@
                     </label>
                     <ul class="space-y-1">
                         @foreach($lead->documents as $doc)
-                            <li>
+                            <li class="flex items-center justify-between gap-3">
                                 <a href="{{ route('leads.attachments.show', [$lead, $doc]) }}" target="_blank"
                                    class="text-sm text-blue-600 hover:underline">{{ $doc->file_name }}</a>
+                                <form action="{{ route('leads.attachments.destroy', [$lead, $doc]) }}" method="POST"
+                                      onsubmit="return confirm('Yakin hapus lampiran ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs font-medium text-red-500 hover:underline">Hapus</button>
+                                </form>
                             </li>
                         @endforeach
                     </ul>

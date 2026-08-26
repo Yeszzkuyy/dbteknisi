@@ -99,4 +99,45 @@ class LeadAttachmentTest extends TestCase
 
         $this->assertSame('requirement.xlsx', $lead->fresh()->documents->first()->file_name);
     }
+
+    public function test_destroy_removes_document_and_file(): void
+    {
+        Storage::fake('public');
+        $user = $this->marketingUser();
+        $customer = Customer::create(['name' => 'PT Hapus']);
+        $lead = Lead::create(['customer_id' => $customer->id, 'pt_group' => 'NTI', 'segment' => 'vendor']);
+        Storage::disk('public')->put('leads/1/boq.pdf', 'isi');
+
+        $doc = $lead->documents()->create([
+            'file_name' => 'boq.pdf',
+            'file_path' => 'leads/1/boq.pdf',
+            'mime_type' => 'application/pdf',
+        ]);
+
+        $this->actingAs($user)->delete(route('leads.attachments.destroy', [$lead, $doc]))
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('lead_documents', ['id' => $doc->id]);
+        Storage::disk('public')->assertMissing('leads/1/boq.pdf');
+    }
+
+    public function test_cannot_delete_attachment_via_other_lead(): void
+    {
+        Storage::fake('public');
+        $user = $this->marketingUser();
+        $c1 = Customer::create(['name' => 'PT Satu']);
+        $c2 = Customer::create(['name' => 'PT Dua']);
+        $lead1 = Lead::create(['customer_id' => $c1->id, 'pt_group' => 'NTI', 'segment' => 'vendor']);
+        $lead2 = Lead::create(['customer_id' => $c2->id, 'pt_group' => 'NTI', 'segment' => 'vendor']);
+
+        $doc = $lead1->documents()->create([
+            'file_name' => 'boq.pdf',
+            'file_path' => 'leads/1/boq.pdf',
+        ]);
+
+        $this->actingAs($user)->delete(route('leads.attachments.destroy', [$lead2, $doc]))
+            ->assertNotFound();
+
+        $this->assertDatabaseHas('lead_documents', ['id' => $doc->id]);
+    }
 }
