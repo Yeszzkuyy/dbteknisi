@@ -102,6 +102,13 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
                         Log Aktivitas
                     </a>
+                    @can('monitor-marketing')
+                        <a href="{{ route('leads.monitoring') }}"
+                           class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('leads.monitoring') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                            <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
+                            Monitoring Tim
+                        </a>
+                    @endcan
                 </div>
             </div>
         @endcan

@@ -2,7 +2,13 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Log Aktivitas Lead</h1>
-            <p class="text-slate-500 mt-1">Riwayat semua perubahan lead beserta user yang melakukannya</p>
+            <p class="text-slate-500 mt-1">
+                Riwayat semua perubahan lead beserta user yang melakukannya
+                @if($filterUser)
+                    — filter: <span class="font-semibold text-blue-600">{{ $filterUser->name }}</span>
+                    <a href="{{ route('leads.activities') }}" class="text-slate-400 hover:text-red-500 ml-1" title="Hapus filter">&times;</a>
+                @endif
+            </p>
         </div>
         <a href="{{ route('leads.index') }}"
            class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">

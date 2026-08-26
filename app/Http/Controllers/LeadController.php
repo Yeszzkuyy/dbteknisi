@@ -242,13 +242,48 @@ class LeadController extends Controller
             ->with('success', 'Lead berhasil dikonversi ke Project');
     }
 
-    public function activities()
+    public function activities(Request $request)
     {
         $activities = LeadActivity::with(['lead.customer', 'user'])
+            ->when($request->filled('user'), fn ($q) => $q->where('user_id', $request->user))
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('leads.activities', compact('activities'));
+        $filterUser = $request->filled('user') ? User::find($request->user) : null;
+
+        return view('leads.activities', compact('activities', 'filterUser'));
+    }
+
+    public function monitoring()
+    {
+        $juniors = User::role(['marketing', 'sales'])
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $counts = Lead::selectRaw('assigned_to, status, count(*) as total')
+            ->whereIn('assigned_to', $juniors->pluck('id'))
+            ->groupBy('assigned_to', 'status')
+            ->get()
+            ->groupBy('assigned_to');
+
+        $lastActivities = LeadActivity::selectRaw('user_id, max(created_at) as last_at')
+            ->whereIn('user_id', $juniors->pluck('id'))
+            ->groupBy('user_id')
+            ->pluck('last_at', 'user_id');
+
+        $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
+
+        $summary = $juniors->map(fn ($u) => (object) [
+            'user' => $u,
+            'counts' => collect($statuses)->mapWithKeys(
+                fn ($s) => [$s => optional($counts->get($u->id))->firstWhere('status', $s)->total ?? 0]
+            ),
+            'total' => $counts->get($u->id)?->sum('total') ?? 0,
+            'lastActivityAt' => $lastActivities->get($u->id),
+        ]);
+
+        return view('leads.monitoring', compact('summary', 'statuses'));
     }
 
     private function logActivity(Lead $lead, string $action, ?array $changes = null): void
