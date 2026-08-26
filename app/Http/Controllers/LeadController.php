@@ -97,8 +97,14 @@ class LeadController extends Controller
             'conversion' => ($won + $lost) > 0 ? (int) round($won / ($won + $lost) * 100) : 0,
         ];
 
-        $perSource = Lead::selectRaw('COALESCE(NULLIF(source, ""), "lainnya") as source, count(*) as total')
-            ->groupBy('source')->orderByDesc('total')->get();
+        // ponytail: grouping source di PHP agar portabel antar driver (MySQL/Postgres/SQLite)
+        $perSource = Lead::pluck('source')
+            ->map(fn ($source) => ($source === null || $source === '') ? 'lainnya' : $source)
+            ->countBy()
+            ->map(fn ($total, $source) => (object) ['source' => $source, 'total' => $total])
+            ->values()
+            ->sortByDesc('total')
+            ->values();
 
         // ponytail: tren 6 bulan dikelompokkan di PHP (portabel antar driver DB); pindah ke SQL native kalau datanya jutaan
         $trendQuery = Lead::whereBetween('incoming_date', [
