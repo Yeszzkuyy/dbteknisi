@@ -79,7 +79,10 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                {{ __('Save') }}
+            </button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -87,7 +90,7 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-slate-600"
+                    class="text-sm font-medium text-green-600 dark:text-green-400"
                 >{{ __('Saved.') }}</p>
             @endif
         </div>
