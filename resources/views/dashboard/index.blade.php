@@ -95,9 +95,7 @@
                 @if(! $loop->last)
                     <span class="absolute left-[19px] top-11 bottom-0 w-px bg-slate-100"></span>
                 @endif
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-md shadow-indigo-500/20">
-                    {{ strtoupper(substr($activity->user?->name ?? 'U', 0, 1)) }}
-                </div>
+                <x-user-avatar :user="$activity->user" size="w-10 h-10" text="text-sm" />
                 <div class="flex-1 min-w-0 pt-1">
                     <p class="text-sm text-slate-800 leading-snug">
                         <span class="font-bold">{{ $activity->user?->name ?? 'System' }}</span>
