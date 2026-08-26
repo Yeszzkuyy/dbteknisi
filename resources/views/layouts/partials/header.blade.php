@@ -12,9 +12,9 @@
         {{-- LOGO --}}
         <a href="{{ route('dashboard') }}" class="flex-shrink-0">
             <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
-                 class="h-9 sm:h-11 w-auto object-contain bg-white rounded-lg p-0.5 dark:hidden">
+                 class="h-9 sm:h-11 w-auto object-contain bg-white rounded-lg p-0.5 dark:bg-transparent dark:hidden">
             <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
-                 class="h-9 sm:h-11 w-auto object-contain bg-white rounded-lg p-0.5 hidden dark:block">
+                 class="h-9 sm:h-11 w-auto object-contain bg-white rounded-lg p-0.5 hidden dark:block dark:bg-transparent">
         </a>
 
         {{-- TITLE --}}
@@ -48,7 +48,7 @@
         </button>
 
         <span class="text-sm text-slate-600">
-            {{ auth()->user()->name }}
+            {{ \Illuminate\Support\Str::limit(auth()->user()->name, 16, '…') }}
         </span>
 
         {{-- Tampilkan role dari Spatie --}}

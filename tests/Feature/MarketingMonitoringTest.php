@@ -28,6 +28,8 @@ class MarketingMonitoringTest extends TestCase
         $lead = $this->userWithRole('marketing-lead');
         $junior = User::factory()->create();
         $junior->assignRole('marketing');
+        $sales = User::factory()->create(['name' => 'Adi Sales']);
+        $sales->assignRole('sales');
 
         $customer = Customer::create(['name' => 'PT Rekap']);
         Lead::create(['customer_id' => $customer->id, 'pt_group' => 'NTI', 'segment' => 'vendor', 'status' => 'won', 'assigned_to' => $junior->id]);
@@ -36,6 +38,7 @@ class MarketingMonitoringTest extends TestCase
         $this->actingAs($lead)->get(route('leads.monitoring'))
             ->assertOk()
             ->assertSee($junior->name)
+            ->assertDontSee('Adi Sales')
             ->assertSee(route('leads.activities', ['user' => $junior->id]));
     }
 

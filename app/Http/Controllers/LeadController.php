@@ -259,7 +259,7 @@ class LeadController extends Controller
 
     public function monitoring()
     {
-        $juniors = User::role(['marketing', 'sales'])
+        $juniors = User::role('marketing')
             ->orderBy('name')
             ->get(['id', 'name']);
 
