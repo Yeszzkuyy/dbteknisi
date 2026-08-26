@@ -79,8 +79,7 @@
                 </thead>
                 <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600">
                     @forelse($leads as $lead)
-                        <tr class="hover:bg-slate-50 group transition">
-
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition group">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-slate-900">{{ $lead->customer->name ?? 'N/A' }}</div>
                             </td>
@@ -145,7 +144,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
                                             </svg>
                                         </a>
-                                        <form action="{{ route('leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('Hapus lead ini?')">
+                                        <form action="{{ route('leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('Hapus lead ini?')" class="inline">
                                             @csrf @method('DELETE')
                                             <button type="submit" title="Hapus lead"
                                                     class="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition">
