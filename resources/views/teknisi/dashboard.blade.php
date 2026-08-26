@@ -175,9 +175,7 @@
 
             @forelse($activities as $activity)
                 <div class="flex items-start gap-4 py-3 border-b border-slate-100 last:border-0">
-                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-                        <span class="text-indigo-600 font-semibold text-sm">{{ strtoupper(substr($activity->user?->name ?? 'S', 0, 1)) }}</span>
-                    </div>
+                    <x-user-avatar :user="$activity->user" size="w-10 h-10" text="text-sm" />
                     <div class="flex-1 min-w-0">
                         <p class="text-sm text-slate-800">
                             <span class="font-semibold">{{ $activity->user?->name ?? 'System' }}</span>
