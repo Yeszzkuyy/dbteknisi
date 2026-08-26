@@ -77,9 +77,9 @@
 
         {{-- Marketing --}}
         @can('view-marketing')
-            <div x-data="{ open: {{ request()->routeIs('leads*') || request()->routeIs('partners*') ? 'true' : 'false' }} }">
+            <div x-data="{ open: {{ request()->routeIs('leads*') || request()->routeIs('partners*') || request()->routeIs('marketing.dashboard') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('leads*') || request()->routeIs('partners*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs(['leads*', 'partners*', 'marketing.dashboard']) ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <x-icon name="chart-bar" class="w-5 h-5" />
                     <span>Marketing</span>
                     <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,10 +87,20 @@
                     </svg>
                 </button>
                 <div x-show="open" class="mt-1 ml-4 space-y-1">
+                    <a href="{{ route('marketing.dashboard') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('marketing.dashboard') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        Dashboard
+                    </a>
                     <a href="{{ route('leads.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                         Lead / Opportunity
+                    </a>
+                    <a href="{{ route('leads.pipeline') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('leads.pipeline') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                        Pipeline
                     </a>
                     <a href="{{ route('partners.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('partners*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">

@@ -18,6 +18,7 @@ class LeadController extends Controller
 {
     public const SEGMENTS = ['end_user', 'vendor', 'system_integrator', 'kontraktor', 'other'];
     public const SOURCES = ['whatsapp', 'email', 'telpon', 'canvasing', 'event', 'website', 'referral', 'social_media', 'other'];
+    public const STATUSES = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
 
     public static function label(string $value): string
     {
@@ -40,10 +41,83 @@ class LeadController extends Controller
 
         $leads = $query->latest()->paginate(15)->withQueryString();
 
-        $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
+        $statuses = self::STATUSES;
         $sources = self::SOURCES;
 
         return view('leads.index', compact('leads', 'statuses', 'sources'));
+    }
+
+    public function pipeline()
+    {
+        $leads = Lead::with(['customer', 'assignee'])->orderByDesc('incoming_date')->get();
+        $statuses = self::STATUSES;
+
+        return view('leads.pipeline', compact('leads', 'statuses'));
+    }
+
+    public function updateStatus(Request $request, Lead $lead)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:'.implode(',', self::STATUSES),
+        ]);
+
+        if ($validated['status'] !== $lead->status) {
+            $old = $lead->status;
+            $lead->update(['status' => $validated['status']]);
+
+            $this->logActivity($lead, 'status_changed', [
+                'status' => ['old' => $old, 'new' => $validated['status']],
+            ]);
+        }
+
+        return response()->noContent();
+    }
+
+    public function dashboard()
+    {
+        $now = now();
+
+        $statusCounts = Lead::selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $countMonth = fn ($date) => Lead::whereMonth('incoming_date', $date->month)
+            ->whereYear('incoming_date', $date->year)->count();
+
+        $won = (int) ($statusCounts['won'] ?? 0);
+        $lost = (int) ($statusCounts['lost'] ?? 0);
+
+        $stats = [
+            'total' => array_sum($statusCounts->all()),
+            'this_month' => $countMonth($now),
+            'last_month' => $countMonth($now->copy()->subMonthNoOverflow()),
+            'active' => array_sum($statusCounts->all()) - $won - $lost,
+            'won' => $won,
+            'lost' => $lost,
+            'conversion' => ($won + $lost) > 0 ? (int) round($won / ($won + $lost) * 100) : 0,
+        ];
+
+        $perSource = Lead::selectRaw('COALESCE(NULLIF(source, ""), "lainnya") as source, count(*) as total')
+            ->groupBy('source')->orderByDesc('total')->get();
+
+        // ponytail: tren 6 bulan dikelompokkan di PHP (portabel antar driver DB); pindah ke SQL native kalau datanya jutaan
+        $trendQuery = Lead::whereBetween('incoming_date', [
+                $now->copy()->subMonths(5)->startOfMonth()->startOfDay(),
+                $now->copy()->endOfDay(),
+            ])
+            ->pluck('incoming_date')
+            ->countBy(fn ($date) => $date->format('Y-m'));
+
+        $trend = collect(range(5, 0))->map(function ($i) use ($now, $trendQuery) {
+            $month = $now->copy()->subMonthsNoOverflow($i);
+
+            return (object) [
+                'label' => $month->translatedFormat('M y'),
+                'total' => $trendQuery[sprintf('%04d-%02d', $month->year, $month->month)] ?? 0,
+            ];
+        });
+
+        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts'));
     }
 
     public function create()

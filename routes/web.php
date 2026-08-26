@@ -188,6 +188,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
         Route::patch('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert');
+        Route::patch('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
 
         // Data Partner (supplier, vendor, kontraktor, partner, distributor)
         Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
@@ -204,6 +205,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:view-marketing|manage-marketing')->group(function () {
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
+        Route::get('/leads/pipeline', [LeadController::class, 'pipeline'])->name('leads.pipeline');
+        Route::get('/marketing/dashboard', [LeadController::class, 'dashboard'])->name('marketing.dashboard');
         Route::get('/leads/activities', [LeadController::class, 'activities'])->name('leads.activities');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
         Route::get('/leads/{lead}/documents/{document}/preview', [LeadController::class, 'previewDocument'])->name('leads.documents.preview');

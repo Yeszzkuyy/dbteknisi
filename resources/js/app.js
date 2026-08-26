@@ -1,6 +1,7 @@
 
 
 import Alpine from 'alpinejs';
+import Sortable from 'sortablejs';
 
 window.Alpine = Alpine;
 
@@ -23,4 +24,44 @@ document.addEventListener('alpine:init', () => {
 });
 
 Alpine.start();
+
+// Pipeline Kanban Lead — aktif hanya untuk yang boleh manage marketing
+const board = document.querySelector('.kanban-board[data-editable]');
+if (board) {
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    board.querySelectorAll('.kanban-list').forEach((list) => {
+        new Sortable(list, {
+            group: 'leads',
+            animation: 150,
+            ghostClass: 'opacity-40',
+            onEnd: async (evt) => {
+                const leadId = evt.item.dataset.leadId;
+                const status = evt.to.dataset.status;
+
+                try {
+                    const res = await fetch(`/leads/${leadId}/status`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrf,
+                        },
+                        body: JSON.stringify({ status }),
+                    });
+
+                    if (!res.ok) throw new Error();
+
+                    [evt.from, evt.to].forEach((l) => {
+                        l.closest('.w-72').querySelector('[data-count]').textContent =
+                            l.querySelectorAll('.kanban-card').length;
+                    });
+                } catch {
+                    alert('Gagal mengubah status lead.');
+                    window.location.reload();
+                }
+            },
+        });
+    });
+}
 
