@@ -40,7 +40,7 @@ class RoleMenuTest extends TestCase
         }
 
         // akses URL
-        $this->actingAs($u)->get('/dashboard')->assertOk();
+        $this->actingAs($u)->get('/dashboard')->assertRedirect('/teknisi/dashboard');
         $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
@@ -62,7 +62,7 @@ class RoleMenuTest extends TestCase
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for sales");
         }
 
-        $this->actingAs($u)->get('/dashboard')->assertOk();
+        $this->actingAs($u)->get('/dashboard')->assertForbidden();
         $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
@@ -85,7 +85,7 @@ class RoleMenuTest extends TestCase
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for admin");
         }
 
-        $this->actingAs($u)->get('/dashboard')->assertOk();
+        $this->actingAs($u)->get('/dashboard')->assertForbidden();
         $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
@@ -106,7 +106,7 @@ class RoleMenuTest extends TestCase
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for marketing");
         }
 
-        $this->actingAs($u)->get('/dashboard')->assertOk();
+        $this->actingAs($u)->get('/dashboard')->assertRedirect(route('marketing.dashboard'));
         $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
