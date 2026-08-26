@@ -130,7 +130,7 @@
                                 <div class="flex items-center justify-end gap-2">
                                     @can('view-marketing')
                                         <a href="{{ route('leads.show', $lead) }}"
-                                           class="px-3 py-1.5 text-sm rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
+                                           class="px-3 py-1.5 text-sm rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">
                                             Lihat
                                         </a>
                                     @endcan
