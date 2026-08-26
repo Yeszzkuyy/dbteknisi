@@ -1,13 +1,9 @@
 <x-app-layout>
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Edit Partner</h1>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Edit Partner</h1>
             <p class="text-slate-500 mt-1">Perbarui data {{ $partner->name }}.</p>
         </div>
-        <a href="{{ route('partners.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
-            Kembali
-        </a>
     </div>
 
     <form action="{{ route('partners.update', $partner) }}" method="POST"
@@ -47,7 +43,7 @@
         </section>
 
         {{-- Kontak --}}
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-6 pt-6 border-t border-slate-200">
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-6 pt-6 border-t border-slate-200 dark:border-slate-600">
             <div>
                 <label for="contact_person" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                     Contact Person
@@ -83,7 +79,7 @@
         </section>
 
         {{-- Lainnya --}}
-        <section class="space-y-6 pt-6 border-t border-slate-200">
+        <section class="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-600">
             <div>
                 <label for="address" class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
                 <textarea name="address" id="address" rows="2"
@@ -105,7 +101,7 @@
         </section>
 
         {{-- Aksi --}}
-        <div class="flex justify-end gap-3 pt-6 border-t border-slate-200">
+        <div class="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-600">
             <a href="{{ route('partners.index') }}"
                class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 text-sm font-medium transition">
                 Batal
