@@ -9,7 +9,7 @@
                 @if(!in_array($lead->status, ['won', 'lost']))
                     <button type="button"
                             onclick="openConvertModal()"
-                            class="px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition">
+                            class="px-4 py-2.5 rounded-xl bg-green-100 hover:bg-green-200 text-green-700 text-sm font-medium transition">
                         Konversi ke Project
                     </button>
                 @endif
