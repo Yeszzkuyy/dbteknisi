@@ -116,16 +116,13 @@
                 </div>
 
                 <div x-show="mode === 'existing'" x-cloak>
-                    <label for="customer_id" class="block text-sm font-medium text-slate-700 mb-1">Pilih Customer <span class="text-red-500">*</span></label>
-                    <select name="customer_id" id="customer_id"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Pilih Customer</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}" {{ old('customer_id', $lead->customer_id) == $customer->id ? 'selected' : '' }}>
-                                {{ $customer->name }}{{ $customer->contact_person ? ' - '.$customer->contact_person : '' }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Customer <span class="text-red-500">*</span></label>
+                    <x-searchable-select
+                        name="customer_id"
+                        :options="$customers->mapWithKeys(fn ($c) => [$c->id => $c->name.($c->contact_person ? ' - '.$c->contact_person : '')])->all()"
+                        :selected="old('customer_id', $lead->customer_id)"
+                        placeholder="Ketik nama customer untuk mencari..."
+                    />
                     @error('customer_id')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
