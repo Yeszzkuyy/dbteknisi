@@ -38,6 +38,9 @@ class LeadFormTest extends TestCase
 
     public function test_store_creates_lead_with_customer_details(): void
     {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
         $this->actingAs($this->marketingUser())
             ->post(route('leads.store'), [
                 'customer_mode' => 'new',
@@ -51,6 +54,7 @@ class LeadFormTest extends TestCase
                 'source' => 'canvasing',
                 'kebutuhan' => 'Instalasi jaringan 3 lantai',
                 'incoming_date' => '2026-08-24',
+                'assigned_to' => $sales->id,
             ])
             ->assertRedirect(route('leads.index'));
 
@@ -78,6 +82,8 @@ class LeadFormTest extends TestCase
             'pt_group' => 'NTI',
             'segment' => 'vendor',
             'kebutuhan' => 'Instalasi CCTV',
+            'incoming_date' => now()->toDateString(),
+            'assigned_to' => $user->id,
         ])->assertRedirect(route('leads.index'));
 
         $lead = Lead::latest('id')->first();
@@ -88,6 +94,8 @@ class LeadFormTest extends TestCase
             'pt_group' => 'TPS',
             'segment' => 'end_user',
             'kebutuhan' => 'Instalasi CCTV',
+            'incoming_date' => now()->toDateString(),
+            'assigned_to' => $user->id,
         ])->assertRedirect(route('leads.index'));
 
         $created = LeadActivity::where('lead_id', $lead->id)->where('action', 'created')->first();
