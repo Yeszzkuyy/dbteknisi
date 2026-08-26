@@ -61,3 +61,23 @@ Setelah merge ke main: `git pull`, lalu `npm run build` jika ada perubahan CSS/J
 - Folder `backups/` (sudah di-gitignore)
 - Kredensial / `.env`
 - File hasil eksperimen tanpa persetujuan
+
+## 7. Warna tombol (konvensi UI)
+
+Setiap aksi punya warna bawaan — pakai kelas ini konsisten di semua view:
+
+| Aksi | Kelas standar |
+|---|---|
+| Simpan / Tambah / Submit utama | `bg-blue-600 hover:bg-blue-700 text-white` |
+| Lihat / detail | `bg-indigo-50 hover:bg-indigo-100 text-indigo-700` |
+| Edit | `bg-blue-100 hover:bg-blue-200 text-blue-700` |
+| Hapus | `bg-red-100 hover:bg-red-200 text-red-700` |
+| Aksi positif (convert/approve) | `bg-green-100 hover:bg-green-200 text-green-700` |
+| Batal / Kembali | `border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200` |
+
+**Larangan:** jangan pakai `bg-slate-*`, `bg-gray-*`, atau `bg-white` sebagai
+background tombol — CSS dark-mode global mengoverride kelas tersebut sehingga
+tombol menyatu dengan background.
+
+Setiap menambah **kelas Tailwind baru**: jalankan ulang `npm run build` setelah
+merge ke main, kalau tidak kelasnya tidak akan ter-compile.
