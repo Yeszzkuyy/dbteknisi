@@ -18,18 +18,16 @@
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         @php
-            function logColor(?int $customerId): array
-            {
+            $logColor = function (?int $customerId): array {
                 if (! $customerId) {
                     return ['hsl(220, 10%, 90%)', 'hsl(220, 10%, 35%)'];
                 }
                 $hue = fmod($customerId * 137.5, 360);
 
                 return ["hsl({$hue}, 70%, 90%)", "hsl({$hue}, 70%, 30%)"];
-            }
+            };
 
-            function formatLogValue(string $field, $value, $customerNames, $userNames): string
-            {
+            $formatLogValue = function (string $field, $value) use ($customerNames, $userNames): string {
                 if ($value === null || $value === '') {
                     return '-';
                 }
@@ -47,7 +45,7 @@
                 }
 
                 return (string) $value;
-            }
+            };
         @endphp
 
         @if($activities->isEmpty())
@@ -57,7 +55,7 @@
         @else
             <ol class="relative border-l-2 border-slate-200 ml-3 space-y-6">
                 @foreach($activities as $activity)
-                    @php [$dotBg] = logColor($activity->lead?->customer_id); @endphp
+                    @php [$dotBg] = ($logColor)($activity->lead?->customer_id); @endphp
                     <li class="ml-6">
                         <span class="absolute -left-[9px] flex w-4 h-4 rounded-full" style="background: {{ $dotBg }}"></span>
 
@@ -65,7 +63,7 @@
                             <span class="font-semibold text-slate-800">{{ $activity->user ? ($userNames[$activity->user_id] ?? $activity->user->name) : 'Sistem' }}</span>
                             <span class="text-slate-600">{{ $activity->actionLabel() }}</span>
                             @if($activity->lead && $activity->lead->customer)
-                                @php [$badgeBg, $badgeText] = logColor($activity->lead->customer_id); @endphp
+                                @php [$badgeBg, $badgeText] = ($logColor)($activity->lead->customer_id); @endphp
                                 — <a href="{{ route('leads.show', $activity->lead) }}"
                                      class="font-medium rounded-full px-2.5 py-0.5 hover:opacity-80 transition"
                                      style="background: {{ $badgeBg }}; color: {{ $badgeText }}">
@@ -81,8 +79,8 @@
                                 @foreach($activity->changes as $field => $change)
                                     @php
                                         $hasOld = $change['old'] !== null && $change['old'] !== '';
-                                        $old = formatLogValue($field, $change['old'], $customerNames, $userNames);
-                                        $new = formatLogValue($field, $change['new'], $customerNames, $userNames);
+                                        $old = ($formatLogValue)($field, $change['old']);
+                                        $new = ($formatLogValue)($field, $change['new']);
                                     @endphp
                                     <div class="text-xs bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2 inline-block mr-2">
                                         <span class="font-semibold text-slate-700 dark:text-slate-200">
