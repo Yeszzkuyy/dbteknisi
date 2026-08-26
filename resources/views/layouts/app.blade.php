@@ -66,7 +66,7 @@
         input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]):not([type=range]):not([type=hidden]),select,textarea{background-color:var(--input-bg)!important;border-color:var(--input-border)!important;color:var(--input-text)!important}
         input:focus,select:focus,textarea:focus{border-color:#3b82f6!important}
         input::placeholder,textarea::placeholder{color:var(--text-muted)!important}
-        .dark input[type=file]{color-scheme:dark}
+        .dark input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]){color-scheme:dark}
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 font-sans antialiased">
