@@ -10,7 +10,7 @@
         </a>
     </div>
 
-    <form action="{{ route('leads.update', $lead) }}" method="POST" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <form action="{{ route('leads.update', $lead) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         @csrf
         @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -141,6 +141,31 @@
                 <textarea name="kebutuhan" id="kebutuhan" rows="3"
                           placeholder="cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi"
                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
+            </div>
+
+            @if($lead->documents->isNotEmpty())
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Lampiran Saat Ini</label>
+                    <ul class="space-y-1">
+                        @foreach($lead->documents as $doc)
+                            <li>
+                                <a href="{{ route('leads.attachments.show', [$lead, $doc]) }}" target="_blank"
+                                   class="text-sm text-blue-600 hover:underline">{{ $doc->file_name }}</a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Tambah Lampiran (BOQ / Kebutuhan User)</label>
+                <input type="file" name="attachments[]" multiple
+                       accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt,.csv"
+                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 file:text-sm file:font-medium">
+                <p class="text-xs text-slate-400 mt-1">Maksimal 5 file per simpan, 10 MB per file</p>
+                @error('attachments.*')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

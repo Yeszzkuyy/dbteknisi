@@ -96,6 +96,27 @@
                 @endif
 
                 <div class="mt-6 pt-6 border-t">
+                    <label class="text-sm font-medium text-slate-500">Lampiran (BOQ / Kebutuhan User)</label>
+                    <div class="mt-3 space-y-2">
+                        @if($lead->documents->isEmpty())
+                            <p class="text-slate-500">Belum ada lampiran.</p>
+                        @else
+                            @foreach($lead->documents as $doc)
+                                <div class="flex items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                    <span class="text-sm text-slate-800 truncate">{{ $doc->file_name }}</span>
+                                    <div class="flex items-center gap-3 shrink-0">
+                                        <a href="{{ route('leads.attachments.show', [$lead, $doc]) }}" target="_blank"
+                                           class="text-xs font-medium text-blue-600 hover:underline">Lihat</a>
+                                        <a href="{{ route('leads.attachments.download', [$lead, $doc]) }}"
+                                           class="text-xs font-medium text-slate-600 hover:underline">Download</a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t">
                     <label class="text-sm font-medium text-slate-500">Dokumentasi Instalasi (Read-Only)</label>
                     <p class="mt-1 text-sm text-slate-500">Dokumen dari project terkait customer ini (diunggah Tim Teknisi)</p>
 
