@@ -10,7 +10,7 @@
     $photoUrl = ($user && $user->avatar) ? asset('storage/' . $user->avatar) : null;
 @endphp
 
-@if ($clickable && $photoUrl)
+@if ($photoUrl)
     <button type="button"
             x-on:click="$dispatch('view-avatar', { src: @js($photoUrl), name: @js($user->name ?? '') })"
             class="cursor-zoom-in rounded-full transition hover:ring-2 hover:ring-blue-300 {{ $class }}"
