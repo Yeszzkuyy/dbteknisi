@@ -252,7 +252,9 @@ class LeadController extends Controller
 
         $filterUser = $request->filled('user') ? User::find($request->user) : null;
 
-        return view('leads.activities', compact('activities', 'filterUser'));
+        return view('leads.activities', compact('activities', 'filterUser'))
+            ->with('customerNames', Customer::pluck('name', 'id'))
+            ->with('userNames', User::pluck('name', 'id'));
     }
 
     public function monitoring()

@@ -88,7 +88,7 @@
                 </button>
                 <div x-show="open" class="mt-1 ml-4 space-y-1">
                     <a href="{{ route('leads.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('leads*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                         Lead / Opportunity
                     </a>
