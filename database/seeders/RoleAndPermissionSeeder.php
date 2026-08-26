@@ -34,6 +34,9 @@ class RoleAndPermissionSeeder extends Seeder
         $permissions[] = 'view-customer';
         $permissions[] = 'view-trash';
 
+        // Monitoring anggota divisi (khusus lead divisi)
+        $permissions[] = 'monitor-marketing';
+
         foreach ($permissions as $name) {
             Permission::create(['name' => $name, 'guard_name' => 'web']);
         }
@@ -46,6 +49,12 @@ class RoleAndPermissionSeeder extends Seeder
         $marketing = Role::create(['name' => 'marketing', 'guard_name' => 'web']);
         $marketing->givePermissionTo([
             'manage-marketing', 'view-marketing', ...$common,
+        ]);
+
+        // Lead divisi marketing: akses penuh marketing + monitoring tim
+        $marketingLead = Role::create(['name' => 'marketing-lead', 'guard_name' => 'web']);
+        $marketingLead->givePermissionTo([
+            'manage-marketing', 'view-marketing', 'monitor-marketing', ...$common,
         ]);
 
         $sales = Role::create(['name' => 'sales', 'guard_name' => 'web']);

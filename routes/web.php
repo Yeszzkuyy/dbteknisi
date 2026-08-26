@@ -197,6 +197,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('/partners/{partner}', [PartnerController::class, 'destroy'])->name('partners.destroy');
     });
 
+    // Monitoring tim marketing — khusus lead divisi (sebelum /leads/{lead})
+    Route::get('/leads/monitoring', [LeadController::class, 'monitoring'])
+        ->middleware('permission:monitor-marketing')
+        ->name('leads.monitoring');
+
     Route::middleware('permission:view-marketing|manage-marketing')->group(function () {
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
         Route::get('/leads/activities', [LeadController::class, 'activities'])->name('leads.activities');

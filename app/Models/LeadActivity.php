@@ -28,11 +28,13 @@ class LeadActivity extends Model
     }
 
     public const FIELD_LABELS = [
+        'pt_group' => 'PT',
+        'assigned_to' => 'Sales',
         'customer_id' => 'Customer',
         'segment' => 'Segment',
         'status' => 'Status',
         'source' => 'Sumber Lead',
-        'kebutuhan' => 'Kebutuhan User',
+        'kebutuhan' => 'Kebutuhan',
         'notes' => 'Catatan',
         'incoming_date' => 'Tanggal Masuk',
     ];

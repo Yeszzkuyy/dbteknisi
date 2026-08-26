@@ -60,8 +60,8 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
-        $ptGroups = self::PT_GROUPS;
-        $salesUsers = User::role(['sales', 'marketing', 'manager'])->orderBy('name')->get(['id', 'name']);
+        $ptGroups = Lead::PT_GROUPS;
+        $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
         return view('leads.create', compact('customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
     }
@@ -77,13 +77,13 @@ class LeadController extends Controller
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
-            'pt_group' => 'required|in:'.implode(',', self::PT_GROUPS),
-            'assigned_to' => 'nullable|exists:users,id',
+            'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
+            'assigned_to' => 'required|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
-            'incoming_date' => 'nullable|date',
+            'incoming_date' => 'required|date',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -135,8 +135,8 @@ class LeadController extends Controller
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
-        $ptGroups = self::PT_GROUPS;
-        $salesUsers = User::role(['sales', 'marketing', 'manager'])->orderBy('name')->get(['id', 'name']);
+        $ptGroups = Lead::PT_GROUPS;
+        $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
         return view('leads.edit', compact('lead', 'customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
     }
@@ -152,13 +152,13 @@ class LeadController extends Controller
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
-            'pt_group' => 'required|in:'.implode(',', self::PT_GROUPS),
-            'assigned_to' => 'nullable|exists:users,id',
+            'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
+            'assigned_to' => 'required|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
-            'incoming_date' => 'nullable|date',
+            'incoming_date' => 'required|date',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -242,13 +242,58 @@ class LeadController extends Controller
             ->with('success', 'Lead berhasil dikonversi ke Project');
     }
 
-    public function activities()
+    public function activities(Request $request)
     {
         $activities = LeadActivity::with(['lead.customer', 'user'])
+            ->when($request->filled('user'), fn ($q) => $q->where('user_id', $request->user))
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('leads.activities', compact('activities'));
+        $filterUser = $request->filled('user') ? User::find($request->user) : null;
+
+        return view('leads.activities', compact('activities', 'filterUser'))
+            ->with('customerNames', Customer::pluck('name', 'id'))
+            ->with('userNames', User::pluck('name', 'id'));
+    }
+
+    public function monitoring()
+    {
+        $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
+
+        $groups = collect([
+            'Marketing' => User::role('marketing')->orderBy('name')->get(['id', 'name']),
+            'Sales' => User::role('sales')->orderBy('name')->get(['id', 'name']),
+        ]);
+
+        $ids = $groups->flatten()->pluck('id');
+
+        $counts = Lead::selectRaw('assigned_to, status, count(*) as total')
+            ->whereIn('assigned_to', $ids)
+            ->groupBy('assigned_to', 'status')
+            ->get()
+            ->groupBy('assigned_to');
+
+        $lastActivities = LeadActivity::selectRaw('user_id, max(created_at) as last_at')
+            ->whereIn('user_id', $ids)
+            ->groupBy('user_id')
+            ->pluck('last_at', 'user_id')
+            ->map(fn ($v) => \Illuminate\Support\Carbon::parse($v));
+
+        $buildRow = fn ($u) => (object) [
+            'user' => $u,
+            'counts' => collect($statuses)->mapWithKeys(
+                fn ($s) => [$s => optional($counts->get($u->id))->firstWhere('status', $s)->total ?? 0]
+            ),
+            'total' => $counts->get($u->id)?->sum('total') ?? 0,
+            'lastActivityAt' => $lastActivities->get($u->id),
+        ];
+
+        $summary = $groups->mapWithKeys(
+            fn ($users, $division) => [$division => $users->map($buildRow)]
+        );
+
+        return view('leads.monitoring', compact('summary', 'statuses'));
     }
 
     private function logActivity(Lead $lead, string $action, ?array $changes = null): void

@@ -10,8 +10,9 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form action="{{ route('leads.store') }}" method="POST" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="pt_group" class="block text-sm font-medium text-slate-700 mb-1">PT <span class="text-red-500">*</span></label>
                     <select name="pt_group" id="pt_group" required
@@ -27,8 +28,8 @@
                 </div>
 
                 <div>
-                    <label for="incoming_date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Masuk</label>
-                    <input type="date" name="incoming_date" id="incoming_date" value="{{ old('incoming_date', now()->toDateString()) }}"
+                    <label for="incoming_date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Masuk <span class="text-red-500">*</span></label>
+                    <input type="date" name="incoming_date" id="incoming_date" required value="{{ old('incoming_date', now()->toDateString()) }}"
                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                 </div>
 
@@ -72,7 +73,7 @@
                     </label>
                     <label class="inline-flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
                         <input type="radio" name="customer_mode" value="existing" x-model="mode" class="accent-blue-600">
-                        Pilih Customer Lama
+                        Customer Lama
                     </label>
                 </div>
 
@@ -149,8 +150,8 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="assigned_to" class="block text-sm font-medium text-slate-700 mb-1">Sales</label>
-                    <select name="assigned_to" id="assigned_to"
+                    <label for="assigned_to" class="block text-sm font-medium text-slate-700 mb-1">Sales <span class="text-red-500">*</span></label>
+                    <select name="assigned_to" id="assigned_to" required
                             class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         <option value="">Pilih Sales</option>
                         @foreach($salesUsers as $user)
@@ -166,6 +167,17 @@
                 </div>
             </div>
 
-        
-    </div>
+            <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-slate-200">
+                <a href="{{ route('leads.index') }}"
+                   class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium transition">
+                    Batal
+                </a>
+                <button type="submit"
+                        class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                    Simpan Lead
+                </button>
+            </div>
+
+        </div>
+    </form>
 </x-app-layout>
