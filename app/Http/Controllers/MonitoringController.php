@@ -138,17 +138,29 @@ class MonitoringController extends Controller
             // We'll filter in the collection since it's complex
         }
 
-        $customers = $query->paginate(15)->withQueryString();
+        $customers = $query->get();
 
         // Add computed properties to each customer
-        $customers->getCollection()->transform(function ($customer) {
+        $customers->transform(function ($customer) {
             $customer->latest_activity = $this->getLatestActivity($customer);
             $customer->overall_status = $this->getOverallStatus($customer);
             $customer->latest_divisi = $this->getLatestDivisi($customer);
             return $customer;
         });
 
-        return $customers;
+        // ponytail: sort di PHP setelah full load; pindah ke subquery SQL kalau customer sudah ribuan
+        $customers = $customers
+            ->sortByDesc(fn ($c) => $c->latest_activity['date'] ?? null)
+            ->values();
+
+        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage();
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $customers->forPage($page, 15),
+            $customers->count(),
+            15,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        );
     }
 
     private function getLatestActivity(Customer $customer): ?array
@@ -160,6 +172,7 @@ class MonitoringController extends Controller
             $activities->push([
                 'type' => 'lead',
                 'label' => 'Lead: ' . ucfirst($lead->status),
+                'overall' => 'Lead: ' . ucfirst($lead->status),
                 'date' => $lead->created_at,
                 'divisi' => 'marketing',
                 'icon' => 'briefcase',
@@ -173,6 +186,7 @@ class MonitoringController extends Controller
             $activities->push([
                 'type' => 'meeting',
                 'label' => 'Meeting',
+                'overall' => 'Meeting',
                 'date' => $meeting->meeting_date,
                 'divisi' => 'sales',
                 'icon' => 'calendar',
@@ -186,6 +200,7 @@ class MonitoringController extends Controller
             $activities->push([
                 'type' => 'followup',
                 'label' => 'Follow Up',
+                'overall' => 'Follow Up',
                 'date' => $followUp->follow_up_date,
                 'divisi' => 'sales',
                 'icon' => 'arrow-path',
@@ -200,6 +215,7 @@ class MonitoringController extends Controller
             $activities->push([
                 'type' => 'project',
                 'label' => 'Project: ' . $statusName,
+                'overall' => $statusName,
                 'date' => $project->start_date,
                 'divisi' => 'teknisi',
                 'icon' => 'folder',
@@ -213,6 +229,7 @@ class MonitoringController extends Controller
             $activities->push([
                 'type' => 'invoice',
                 'label' => 'Invoice: ' . ucfirst($invoice->status),
+                'overall' => 'Invoice: ' . ucfirst($invoice->status),
                 'date' => $invoice->issue_date,
                 'divisi' => 'admin',
                 'icon' => 'document-text',
@@ -226,6 +243,7 @@ class MonitoringController extends Controller
             $activities->push([
                 'type' => 'po',
                 'label' => 'PO: ' . ucfirst($po->status),
+                'overall' => 'PO: ' . ucfirst($po->status),
                 'date' => $po->issue_date,
                 'divisi' => 'admin',
                 'icon' => 'clipboard-document',
@@ -240,37 +258,9 @@ class MonitoringController extends Controller
 
     private function getOverallStatus(Customer $customer): string
     {
-        // Priority: Project status > Invoice > PO > Meeting > Lead
-        $projects = $customer->projects;
-        if ($projects->isNotEmpty()) {
-            $latestProject = $projects->sortByDesc('start_date')->first();
-            return $latestProject->status?->name ?? 'Belum Memulai';
-        }
-
-        $invoices = $customer->invoices;
-        if ($invoices->isNotEmpty()) {
-            $latestInvoice = $invoices->sortByDesc('issue_date')->first();
-            return 'Invoice: ' . ucfirst($latestInvoice->status);
-        }
-
-        $pos = $customer->purchaseOrders;
-        if ($pos->isNotEmpty()) {
-            $latestPo = $pos->sortByDesc('issue_date')->first();
-            return 'PO: ' . ucfirst($latestPo->status);
-        }
-
-        $meetings = $customer->meetings;
-        if ($meetings->isNotEmpty()) {
-            return 'Meeting';
-        }
-
-        $leads = $customer->leads;
-        if ($leads->isNotEmpty()) {
-            $latestLead = $leads->sortByDesc('created_at')->first();
-            return 'Lead: ' . ucfirst($latestLead->status);
-        }
-
-        return 'Baru';
+        // Status mengikuti aktivitas terbaru apa pun divisinya,
+        // supaya konsisten dengan kolom Divisi Terakhir Update & Waktu.
+        return $this->getLatestActivity($customer)['overall'] ?? 'Baru';
     }
 
     private function getLatestDivisi(Customer $customer): ?string
