@@ -30,7 +30,7 @@
 
                 <div>
                     <label for="incoming_date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Masuk</label>
-                    <input type="date" name="incoming_date" id="incoming_date" value="{{ old('incoming_date', $lead->incoming_date?->format('Y-m-d')) }}"
+                    <input type="date" name="incoming_date" id="incoming_date" required value="{{ old('incoming_date', $lead->incoming_date?->format('Y-m-d')) }}"
                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                 </div>
 
@@ -74,7 +74,7 @@
                     </label>
                     <label class="inline-flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
                         <input type="radio" name="customer_mode" value="existing" x-model="mode" class="accent-blue-600">
-                        Pilih Customer Lama
+                        Customer Lama
                     </label>
                 </div>
 
@@ -149,7 +149,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="assigned_to" class="block text-sm font-medium text-slate-700 mb-1">Sales</label>
-                    <select name="assigned_to" id="assigned_to"
+                    <select name="assigned_to" id="assigned_to" required
                             class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         <option value="">Pilih Sales</option>
                         @foreach($salesUsers as $user)

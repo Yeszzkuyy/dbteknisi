@@ -61,7 +61,7 @@ class LeadController extends Controller
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
-        $salesUsers = User::role(['sales', 'marketing', 'manager'])->orderBy('name')->get(['id', 'name']);
+        $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
         return view('leads.create', compact('customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
     }
@@ -78,12 +78,12 @@ class LeadController extends Controller
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
-            'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'required|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
-            'incoming_date' => 'nullable|date',
+            'incoming_date' => 'required|date',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -136,7 +136,7 @@ class LeadController extends Controller
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
-        $salesUsers = User::role(['sales', 'marketing', 'manager'])->orderBy('name')->get(['id', 'name']);
+        $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
         return view('leads.edit', compact('lead', 'customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
     }
@@ -153,12 +153,12 @@ class LeadController extends Controller
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
-            'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'required|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
             'notes' => 'nullable',
-            'incoming_date' => 'nullable|date',
+            'incoming_date' => 'required|date',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
