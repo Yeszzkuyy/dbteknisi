@@ -89,16 +89,6 @@
                 @if(session('error'))
                     <div class="rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-5 py-3 mb-4">{{ session('error') }}</div>
                 @endif
-                @if($errors->any())
-                    <div class="rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-5 py-3 mb-4">
-                        <p class="font-semibold mb-1">Terdapat kesalahan pada form:</p>
-                        <ul class="list-disc list-inside text-sm">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
             </div>
 
             <main class="flex-1 px-4 sm:px-6 lg:px-8 pb-8">

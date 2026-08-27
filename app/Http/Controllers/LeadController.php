@@ -272,7 +272,7 @@ class LeadController extends Controller
         }
 
         $lead->save();
-        $this->syncAttachments($request, $lead);
+        $this->saveAttachments($request, $lead);
 
         if ($changes) {
             $this->logActivity($lead, 'updated', $changes);
@@ -412,22 +412,6 @@ class LeadController extends Controller
 
     private function saveAttachments(Request $request, Lead $lead): void
     {
-        foreach ($request->file('attachments', []) as $file) {
-            $path = $file->store("leads/{$lead->id}", 'public');
-            $lead->documents()->create([
-                'file_name' => $file->getClientOriginalName(),
-                'file_path' => $path,
-                'mime_type' => $file->getClientMimeType(),
-            ]);
-        }
-    }
-
-    private function syncAttachments(Request $request, Lead $lead): void
-    {
-        // Delete all existing attachments
-        $lead->documents()->delete();
-
-        // Save new attachments
         foreach ($request->file('attachments', []) as $file) {
             $path = $file->store("leads/{$lead->id}", 'public');
             $lead->documents()->create([
