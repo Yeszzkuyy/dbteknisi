@@ -29,12 +29,12 @@
     }"
     class="relative"
 >
-    <input type="hidden" name="{{ $name }}" :value="selectedId">
+    <input type="hidden" name="{{ $name }}" x-model="selectedId">
     <input
         type="text"
         x-model="query"
         @focus="open = true"
-        @input="if (query !== selectedLabel) selectedId = null; open = true"
+        @input="if (query !== selectedLabel && query !== '') { selectedId = null; } open = true"
         @keydown.escape="open = false"
         @blur="setTimeout(() => open = false, 150)"
         placeholder="{{ $placeholder }}"
