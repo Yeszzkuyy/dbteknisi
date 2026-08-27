@@ -214,6 +214,9 @@
                 <input type="file" name="attachments[]" multiple
                        accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt,.csv"
                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 file:text-sm file:font-medium">
+                @error('attachments')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
                 @error('attachments.*')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
