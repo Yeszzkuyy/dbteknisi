@@ -182,6 +182,7 @@ class LeadController extends Controller
             $validated['customer_phone'],
             $validated['customer_address'],
             $validated['customer_contact_person'],
+            $validated['attachments'],
         );
 
         $validated['status'] ??= 'new';
@@ -260,6 +261,7 @@ class LeadController extends Controller
             $validated['customer_phone'],
             $validated['customer_address'],
             $validated['customer_contact_person'],
+            $validated['attachments'],
         );
 
         $lead->fill($validated);
@@ -424,8 +426,6 @@ class LeadController extends Controller
 
     private function syncAttachments(Request $request, Lead $lead): void
     {
-        $lead->documents()->delete();
-
         foreach ($request->file('attachments', []) as $file) {
             $path = $file->store("leads/{$lead->id}", 'public');
             $lead->documents()->create([
