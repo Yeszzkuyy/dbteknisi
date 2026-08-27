@@ -194,12 +194,11 @@
                             <li class="flex items-center justify-between gap-3">
                                 <a href="{{ route('leads.attachments.show', [$lead, $doc]) }}" target="_blank"
                                    class="text-sm text-blue-600 hover:underline">{{ $doc->file_name }}</a>
-                                <form action="{{ route('leads.attachments.destroy', [$lead, $doc]) }}" method="POST"
-                                      onsubmit="return confirm('Yakin hapus lampiran ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-xs font-medium text-red-500 hover:underline">Hapus</button>
-                                </form>
+                                <button type="button"
+                                        class="text-xs font-medium text-red-500 hover:underline"
+                                        onclick="if(confirm('Yakin hapus lampiran ini?')){fetch('{{ route('leads.attachments.destroy', [$lead, $doc]) }}',{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({_method:'DELETE'})}).then(r=>r.ok&&location.reload())}">
+                                    Hapus
+                                </button>
                             </li>
                         @endforeach
                     </ul>
