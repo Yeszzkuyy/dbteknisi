@@ -145,16 +145,17 @@
                             <p class="text-slate-500">Belum ada lampiran.</p>
                         @else
                             @foreach($lead->documents as $doc)
-                                <div class="flex items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                    <div class="flex items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
                                     <span class="text-sm text-slate-800 truncate">{{ $doc->file_name }}</span>
                                     <div class="flex items-center gap-2 shrink-0">
-                                        <a href="{{ route('leads.attachments.show', [$lead, $doc]) }}" target="_blank" title="Lihat"
-                                           class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
+                                        <button type="button" title="Lihat"
+                                                onclick="openPreviewModal('{{ route('leads.attachments.show', [$lead, $doc]) }}', '{{ $doc->file_name }}', '{{ $doc->mime_type }}')"
+                                                class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                             </svg>
-                                        </a>
+                                        </button>
                                         <a href="{{ route('leads.attachments.download', [$lead, $doc]) }}" title="Download"
                                            class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
@@ -298,4 +299,62 @@
     function closeConvertModal() {
         document.getElementById('convertModal').classList.add('hidden');
     }
+
+    function openPreviewModal(url, filename, mimeType) {
+        var modal = document.getElementById('previewModal');
+        var content = document.getElementById('previewContent');
+        var title = document.getElementById('previewTitle');
+
+        title.textContent = filename;
+        content.innerHTML = '';
+
+        var imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+        var pdfTypes = ['application/pdf'];
+
+        if (imageTypes.includes(mimeType)) {
+            var img = document.createElement('img');
+            img.src = url;
+            img.className = 'max-h-[80vh] max-w-full mx-auto rounded-lg object-contain';
+            img.alt = filename;
+            content.appendChild(img);
+        } else if (pdfTypes.includes(mimeType)) {
+            var iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.className = 'w-full h-[80vh] rounded-lg border-0';
+            content.appendChild(iframe);
+        } else {
+            content.innerHTML = '<div class="text-center py-10">' +
+                '<svg class="w-16 h-16 mx-auto text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>' +
+                '<p class="text-slate-600 font-medium mb-2">File ini perlu didownload</p>' +
+                '<a href="' + url.replace('/show', '/download') + '" ' +
+                'class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">' +
+                '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>' +
+                'Download</a>' +
+                '</div>';
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function closePreviewModal() {
+        var modal = document.getElementById('previewModal');
+        modal.classList.add('hidden');
+        document.getElementById('previewContent').innerHTML = '';
+    }
 </script>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex min-h-full items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slate-900/70" onclick="closePreviewModal()"></div>
+        <div class="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl">
+            <div class="flex items-center justify-between p-4 border-b border-slate-200">
+                <h3 id="previewTitle" class="text-sm font-semibold text-slate-900 truncate max-w-[80%]"></h3>
+                <button type="button" onclick="closePreviewModal()" class="text-slate-400 hover:text-slate-600 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="previewContent" class="p-4"></div>
+        </div>
+    </div>
+</div>
