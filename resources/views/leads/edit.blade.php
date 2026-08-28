@@ -178,7 +178,7 @@
 
         {{-- Detail --}}
         <section class="border-t border-slate-200">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                 <div>
                     <label for="kebutuhan" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                         Kebutuhan
