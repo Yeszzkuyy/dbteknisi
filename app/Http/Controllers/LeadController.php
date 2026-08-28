@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Storage;
 
 class LeadController extends Controller
 {
-    public const SEGMENTS = ['end_user', 'vendor', 'system_integrator', 'kontraktor', 'other'];
+    public const SEGMENTS = ['end_user', 'vendor', 'system_integrator', 'kontraktor', 'gov', 'principle', 'distributor', 'other'];
     public const SOURCES = ['whatsapp', 'email', 'telpon', 'canvasing', 'event', 'website', 'referral', 'social_media', 'other'];
     public const STATUSES = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
 
@@ -25,6 +25,9 @@ class LeadController extends Controller
         return match ($value) {
             'end_user' => 'End User',
             'system_integrator' => 'System Integrator',
+            'gov' => 'Gov',
+            'principle' => 'Principle',
+            'distributor' => 'Distributor',
             default => ucfirst(str_replace('_', ' ', $value)),
         };
     }
@@ -145,6 +148,7 @@ class LeadController extends Controller
             'customer_company' => 'nullable|string|max:255',
             'customer_email' => 'nullable|email|max:255',
             'customer_phone' => 'nullable|string|max:50',
+            'customer_whatsapp' => 'nullable|string|max:50',
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
@@ -153,6 +157,8 @@ class LeadController extends Controller
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
+            'solusi' => 'nullable|string|max:2000',
+            'progress_notes' => 'nullable|string|max:2000',
             'notes' => 'nullable',
             'incoming_date' => 'required|date',
             'attachments' => 'nullable|array|max:5',
@@ -165,6 +171,7 @@ class LeadController extends Controller
                 'company' => $validated['customer_company'] ?? $validated['customer_name'],
                 'email' => $validated['customer_email'] ?? null,
                 'phone' => $validated['customer_phone'] ?? null,
+                'whatsapp' => $validated['customer_whatsapp'] ?? null,
                 'address' => $validated['customer_address'] ?? null,
                 'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
@@ -180,6 +187,7 @@ class LeadController extends Controller
             $validated['customer_company'],
             $validated['customer_email'],
             $validated['customer_phone'],
+            $validated['customer_whatsapp'],
             $validated['customer_address'],
             $validated['customer_contact_person'],
             $validated['attachments'],
@@ -224,6 +232,7 @@ class LeadController extends Controller
             'customer_company' => 'nullable|string|max:255',
             'customer_email' => 'nullable|email|max:255',
             'customer_phone' => 'nullable|string|max:50',
+            'customer_whatsapp' => 'nullable|string|max:50',
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
@@ -232,6 +241,8 @@ class LeadController extends Controller
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
+            'solusi' => 'nullable|string|max:2000',
+            'progress_notes' => 'nullable|string|max:2000',
             'notes' => 'nullable',
             'incoming_date' => 'required|date',
             'attachments' => 'nullable|array|max:5',
@@ -244,6 +255,7 @@ class LeadController extends Controller
                 'company' => $validated['customer_company'] ?? $validated['customer_name'],
                 'email' => $validated['customer_email'] ?? null,
                 'phone' => $validated['customer_phone'] ?? null,
+                'whatsapp' => $validated['customer_whatsapp'] ?? null,
                 'address' => $validated['customer_address'] ?? null,
                 'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
@@ -259,6 +271,7 @@ class LeadController extends Controller
             $validated['customer_company'],
             $validated['customer_email'],
             $validated['customer_phone'],
+            $validated['customer_whatsapp'],
             $validated['customer_address'],
             $validated['customer_contact_person'],
             $validated['attachments'],

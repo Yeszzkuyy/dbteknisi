@@ -62,7 +62,7 @@
             <div>
                 <label for="segment" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                     Segmentasi <span class="text-red-500">*</span>
-                    <x-info-tip tip="Jenis calon client: End User (pemakai langsung), Vendor, System Integrator, Kontraktor, atau lainnya." />
+                    <x-info-tip tip="Jenis calon client: End User, Vendor, System Integrator, Kontraktor, Gov, Principle, Distributor, atau lainnya." />
                 </label>
                 <select name="segment" id="segment" required
                         class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
@@ -129,7 +129,13 @@
                     <div>
                         <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">Telp</label>
                         <input type="text" name="customer_phone" id="customer_phone" value="{{ old('customer_phone') }}"
-                               placeholder="cth: wa.me/6282234470680 atau 0812-3456-7890"
+                               placeholder="cth: 0812-3456-7890"
+                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="customer_whatsapp" class="block text-sm font-medium text-slate-700 mb-1">No WA</label>
+                        <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp') }}"
+                               placeholder="cth: 0812-3456-7890"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="md:col-span-2">
@@ -179,6 +185,28 @@
             <textarea name="kebutuhan" id="kebutuhan" rows="3"
                       placeholder="cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi"
                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
+        </section>
+
+        {{-- Solusi --}}
+        <section class="pt-6 border-t border-slate-200">
+            <label for="solusi" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                Solusi
+                <x-info-tip tip="Solusi yang ditawarkan untuk memenuhi kebutuhan customer." />
+            </label>
+            <textarea name="solusi" id="solusi" rows="3"
+                      placeholder="cth: Rekomendasi Cisco Webex Board 55S untuk ruang meeting"
+                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('solusi', $lead->solusi) }}</textarea>
+        </section>
+
+        {{-- Progress FollowUp --}}
+        <section class="pt-6 border-t border-slate-200">
+            <label for="progress_notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                Progress FollowUp / Keterangan
+                <x-info-tip tip="Catatan progress follow-up: sudah dihubungi, jadwal meeting, status negosiasi, dll." />
+            </label>
+            <textarea name="progress_notes" id="progress_notes" rows="3"
+                      placeholder="cth: Sudah telepon, menunggu balasan. Follow-up lagi Senin depan."
+                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('progress_notes', $lead->progress_notes) }}</textarea>
         </section>
 
         {{-- Lampiran --}}
