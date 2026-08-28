@@ -126,7 +126,7 @@
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">Telp</label>
+                        <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">Telpon Kantor</label>
                         <input type="text" name="customer_phone" id="customer_phone" value="{{ old('customer_phone') }}"
                                placeholder="cth: 0812-3456-7890"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
