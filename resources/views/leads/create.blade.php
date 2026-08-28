@@ -222,18 +222,35 @@
 
         {{-- Penugasan --}}
         <section class="border-t border-slate-200">
-            <div>
-                <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Sales <span class="text-red-500">*</span>
-                    <x-info-tip tip="Orang yang bertanggung jawab follow-up lead ini." />
-                </label>
-                <select name="assigned_to" id="assigned_to" required
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih Sales</option>
-                    @foreach($salesUsers as $user)
-                        <option value="{{ $user->id }}" {{ old('assigned_to') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                    @endforeach
-                </select>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <div>
+                    <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                        Sales <span class="text-red-500">*</span>
+                        <x-info-tip tip="Orang yang bertanggung jawab follow-up lead ini." />
+                    </label>
+                    <select name="assigned_to" id="assigned_to" required
+                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Pilih Sales</option>
+                        @foreach($salesUsers as $user)
+                            <option value="{{ $user->id }}" {{ old('assigned_to') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="partner_id" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                        Partner Terkait
+                        <x-info-tip tip="Pilih partner jika lead ini melibatkan vendor/supplier/kontraktor tertentu. Opsional." />
+                    </label>
+                    <select name="partner_id" id="partner_id"
+                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Tidak Ada Partner</option>
+                        @foreach($partners as $partner)
+                            <option value="{{ $partner->id }}" {{ old('partner_id') == $partner->id ? 'selected' : '' }}>
+                                {{ $partner->name }} ({{ ucfirst($partner->type) }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </section>
 

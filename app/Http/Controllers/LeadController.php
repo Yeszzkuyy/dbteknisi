@@ -6,6 +6,7 @@ use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\LeadDocument;
 use App\Models\Customer;
+use App\Models\Partner;
 use App\Models\Project;
 use App\Models\ProjectDocument;
 use App\Models\ProjectStatus;
@@ -34,7 +35,7 @@ class LeadController extends Controller
 
     public function index(Request $request)
     {
-        $query = Lead::with(['customer', 'assignee'])
+        $query = Lead::with(['customer', 'assignee', 'partner'])
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
                 fn ($c) => $c->where('name', 'like', '%'.$request->search.'%')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
@@ -52,7 +53,7 @@ class LeadController extends Controller
 
     public function pipeline()
     {
-        $leads = Lead::with(['customer', 'assignee'])->orderByDesc('incoming_date')->get();
+        $leads = Lead::with(['customer', 'assignee', 'partner'])->orderByDesc('incoming_date')->get();
         $statuses = self::STATUSES;
 
         return view('leads.pipeline', compact('leads', 'statuses'));
@@ -74,6 +75,33 @@ class LeadController extends Controller
         }
 
         return response()->noContent();
+    }
+
+    public function batchUpdateStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'changes' => 'required|array',
+            'changes.*.lead_id' => 'required|exists:leads,id',
+            'changes.*.status' => 'required|in:'.implode(',', self::STATUSES),
+        ]);
+
+        $results = [];
+        foreach ($validated['changes'] as $change) {
+            $lead = Lead::find($change['lead_id']);
+            $old = $lead->status;
+
+            if ($old !== $change['status']) {
+                $lead->update(['status' => $change['status']]);
+
+                $this->logActivity($lead, 'status_changed', [
+                    'status' => ['old' => $old, 'new' => $change['status']],
+                ]);
+
+                $results[] = ['lead_id' => $lead->id, 'old' => $old, 'new' => $change['status']];
+            }
+        }
+
+        return response()->json(['updated' => count($results), 'changes' => $results]);
     }
 
     public function dashboard()
@@ -132,12 +160,13 @@ class LeadController extends Controller
     public function create()
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
+        $partners = Partner::orderBy('name')->get(['id', 'name', 'type']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
         $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
-        return view('leads.create', compact('customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
+        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups', 'salesUsers'));
     }
 
     public function store(Request $request)
@@ -152,6 +181,7 @@ class LeadController extends Controller
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
+            'partner_id' => 'nullable|exists:partners,id',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
             'assigned_to' => 'required|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
@@ -206,7 +236,7 @@ class LeadController extends Controller
 
     public function show(Lead $lead)
     {
-        $lead->load(['customer', 'activities.user', 'customer.projects.documents']);
+        $lead->load(['customer', 'partner', 'activities.user', 'customer.projects.documents']);
         $documents = $lead->customer->projects->flatMap->documents;
         $projectStatuses = ProjectStatus::orderBy('sort_order')->get(['id', 'name']);
         $workTypes = WorkType::orderBy('name')->get(['id', 'name']);
@@ -216,12 +246,13 @@ class LeadController extends Controller
     public function edit(Lead $lead)
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
+        $partners = Partner::orderBy('name')->get(['id', 'name', 'type']);
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
         $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
-        return view('leads.edit', compact('lead', 'customers', 'segments', 'sources', 'ptGroups', 'salesUsers'));
+        return view('leads.edit', compact('lead', 'customers', 'partners', 'segments', 'sources', 'ptGroups', 'salesUsers'));
     }
 
     public function update(Request $request, Lead $lead)
@@ -236,6 +267,7 @@ class LeadController extends Controller
             'customer_address' => 'nullable|string|max:1000',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
             'customer_contact_person' => 'nullable|string|max:255',
+            'partner_id' => 'nullable|exists:partners,id',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
             'assigned_to' => 'required|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),

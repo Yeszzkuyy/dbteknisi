@@ -55,6 +55,7 @@
                         <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider">Partner</th>
                         <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider">Tipe</th>
                         <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider">Kontak</th>
+                        <th class="px-6 py-3.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider">Jumlah Lead</th>
                         <th class="px-6 py-3.5 text-right text-xs font-semibold text-slate-500 dark:text-slate-200 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -107,6 +108,15 @@
                                     <span class="text-slate-400">-</span>
                                 @endif
                             </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($partner->leads_count > 0)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                                        {{ $partner->leads_count }} lead
+                                    </span>
+                                @else
+                                    <span class="text-slate-400 text-sm">0</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
                                 <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                     @can('manage-marketing')
@@ -132,7 +142,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-16 text-center">
+                            <td colspan="5" class="px-6 py-16 text-center">
                                 <div class="mx-auto w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-slate-400">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>

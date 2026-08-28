@@ -189,6 +189,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
         Route::patch('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert');
         Route::patch('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
+        Route::patch('/leads/batch-status', [LeadController::class, 'batchUpdateStatus'])->name('leads.batch-status');
 
         // Data Partner (supplier, vendor, kontraktor, partner, distributor)
         Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');

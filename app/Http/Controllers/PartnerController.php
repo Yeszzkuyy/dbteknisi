@@ -9,7 +9,7 @@ class PartnerController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Partner::query();
+        $query = Partner::withCount('leads');
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {

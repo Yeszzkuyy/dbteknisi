@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Partner extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'name',
         'type',
@@ -31,4 +34,9 @@ class Partner extends Model
         'partner' => '#22c55e',
         'distributor' => '#eab308',
     ];
+
+    public function leads()
+    {
+        return $this->hasMany(Lead::class);
+    }
 }

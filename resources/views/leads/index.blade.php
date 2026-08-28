@@ -72,6 +72,7 @@
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Customer</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Sumber</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Partner</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Kebutuhan</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Tanggal Masuk</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Aksi</th>
@@ -108,6 +109,16 @@
                             <td class="px-6 py-4 text-left">
                                 @if($lead->source)
                                     <span class="text-sm text-slate-700">{{ ucfirst(str_replace('_', ' ', $lead->source)) }}</span>
+                                @else
+                                    <span class="text-slate-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-left">
+                                @if($lead->partner)
+                                    <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200">
+                                        <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ \App\Models\Partner::TYPE_DOTS[$lead->partner->type] ?? '#94a3b8' }}"></span>
+                                        {{ $lead->partner->name }}
+                                    </span>
                                 @else
                                     <span class="text-slate-400">-</span>
                                 @endif
@@ -159,7 +170,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center text-slate-500">
+                            <td colspan="8" class="px-6 py-12 text-center text-slate-500">
                                 Belum ada lead. <a href="{{ route('leads.create') }}" class="text-blue-600 hover:underline">Tambah lead pertama</a>
                             </td>
                         </tr>

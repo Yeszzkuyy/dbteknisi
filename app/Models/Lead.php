@@ -20,6 +20,7 @@ class Lead extends Model
 
     protected $fillable = [
         'customer_id',
+        'partner_id',
         'pt_group',
         'segment',
         'status',
@@ -55,6 +56,11 @@ class Lead extends Model
     public function assignee()
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function partner()
+    {
+        return $this->belongsTo(Partner::class);
     }
 
     public function projects()

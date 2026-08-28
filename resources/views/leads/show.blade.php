@@ -74,6 +74,19 @@
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Segment</label>
                         <p class="mt-1 text-slate-900 font-semibold">{{ $lead->segment ? \App\Http\Controllers\LeadController::label($lead->segment) : '-' }}</p>
                     </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Partner</label>
+                        <p class="mt-1 text-slate-900">
+                            @if($lead->partner)
+                                <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                                    <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ \App\Models\Partner::TYPE_DOTS[$lead->partner->type] ?? '#94a3b8' }}"></span>
+                                    {{ $lead->partner->name }} ({{ ucfirst($lead->partner->type) }})
+                                </span>
+                            @else
+                                -
+                            @endif
+                        </p>
+                    </div>
 
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Alamat</label>
