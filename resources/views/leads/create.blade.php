@@ -11,7 +11,7 @@
     </div>
 
     <form action="{{ route('leads.store') }}" method="POST" enctype="multipart/form-data"
-          class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
         @csrf
 
         {{-- Info Umum --}}
@@ -79,7 +79,7 @@
         </section>
 
         {{-- Data Customer --}}
-        <section x-data="{ mode: '{{ old('customer_mode', 'new') }}' }" class="pt-6 border-t border-slate-200">
+        <section x-data="{ mode: '{{ old('customer_mode', 'new') }}' }" class="border-t border-slate-200">
             <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-3">
                 Data Customer <span class="text-red-500">*</span>
                 <x-info-tip tip="Pilih Customer Baru kalau belum pernah tercatat, atau Customer Lama kalau sudah ada di database." />
@@ -179,14 +179,14 @@
         </section>
 
         {{-- Detail --}}
-        <section class="pt-6 border-t border-slate-200">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
+        <section class="border-t border-slate-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4">
                 <div>
                     <label for="kebutuhan" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                         Kebutuhan
                         <x-info-tip tip="Ringkasan apa yang dibutuhkan user: produk, jumlah, dan apakah termasuk instalasi." />
                     </label>
-                    <textarea name="kebutuhan" id="kebutuhan" rows="3"
+                    <textarea name="kebutuhan" id="kebutuhan" rows="2"
                               placeholder="cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi"
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan') }}</textarea>
                 </div>
@@ -195,7 +195,7 @@
                         Solusi
                         <x-info-tip tip="Solusi yang ditawarkan untuk memenuhi kebutuhan customer." />
                     </label>
-                    <textarea name="solusi" id="solusi" rows="3"
+                    <textarea name="solusi" id="solusi" rows="2"
                               placeholder="cth: Rekomendasi Cisco Webex Board 55S untuk ruang meeting"
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('solusi') }}</textarea>
                 </div>
@@ -204,7 +204,7 @@
                         Progress FollowUp / Keterangan
                         <x-info-tip tip="Catatan progress follow-up: sudah dihubungi, jadwal meeting, status negosiasi, dll." />
                     </label>
-                    <textarea name="progress_notes" id="progress_notes" rows="3"
+                    <textarea name="progress_notes" id="progress_notes" rows="2"
                               placeholder="cth: Sudah telepon, menunggu balasan. Follow-up lagi Senin depan."
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('progress_notes') }}</textarea>
                 </div>
@@ -213,7 +213,7 @@
                         Catatan Internal
                         <x-info-tip tip="Catatan khusus tim, tidak ditampilkan ke customer." />
                     </label>
-                    <textarea name="notes" id="notes" rows="3"
+                    <textarea name="notes" id="notes" rows="2"
                               placeholder="Catatan internal..."
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes') }}</textarea>
                 </div>
@@ -221,7 +221,7 @@
         </section>
 
         {{-- Penugasan --}}
-        <section class="pt-6 border-t border-slate-200">
+        <section class="border-t border-slate-200">
             <div>
                 <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                     Sales <span class="text-red-500">*</span>
@@ -238,7 +238,7 @@
         </section>
 
         {{-- Lampiran --}}
-        <section class="pt-6 border-t border-slate-200">
+        <section class="border-t border-slate-200">
             <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                 Lampiran (BOQ / Kebutuhan User)
                 <x-info-tip tip="Unggah file BOQ awal, spesifikasi, atau dokumen kebutuhan dari user. Maksimal 5 file, 10 MB per file." />
@@ -252,7 +252,7 @@
         </section>
 
         {{-- Aksi --}}
-        <div class="flex justify-end gap-3 pt-6 border-t border-slate-200">
+        <div class="flex justify-end gap-3 border-t border-slate-200">
             <a href="{{ route('leads.index') }}"
                class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium transition">
                 Batal
