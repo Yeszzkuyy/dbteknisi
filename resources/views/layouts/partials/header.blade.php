@@ -20,7 +20,7 @@
         {{-- TITLE --}}
         <div>
             <h1 class="text-lg sm:text-xl font-bold text-slate-800">
-                {{ $pageTitle ?? 'Tridaya App' }}
+                {{ $pageTitle ?? '3DY App' }}
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 hidden sm:block">
                 Full Visibility. Zero Guesswork • 3DY Group

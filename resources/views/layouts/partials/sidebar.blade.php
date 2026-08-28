@@ -11,7 +11,7 @@
             <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
                  class="h-10 w-auto object-contain bg-white rounded-lg p-0.5 hidden dark:block dark:bg-transparent">
             <div class="min-w-0">
-                <h1 class="text-xl font-bold text-blue-600 truncate">Tridaya App</h1>
+                <h1 class="text-xl font-bold text-blue-600 truncate">3DY App</h1>
                 <p class="text-xs text-slate-400 mt-0.5">3DY Group</p>
             </div>
         </a>

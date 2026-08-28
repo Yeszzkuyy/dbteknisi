@@ -14,7 +14,7 @@ class Lead extends Model
     public const PT_COLORS = [
         'NTI' => 'bg-sky-500 text-white',
         'MGK' => 'bg-blue-900 text-white',
-        'TPS' => 'bg-red-900 text-white',
+        'TPS' => 'bg-red-500 text-white',
         'WANI' => 'bg-orange-500 text-white',
     ];
 
