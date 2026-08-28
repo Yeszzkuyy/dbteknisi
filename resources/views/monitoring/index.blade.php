@@ -28,18 +28,9 @@
             {{-- Date Range --}}
             <div class="flex gap-2">
                 <label for="date_from" class="sr-only">Dari tanggal</label>
-                <input type="date"
-                       id="date_from"
-                       name="date_from"
-                       value="{{ request('date_from') }}"
-                       class="px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                <x-datepicker id="date_from" name="date_from" value="{{ request('date_from') }}"></x-datepicker>
                 <span class="flex items-center text-slate-400">s/d</span>
-                <label for="date_to" class="sr-only">Sampai tanggal</label>
-                <input type="date"
-                       id="date_to"
-                       name="date_to"
-                       value="{{ request('date_to') }}"
-                       class="px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                <x-datepicker id="date_to" name="date_to" value="{{ request('date_to') }}"></x-datepicker>
             </div>
 
             <button type="submit"
