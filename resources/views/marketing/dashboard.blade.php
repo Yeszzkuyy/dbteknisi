@@ -10,6 +10,42 @@
         </a>
     </div>
 
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 mb-6">
+        <form method="GET" action="{{ route('marketing.dashboard') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div>
+                <label class="text-sm font-medium text-slate-500">Dari Tanggal</label>
+                <x-datepicker name="date_from" value="{{ $dateFrom }}" class="mt-1"></x-datepicker>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-slate-500">Sampai Tanggal</label>
+                <x-datepicker name="date_to" value="{{ $dateTo }}" class="mt-1"></x-datepicker>
+            </div>
+            <div class="flex items-end gap-2">
+                <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                    Filter
+                </button>
+                <a href="{{ route('marketing.dashboard') }}" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 font-medium transition">
+                    Reset
+                </a>
+            </div>
+            <div class="flex items-end gap-2">
+                @php
+                    $presets = [
+                        'Bulan Ini' => [now()->startOfMonth()->toDateString(), now()->toDateString()],
+                        '3 Bulan' => [now()->subMonths(2)->startOfMonth()->toDateString(), now()->toDateString()],
+                        '6 Bulan' => [now()->subMonths(5)->startOfMonth()->toDateString(), now()->toDateString()],
+                    ];
+                @endphp
+                @foreach($presets as $label => [$from, $to])
+                    <a href="{{ route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to]) }}"
+                       class="px-3 py-2 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium transition">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+        </form>
+    </div>
+
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
             <p class="text-sm text-slate-500">Lead Bulan Ini</p>
@@ -41,7 +77,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {{-- Tren lead masuk --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-            <h2 class="font-semibold text-slate-700 mb-4">Lead Masuk — 6 Bulan Terakhir</h2>
+            <h2 class="font-semibold text-slate-700 mb-4">Lead Masuk — {{ $dateFrom }} s/d {{ $dateTo }}</h2>
             @php($maxTrend = max($trend->max('total'), 1))
             <div class="flex items-end justify-between gap-3 h-44">
                 @foreach($trend as $month)

@@ -105,15 +105,19 @@ class LeadController extends Controller
         return response()->json(['updated' => count($results), 'changes' => $results]);
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $now = now();
+        $dateFrom = $request->filled('date_from') ? $request->date_from : $now->copy()->subMonths(5)->startOfMonth()->toDateString();
+        $dateTo = $request->filled('date_to') ? $request->date_to : $now->toDateString();
 
-        $statusCounts = Lead::selectRaw('status, count(*) as total')
+        $statusCounts = Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
+            ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        $countMonth = fn ($date) => Lead::whereMonth('incoming_date', $date->month)
+        $countMonth = fn ($date) => Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
+            ->whereMonth('incoming_date', $date->month)
             ->whereYear('incoming_date', $date->year)->count();
 
         $won = (int) ($statusCounts['won'] ?? 0);
@@ -130,7 +134,8 @@ class LeadController extends Controller
         ];
 
         // ponytail: grouping source di PHP agar portabel antar driver (MySQL/Postgres/SQLite)
-        $perSource = Lead::pluck('source')
+        $perSource = Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
+            ->pluck('source')
             ->map(fn ($source) => ($source === null || $source === '') ? 'lainnya' : $source)
             ->countBy()
             ->map(fn ($total, $source) => (object) ['source' => $source, 'total' => $total])
@@ -138,16 +143,14 @@ class LeadController extends Controller
             ->sortByDesc('total')
             ->values();
 
-        // ponytail: tren 6 bulan dikelompokkan di PHP (portabel antar driver DB); pindah ke SQL native kalau datanya jutaan
-        $trendQuery = Lead::whereBetween('incoming_date', [
-                $now->copy()->subMonths(5)->startOfMonth()->startOfDay(),
-                $now->copy()->endOfDay(),
-            ])
+        // ponytail: tren per bulan dikelompokkan di PHP (portabel antar driver DB); pindah ke SQL native kalau datanya jutaan
+        $trendQuery = Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
             ->pluck('incoming_date')
             ->countBy(fn ($date) => $date->format('Y-m'));
 
-        $trend = collect(range(5, 0))->map(function ($i) use ($now, $trendQuery) {
-            $month = $now->copy()->subMonthsNoOverflow($i);
+        $months = now()->parse($dateFrom)->diffInMonths(now()->parse($dateTo));
+        $trend = collect(range($months, 0))->map(function ($i) use ($dateTo, $trendQuery) {
+            $month = now()->parse($dateTo)->subMonthsNoOverflow($i);
 
             return (object) [
                 'label' => $month->translatedFormat('M y'),
@@ -155,7 +158,7 @@ class LeadController extends Controller
             ];
         });
 
-        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts'));
+        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo'));
     }
 
     public function create()
