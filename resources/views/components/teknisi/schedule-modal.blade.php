@@ -294,7 +294,7 @@ document.addEventListener('alpine:init', () => {
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <x-input-label for="schedule-date" value="Tanggal" />
-                    <x-text-input id="schedule-date" type="date" name="date" class="mt-1 w-full" x-model="form.date" required />
+                    <x-datepicker id="schedule-date" name="date" class="mt-1 w-full" x-model="form.date" required></x-datepicker>
                     <x-input-error :messages="$errors->get('date')" class="mt-1" />
                 </div>
                 <div>
