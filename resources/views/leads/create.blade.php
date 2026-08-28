@@ -178,37 +178,63 @@
             </div>
         </section>
 
-        {{-- Kebutuhan --}}
+        {{-- Detail --}}
         <section class="pt-6 border-t border-slate-200">
-            <label for="kebutuhan" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                Kebutuhan
-                <x-info-tip tip="Ringkasan apa yang dibutuhkan user: produk, jumlah, dan apakah termasuk instalasi." />
-            </label>
-            <textarea name="kebutuhan" id="kebutuhan" rows="3"
-                      placeholder="cth: Kebutuhan Cisco IP Phone 780 Series, Cisco IP Phone 6800 series, dan Cisco IP conference phone dengan instalasi"
-                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan') }}</textarea>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
+                <div>
+                    <label for="kebutuhan" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                        Kebutuhan
+                        <x-info-tip tip="Ringkasan apa yang dibutuhkan user: produk, jumlah, dan apakah termasuk instalasi." />
+                    </label>
+                    <textarea name="kebutuhan" id="kebutuhan" rows="3"
+                              placeholder="cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi"
+                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan') }}</textarea>
+                </div>
+                <div>
+                    <label for="solusi" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                        Solusi
+                        <x-info-tip tip="Solusi yang ditawarkan untuk memenuhi kebutuhan customer." />
+                    </label>
+                    <textarea name="solusi" id="solusi" rows="3"
+                              placeholder="cth: Rekomendasi Cisco Webex Board 55S untuk ruang meeting"
+                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('solusi') }}</textarea>
+                </div>
+                <div>
+                    <label for="progress_notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                        Progress FollowUp / Keterangan
+                        <x-info-tip tip="Catatan progress follow-up: sudah dihubungi, jadwal meeting, status negosiasi, dll." />
+                    </label>
+                    <textarea name="progress_notes" id="progress_notes" rows="3"
+                              placeholder="cth: Sudah telepon, menunggu balasan. Follow-up lagi Senin depan."
+                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('progress_notes') }}</textarea>
+                </div>
+                <div>
+                    <label for="notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                        Catatan Internal
+                        <x-info-tip tip="Catatan khusus tim, tidak ditampilkan ke customer." />
+                    </label>
+                    <textarea name="notes" id="notes" rows="3"
+                              placeholder="Catatan internal..."
+                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes') }}</textarea>
+                </div>
+            </div>
         </section>
 
-        {{-- Solusi --}}
+        {{-- Penugasan --}}
         <section class="pt-6 border-t border-slate-200">
-            <label for="solusi" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                Solusi
-                <x-info-tip tip="Solusi yang ditawarkan untuk memenuhi kebutuhan customer." />
-            </label>
-            <textarea name="solusi" id="solusi" rows="3"
-                      placeholder="cth: Rekomendasi Cisco Webex Board 55S untuk ruang meeting, termasuk instalasi dan konfigurasi"
-                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('solusi') }}</textarea>
-        </section>
-
-        {{-- Progress FollowUp --}}
-        <section class="pt-6 border-t border-slate-200">
-            <label for="progress_notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                Progress FollowUp / Keterangan
-                <x-info-tip tip="Catatan progress follow-up: sudah dihubungi, jadwal meeting, status negosiasi, dll." />
-            </label>
-            <textarea name="progress_notes" id="progress_notes" rows="3"
-                      placeholder="cth: Sudah telepon, menunggu balasan. Follow-up lagi Senin depan."
-                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('progress_notes') }}</textarea>
+            <div>
+                <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                    Sales <span class="text-red-500">*</span>
+                    <x-info-tip tip="Orang yang bertanggung jawab follow-up lead ini." />
+                </label>
+                <select name="assigned_to" id="assigned_to" required
+                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Pilih Sales</option>
+                    @foreach($salesUsers as $user)
+                        <option value="{{ $user->id }}" {{ old('assigned_to') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
         </section>
 
         {{-- Lampiran --}}
@@ -223,32 +249,6 @@
             @error('attachments.*')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
-        </section>
-
-        {{-- Penugasan --}}
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 pt-6 border-t border-slate-200">
-            <div>
-                <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Sales <span class="text-red-500">*</span>
-                    <x-info-tip tip="Orang yang bertanggung jawab follow-up lead ini." />
-                </label>
-                <select name="assigned_to" id="assigned_to" required
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih Sales</option>
-                    @foreach($salesUsers as $user)
-                        <option value="{{ $user->id }}" {{ old('assigned_to') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label for="notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Catatan Internal
-                    <x-info-tip tip="Catatan khusus tim, tidak ditampilkan ke customer." />
-                </label>
-                <textarea name="notes" id="notes" rows="3"
-                          class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"></textarea>
-            </div>
         </section>
 
         {{-- Aksi --}}
