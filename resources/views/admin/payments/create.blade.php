@@ -25,7 +25,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Bayar <span class="text-red-500">*</span></label>
-                        <input type="date" name="payment_date" value="{{ old('payment_date', date('Y-m-d')) }}" required class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <x-datepicker name="payment_date" required value="{{ old('payment_date', date('Y-m-d')) }}"></x-datepicker>
                     </div>
                 </div>
                 <div>

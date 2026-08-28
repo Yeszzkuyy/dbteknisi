@@ -44,11 +44,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Terbit <span class="text-red-500">*</span></label>
-                        <input type="date" name="issue_date" value="{{ old('issue_date', date('Y-m-d')) }}" required class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <x-datepicker name="issue_date" required value="{{ old('issue_date', date('Y-m-d')) }}"></x-datepicker>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Jatuh Tempo</label>
-                        <input type="date" name="due_date" value="{{ old('due_date') }}" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <x-datepicker name="due_date" value="{{ old('due_date') }}"></x-datepicker>
                     </div>
                 </div>
                 <div>

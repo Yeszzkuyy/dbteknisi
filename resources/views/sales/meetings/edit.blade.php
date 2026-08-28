@@ -54,8 +54,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Meeting <span class="text-red-500">*</span></label>
-                    <input type="date" name="meeting_date" value="{{ old('meeting_date', $meeting->meeting_date->format('Y-m-d')) }}" required
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <x-datepicker name="meeting_date" required value="{{ old('meeting_date', $meeting->meeting_date->format('Y-m-d')) }}"></x-datepicker>
                 </div>
 
                 <div>

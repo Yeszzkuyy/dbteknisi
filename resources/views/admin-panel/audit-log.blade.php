@@ -11,13 +11,11 @@
             <form method="GET" action="{{ route('admin-panel.audit-log') }}" class="flex flex-wrap gap-4">
                 <div>
                     <label for="date_from" class="sr-only">Dari Tanggal</label>
-                    <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}"
-                           class="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <x-datepicker id="date_from" name="date_from" value="{{ request('date_from') }}"></x-datepicker>
                 </div>
                 <div>
                     <label for="date_to" class="sr-only">Sampai Tanggal</label>
-                    <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}"
-                           class="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <x-datepicker id="date_to" name="date_to" value="{{ request('date_to') }}"></x-datepicker>
                 </div>
                 <div>
                     <label for="action" class="sr-only">Action</label>

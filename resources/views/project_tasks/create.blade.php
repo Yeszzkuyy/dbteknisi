@@ -67,16 +67,14 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                            <input type="date" name="start_date" id="start_date" value="{{ old('start_date') }}"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <x-datepicker name="start_date" id="start_date" value="{{ old('start_date') }}"></x-datepicker>
                             @error('start_date')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
                             <label for="due_date" class="block text-sm font-medium text-gray-700">Tanggal Selesai (Target)</label>
-                            <input type="date" name="due_date" id="due_date" value="{{ old('due_date') }}"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <x-datepicker name="due_date" id="due_date" value="{{ old('due_date') }}"></x-datepicker>
                             @error('due_date')
                                 <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                             @enderror

@@ -49,8 +49,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Follow Up</label>
-                    <input type="date" name="follow_up_date" value="{{ old('follow_up_date', $followUp->follow_up_date?->format('Y-m-d')) }}"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <x-datepicker name="follow_up_date" value="{{ old('follow_up_date', $followUp->follow_up_date?->format('Y-m-d')) }}"></x-datepicker>
                 </div>
 
                 <div class="flex gap-3 pt-2">

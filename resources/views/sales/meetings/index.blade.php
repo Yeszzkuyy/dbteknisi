@@ -23,13 +23,11 @@
             </div>
             <div>
                 <label class="block text-xs font-medium text-slate-500 mb-1">Dari Tanggal</label>
-                <input type="date" name="date_from" value="{{ request('date_from') }}"
-                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                <x-datepicker name="date_from" value="{{ request('date_from') }}"></x-datepicker>
             </div>
             <div>
                 <label class="block text-xs font-medium text-slate-500 mb-1">Sampai Tanggal</label>
-                <input type="date" name="date_to" value="{{ request('date_to') }}"
-                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                <x-datepicker name="date_to" value="{{ request('date_to') }}"></x-datepicker>
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit"
