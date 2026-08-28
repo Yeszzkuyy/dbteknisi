@@ -111,6 +111,10 @@ class LeadController extends Controller
         $dateFrom = $request->filled('date_from') ? $request->date_from : $now->copy()->subMonths(5)->startOfMonth()->toDateString();
         $dateTo = $request->filled('date_to') ? $request->date_to : $now->toDateString();
 
+        if ($dateFrom > $dateTo) {
+            [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
+        }
+
         $statusCounts = Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
@@ -148,15 +152,20 @@ class LeadController extends Controller
             ->pluck('incoming_date')
             ->countBy(fn ($date) => $date->format('Y-m'));
 
-        $months = now()->parse($dateFrom)->diffInMonths(now()->parse($dateTo));
-        $trend = collect(range($months, 0))->map(function ($i) use ($dateTo, $trendQuery) {
-            $month = now()->parse($dateTo)->subMonthsNoOverflow($i);
+        $months = max(0, now()->parse($dateFrom)->diffInMonths(now()->parse($dateTo)));
+        $trend = $months < 1
+            ? collect([(object) [
+                'label' => now()->parse($dateTo)->translatedFormat('M y'),
+                'total' => $trendQuery[now()->parse($dateTo)->format('Y-m')] ?? 0,
+            ]])
+            : collect(range(0, $months))->map(function ($i) use ($dateTo, $trendQuery) {
+                $month = now()->parse($dateTo)->subMonthsNoOverflow($i);
 
-            return (object) [
-                'label' => $month->translatedFormat('M y'),
-                'total' => $trendQuery[sprintf('%04d-%02d', $month->year, $month->month)] ?? 0,
-            ];
-        });
+                return (object) [
+                    'label' => $month->translatedFormat('M y'),
+                    'total' => $trendQuery[sprintf('%04d-%02d', $month->year, $month->month)] ?? 0,
+                ];
+            })->reverse()->values();
 
         return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo'));
     }
