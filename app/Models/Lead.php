@@ -25,6 +25,8 @@ class Lead extends Model
         'status',
         'source',
         'kebutuhan',
+        'solusi',
+        'progress_notes',
         'notes',
         'incoming_date',
         'assigned_to',
