@@ -87,36 +87,36 @@
                 </div>
 
                 @if($lead->notes)
-                    <div class="mt-6 pt-6 border-t">
+                    <div class="mt-3 pt-3 border-t">
                         <label class="text-sm font-medium text-slate-500">Catatan</label>
-                        <div class="mt-1 p-4 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
+                        <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
                             {{ $lead->notes }}
                         </div>
                     </div>
                 @endif
 
                 @if($lead->kebutuhan)
-                    <div class="mt-6 pt-6 border-t">
+                    <div class="mt-3 pt-3 border-t">
                         <label class="text-sm font-medium text-slate-500">Kebutuhan</label>
-                        <div class="mt-1 p-4 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
+                        <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
                             {{ $lead->kebutuhan }}
                         </div>
                     </div>
                 @endif
 
                 @if($lead->solusi)
-                    <div class="mt-6 pt-6 border-t">
+                    <div class="mt-3 pt-3 border-t">
                         <label class="text-sm font-medium text-slate-500">Solusi</label>
-                        <div class="mt-1 p-4 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
+                        <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
                             {{ $lead->solusi }}
                         </div>
                     </div>
                 @endif
 
                 @if($lead->progress_notes)
-                    <div class="mt-6 pt-6 border-t">
+                    <div class="mt-3 pt-3 border-t">
                         <label class="text-sm font-medium text-slate-500">Progress FollowUp / Keterangan</label>
-                        <div class="mt-1 p-4 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
+                        <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
                             {{ $lead->progress_notes }}
                         </div>
                     </div>
