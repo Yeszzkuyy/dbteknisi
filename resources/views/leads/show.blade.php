@@ -75,11 +75,10 @@
                         <p class="mt-1 text-slate-900 font-semibold">{{ $lead->segment ? \App\Http\Controllers\LeadController::label($lead->segment) : '-' }}</p>
                     </div>
 
-                    <div class="md:col-span-2">
+                    <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Alamat</label>
                         <p class="mt-1 text-slate-900">{{ $lead->customer->address ?? '-' }}</p>
                     </div>
-
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Telpon Kantor</label>
                         <p class="mt-1 text-slate-900">{{ $lead->customer->phone ?? '-' }}</p>
@@ -88,7 +87,7 @@
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">No WA</label>
                         <p class="mt-1 text-slate-900">{{ $lead->customer->whatsapp ?? '-' }}</p>
                     </div>
-                    <div class="md:col-span-2">
+                    <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Email</label>
                         <p class="mt-1 text-slate-900">{{ $lead->customer->email ?? '-' }}</p>
                     </div>
