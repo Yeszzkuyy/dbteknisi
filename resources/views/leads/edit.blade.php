@@ -39,8 +39,7 @@
                     Tanggal Masuk <span class="text-red-500">*</span>
                     <x-info-tip tip="Tanggal pertama kali lead ini masuk ke tim (misal dari chat/email)." />
                 </label>
-                <input type="date" name="incoming_date" id="incoming_date" required value="{{ old('incoming_date', $lead->incoming_date?->format('Y-m-d')) }}"
-                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                <x-datepicker name="incoming_date" id="incoming_date" required value="{{ old('incoming_date', $lead->incoming_date?->format('Y-m-d')) }}"></x-datepicker>
             </div>
 
             <div>

@@ -5,10 +5,16 @@
             <p class="text-slate-500 mt-1">Kelola lead marketing dan opportunity sales</p>
         </div>
         @can('manage-marketing')
-            <a href="{{ route('leads.create') }}"
-               class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
-                + Tambah Lead
-            </a>
+            <div class="flex gap-3">
+                <a href="{{ route('leads.import') }}"
+                   class="px-5 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium transition">
+                    📥 Import
+                </a>
+                <a href="{{ route('leads.create') }}"
+                   class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                    + Tambah Lead
+                </a>
+            </div>
         @endcan
     </div>
 
@@ -45,13 +51,11 @@
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">Tanggal Mulai</label>
-                    <input type="date" name="date_from" value="{{ request('date_from') }}"
-                           class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <x-datepicker name="date_from" value="{{ request('date_from') }}" class="mt-1"></x-datepicker>
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">Tanggal Akhir</label>
-                    <input type="date" name="date_to" value="{{ request('date_to') }}"
-                           class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <x-datepicker name="date_to" value="{{ request('date_to') }}" class="mt-1"></x-datepicker>
                 </div>
                 <div class="sm:col-span-2 lg:col-span-5 flex items-end gap-2">
                     <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">

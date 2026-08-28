@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\WorkType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LeadController extends Controller
 {
@@ -539,5 +540,103 @@ class LeadController extends Controller
         }
 
         return Storage::disk('public')->download($document->file_path, $document->file_name);
+    }
+
+    public function importForm()
+    {
+        return view('leads.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240|mimes:csv,txt,xlsx,xls',
+        ]);
+
+        $file = $request->file('file');
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        try {
+            if (in_array($extension, ['xlsx', 'xls'])) {
+                $spreadsheet = IOFactory::load($file->getRealPath());
+                $sheet = $spreadsheet->getActiveSheet();
+                $rows = $sheet->toArray();
+            } else {
+                $rows = [];
+                $handle = fopen($file->getRealPath(), 'r');
+                while (($row = fgetcsv($handle, 0, ',')) !== false) {
+                    $rows[] = $row;
+                }
+                fclose($handle);
+            }
+
+            if (count($rows) < 2) {
+                return back()->withErrors(['file' => 'File kosong atau hanya berisi header.']);
+            }
+
+            $headers = array_map(fn ($h) => strtolower(trim(str_replace([' ', "\t"], '_', $h))), $rows[0]);
+            $results = ['success' => 0, 'failed' => 0, 'errors' => []];
+
+            for ($i = 1; $i < count($rows); $i++) {
+                $row = $rows[$i];
+                if (empty(array_filter($row)) || count($row) < count($headers)) continue;
+
+                $data = array_combine($headers, $row);
+                $rowNum = $i + 1;
+
+                try {
+                    $companyName = $data['nama_perusahaan'] ?? $data['company'] ?? $data['perusahaan'] ?? null;
+                    if (empty($companyName)) {
+                        throw new \Exception('Nama perusahaan kosong');
+                    }
+
+                    $customer = Customer::firstOrCreate(
+                        ['name' => trim($companyName)],
+                        [
+                            'company' => trim($companyName),
+                            'address' => $data['alamat'] ?? $data['address'] ?? null,
+                            'phone' => $data['telp'] ?? $data['phone'] ?? $data['telepon'] ?? null,
+                            'whatsapp' => $data['wa'] ?? $data['whatsapp'] ?? null,
+                            'email' => $data['email'] ?? null,
+                            'contact_person' => $data['pic'] ?? $data['contact_person'] ?? null,
+                        ]
+                    );
+
+                    $incomingDate = $data['tanggal'] ?? $data['date'] ?? $data['incoming_date'] ?? now()->toDateString();
+                    if (!strtotime($incomingDate)) $incomingDate = now()->toDateString();
+
+                    $assignedTo = null;
+                    $salesVal = $data['sales'] ?? $data['assigned_to'] ?? null;
+                    if ($salesVal) {
+                        $salesUser = User::where('name', 'like', "%{$salesVal}%")->first()
+                            ?? User::find($salesVal);
+                        $assignedTo = $salesUser?->id;
+                    }
+
+                    Lead::create([
+                        'customer_id' => $customer->id,
+                        'pt_group' => $data['pt'] ?? $data['pt_group'] ?? 'NTI',
+                        'segment' => $data['segment'] ?? 'other',
+                        'source' => $data['source'] ?? $data['masuk_by'] ?? null,
+                        'kebutuhan' => $data['kebutuhan'] ?? null,
+                        'solusi' => $data['solusi'] ?? null,
+                        'progress_notes' => $data['progress'] ?? $data['followup'] ?? null,
+                        'notes' => $data['catatan'] ?? $data['notes'] ?? null,
+                        'incoming_date' => $incomingDate,
+                        'assigned_to' => $assignedTo,
+                        'status' => 'new',
+                    ]);
+
+                    $results['success']++;
+                } catch (\Exception $e) {
+                    $results['failed']++;
+                    $results['errors'][] = "Baris {$rowNum}: {$e->getMessage()}";
+                }
+            }
+
+            return back()->with('import_results', $results);
+        } catch (\Exception $e) {
+            return back()->withErrors(['file' => 'Gagal memproses file: ' . $e->getMessage()]);
+        }
     }
 }

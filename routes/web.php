@@ -190,6 +190,8 @@ Route::middleware('auth')->group(function () {
         Route::patch('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert');
         Route::patch('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
         Route::patch('/leads/batch-status', [LeadController::class, 'batchUpdateStatus'])->name('leads.batch-status');
+        Route::get('/leads/import', [LeadController::class, 'importForm'])->name('leads.import');
+        Route::post('/leads/import', [LeadController::class, 'import'])->name('leads.import.execute');
 
         // Data Partner (supplier, vendor, kontraktor, partner, distributor)
         Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
