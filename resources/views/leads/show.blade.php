@@ -87,7 +87,7 @@
                 </div>
 
                 @if($lead->notes)
-                    <div class="mt-3 pt-3 border-t">
+                    <div class="mt-1 pt-1 border-t">
                         <label class="text-sm font-medium text-slate-500">Catatan</label>
                         <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
                             {{ $lead->notes }}
@@ -96,7 +96,7 @@
                 @endif
 
                 @if($lead->kebutuhan)
-                    <div class="mt-3 pt-3 border-t">
+                    <div class="mt-1 pt-1 border-t">
                         <label class="text-sm font-medium text-slate-500">Kebutuhan</label>
                         <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
                             {{ $lead->kebutuhan }}
@@ -105,7 +105,7 @@
                 @endif
 
                 @if($lead->solusi)
-                    <div class="mt-3 pt-3 border-t">
+                    <div class="mt-1 pt-1 border-t">
                         <label class="text-sm font-medium text-slate-500">Solusi</label>
                         <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
                             {{ $lead->solusi }}
@@ -114,7 +114,7 @@
                 @endif
 
                 @if($lead->progress_notes)
-                    <div class="mt-3 pt-3 border-t">
+                    <div class="mt-1 pt-1 border-t">
                         <label class="text-sm font-medium text-slate-500">Progress FollowUp / Keterangan</label>
                         <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
                             {{ $lead->progress_notes }}
