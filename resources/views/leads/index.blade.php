@@ -7,8 +7,9 @@
         @can('manage-marketing')
             <div class="flex gap-3">
                 <a href="{{ route('leads.import') }}"
-                   class="px-5 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium transition">
-                    📥 Import
+                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:border-slate-600 font-medium transition">
+                    <span class="text-base leading-none">📥</span>
+                    Import
                 </a>
                 <a href="{{ route('leads.create') }}"
                    class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
