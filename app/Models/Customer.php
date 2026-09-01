@@ -15,6 +15,7 @@ class Customer extends Model
         'company',
         'address',
         'phone',
+        'whatsapp',
         'email',
         'notes',
         'status',

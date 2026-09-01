@@ -48,16 +48,41 @@
                         @error('address') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
+                    {{-- PIC --}}
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">
+                            PIC
+                        </label>
+                        <input type="text"
+                               name="contact_person"
+                               value="{{ old('contact_person', $customer->contact_person) }}"
+                               placeholder="cth: Ibu Vita"
+                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        @error('contact_person') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    </div>
+
                     {{-- Phone --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            Phone
+                            No Telp
                         </label>
                         <input type="text" 
                                name="phone" 
                                value="{{ old('phone', $customer->phone) }}"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- WhatsApp --}}
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">
+                            No WA
+                        </label>
+                        <input type="text"
+                               name="whatsapp"
+                               value="{{ old('whatsapp', $customer->whatsapp) }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     {{-- Email --}}

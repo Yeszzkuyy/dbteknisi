@@ -103,12 +103,20 @@
                                     <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->name }}</p>
                                 </div>
                                 <div>
+                                    <p class="text-xs text-slate-400">PIC</p>
+                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->contact_person ?? '-' }}</p>
+                                </div>
+                                <div>
                                     <p class="text-xs text-slate-400">Alamat</p>
                                     <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->address ?? '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Telepon</p>
                                     <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->phone ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">No WA</p>
+                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->whatsapp ?? '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Email</p>

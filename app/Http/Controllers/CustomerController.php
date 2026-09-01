@@ -48,9 +48,11 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required',
+            'contact_person' => 'nullable',
             'company' => 'nullable',
             'address' => 'nullable',
             'phone' => 'nullable',
+            'whatsapp' => 'nullable',
             'email' => 'nullable|email',
             'notes' => 'nullable',
             'status' => 'nullable|in:lead,deal,instalasi,selesai',
@@ -98,9 +100,11 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required',
+            'contact_person' => 'nullable',
             'company' => 'nullable',
             'address' => 'nullable',
             'phone' => 'nullable',
+            'whatsapp' => 'nullable',
             'email' => 'nullable|email',
             'notes' => 'nullable',
             'status' => 'nullable|in:lead,deal,instalasi,selesai',
