@@ -169,58 +169,70 @@
         </div>
     </div>
 
-    {{-- Funnel Lead per Status (ApexCharts) --}}
+    {{-- Donut Lead per Status (ApexCharts) --}}
     <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4">
         <h2 class="font-semibold text-slate-700 mb-4">Pipeline Lead per Status</h2>
-        <div id="funnel-status-chart" class="w-full"></div>
+        <div id="status-donut-chart" class="w-full"></div>
         <script>
             // Tunggu DOM siap: bundle Vite dimuat sebagai module (deferred),
             // jadi window.ApexCharts baru tersedia setelah DOMContentLoaded.
             document.addEventListener('DOMContentLoaded', function () {
-            // Data funnel dari controller: [{ label, value, key }, ...] urut New → Lost
-            const funnelData = @json($funnel);
+                // Data donut dari controller: [{ label, value, key }, ...] urut New → Lost
+                const funnelData = @json($funnel);
 
-            // Warna segmen funnel — SAMAKAN dengan warna badge status di view lain.
-            // Palet bawaan: new=blue, contacted=yellow, qualified=purple,
-            // proposal=orange, won=green, lost=red. Ubah nilai hex-nya di sini.
-            const statusColors = {
-                new:        '#3b82f6', // biru   (bg-blue-100 text-blue-800)
-                contacted:  '#eab308', // kuning (bg-yellow-100 text-yellow-800)
-                qualified:  '#a855f7', // ungu   (bg-purple-100 text-purple-800)
-                proposal:   '#f97316', // oranye (bg-orange-100 text-orange-800)
-                won:        '#22c55e', // hijau  (bg-green-100 text-green-800)
-                lost:       '#ef4444', // merah  (bg-red-100 text-red-800)
-            };
+                // Warna segmen donut — SAMAKAN dengan warna badge status di view lain.
+                // Palet bawaan: new=blue, contacted=yellow, qualified=purple,
+                // proposal=orange, won=green, lost=red. Ubah nilai hex-nya di sini.
+                const statusColors = {
+                    new:        '#3b82f6', // biru   (bg-blue-100 text-blue-800)
+                    contacted:  '#eab308', // kuning (bg-yellow-100 text-yellow-800)
+                    qualified:  '#a855f7', // ungu   (bg-purple-100 text-purple-800)
+                    proposal:   '#f97316', // oranye (bg-orange-100 text-orange-800)
+                    won:        '#22c55e', // hijau  (bg-green-100 text-green-800)
+                    lost:       '#ef4444', // merah  (bg-red-100 text-red-800)
+                };
 
-            // Ambil warna per segmen mengikuti urutan data dari controller
-            const colors = funnelData.map(s => statusColors[s.key]);
+                const isDark = document.documentElement.classList.contains('dark');
 
-            const isDark = document.documentElement.classList.contains('dark');
-
-            new ApexCharts(document.querySelector('#funnel-status-chart'), {
-                chart: {
-                    type: 'funnel',
-                    height: 380,
-                    width: '100%', // responsif mengikuti container
-                    toolbar: { show: false },
-                    background: 'transparent',
-                },
-                series: [{
-                    name: 'Lead',
-                    data: funnelData.map(s => ({ x: s.label, y: s.value })),
-                }],
-                colors: colors,
-                theme: { mode: isDark ? 'dark' : 'light' },
-                plotOptions: {
-                    funnel: { inverted: false }, // New (terbesar) di atas → Won/Lost di bawah
-                },
-                legend: { show: true },
-                dataLabels: {
-                    enabled: true,
-                    formatter: (val, { dataPointIndex }) =>
-                        `${funnelData[dataPointIndex].label}: ${val}`,
-                },
-            }).render();
+                new ApexCharts(document.querySelector('#status-donut-chart'), {
+                    chart: {
+                        type: 'donut',
+                        height: 380,
+                        width: '100%', // responsif mengikuti container
+                        toolbar: { show: false },
+                        background: 'transparent',
+                    },
+                    series: funnelData.map(s => s.value),
+                    labels: funnelData.map(s => s.label),
+                    colors: funnelData.map(s => statusColors[s.key]),
+                    theme: { mode: isDark ? 'dark' : 'light' },
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '70%', // rasio lubang tengah donut agar proporsional
+                                labels: {
+                                    show: true,
+                                    total: {
+                                        show: true,
+                                        label: 'Total Lead',
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        color: isDark ? '#cbd5e1' : '#475569',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    legend: {
+                        show: true,
+                        position: 'bottom',
+                        fontSize: '13px',
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: (val, opts) => opts.w.globals.series[opts.seriesIndex],
+                    },
+                }).render();
             });
         </script>
     </div>
