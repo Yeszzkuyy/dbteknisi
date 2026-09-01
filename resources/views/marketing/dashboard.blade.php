@@ -56,7 +56,7 @@
     </div>
 
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+        <div class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-blue-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+        <div class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-indigo-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -85,7 +85,7 @@
             </div>
         </div>
 
-        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+        <div class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-amber-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -98,7 +98,7 @@
             </div>
         </div>
 
-        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+        <div class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-green-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -112,7 +112,7 @@
             </div>
         </div>
 
-        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+        <div class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-cyan-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -136,7 +136,7 @@
                 @foreach($trend as $month)
                     <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                         <span class="text-xs font-semibold text-slate-600">{{ $month->total }}</span>
-                        <div class="w-full max-w-12 rounded-t-lg bg-blue-500 transition-all"
+                        <div class="w-full max-w-12 rounded-t-[4px] bg-blue-500 transition-all"
                              style="height: {{ max(round($month->total / $maxTrend * 100), 2) }}%"></div>
                         <span class="text-[11px] text-slate-500 whitespace-nowrap">{{ $month->label }}</span>
                     </div>
@@ -174,6 +174,9 @@
         <h2 class="font-semibold text-slate-700 mb-4">Pipeline Lead per Status</h2>
         <div id="funnel-status-chart" class="w-full"></div>
         <script>
+            // Tunggu DOM siap: bundle Vite dimuat sebagai module (deferred),
+            // jadi window.ApexCharts baru tersedia setelah DOMContentLoaded.
+            document.addEventListener('DOMContentLoaded', function () {
             // Data funnel dari controller: [{ label, value, key }, ...] urut New → Lost
             const funnelData = @json($funnel);
 
@@ -218,6 +221,7 @@
                         `${funnelData[dataPointIndex].label}: ${val}`,
                 },
             }).render();
+            });
         </script>
     </div>
 
