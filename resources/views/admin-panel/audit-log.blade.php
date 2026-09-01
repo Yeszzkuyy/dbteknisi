@@ -27,7 +27,7 @@
                     </select>
                 </div>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Filter</button>
-                <a href="{{ route('admin-panel.audit-log') }}" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition">Reset</a>
+                <a href="{{ route('admin-panel.audit-log') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">Reset</a>
             </form>
         </div>
 

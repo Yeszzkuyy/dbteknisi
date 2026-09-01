@@ -293,7 +293,7 @@
                 </div>
                 <div class="flex justify-end gap-3 p-4 border-t border-slate-200">
                     <button type="button" onclick="closeConvertModal()"
-                            class="px-4 py-2 text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+                            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">
                         Batal
                     </button>
                     <button type="submit"

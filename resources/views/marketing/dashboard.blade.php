@@ -24,7 +24,7 @@
                 <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
                     Filter
                 </button>
-                <a href="{{ route('marketing.dashboard') }}" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 font-medium transition">
+                <a href="{{ route('marketing.dashboard') }}" class="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium transition">
                     Reset
                 </a>
             </div>

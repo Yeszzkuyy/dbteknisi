@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">Import data dari file Excel (.xlsx) atau CSV</p>
         </div>
         <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition">
             Kembali
         </a>
     </div>
@@ -66,7 +66,7 @@
 
             <div class="flex justify-end gap-3 mt-6">
                 <a href="{{ route('leads.index') }}"
-                   class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 text-sm font-medium transition">
+                   class="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition">
                     Batal
                 </a>
                 <button type="submit" id="submitBtn"

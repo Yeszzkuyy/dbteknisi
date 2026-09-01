@@ -39,7 +39,7 @@
             </button>
 
             <a href="{{ route('monitoring.index') }}"
-               class="px-4 py-2 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition whitespace-nowrap">
+               class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white transition whitespace-nowrap">
                 Reset
             </a>
         </form>
