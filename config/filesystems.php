@@ -47,6 +47,16 @@ return [
             'report' => false,
         ],
 
+        // Dokumen sensitif (lead/BOQ, project document, bukti pembayaran).
+        // Tidak punya symlink ke public — hanya bisa diakses via controller
+        // yang sudah authentication + authorization.
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

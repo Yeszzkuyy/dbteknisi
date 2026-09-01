@@ -36,6 +36,8 @@ class LeadController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Lead::class);
+
         $query = Lead::with(['customer', 'assignee', 'partner'])
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
                 fn ($c) => $c->where('name', 'like', '%'.$request->search.'%')))
@@ -54,6 +56,8 @@ class LeadController extends Controller
 
     public function pipeline()
     {
+        $this->authorize('viewAny', Lead::class);
+
         $leads = Lead::with(['customer', 'assignee', 'partner'])->orderByDesc('incoming_date')->get();
         $statuses = self::STATUSES;
 
@@ -180,6 +184,8 @@ class LeadController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Lead::class);
+
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $partners = Partner::orderBy('name')->get(['id', 'name', 'type']);
         $segments = self::SEGMENTS;
@@ -192,6 +198,8 @@ class LeadController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Lead::class);
+
         $validated = $request->validate([
             'customer_mode' => 'required|in:new,existing',
             'customer_name' => 'nullable|required_if:customer_mode,new|string|max:255',
@@ -257,6 +265,8 @@ class LeadController extends Controller
 
     public function show(Lead $lead)
     {
+        $this->authorize('view', $lead);
+
         $lead->load(['customer', 'partner', 'activities.user', 'customer.projects.documents']);
         $documents = $lead->customer->projects->flatMap->documents;
         $projectStatuses = ProjectStatus::orderBy('sort_order')->get(['id', 'name']);
@@ -266,6 +276,8 @@ class LeadController extends Controller
 
     public function edit(Lead $lead)
     {
+        $this->authorize('update', $lead);
+
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $partners = Partner::orderBy('name')->get(['id', 'name', 'type']);
         $segments = self::SEGMENTS;
@@ -278,6 +290,8 @@ class LeadController extends Controller
 
     public function update(Request $request, Lead $lead)
     {
+        $this->authorize('update', $lead);
+
         $validated = $request->validate([
             'customer_mode' => 'required|in:new,existing',
             'customer_name' => 'nullable|required_if:customer_mode,new|string|max:255',
@@ -362,6 +376,8 @@ class LeadController extends Controller
 
     public function destroy(Lead $lead)
     {
+        $this->authorize('delete', $lead);
+
         $this->logActivity($lead, 'deleted');
         $lead->delete();
 
@@ -452,11 +468,13 @@ class LeadController extends Controller
 
     public function showAttachment(Lead $lead, LeadDocument $document)
     {
-        if ($document->lead_id !== $lead->id || !Storage::disk('public')->exists($document->file_path)) {
+        $this->authorize('view', $lead);
+
+        if ($document->lead_id !== $lead->id || !Storage::disk('private')->exists($document->file_path)) {
             abort(404);
         }
 
-        return response()->file(Storage::disk('public')->path($document->file_path), [
+        return response()->file(Storage::disk('private')->path($document->file_path), [
             'Content-Type' => $document->mime_type ?? 'application/octet-stream',
             'Content-Disposition' => 'inline; filename="'.$document->file_name.'"',
         ]);
@@ -464,20 +482,24 @@ class LeadController extends Controller
 
     public function downloadAttachment(Lead $lead, LeadDocument $document)
     {
+        $this->authorize('view', $lead);
+
         if ($document->lead_id !== $lead->id) {
             abort(404);
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->file_name);
+        return Storage::disk('private')->download($document->file_path, $document->file_name);
     }
 
     public function destroyAttachment(Lead $lead, LeadDocument $document)
     {
+        $this->authorize('update', $lead);
+
         if ($document->lead_id !== $lead->id) {
             abort(404);
         }
 
-        Storage::disk('public')->delete($document->file_path);
+        Storage::disk('private')->delete($document->file_path);
         $document->delete();
 
         $this->logActivity($lead, 'attachment_deleted', [
@@ -490,7 +512,11 @@ class LeadController extends Controller
     private function saveAttachments(Request $request, Lead $lead): void
     {
         foreach ($request->file('attachments', []) as $file) {
-            $path = $file->store("leads/{$lead->id}", 'public');
+            $path = $file->storeAs(
+                "leads/{$lead->id}",
+                \Illuminate\Support\Str::uuid() . '.' . strtolower($file->getClientOriginalExtension()),
+                'private'
+            );
             $lead->documents()->create([
                 'file_name' => $file->getClientOriginalName(),
                 'file_path' => $path,
@@ -501,9 +527,12 @@ class LeadController extends Controller
 
     private function syncAttachments(Request $request, Lead $lead): void
     {
-
         foreach ($request->file('attachments', []) as $file) {
-            $path = $file->store("leads/{$lead->id}", 'public');
+            $path = $file->storeAs(
+                "leads/{$lead->id}",
+                \Illuminate\Support\Str::uuid() . '.' . strtolower($file->getClientOriginalExtension()),
+                'private'
+            );
             $lead->documents()->create([
                 'file_name' => $file->getClientOriginalName(),
                 'file_path' => $path,
@@ -524,17 +553,17 @@ class LeadController extends Controller
 
     public function previewDocument(Lead $lead, ProjectDocument $document)
     {
-        $this->authorize('viewAny', Lead::class);
+        $this->authorize('view', $lead);
 
         if ($document->project->customer_id !== $lead->customer_id) {
             abort(404);
         }
 
-        $filePath = storage_path('app/public/' . $document->file_path);
-
-        if (!file_exists($filePath)) {
+        if (!Storage::disk('private')->exists($document->file_path)) {
             abort(404, 'File tidak ditemukan.');
         }
+
+        $filePath = Storage::disk('private')->path($document->file_path);
 
         $mimeType = $document->mime_type ?? mime_content_type($filePath);
         $extension = strtolower(pathinfo($document->file_name, PATHINFO_EXTENSION));
@@ -550,25 +579,25 @@ class LeadController extends Controller
 
         $officeTypes = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
         if (in_array($extension, $officeTypes)) {
-            return Storage::disk('public')->download($document->file_path, $document->file_name);
+            return Storage::disk('private')->download($document->file_path, $document->file_name);
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->file_name);
+        return Storage::disk('private')->download($document->file_path, $document->file_name);
     }
 
     public function downloadDocument(Lead $lead, ProjectDocument $document)
     {
-        $this->authorize('viewAny', Lead::class);
+        $this->authorize('view', $lead);
 
         if ($document->project->customer_id !== $lead->customer_id) {
             abort(404);
         }
 
-        if (!Storage::disk('public')->exists($document->file_path)) {
+        if (!Storage::disk('private')->exists($document->file_path)) {
             abort(404, 'File tidak ditemukan.');
         }
 
-        return Storage::disk('public')->download($document->file_path, $document->file_name);
+        return Storage::disk('private')->download($document->file_path, $document->file_name);
     }
 
     public function importForm()

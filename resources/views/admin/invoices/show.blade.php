@@ -53,7 +53,7 @@
                             </div>
                             <div class="flex gap-2">
                                 @if($payment->proof_file)
-                                    <a href="{{ asset('storage/' . $payment->proof_file) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">Bukti</a>
+                                    <a href="{{ route('admin.payments.proof', $payment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">Bukti</a>
                                 @endif
                                 <a href="{{ route('admin.payments.show', $payment) }}" class="text-blue-600 hover:text-blue-800 text-xs">Detail</a>
                             </div>

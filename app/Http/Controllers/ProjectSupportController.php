@@ -23,6 +23,8 @@ class ProjectSupportController extends Controller
      */
     public function create(Project $project)
     {
+        $this->authorize('update', $project);
+
         $engineers = User::where('role', 'teknisi')->get();
 
         return view(
@@ -42,6 +44,8 @@ class ProjectSupportController extends Controller
         Project $project
     )
     {
+        $this->authorize('update', $project);
+
         $validated = $request->validate([
             'user_id' => 'required',
         ]);
@@ -104,6 +108,8 @@ class ProjectSupportController extends Controller
      */
     public function destroy(ProjectSupport $projectSupport)
     {
+        $this->authorize('update', $projectSupport->project);
+
         $project = $projectSupport->project;
     
         ProjectActivity::create([

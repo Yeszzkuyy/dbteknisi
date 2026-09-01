@@ -8,40 +8,41 @@ use App\Models\User;
 class ProjectPolicy
 {
     /**
-     * Semua role (termasuk Guest) boleh melihat daftar & detail project.
+     * Semua user dengan akses ke divisi teknisi/sales boleh melihat daftar & detail project
+     * (sesama teknisi boleh melihat project yang bukan miliknya, sesuai keputusan bisnis).
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasAnyPermission(['view-teknisi', 'manage-teknisi', 'view-sales']);
     }
 
     public function view(User $user, Project $project): bool
     {
-        return true;
+        return $user->hasAnyPermission(['view-teknisi', 'manage-teknisi', 'view-sales']);
     }
 
     public function create(User $user): bool
     {
-        return $user->hasRole('Super Admin') || $user->hasRole('Admin');
+        return $user->can('manage-teknisi');
     }
 
     public function update(User $user, Project $project): bool
     {
-        return $user->hasRole('Super Admin') || $user->hasRole('Admin');
+        return $user->can('manage-teknisi');
     }
 
     public function delete(User $user, Project $project): bool
     {
-        return $user->hasRole('Super Admin') || $user->hasRole('Admin');
+        return $user->can('manage-teknisi');
     }
 
     public function restore(User $user, Project $project): bool
     {
-        return $user->hasRole('Super Admin') || $user->hasRole('Admin');
+        return $user->can('manage-admin');
     }
 
     public function forceDelete(User $user, Project $project): bool
     {
-        return $user->hasRole('Super Admin');
+        return $user->can('manage-admin');
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Services\AdminService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -193,7 +194,7 @@ class AdminController extends Controller
 
         if ($request->hasFile('proof_file')) {
             $validated['proof_file'] = $request->file('proof_file')
-                ->store('payments', 'public');
+                ->storeAs('payments', Str::uuid() . '.' . strtolower($request->file('proof_file')->getClientOriginalExtension()), 'private');
         }
 
         $this->adminService->createPayment($validated);
@@ -208,10 +209,19 @@ class AdminController extends Controller
         return view('admin.payments.show', compact('payment'));
     }
 
+    public function paymentsProof(Payment $payment)
+    {
+        if (!$payment->proof_file || !Storage::disk('private')->exists($payment->proof_file)) {
+            abort(404, 'File bukti tidak ditemukan.');
+        }
+
+        return Storage::disk('private')->response($payment->proof_file);
+    }
+
     public function paymentsDestroy(Payment $payment)
     {
         if ($payment->proof_file) {
-            Storage::disk('public')->delete($payment->proof_file);
+            Storage::disk('private')->delete($payment->proof_file);
         }
         $this->adminService->deletePayment($payment);
         return redirect()->route('admin.payments.index')

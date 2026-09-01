@@ -11,6 +11,8 @@ class ProjectTaskController extends Controller
 {
     public function create(Project $project)
     {
+        $this->authorize('update', $project);
+
         $engineers = User::where('role', 'teknisi')->get();
 
         return view(
@@ -27,6 +29,8 @@ class ProjectTaskController extends Controller
         Project $project
     )
     {
+        $this->authorize('update', $project);
+
         $validated = $request->validate([
             'assigned_to' => 'nullable',
             'title' => 'required',
@@ -51,6 +55,8 @@ class ProjectTaskController extends Controller
         ProjectTask $projectTask
     )
     {
+        $this->authorize('update', $projectTask->project);
+
         $project = $projectTask->project;
 
         $projectTask->delete();

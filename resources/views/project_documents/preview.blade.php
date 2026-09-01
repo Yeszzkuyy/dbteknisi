@@ -20,7 +20,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             @php
                 $extension = strtolower(pathinfo($document->file_name, PATHINFO_EXTENSION));
-                $fileUrl = asset('storage/' . $document->file_path);
+                $fileUrl = route('project-documents.preview', $document);
             @endphp
 
             {{-- PDF --}}

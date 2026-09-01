@@ -38,7 +38,7 @@ class LeadAttachmentTest extends TestCase
 
     public function test_store_saves_attachments(): void
     {
-        Storage::fake('public');
+        Storage::fake('private');
         $user = $this->marketingUser();
 
         $this->actingAs($user)->post(route('leads.store'), $this->leadPayload([
@@ -52,16 +52,16 @@ class LeadAttachmentTest extends TestCase
 
         $this->assertCount(2, $lead->documents);
         $this->assertSame('boq-awal.pdf', $lead->documents->first()->file_name);
-        Storage::disk('public')->assertExists($lead->documents->first()->file_path);
+        Storage::disk('private')->assertExists($lead->documents->first()->file_path);
     }
 
     public function test_show_lists_attachments_and_streams_file(): void
     {
-        Storage::fake('public');
+        Storage::fake('private');
         $user = $this->marketingUser();
         $customer = Customer::create(['name' => 'PT Tampil']);
         $lead = Lead::create(['customer_id' => $customer->id, 'pt_group' => 'NTI', 'segment' => 'vendor']);
-        Storage::disk('public')->put('leads/1/boq.pdf', 'isi');
+        Storage::disk('private')->put('leads/1/boq.pdf', 'isi');
 
         $lead->documents()->create([
             'file_name' => 'boq.pdf',
@@ -82,7 +82,7 @@ class LeadAttachmentTest extends TestCase
 
     public function test_edit_can_add_more_attachments(): void
     {
-        Storage::fake('public');
+        Storage::fake('private');
         $user = $this->marketingUser();
         $customer = Customer::create(['name' => 'PT Tambah']);
         $lead = Lead::create(['customer_id' => $customer->id, 'pt_group' => 'NTI', 'segment' => 'vendor']);
@@ -102,11 +102,11 @@ class LeadAttachmentTest extends TestCase
 
     public function test_destroy_removes_document_and_file(): void
     {
-        Storage::fake('public');
+        Storage::fake('private');
         $user = $this->marketingUser();
         $customer = Customer::create(['name' => 'PT Hapus']);
         $lead = Lead::create(['customer_id' => $customer->id, 'pt_group' => 'NTI', 'segment' => 'vendor']);
-        Storage::disk('public')->put('leads/1/boq.pdf', 'isi');
+        Storage::disk('private')->put('leads/1/boq.pdf', 'isi');
 
         $doc = $lead->documents()->create([
             'file_name' => 'boq.pdf',
@@ -118,7 +118,7 @@ class LeadAttachmentTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseMissing('lead_documents', ['id' => $doc->id]);
-        Storage::disk('public')->assertMissing('leads/1/boq.pdf');
+        Storage::disk('private')->assertMissing('leads/1/boq.pdf');
 
         $this->assertDatabaseHas('lead_activities', [
             'lead_id' => $lead->id,
@@ -129,7 +129,7 @@ class LeadAttachmentTest extends TestCase
 
     public function test_cannot_delete_attachment_via_other_lead(): void
     {
-        Storage::fake('public');
+        Storage::fake('private');
         $user = $this->marketingUser();
         $c1 = Customer::create(['name' => 'PT Satu']);
         $c2 = Customer::create(['name' => 'PT Dua']);

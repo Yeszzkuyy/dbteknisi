@@ -12,6 +12,8 @@ class CustomerController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Customer::class);
+
         $customers = Customer::withCount('projects')
             ->with(['contacts' => function ($query) {
                 $query->where('is_primary', true);
@@ -38,6 +40,8 @@ class CustomerController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Customer::class);
+
         return view('customers.create');
     }
 
@@ -46,6 +50,8 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Customer::class);
+
         $validated = $request->validate([
             'name' => 'required',
             'contact_person' => 'nullable',
@@ -73,6 +79,8 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
+        $this->authorize('view', $customer);
+
         // Load relasi projects dan contacts sekaligus
         // Contacts diurutkan berdasarkan is_primary supaya PIC utama muncul di atas
         $customer->load([
@@ -90,6 +98,8 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
+        $this->authorize('update', $customer);
+
         return view('customers.edit', compact('customer'));
     }
 
@@ -98,6 +108,8 @@ class CustomerController extends Controller
      */
     public function update(Request $request, Customer $customer)
     {
+        $this->authorize('update', $customer);
+
         $validated = $request->validate([
             'name' => 'required',
             'contact_person' => 'nullable',
@@ -124,6 +136,8 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
+        $this->authorize('delete', $customer);
+
         $customer->delete();
 
         return redirect()

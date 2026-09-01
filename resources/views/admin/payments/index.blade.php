@@ -34,7 +34,7 @@
                             <td class="px-4 py-3 text-right font-mono text-slate-800 dark:text-slate-100">Rp {{ number_format($pm->amount, 0, ',', '.') }}</td>
                             <td class="px-4 py-3 text-center">
                                 @if($pm->proof_file)
-                                    <a href="{{ asset('storage/' . $pm->proof_file) }}" target="_blank"
+                                    <a href="{{ route('admin.payments.proof', $pm) }}" target="_blank"
                                        class="text-blue-600 hover:text-blue-800 text-xs underline">Lihat</a>
                                 @else
                                     <span class="text-slate-400 text-xs">-</span>

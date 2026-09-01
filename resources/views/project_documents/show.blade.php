@@ -41,7 +41,7 @@
                 </dl>
 
                 <div class="mt-6 flex items-center gap-4">
-                    <a href="{{ Storage::url($projectDocument->file_path) }}" target="_blank"
+                    <a href="{{ route('project-documents.preview', $projectDocument) }}" target="_blank"
                         class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
                         Lihat / Download File
                     </a>

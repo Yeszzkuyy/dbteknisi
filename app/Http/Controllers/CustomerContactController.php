@@ -13,6 +13,8 @@ class CustomerContactController extends Controller
      */
     public function create(Customer $customer)
     {
+        $this->authorize('update', $customer);
+
         return view('customer_contacts.create', compact('customer'));
     }
 
@@ -21,6 +23,8 @@ class CustomerContactController extends Controller
      */
     public function store(Request $request, Customer $customer)
     {
+        $this->authorize('update', $customer);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'position' => 'nullable|string|max:255',
@@ -46,6 +50,8 @@ class CustomerContactController extends Controller
      */
     public function edit(CustomerContact $customerContact)
     {
+        $this->authorize('update', $customerContact->customer);
+
         $customer = $customerContact->customer;
         return view('customer_contacts.edit', compact('customerContact', 'customer'));
     }
@@ -55,6 +61,8 @@ class CustomerContactController extends Controller
      */
     public function update(Request $request, CustomerContact $customerContact)
     {
+        $this->authorize('update', $customerContact->customer);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'position' => 'nullable|string|max:255',
@@ -82,6 +90,8 @@ class CustomerContactController extends Controller
      */
     public function destroy(CustomerContact $customerContact)
     {
+        $this->authorize('update', $customerContact->customer);
+
         $customer = $customerContact->customer;
         $customerContact->delete();
 

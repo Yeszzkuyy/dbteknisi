@@ -23,6 +23,8 @@ class ProjectController extends Controller
 
     public function index()
     {
+        $this->authorize('viewAny', Project::class);
+
         // Semua project ditampilkan supaya perubahan status tidak membuat project "menghilang" dari daftar
         $projects = Project::with(['customer', 'workType', 'status'])
             ->latest()
@@ -44,6 +46,8 @@ class ProjectController extends Controller
 
     public function create(Request $request)
     {
+        $this->authorize('create', Project::class);
+
         $customerId = $request->query('customer_id');
         
         if (!$customerId) {
@@ -62,6 +66,8 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Project::class);
+
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'name' => 'required|string|max:255',
@@ -85,6 +91,8 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
+        $this->authorize('view', $project);
+
         $project->load([
             'customer', 
             'workType', 
@@ -100,6 +108,8 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
+        $this->authorize('update', $project);
+
         $customers = Customer::all();
         $workTypes = WorkType::all();
         $accountManagers = AccountManager::all();
@@ -111,6 +121,8 @@ class ProjectController extends Controller
 
     public function update(Request $request, Project $project)
     {
+        $this->authorize('update', $project);
+
         $validated = $request->validate([
             'project_name' => 'required|string|max:255',
             'work_type_id' => 'required|exists:work_types,id',
@@ -134,6 +146,8 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
+        $this->authorize('delete', $project);
+
         $project->delete();
 
         return redirect()
