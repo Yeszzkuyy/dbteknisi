@@ -11,66 +11,119 @@
     </div>
 
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 mb-6">
-        <form method="GET" action="{{ route('marketing.dashboard') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-            <div>
-                <label class="text-sm font-medium text-slate-500">Dari Tanggal</label>
-                <x-datepicker name="date_from" value="{{ $dateFrom }}" class="mt-1"></x-datepicker>
+        <form method="GET" action="{{ route('marketing.dashboard') }}" class="flex flex-wrap items-end gap-x-6 gap-y-4">
+            <div class="flex flex-wrap sm:flex-nowrap items-end gap-4">
+                <div>
+                    <label class="text-sm font-medium text-slate-500">Dari Tanggal</label>
+                    <x-datepicker name="date_from" value="{{ $dateFrom }}" class="mt-1"></x-datepicker>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-slate-500">Sampai Tanggal</label>
+                    <x-datepicker name="date_to" value="{{ $dateTo }}" class="mt-1"></x-datepicker>
+                </div>
             </div>
-            <div>
-                <label class="text-sm font-medium text-slate-500">Sampai Tanggal</label>
-                <x-datepicker name="date_to" value="{{ $dateTo }}" class="mt-1"></x-datepicker>
-            </div>
+
             <div class="flex items-end gap-2">
                 <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
                     Filter
                 </button>
-                <a href="{{ route('marketing.dashboard') }}" class="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium transition">
+                <a href="{{ route('marketing.dashboard') }}"
+                   class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 font-medium transition">
                     Reset
                 </a>
             </div>
-            <div class="flex items-end gap-2">
+
+            <div class="flex items-end">
                 @php
                     $presets = [
                         'Bulan Ini' => [now()->startOfMonth()->toDateString(), now()->toDateString()],
                         '3 Bulan' => [now()->subMonths(2)->startOfMonth()->toDateString(), now()->toDateString()],
                         '6 Bulan' => [now()->subMonths(5)->startOfMonth()->toDateString(), now()->toDateString()],
                     ];
+                    $activeRange = $dateFrom . '|' . $dateTo;
                 @endphp
-                @foreach($presets as $label => [$from, $to])
-                    <a href="{{ route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to]) }}"
-                       class="px-3 py-2 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium transition">
-                        {{ $label }}
-                    </a>
-                @endforeach
+                <div class="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-600 overflow-hidden divide-x divide-slate-200 dark:divide-slate-600">
+                    @foreach($presets as $label => [$from, $to])
+                        @php($active = $activeRange === $from . '|' . $to)
+                        <a href="{{ route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to]) }}"
+                           class="px-4 py-2.5 text-sm font-medium transition {{ $active ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">
+                            {{ $label }}
+                        </a>
+                    @endforeach
+                </div>
             </div>
         </form>
     </div>
 
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
-            <p class="text-sm text-slate-500">Lead Bulan Ini</p>
-            <p class="text-3xl font-bold text-slate-800 mt-1">{{ $stats['this_month'] }}</p>
-            <p class="text-xs mt-1 {{ $stats['this_month'] >= $stats['last_month'] ? 'text-green-600' : 'text-red-500' }}">
-                {{ $stats['this_month'] >= $stats['last_month'] ? '▲' : '▼' }} bulan lalu: {{ $stats['last_month'] }}
-            </p>
+        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-blue-500/5"></div>
+            <div class="relative flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Lead Bulan Ini</p>
+                    <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['this_month'] }}</p>
+                    <p class="text-xs mt-1 {{ $stats['this_month'] >= $stats['last_month'] ? 'text-green-600' : 'text-red-500' }}">
+                        {{ $stats['this_month'] >= $stats['last_month'] ? '▲' : '▼' }} bulan lalu: {{ $stats['last_month'] }}
+                    </p>
+                </div>
+                <div class="shrink-0 p-2.5 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+            </div>
         </div>
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
-            <p class="text-sm text-slate-500">Total Lead</p>
-            <p class="text-3xl font-bold text-blue-600 mt-1">{{ $stats['total'] }}</p>
+
+        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-indigo-500/5"></div>
+            <div class="relative flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total Lead</p>
+                    <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['total'] }}</p>
+                </div>
+                <div class="shrink-0 p-2.5 rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </div>
+            </div>
         </div>
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
-            <p class="text-sm text-slate-500">Lead Aktif</p>
-            <p class="text-3xl font-bold text-yellow-600 mt-1">{{ $stats['active'] }}</p>
+
+        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-amber-500/5"></div>
+            <div class="relative flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Lead Aktif</p>
+                    <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['active'] }}</p>
+                </div>
+                <div class="shrink-0 p-2.5 rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+            </div>
         </div>
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
-            <p class="text-sm text-slate-500">Won</p>
-            <p class="text-3xl font-bold text-green-600 mt-1">{{ $stats['won'] }}</p>
-            <p class="text-xs text-red-500 mt-1">Lost: {{ $stats['lost'] }}</p>
+
+        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-green-500/5"></div>
+            <div class="relative flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Won</p>
+                    <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['won'] }}</p>
+                    <p class="text-xs text-red-500 mt-1">Lost: {{ $stats['lost'] }}</p>
+                </div>
+                <div class="shrink-0 p-2.5 rounded-xl bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
         </div>
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
-            <p class="text-sm text-slate-500">Conversion Rate</p>
-            <p class="text-3xl font-bold text-emerald-600 mt-1">{{ $stats['conversion'] }}%</p>
-            <p class="text-xs text-slate-400 mt-1">won ÷ (won + lost)</p>
+
+        <div class="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-cyan-500/5"></div>
+            <div class="relative flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Conversion Rate</p>
+                    <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['conversion'] }}%</p>
+                    <p class="text-xs text-slate-400 mt-1">won ÷ (won + lost)</p>
+                </div>
+                <div class="shrink-0 p-2.5 rounded-xl bg-cyan-100 text-cyan-600 dark:bg-cyan-900/40 dark:text-cyan-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"></path></svg>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -170,20 +223,22 @@
 
     {{-- Ringkasan per status --}}
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4">
-        <div class="flex flex-wrap gap-3">
+        <h2 class="font-semibold text-slate-700 mb-4">Ringkasan per Status</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             @foreach(['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'] as $status)
                 <a href="{{ route('leads.index', ['status' => $status]) }}"
-                   class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium
+                   class="group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-4 text-center transition hover:scale-[1.02] active:scale-[0.99]
                     @switch($status)
-                        @case('new') bg-blue-100 text-blue-800 @break
-                        @case('contacted') bg-yellow-100 text-yellow-800 @break
-                        @case('qualified') bg-purple-100 text-purple-800 @break
-                        @case('proposal') bg-orange-100 text-orange-800 @break
-                        @case('won') bg-green-100 text-green-800 @break
-                        @default bg-red-100 text-red-800
+                        @case('new') bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/30 @break
+                        @case('contacted') bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300 dark:hover:bg-amber-900/30 @break
+                        @case('qualified') bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/30 @break
+                        @case('proposal') bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100 dark:bg-orange-900/20 dark:border-orange-800 dark:text-orange-300 dark:hover:bg-orange-900/30 @break
+                        @case('won') bg-green-50 border-green-200 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300 dark:hover:bg-green-900/30 @break
+                        @default bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/30
                     @endswitch
-                ">
-                    {{ ucfirst($status) }}: {{ $statusCounts[$status] ?? 0 }}
+                   ">
+                    <span class="text-2xl font-extrabold leading-none">{{ $statusCounts[$status] ?? 0 }}</span>
+                    <span class="text-xs font-semibold uppercase tracking-wider">{{ ucfirst($status) }}</span>
                 </a>
             @endforeach
         </div>
