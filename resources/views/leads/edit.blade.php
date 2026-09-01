@@ -142,6 +142,9 @@
                         <input type="email" name="customer_email" id="customer_email" value="{{ old('customer_email') }}"
                                placeholder="cth: vita@ptkoin.com"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        @error('customer_email')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
             </div>
