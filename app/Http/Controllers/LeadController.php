@@ -312,10 +312,19 @@ class LeadController extends Controller
                 'address' => $validated['customer_address'] ?? null,
                 'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
-        } elseif (!empty($validated['customer_contact_person'])) {
-            Customer::whereKey($validated['customer_id'])->update([
-                'contact_person' => $validated['customer_contact_person'],
-            ]);
+        } else {
+            $customerData = array_filter([
+                'name' => $validated['customer_name'] ?? null,
+                'contact_person' => $validated['customer_contact_person'] ?? null,
+                'address' => $validated['customer_address'] ?? null,
+                'phone' => $validated['customer_phone'] ?? null,
+                'whatsapp' => $validated['customer_whatsapp'] ?? null,
+                'email' => $validated['customer_email'] ?? null,
+            ], fn ($value) => $value !== null);
+
+            if ($customerData) {
+                Customer::whereKey($validated['customer_id'])->update($customerData);
+            }
         }
 
         unset(

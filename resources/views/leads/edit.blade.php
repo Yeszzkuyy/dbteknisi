@@ -79,29 +79,21 @@
         </section>
 
         {{-- Data Customer --}}
-        <section x-data="{ mode: '{{ old('customer_mode', 'existing') }}' }" class="border-t border-slate-200">
+        <section class="border-t border-slate-200">
             <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-3">
                 Data Customer <span class="text-red-500">*</span>
-                <x-info-tip tip="Pilih Customer Baru kalau belum pernah tercatat, atau Customer Lama kalau sudah ada di database." />
+                <x-info-tip tip="Perbarui data customer yang terkait dengan lead ini." />
             </label>
 
-            <div class="flex items-center gap-6 mb-4">
-                <label class="inline-flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
-                    <input type="radio" name="customer_mode" value="new" x-model="mode" class="accent-blue-600">
-                    Customer Baru
-                </label>
-                <label class="inline-flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
-                    <input type="radio" name="customer_mode" value="existing" x-model="mode" class="accent-blue-600">
-                    Customer Lama
-                </label>
-            </div>
+            <input type="hidden" name="customer_mode" value="existing">
+            <input type="hidden" name="customer_id" value="{{ old('customer_id', $lead->customer_id) }}">
 
-            <div x-show="mode === 'new'" x-cloak class="space-y-4">
+            <div class="space-y-4">
                 <div>
                     <label for="customer_name" class="block text-sm font-medium text-slate-700 mb-1">
                         Perusahaan <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name') }}"
+                    <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name', $lead->customer->name) }}"
                            placeholder="cth: PT Koin Konstruksi"
                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                     @error('customer_name')
@@ -114,66 +106,38 @@
                         <label for="customer_address" class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
                         <textarea name="customer_address" id="customer_address" rows="2"
                                   placeholder="cth: Plaza Kebon Jeruk Blok D7-8, Jl. Raya Perjuangan, Jakarta Barat 11530"
-                                  class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('customer_address') }}</textarea>
+                                  class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('customer_address', $lead->customer->address) }}</textarea>
                     </div>
                     <div>
                         <label for="customer_contact_person" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                             PIC
                             <x-info-tip tip="Nama orang yang bisa dihubungi di perusahaan tersebut." />
                         </label>
-                        <input type="text" name="customer_contact_person" id="customer_contact_person" value="{{ old('customer_contact_person') }}"
+                        <input type="text" name="customer_contact_person" id="customer_contact_person" value="{{ old('customer_contact_person', $lead->customer->contact_person) }}"
                                placeholder="cth: Ibu Vita"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
                         <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">Telpon Kantor</label>
-                        <input type="text" name="customer_phone" id="customer_phone" value="{{ old('customer_phone') }}"
+                        <input type="text" name="customer_phone" id="customer_phone" value="{{ old('customer_phone', $lead->customer->phone) }}"
                                placeholder="cth: 0812-3456-7890"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
                         <label for="customer_whatsapp" class="block text-sm font-medium text-slate-700 mb-1">No WA</label>
-                        <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp') }}"
+                        <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp', $lead->customer->whatsapp) }}"
                                placeholder="cth: 0812-3456-7890"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="md:col-span-2">
                         <label for="customer_email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                        <input type="email" name="customer_email" id="customer_email" value="{{ old('customer_email') }}"
+                        <input type="email" name="customer_email" id="customer_email" value="{{ old('customer_email', $lead->customer->email) }}"
                                placeholder="cth: vita@ptkoin.com"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('customer_email')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
-                </div>
-            </div>
-
-            <div x-show="mode === 'existing'" x-cloak class="space-y-4">
-                <div>
-                    <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Pilih Customer <span class="text-red-500">*</span>
-                        <x-info-tip tip="Ketik nama perusahaan untuk mencari customer yang sudah terdaftar." />
-                    </label>
-                    <x-searchable-select
-                        name="customer_id"
-                        :options="$customers->mapWithKeys(fn ($c) => [$c->id => $c->name.($c->contact_person ? ' - '.$c->contact_person : '')])->all()"
-                        :selected="old('customer_id', $lead->customer_id)"
-                        placeholder="Ketik nama customer untuk mencari..."
-                    />
-                    @error('customer_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="customer_contact_person_existing" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        PIC saat ini: {{ $lead->customer->contact_person ?? '-' }}
-                        <x-info-tip tip="Isi hanya jika ingin memperbarui nama PIC customer ini." />
-                    </label>
-                    <input type="text" name="customer_contact_person" id="customer_contact_person_existing" value="{{ old('customer_contact_person') }}"
-                           placeholder="isi untuk memperbarui PIC customer ini"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
         </section>
