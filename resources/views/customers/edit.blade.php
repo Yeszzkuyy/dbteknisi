@@ -1,8 +1,8 @@
 <x-app-layout>
     <div class="px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-3xl font-bold text-slate-800">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div class="min-w-0">
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
                     Edit Customer
                 </h1>
                 <p class="text-slate-500 mt-1">
@@ -10,8 +10,11 @@
                 </p>
             </div>
             <a href="{{ route('customers.show', $customer) }}" 
-               class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition">
-                ← Kembali ke Customer
+               class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 text-sm font-medium transition sm:self-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Kembali ke Customer
             </a>
         </div>
 
@@ -81,14 +84,14 @@
                     </div>
                 </div>
 
-                <div class="mt-6 flex gap-3">
+                <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3">
+                    <a href="{{ route('customers.show', $customer) }}" 
+                       class="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 font-medium transition text-base text-center">
+                        Batal
+                    </a>
                     <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition text-base">
                         Update Customer
                     </button>
-                    <a href="{{ route('customers.show', $customer) }}" 
-                       class="px-6 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition text-base">
-                        Batal
-                    </a>
                 </div>
             </form>
         </div>

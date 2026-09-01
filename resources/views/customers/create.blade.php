@@ -1,46 +1,80 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Customer') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form action="{{ route('customers.store') }}" method="POST" class="space-y-4">
-                    @csrf
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Nama Perusahaan</label>
-                        <input type="text" name="name" value="{{ old('name') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Address</label>
-                        <textarea name="address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Phone</label>
-                        <input type="text" name="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Notes</label>
-                        <textarea name="notes" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
-                    </div>
-
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
-                        Simpan
-                    </button>
-                </form>
-            </div>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div class="min-w-0">
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
+                Tambah Customer
+            </h1>
+            <p class="text-slate-500 mt-1">
+                Catat perusahaan / customer baru ke Tridaya App.
+            </p>
         </div>
+        <a href="{{ route('customers.index') }}"
+           class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 text-sm font-medium transition sm:self-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali
+        </a>
     </div>
+
+    <form action="{{ route('customers.store') }}" method="POST"
+          class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 space-y-4 w-full">
+        @csrf
+
+        <div>
+            <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                Nama Perusahaan <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+            @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
+            <label for="address" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                Address
+            </label>
+            <textarea id="address" name="address" rows="3"
+                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('address') }}</textarea>
+            @error('address') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
+            <label for="phone" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                Phone
+            </label>
+            <input type="text" id="phone" name="phone" value="{{ old('phone') }}"
+                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+            @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
+            <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                Email
+            </label>
+            <input type="email" id="email" name="email" value="{{ old('email') }}"
+                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+            @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
+            <label for="notes" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                Notes
+            </label>
+            <textarea id="notes" name="notes" rows="3"
+                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes') }}</textarea>
+            @error('notes') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t border-slate-200 dark:border-slate-600 pt-5">
+            <a href="{{ route('customers.index') }}"
+               class="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 text-sm font-medium transition text-center">
+                Batal
+            </a>
+            <button type="submit"
+                    class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                Simpan Customer
+            </button>
+        </div>
+    </form>
 </x-app-layout>

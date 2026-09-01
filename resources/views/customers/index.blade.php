@@ -1,9 +1,9 @@
 <x-app-layout>
 
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
 
-        <div>
-            <h1 class="text-3xl font-bold text-slate-800">
+        <div class="min-w-0">
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
                 Daftar Customer
             </h1>
 
@@ -15,7 +15,7 @@
         {{-- GANTI: Cek permission 'create-clients' atau 'create-customers' --}}
         @can('manage-sales')
             <a href="{{ route('customers.create') }}"
-               class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+               class="inline-flex items-center justify-center whitespace-nowrap px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition sm:self-start">
                 + Tambah Customer
             </a>
         @endcan
@@ -59,8 +59,6 @@
         </div>
         <div id="customer-table">
             @include('customers._list')
-        </div>
-            </div>
         </div>
     </div>
 
