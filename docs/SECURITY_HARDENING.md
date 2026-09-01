@@ -83,6 +83,40 @@ Script: `php artisan files:migrate-private [--purge-public]`
 
 ---
 
+## PHASE 3 — File Upload Hardening
+
+### Rule reusable: `app/Rules/SecureFile.php`
+Satu aturan validasi yang dipakai semua endpoint upload (menghilangkan duplikasi aturan `mimes:` yang tersebar).
+
+Lapisan pemeriksaan:
+1. **Ekstensi berbahaya ditolak** (blacklist): `.php .phtml .phar .php3-8 .pht .phps .exe .sh .bat .cmd .js .jsp .asp .cgi .pl .py .rb .jar .dll .so .bin .htaccess` dll — ditolak **tanpa melihat MIME**.
+2. **Ekstensi harus di daftar izin** (allowed extension per konteks).
+3. **MIME asli dari isi file** (finfo `getMimeType()`), bukan klaim client. Fallback untuk MIME generik (`application/zip`/`octet-stream`/`text/plain`) hanya diterima bila ekstensinya diizinkan (format Office terbaca sebagai zip).
+4. **Ukuran** tetap via rule `max:` per endpoint (10/20/5 MB sesuai konteks).
+
+Preset yang tersedia:
+- `SecureFile::images()` → avatar
+- `SecureFile::documents()` → lampiran lead, dokumen project
+- `SecureFile::spreadsheets()` → import lead (CSV/Excel)
+- `SecureFile::paymentProof()` → bukti pembayaran
+
+Sanitasi nama: `SecureFile::sanitizeName()` — buang path & karakter kontrol dari nama asli (tetap disimpan di DB untuk display; file fisik sudah UUID).
+
+### Endpoint yang diterapkan
+| Endpoint | Rule |
+|---|---|
+| `LeadController::store/update` (attachments) | `SecureFile::documents()` |
+| `LeadController::import` | `SecureFile::spreadsheets()` |
+| `ProjectDocumentController::store` | `SecureFile::documents()` |
+| `AdminController::paymentsStore` (proof) | `SecureFile::paymentProof()` |
+| `ProfileController::updateAvatar` + `ProfileUpdateRequest` | `SecureFile::images()` |
+
+### Catatan
+- File fisik tetap disimpan dengan **UUID + ekstensi** (PH2), sehingga file yang di-rename (mis. `shell.php` → `shell.pdf`) tidak akan pernah tersimpan sebagai ekstensi berbahaya.
+- Test baru: `SecurityAccessTest` — `.php/.phtml/.phar/.exe/.sh` ditolak, ekstensi tak diizinkan ditolak, file valid tetap diterima. Total **95 test PASS**.
+
+---
+
 ## Catatan operasional setelah merge
 ```bash
 # 1. Salin file public → private (tanpa hapus dulu)

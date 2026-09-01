@@ -30,13 +30,13 @@ class ProjectDocumentController extends Controller
         $this->authorize('update', $project);
 
         $request->validate([
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png,gif,webp,doc,docx,xls,xlsx,ppt,pptx,zip,rar,txt,csv|max:20480',
+            'file' => ['required', 'file', 'max:20480', \App\Rules\SecureFile::documents()],
             'document_category_id' => 'nullable|exists:document_categories,id',
             'notes' => 'nullable|string|max:500',
         ]);
 
         $file = $request->file('file');
-        $originalName = $file->getClientOriginalName();
+        $originalName = \App\Rules\SecureFile::sanitizeName($file->getClientOriginalName());
         $path = $file->storeAs(
             'documents/' . $project->id,
             Str::uuid() . '.' . strtolower($file->getClientOriginalExtension()),

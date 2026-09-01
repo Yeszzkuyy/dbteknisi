@@ -189,7 +189,7 @@ class AdminController extends Controller
             'payment_date' => 'required|date',
             'payment_method' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
-            'proof_file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'proof_file' => ['nullable', 'file', 'max:5120', \App\Rules\SecureFile::paymentProof()],
         ]);
 
         if ($request->hasFile('proof_file')) {

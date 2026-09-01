@@ -221,7 +221,7 @@ class LeadController extends Controller
             'notes' => 'nullable',
             'incoming_date' => 'required|date',
             'attachments' => 'nullable|array|max:5',
-            'attachments.*' => 'file|max:10240|mimes:pdf,jpg,jpeg,png,gif,webp,doc,docx,xls,xlsx,ppt,pptx,zip,rar,txt,csv',
+            'attachments.*' => ['file', 'max:10240', \App\Rules\SecureFile::documents()],
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -313,7 +313,7 @@ class LeadController extends Controller
             'notes' => 'nullable',
             'incoming_date' => 'required|date',
             'attachments' => 'nullable|array|max:5',
-            'attachments.*' => 'file|max:10240|mimes:pdf,jpg,jpeg,png,gif,webp,doc,docx,xls,xlsx,ppt,pptx,zip,rar,txt,csv',
+            'attachments.*' => ['file', 'max:10240', \App\Rules\SecureFile::documents()],
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -518,7 +518,7 @@ class LeadController extends Controller
                 'private'
             );
             $lead->documents()->create([
-                'file_name' => $file->getClientOriginalName(),
+                'file_name' => \App\Rules\SecureFile::sanitizeName($file->getClientOriginalName()),
                 'file_path' => $path,
                 'mime_type' => $file->getClientMimeType(),
             ]);
@@ -534,7 +534,7 @@ class LeadController extends Controller
                 'private'
             );
             $lead->documents()->create([
-                'file_name' => $file->getClientOriginalName(),
+                'file_name' => \App\Rules\SecureFile::sanitizeName($file->getClientOriginalName()),
                 'file_path' => $path,
                 'mime_type' => $file->getClientMimeType(),
             ]);
@@ -608,7 +608,7 @@ class LeadController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|max:10240|mimes:csv,txt,xlsx,xls',
+            'file' => ['required', 'file', 'max:10240', \App\Rules\SecureFile::spreadsheets()],
         ]);
 
         $file = $request->file('file');

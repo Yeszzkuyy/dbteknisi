@@ -151,4 +151,75 @@ class SecurityAccessTest extends TestCase
 
         $this->actingAs($u)->get(route('project-documents.download', $doc))->assertOk();
     }
+
+    /**
+     * File berbahaya (script/executable) ditolak walau ekstensi valid lainnya.
+     */
+    public function test_dangerous_file_extensions_rejected(): void
+    {
+        $u = $this->loginAs('teknisi');
+        $this->actingAs($u);
+        $customer = Customer::create(['name' => 'PT Bahaya']);
+        $workType = \App\Models\WorkType::create(['name' => 'Instalasi']);
+        $project = Project::create([
+            'customer_id' => $customer->id,
+            'work_type_id' => $workType->id,
+            'project_name' => 'Project Bahaya',
+        ]);
+        Storage::fake('private');
+
+        foreach (['shell.php', 'exploit.phtml', 'payload.phar', 'virus.exe', 'run.sh'] as $name) {
+            $this->actingAs($u)->post(route('project-documents.store', $project), [
+                'file' => UploadedFile::fake()->create($name, 50),
+            ])->assertSessionHasErrors('file', "file {$name} harus ditolak");
+
+            $this->assertSame(0, $project->fresh()->documents()->count(), "file {$name} tidak boleh tersimpan");
+        }
+    }
+
+    /**
+     * Ekstensi di luar daftar izin ditolak.
+     */
+    public function test_unallowed_extension_rejected(): void
+    {
+        $u = $this->loginAs('teknisi');
+        $this->actingAs($u);
+        $customer = Customer::create(['name' => 'PT Batas']);
+        $workType = \App\Models\WorkType::create(['name' => 'Instalasi']);
+        $project = Project::create([
+            'customer_id' => $customer->id,
+            'work_type_id' => $workType->id,
+            'project_name' => 'Project Batas',
+        ]);
+        Storage::fake('private');
+
+        $this->actingAs($u)->post(route('project-documents.store', $project), [
+            'file' => UploadedFile::fake()->create('data.mp4', 50),
+        ])->assertSessionHasErrors('file');
+
+        $this->assertSame(0, $project->fresh()->documents()->count());
+    }
+
+    /**
+     * File yang sah tetap diterima (regresi).
+     */
+    public function test_valid_document_still_accepted(): void
+    {
+        $u = $this->loginAs('teknisi');
+        $this->actingAs($u);
+        $customer = Customer::create(['name' => 'PT Valid']);
+        $workType = \App\Models\WorkType::create(['name' => 'Instalasi']);
+        $project = Project::create([
+            'customer_id' => $customer->id,
+            'work_type_id' => $workType->id,
+            'project_name' => 'Project Valid',
+        ]);
+        Storage::fake('private');
+
+        $this->actingAs($u)->post(route('project-documents.store', $project), [
+            'file' => UploadedFile::fake()->create('boq.pdf', 50, 'application/pdf'),
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame(1, $project->fresh()->documents()->count());
+    }
 }
