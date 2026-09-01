@@ -80,6 +80,10 @@
     document.addEventListener('DOMContentLoaded', function () {
         var board = document.querySelector('.kanban-board[data-editable]');
         if (!board) return;
+        if (typeof Sortable === 'undefined') {
+            console.warn('SortableJS tidak tersedia, drag & drop pipeline dinonaktifkan.');
+            return;
+        }
 
         var csrf = document.querySelector('meta[name="csrf-token"]')?.content;
         var pendingChanges = new Map();
@@ -146,7 +150,7 @@
                 return { lead_id: parseInt(entry[0]), status: entry[1].newStatus };
             });
 
-            fetch('/leads/batch-status', {
+            fetch('{{ route('leads.batch-status') }}', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

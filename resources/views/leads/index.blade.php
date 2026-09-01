@@ -73,8 +73,7 @@
             <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
                 <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Lead / Opportunity</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Customer</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Lead / Customer</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Sumber</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Partner</th>
@@ -88,10 +87,10 @@
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition group">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-slate-900">{{ $lead->customer->name ?? 'N/A' }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div>{{ $lead->customer->company ?? $lead->customer->name ?? '-' }}</div>
                                 <div class="text-sm text-slate-500">
+                                    @if($lead->customer->company && $lead->customer->company !== $lead->customer->name)
+                                        <span>{{ $lead->customer->company }}</span>
+                                    @endif
                                     @if($lead->pt_group)<span class="inline-flex px-1.5 py-0.5 rounded {{ \App\Models\Lead::PT_COLORS[$lead->pt_group] ?? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' }} text-[11px] font-semibold mr-1">{{ $lead->pt_group }}</span>@endif
                                     {{ $lead->customer->contact_person ? 'PIC: '.$lead->customer->contact_person : '' }}
                                 </div>
@@ -99,13 +98,13 @@
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium
                                     @switch($lead->status)
-                                        @case('new') bg-blue-100 text-blue-800 @break
-                                        @case('contacted') bg-yellow-100 text-yellow-800 @break
-                                        @case('qualified') bg-purple-100 text-purple-800 @break
-                                        @case('proposal') bg-orange-100 text-orange-800 @break
-                                        @case('won') bg-green-100 text-green-800 @break
-                                        @case('lost') bg-red-100 text-red-800 @break
-                                        @default bg-slate-100 text-slate-800
+                                        @case('new') bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 @break
+                                        @case('contacted') bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 @break
+                                        @case('qualified') bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 @break
+                                        @case('proposal') bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 @break
+                                        @case('won') bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 @break
+                                        @case('lost') bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 @break
+                                        @default bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200
                                     @endswitch
                                 ">
                                     {{ ucfirst($lead->status) }}
@@ -130,7 +129,7 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 @if($lead->kebutuhan)
-                                    <span class="text-sm text-slate-700">{{ Str::limit($lead->kebutuhan, 40) }}</span>
+                                    <span class="text-sm text-slate-700 truncate max-w-[200px] inline-block align-bottom" title="{{ $lead->kebutuhan }}">{{ Str::limit($lead->kebutuhan, 40) }}</span>
                                 @else
                                     <span class="text-slate-400">-</span>
                                 @endif
@@ -175,7 +174,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-slate-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-500">
                                 Belum ada lead. <a href="{{ route('leads.create') }}" class="text-blue-600 hover:underline">Tambah lead pertama</a>
                             </td>
                         </tr>

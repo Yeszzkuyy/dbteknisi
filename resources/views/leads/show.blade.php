@@ -33,19 +33,19 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">PT</label>
-                        <p class="mt-1 text-slate-900 font-semibold">{{ $lead->pt_group ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100 font-semibold">{{ $lead->pt_group ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Perusahaan</label>
-                        <p class="mt-1 text-slate-900 font-semibold">{{ $lead->customer->company ?? $lead->customer->name }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100 font-semibold">{{ $lead->customer->company ?? $lead->customer->name }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">PIC</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->customer->contact_person ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->contact_person ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Status</label>
@@ -68,11 +68,11 @@
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Masuk by</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->source ? ucfirst(str_replace('_', ' ', $lead->source)) : '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->source ? ucfirst(str_replace('_', ' ', $lead->source)) : '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Segment</label>
-                        <p class="mt-1 text-slate-900 font-semibold">{{ $lead->segment ? \App\Http\Controllers\LeadController::label($lead->segment) : '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100 font-semibold">{{ $lead->segment ? \App\Http\Controllers\LeadController::label($lead->segment) : '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Partner</label>
@@ -90,35 +90,35 @@
 
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Alamat</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->customer->address ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->address ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Telpon Kantor</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->customer->phone ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->phone ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">No WA</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->customer->whatsapp ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->whatsapp ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Email</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->customer->email ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->email ?? '-' }}</p>
                     </div>
 
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Tanggal Masuk</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->incoming_date ? $lead->incoming_date->format('d M Y') : '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->incoming_date ? $lead->incoming_date->format('d M Y') : '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Dibuat pada</label>
-                        <p class="mt-1 text-slate-900">{{ $lead->created_at->format('d M Y H:i') }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->created_at->format('d M Y H:i') }}</p>
                     </div>
                 </div>
 
                 @if($lead->notes)
                     <div class="mt-1 pt-1 border-t">
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Catatan</label>
-                        <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
+                        <div class="mt-1 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-slate-100 whitespace-pre-wrap">
                             {{ $lead->notes }}
                         </div>
                     </div>
@@ -127,7 +127,7 @@
                 @if($lead->kebutuhan)
                     <div class="mt-1 pt-1 border-t">
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Kebutuhan</label>
-                        <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
+                        <div class="mt-1 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-slate-100 whitespace-pre-wrap">
                             {{ $lead->kebutuhan }}
                         </div>
                     </div>
@@ -136,7 +136,7 @@
                 @if($lead->solusi)
                     <div class="mt-1 pt-1 border-t">
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Solusi</label>
-                        <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
+                        <div class="mt-1 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-slate-100 whitespace-pre-wrap">
                             {{ $lead->solusi }}
                         </div>
                     </div>
@@ -145,7 +145,7 @@
                 @if($lead->progress_notes)
                     <div class="mt-1 pt-1 border-t">
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Progress FollowUp / Keterangan</label>
-                        <div class="mt-1 p-3 bg-slate-50 rounded-xl text-slate-900 whitespace-pre-wrap">
+                        <div class="mt-1 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl text-slate-900 dark:text-slate-100 whitespace-pre-wrap">
                             {{ $lead->progress_notes }}
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Dashboard Marketing</h1>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Dashboard Marketing</h1>
             <p class="text-slate-500 mt-1">Ringkasan performa lead dan pipeline</p>
         </div>
         <a href="{{ route('leads.index') }}"
@@ -130,7 +130,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {{-- Tren lead masuk --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-            <h2 class="font-semibold text-slate-700 mb-4">Lead Masuk — {{ $dateFrom }} s/d {{ $dateTo }}</h2>
+            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Lead Masuk — {{ $dateFrom }} s/d {{ $dateTo }}</h2>
             @php($maxTrend = max($trend->max('total'), 1))
             <div class="flex items-end justify-between gap-3 h-44">
                 @foreach($trend as $month)
@@ -146,7 +146,7 @@
 
         {{-- Lead per sumber --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-            <h2 class="font-semibold text-slate-700 mb-4">Lead per Sumber</h2>
+            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Lead per Sumber</h2>
             @if($perSource->isEmpty())
                 <p class="text-sm text-slate-500 py-8 text-center">Belum ada data lead.</p>
             @else
@@ -171,7 +171,7 @@
 
     {{-- Donut Lead per Status (ApexCharts) --}}
     <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4">
-        <h2 class="font-semibold text-slate-700 mb-4">Pipeline Lead per Status</h2>
+        <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Pipeline Lead per Status</h2>
         <div id="status-donut-chart" class="w-full"></div>
         <script>
             // Tunggu DOM siap: bundle Vite dimuat sebagai module (deferred),
@@ -239,7 +239,7 @@
 
     {{-- Ringkasan per status --}}
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4">
-        <h2 class="font-semibold text-slate-700 mb-4">Ringkasan per Status</h2>
+        <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Ringkasan per Status</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             @foreach(['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'] as $status)
                 <a href="{{ route('leads.index', ['status' => $status]) }}"
