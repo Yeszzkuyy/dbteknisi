@@ -129,7 +129,7 @@
             if (!saveBtn) {
                 saveBtn = document.createElement('button');
                 saveBtn.id = 'pipeline-save-btn';
-                saveBtn.className = 'px-5 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold transition fixed bottom-6 right-6 shadow-lg z-50 flex items-center gap-2';
+                saveBtn.className = 'px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold transition fixed bottom-6 right-6 shadow-lg z-50 flex items-center gap-2';
                 saveBtn.onclick = savePendingChanges;
                 document.body.appendChild(saveBtn);
             }
