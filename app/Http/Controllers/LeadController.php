@@ -115,12 +115,13 @@ class LeadController extends Controller
             [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
         }
 
-        $statusCounts = Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
+        // whereDate di kedua batas agar lead hari ini ikut terhitung (cast 'date' menyimpan jam juga)
+        $statusCounts = Lead::whereDate('incoming_date', '>=', $dateFrom)->whereDate('incoming_date', '<=', $dateTo)
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        $countMonth = fn ($date) => Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
+        $countMonth = fn ($date) => Lead::whereDate('incoming_date', '>=', $dateFrom)->whereDate('incoming_date', '<=', $dateTo)
             ->whereMonth('incoming_date', $date->month)
             ->whereYear('incoming_date', $date->year)->count();
 
@@ -138,7 +139,7 @@ class LeadController extends Controller
         ];
 
         // ponytail: grouping source di PHP agar portabel antar driver (MySQL/Postgres/SQLite)
-        $perSource = Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
+        $perSource = Lead::whereDate('incoming_date', '>=', $dateFrom)->whereDate('incoming_date', '<=', $dateTo)
             ->pluck('source')
             ->map(fn ($source) => ($source === null || $source === '') ? 'lainnya' : $source)
             ->countBy()
@@ -148,7 +149,7 @@ class LeadController extends Controller
             ->values();
 
         // ponytail: tren per bulan dikelompokkan di PHP (portabel antar driver DB); pindah ke SQL native kalau datanya jutaan
-        $trendQuery = Lead::whereBetween('incoming_date', [$dateFrom, $dateTo])
+        $trendQuery = Lead::whereDate('incoming_date', '>=', $dateFrom)->whereDate('incoming_date', '<=', $dateTo)
             ->pluck('incoming_date')
             ->countBy(fn ($date) => $date->format('Y-m'));
 
@@ -167,7 +168,14 @@ class LeadController extends Controller
                 ];
             })->reverse()->values();
 
-        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo'));
+        // Funnel: jumlah lead per status, diurutkan sesuai STATUSES (New → Lost)
+        $funnel = collect(self::STATUSES)->map(fn ($status) => [
+            'label' => ucfirst($status),
+            'value' => (int) ($statusCounts[$status] ?? 0),
+            'key'   => $status,
+        ]);
+
+        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo', 'funnel'));
     }
 
     public function create()

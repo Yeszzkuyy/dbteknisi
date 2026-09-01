@@ -2,9 +2,11 @@
 
 import Alpine from 'alpinejs';
 import Sortable from 'sortablejs';
+import ApexCharts from 'apexcharts';
 
 window.Alpine = Alpine;
 window.Sortable = Sortable;
+window.ApexCharts = ApexCharts;
 
 document.addEventListener('alpine:init', () => {
     Alpine.data('counter', (target, duration = 900) => ({

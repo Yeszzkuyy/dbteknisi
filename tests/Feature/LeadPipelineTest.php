@@ -97,7 +97,9 @@ class LeadPipelineTest extends TestCase
         $this->actingAs($user)->get(route('marketing.dashboard'))
             ->assertOk()
             ->assertViewHas('stats', fn ($stats) => $stats['total'] === 3
-                && $stats['won'] === 1 && $stats['conversion'] === 50);
+                && $stats['won'] === 1 && $stats['conversion'] === 50)
+            ->assertViewHas('funnel', fn ($funnel) => $funnel->sum('value') === 3
+                && $funnel->pluck('key')->all() === ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost']);
 
         $this->assertSame(3, Lead::count());
     }
