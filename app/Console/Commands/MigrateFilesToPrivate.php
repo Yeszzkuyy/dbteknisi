@@ -35,6 +35,7 @@ class MigrateFilesToPrivate extends Command
 
                 if (Storage::disk('private')->exists($path)) {
                     $skipped++;
+                    $this->purgePublicIfRequested($path);
                     continue;
                 }
 
@@ -52,11 +53,7 @@ class MigrateFilesToPrivate extends Command
                 )) {
                     $copied++;
                     $this->line("  disalin: {$path}");
-
-                    if ($this->option('purge-public')) {
-                        Storage::disk('public')->delete($path);
-                        $this->line("  -> dihapus dari public: {$path}");
-                    }
+                    $this->purgePublicIfRequested($path);
                 } else {
                     $this->error("  gagal menyalin: {$path}");
                 }
@@ -73,5 +70,17 @@ class MigrateFilesToPrivate extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    private function purgePublicIfRequested(string $path): void
+    {
+        if (!$this->option('purge-public')) {
+            return;
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+            $this->line("  -> dihapus dari public: {$path}");
+        }
     }
 }
