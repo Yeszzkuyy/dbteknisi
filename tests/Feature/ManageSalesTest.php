@@ -69,6 +69,8 @@ class ManageSalesTest extends TestCase
         $this->assertSame($management->id, $lead->assigned_by);
         $this->assertNotNull($lead->assigned_at);
         $this->assertNotNull(LeadActivity::where('lead_id', $lead->id)->where('action', 'assigned')->first());
+
+        $this->actingAs($management)->get(route('manage-sales.index'))->assertOk();
     }
 
     public function test_management_cannot_assign_to_non_sales_user(): void
