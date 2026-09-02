@@ -20,6 +20,7 @@ use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\AdminPanelController;
+use App\Http\Controllers\ManageSalesController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\TechnicianScheduleController;
 use App\Http\Controllers\TechnicianDashboardController;
@@ -225,6 +226,19 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
     });
+
+    // ============================================
+    // MANAGE SALES — Management (assign lead ke sales)
+    // ============================================
+    Route::middleware('permission:manage-sales-leads')->prefix('manage-sales')->name('manage-sales.')->group(function () {
+        Route::get('/', [ManageSalesController::class, 'index'])->name('index');
+        Route::get('/{lead}/edit', [ManageSalesController::class, 'edit'])->name('edit');
+        Route::put('/{lead}', [ManageSalesController::class, 'update'])->name('update');
+        Route::post('/{lead}/assign', [ManageSalesController::class, 'assign'])->name('assign');
+    });
+
+    // Lead milik sales (muncul di menu Sales)
+    Route::middleware('permission:view-sales|manage-sales')->get('/sales/my-leads', [ManageSalesController::class, 'myLeads'])->name('sales.my-leads');
 
     // ============================================
     // MONITORING — Manager & Super Admin

@@ -125,6 +125,15 @@
             </div>
         @endcan
 
+        {{-- Manage Sales (Management) --}}
+        @can('manage-sales-leads')
+            <a href="{{ route('manage-sales.index') }}"
+               class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('manage-sales*') ? 'bg-green-50 text-green-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                <x-icon name="briefcase" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
+                <span>Manage Sales</span>
+            </a>
+        @endcan
+
         @can('view-sales')
             <div x-data="{ open: {{ request()->routeIs('sales.*') || request()->routeIs('projects*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
@@ -136,6 +145,11 @@
                     </svg>
                 </button>
                 <div x-show="open" class="mt-1 ml-4 space-y-1">
+                    <a href="{{ route('sales.my-leads') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('sales.my-leads') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        My Leads
+                    </a>
                     <a href="{{ route('sales.meetings.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('sales.meetings.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>

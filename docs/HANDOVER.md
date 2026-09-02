@@ -38,6 +38,7 @@
 - Trash (soft delete + restore customer/project) di `/trash` — sudah ada di main via admin routes.
 - Konsolidasi UI: konvensi warna tombol (bagian 7 AGENTS.md), dark mode input `color-scheme`, filter leads (pakai `incoming_date`, lead tetap tampil walau customer soft-deleted).
 - Hapus lampiran lead (file fisik + record + log aktivitas).
+- Manage Sales (branch `feature/manage-sales`): role `management` (Bu Yanita `yanita@dbteknisi.com`, Bu Ayu `ayu@dbteknisi.com` — password `password`, role diset via seeder/tinker) dengan permission `manage-sales-leads`. Marketing simpan lead tanpa assign → lead muncul di Data Lead Marketing (`/leads`) dan Manage Sales (`/manage-sales`) tanpa duplikat. Management mengisi Solusi / Progress FollowUp / Catatan Internal + Assign ke Sales (kolom `assigned_to` lama dipakai ulang; tambah `assigned_by`, `assigned_at`). Sales melihat lead-nya di `/sales/my-leads`. Field tsb dihapus dari form Tambah/Edit Lead; label "PT" → "Lead dari PT".
 
 ## 4. Rencana / Yang BELUM Dikerjakan (urutan prioritas)
 

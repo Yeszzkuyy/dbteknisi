@@ -191,9 +191,8 @@ class LeadController extends Controller
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
-        $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
-        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups', 'salesUsers'));
+        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups'));
     }
 
     public function store(Request $request)
@@ -212,7 +211,7 @@ class LeadController extends Controller
             'customer_contact_person' => 'nullable|string|max:255',
             'partner_id' => 'nullable|exists:partners,id',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
-            'assigned_to' => 'required|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
@@ -283,9 +282,8 @@ class LeadController extends Controller
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
-        $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
-        return view('leads.edit', compact('lead', 'customers', 'partners', 'segments', 'sources', 'ptGroups', 'salesUsers'));
+        return view('leads.edit', compact('lead', 'customers', 'partners', 'segments', 'sources', 'ptGroups'));
     }
 
     public function update(Request $request, Lead $lead)
@@ -304,7 +302,7 @@ class LeadController extends Controller
             'customer_contact_person' => 'nullable|string|max:255',
             'partner_id' => 'nullable|exists:partners,id',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
-            'assigned_to' => 'required|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',

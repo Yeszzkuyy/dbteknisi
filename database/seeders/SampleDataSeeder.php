@@ -23,6 +23,8 @@ class SampleDataSeeder extends Seeder
             ['name' => 'Rudi Teknisi', 'email' => 'teknisi@dbteknisi.com', 'role' => 'teknisi'],
             ['name' => 'Dewi Teknisi', 'email' => 'teknisi2@dbteknisi.com', 'role' => 'teknisi'],
             ['name' => 'Pak Manager', 'email' => 'manager@dbteknisi.com', 'role' => 'manager'],
+            ['name' => 'Bu Yanita', 'email' => 'yanita@dbteknisi.com', 'role' => 'management'],
+            ['name' => 'Bu Ayu', 'email' => 'ayu@dbteknisi.com', 'role' => 'management'],
         ];
 
         $userIds = [];
