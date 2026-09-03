@@ -12,7 +12,9 @@ use App\Models\ProjectDocument;
 use App\Models\ProjectStatus;
 use App\Models\User;
 use App\Models\WorkType;
+use App\Notifications\NewLeadNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -256,6 +258,13 @@ class LeadController extends Controller
         $lead = Lead::create($validated);
         $this->saveAttachments($request, $lead);
         $this->logActivity($lead, 'created');
+
+        if (empty($lead->assigned_to)) {
+            Notification::send(
+                User::permission('manage-sales-leads')->get(),
+                new NewLeadNotification($lead)
+            );
+        }
 
         return redirect()
             ->route('leads.index')

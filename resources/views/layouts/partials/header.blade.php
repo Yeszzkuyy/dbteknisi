@@ -47,11 +47,51 @@
             </span>
         </button>
 
+        {{-- Notifikasi (Management: lead baru butuh di-assign) --}}
+        @can('manage-sales-leads')
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open"
+                        class="relative p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition"
+                        aria-label="Notifikasi">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.66V5a2 2 0 10-4 0v.34A6 6 0 006 11v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    @if (auth()->user()->unreadNotifications()->count() > 0)
+                        <span class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                            {{ auth()->user()->unreadNotifications()->count() }}
+                        </span>
+                    @endif
+                </button>
+                <div x-show="open" @click.away="open = false"
+                     class="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 origin-top-right">
+                    <div class="flex items-center justify-between px-4 py-1.5 border-b border-slate-100">
+                        <span class="text-sm font-semibold text-slate-700">Notifikasi</span>
+                        @if (auth()->user()->unreadNotifications()->count() > 0)
+                            <form method="POST" action="{{ route('notifications.read-all') }}">
+                                @csrf
+                                <button class="text-xs text-blue-600 hover:text-blue-700">Tandai semua dibaca</button>
+                            </form>
+                        @endif
+                    </div>
+                    @forelse (auth()->user()->notifications()->limit(10)->get() as $notification)
+                        <a href="{{ route('manage-sales.index') }}"
+                           class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition {{ $notification->read_at ? 'opacity-60' : '' }}">
+                            <span class="mt-1.5 h-2 w-2 rounded-full shrink-0 {{ $notification->read_at ? 'bg-slate-300' : 'bg-red-500' }}"></span>
+                            <span class="min-w-0">
+                                <span class="block text-sm text-slate-700">Lead baru: <strong>{{ $notification->data['customer'] }}</strong></span>
+                                <span class="block text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span>
+                            </span>
+                        </a>
+                    @empty
+                        <p class="px-4 py-6 text-center text-sm text-slate-400">Tidak ada notifikasi</p>
+                    @endforelse
+                </div>
+            </div>
+        @endcan
+
         <span class="text-sm text-slate-600">
             {{ \Illuminate\Support\Str::limit(auth()->user()->name, 16, '…') }}
         </span>
-
-        {{-- Tampilkan role dari Spatie --}}
         @if(auth()->user()->roles->isNotEmpty())
             <span class="px-3 py-1 text-xs font-semibold rounded-full 
                 @if(in_array(auth()->user()->roles->first()->name, ['super-admin', 'admin', 'manager']))
