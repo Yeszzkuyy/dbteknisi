@@ -155,4 +155,29 @@ class ManageSalesTest extends TestCase
         $this->assertStringNotContainsString('assigned_to', $res->getContent());
         $this->assertStringContainsString('Lead dari PT', $res->getContent());
     }
+
+    public function test_management_activity_log_shows_management_actions(): void
+    {
+        $management = $this->loginAs('management');
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+        $lead = $this->makeLead();
+
+        $this->actingAs($management)
+            ->post(route('manage-sales.assign', $lead), ['assigned_to' => $sales->id])
+            ->assertRedirect(route('manage-sales.index'));
+
+        $this->actingAs($management)
+            ->get(route('manage-sales.activity-log'))
+            ->assertOk()
+            ->assertSee('Activity Log')
+            ->assertSee($management->name);
+    }
+
+    public function test_sales_cannot_open_activity_log(): void
+    {
+        $this->actingAs($this->loginAs('sales'))
+            ->get(route('manage-sales.activity-log'))
+            ->assertForbidden();
+    }
 }

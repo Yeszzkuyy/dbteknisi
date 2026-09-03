@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\User;
@@ -112,6 +113,27 @@ class ManageSalesController extends Controller
             ->paginate(15);
 
         return view('sales.my-leads', compact('leads'));
+    }
+
+    public function activityLog(Request $request)
+    {
+        $managementIds = User::role('management')->pluck('id');
+
+        $activities = LeadActivity::with(['lead.customer', 'user'])
+            ->whereIn('user_id', $managementIds)
+            ->when($request->filled('user'), fn ($q) => $q->where('user_id', $request->user))
+            ->when($request->filled('date_from'), fn ($q) => $q->whereDate('created_at', '>=', $request->date_from))
+            ->when($request->filled('date_to'), fn ($q) => $q->whereDate('created_at', '<=', $request->date_to))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $filterUser = $request->filled('user') ? User::find($request->user) : null;
+
+        return view('manage-sales.activity-log', compact('activities', 'filterUser'))
+            ->with('customerNames', Customer::pluck('name', 'id'))
+            ->with('userNames', User::pluck('name', 'id'))
+            ->with('managementUsers', User::role('management')->orderBy('name')->get(['id', 'name']));
     }
 
     private function trackAssignment(Lead $lead, ?int $assignedTo): void

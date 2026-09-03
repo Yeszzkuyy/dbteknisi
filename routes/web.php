@@ -237,6 +237,7 @@ Route::middleware('auth')->group(function () {
     // ============================================
     Route::middleware('permission:manage-sales-leads')->prefix('manage-sales')->name('manage-sales.')->group(function () {
         Route::get('/', [ManageSalesController::class, 'index'])->name('index');
+        Route::get('/activity-log', [ManageSalesController::class, 'activityLog'])->name('activity-log');
         Route::get('/{lead}/edit', [ManageSalesController::class, 'edit'])->name('edit');
         Route::put('/{lead}', [ManageSalesController::class, 'update'])->name('update');
         Route::post('/{lead}/assign', [ManageSalesController::class, 'assign'])->name('assign');

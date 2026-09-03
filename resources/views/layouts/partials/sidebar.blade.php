@@ -53,6 +53,11 @@
                             <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
                         </template>
                     </a>
+                    <a href="{{ route('manage-sales.activity-log') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage-sales.activity-log') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                        Activity Log
+                    </a>
                     <a href="{{ route('manage.marketing.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.marketing*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
