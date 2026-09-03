@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">Isi solusi, progress follow-up, catatan internal, dan assign ke Sales</p>
         </div>
         <a href="{{ route('manage-sales.index') }}"
-           class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 text-sm font-medium transition">
             Kembali
         </a>
     </div>
@@ -103,7 +103,7 @@
         {{-- Aksi --}}
         <div class="flex justify-end gap-3 border-t border-slate-200">
             <a href="{{ route('manage-sales.index') }}"
-               class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 text-sm font-medium transition">
+               class="px-4 py-2.5 rounded-xl bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 text-sm font-medium transition">
                 Batal
             </a>
             <button type="submit"

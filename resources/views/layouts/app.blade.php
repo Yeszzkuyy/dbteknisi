@@ -16,11 +16,12 @@
     <script>if(localStorage.getItem('dark-mode')==='true'||(!('dark-mode' in localStorage)&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}</script>
 
     @php
-        $notifInit = ['unread' => 0, 'unassigned' => 0];
+        $notifInit = ['unread' => 0, 'unassigned' => 0, 'items' => []];
         if (auth()->check() && auth()->user()->can('manage-sales-leads')) {
             $notifInit = [
                 'unread' => auth()->user()->unreadNotifications()->count(),
                 'unassigned' => \App\Models\Lead::whereNull('assigned_to')->count(),
+                'items' => \App\Http\Controllers\NotificationController::itemsFor(auth()->user()),
             ];
         }
     @endphp
@@ -61,6 +62,7 @@
         .dark .bg-slate-200{background-color:#334155!important}
         .dark .bg-slate-300{background-color:#475569!important}
         .dark .bg-gray-300{background-color:#475569!important}
+        .dark .bg-gray-100{background-color:#243244!important}
         .dark .hover\:bg-slate-100:hover{background-color:#243244!important}
         .dark .hover\:bg-slate-200:hover{background-color:#334155!important}
         .dark .hover\:bg-slate-300:hover{background-color:#475569!important}

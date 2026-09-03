@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\User;
+use App\Notifications\NewLeadNotification;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 
 class ManageSalesController extends Controller
 {
@@ -67,6 +69,10 @@ class ManageSalesController extends Controller
             $this->logActivity($lead, 'updated', $changes);
         }
 
+        if (!empty($validated['assigned_to'])) {
+            $this->clearLeadNotifications($lead);
+        }
+
         return redirect()
             ->route('manage-sales.index')
             ->with('success', 'Lead berhasil diperbarui');
@@ -91,6 +97,8 @@ class ManageSalesController extends Controller
             'assigned_to' => ['old' => $lead->getOriginal('assigned_to'), 'new' => $salesUser->id],
         ]);
 
+        $this->clearLeadNotifications($lead);
+
         return redirect()
             ->route('manage-sales.index')
             ->with('success', "Lead di-assign ke {$salesUser->name}");
@@ -111,6 +119,14 @@ class ManageSalesController extends Controller
         $lead->assigned_to = $assignedTo;
         $lead->assigned_by = $assignedTo ? auth()->id() : null;
         $lead->assigned_at = $assignedTo ? now() : null;
+    }
+
+    private function clearLeadNotifications(Lead $lead): void
+    {
+        DatabaseNotification::where('type', NewLeadNotification::class)
+            ->get()
+            ->filter(fn ($n) => ($n->data['lead_id'] ?? null) == $lead->id)
+            ->each->delete();
     }
 
     private function logActivity(Lead $lead, string $action, ?array $changes = null): void

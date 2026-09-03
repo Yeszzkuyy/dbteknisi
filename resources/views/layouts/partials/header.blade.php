@@ -64,25 +64,27 @@
                      class="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 origin-top-right">
                     <div class="flex items-center justify-between px-4 py-1.5 border-b border-slate-100">
                         <span class="text-sm font-semibold text-slate-700">Notifikasi</span>
-                        @if (auth()->user()->unreadNotifications()->count() > 0)
+                        <template x-if="$store.notif.unread > 0">
                             <form method="POST" action="{{ route('notifications.read-all') }}">
                                 @csrf
                                 <button class="text-xs text-blue-600 hover:text-blue-700">Tandai semua dibaca</button>
                             </form>
-                        @endif
+                        </template>
                     </div>
-                    @forelse (auth()->user()->notifications()->limit(10)->get() as $notification)
-                        <a href="{{ route('manage-sales.edit', $notification->data['lead_id']) }}"
-                           class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition {{ $notification->read_at ? 'opacity-60' : '' }}">
-                            <span class="mt-1.5 h-2 w-2 rounded-full shrink-0 {{ $notification->read_at ? 'bg-slate-300' : 'bg-red-500' }}"></span>
+                    <template x-for="n in $store.notif.items" :key="n.id">
+                        <a :href="n.url"
+                           class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition"
+                           :class="n.read ? 'opacity-60' : ''">
+                            <span class="mt-1.5 h-2 w-2 rounded-full shrink-0" :class="n.read ? 'bg-slate-300' : 'bg-red-500'"></span>
                             <span class="min-w-0">
-                                <span class="block text-sm text-slate-700">Lead baru: <strong>{{ $notification->data['customer'] }}</strong></span>
-                                <span class="block text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</span>
+                                <span class="block text-sm text-slate-700">Lead baru: <strong x-text="n.customer"></strong></span>
+                                <span class="block text-xs text-slate-400" x-text="n.ago"></span>
                             </span>
                         </a>
-                    @empty
+                    </template>
+                    <template x-if="$store.notif.items.length === 0">
                         <p class="px-4 py-6 text-center text-sm text-slate-400">Tidak ada notifikasi</p>
-                    @endforelse
+                    </template>
                 </div>
 
                 {{-- Toast kecil: lead baru belum di-assign --}}

@@ -12,6 +12,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.store('notif', {
         unread: window.notifInit?.unread ?? 0,
         unassigned: window.notifInit?.unassigned ?? 0,
+        items: window.notifInit?.items ?? [],
         toast: false,
         toastTimer: null,
         init() {
@@ -29,6 +30,7 @@ document.addEventListener('alpine:init', () => {
                 if (data.unread > this.unread) this.showToast();
                 this.unread = data.unread;
                 this.unassigned = data.unassigned;
+                this.items = data.items ?? [];
             } catch (e) {}
         },
         showToast() {

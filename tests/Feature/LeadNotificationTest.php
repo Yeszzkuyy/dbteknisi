@@ -107,7 +107,31 @@ class LeadNotificationTest extends TestCase
         $this->actingAs($management)
             ->get(route('notifications.status'))
             ->assertOk()
-            ->assertJson(['unread' => 1, 'unassigned' => 1]);
+            ->assertJson(['unread' => 1, 'unassigned' => 1])
+            ->assertJsonPath('items.0.customer', 'PT Notif JSON');
+    }
+
+    public function test_assigned_lead_removes_its_notifications(): void
+    {
+        $management = $this->loginAs('management');
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+
+        $lead = Lead::create([
+            'customer_id' => Customer::create(['name' => 'PT Assign Hapus Notif'])->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'status' => 'new',
+            'incoming_date' => now()->toDateString(),
+        ]);
+        $management->notify(new NewLeadNotification($lead));
+
+        $this->actingAs($management)
+            ->post(route('manage-sales.assign', $lead), ['assigned_to' => $sales->id])
+            ->assertRedirect(route('manage-sales.index'));
+
+        $this->assertSame(0, $management->fresh()->unreadNotifications()->count());
+        $this->assertSame(0, $management->fresh()->notifications()->count());
     }
 
     public function test_management_can_open_lead_page_from_notification_link(): void
