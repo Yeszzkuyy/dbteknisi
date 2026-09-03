@@ -91,4 +91,22 @@ class LeadNotificationTest extends TestCase
 
         $this->assertSame(0, $management->fresh()->unreadNotifications()->count());
     }
+
+    public function test_unread_count_endpoint_returns_json(): void
+    {
+        $management = $this->loginAs('management');
+        $lead = Lead::create([
+            'customer_id' => Customer::create(['name' => 'PT Notif JSON'])->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'status' => 'new',
+            'incoming_date' => now()->toDateString(),
+        ]);
+        $management->notify(new NewLeadNotification($lead));
+
+        $this->actingAs($management)
+            ->get(route('notifications.unread-count'))
+            ->assertOk()
+            ->assertJson(['count' => 1]);
+    }
 }

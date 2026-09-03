@@ -9,6 +9,30 @@ window.Sortable = Sortable;
 window.ApexCharts = ApexCharts;
 
 document.addEventListener('alpine:init', () => {
+    Alpine.data('notificationBell', (initialUnread = 0) => ({
+        open: false,
+        unread: initialUnread,
+        toast: false,
+        toastTimer: null,
+        init() {
+            this.refresh();
+            this.timer = setInterval(() => this.refresh(), 30000);
+        },
+        async refresh() {
+            try {
+                const res = await fetch('/notifications/unread-count');
+                const data = await res.json();
+                if (data.count > this.unread) this.showToast();
+                this.unread = data.count;
+            } catch (e) {}
+        },
+        showToast() {
+            this.toast = true;
+            clearTimeout(this.toastTimer);
+            this.toastTimer = setTimeout(() => (this.toast = false), 10000);
+        },
+    }));
+
     Alpine.data('counter', (target, duration = 900) => ({
         display: 0,
         start() {

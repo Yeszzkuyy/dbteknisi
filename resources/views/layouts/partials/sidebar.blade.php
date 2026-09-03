@@ -30,6 +30,7 @@
 
         {{-- Management (Management Hub) --}}
         @can('manage-sales-leads')
+            @php $unassignedLeads = \App\Models\Lead::whereNull('assigned_to')->count(); @endphp
             <div x-data="{ open: {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                         class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
@@ -44,6 +45,9 @@
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage-sales*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
                         Manage Sales
+                        @if ($unassignedLeads > 0)
+                            <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="{{ $unassignedLeads }} lead belum di-assign"></span>
+                        @endif
                     </a>
                     <a href="{{ route('manage.marketing.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.marketing*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
