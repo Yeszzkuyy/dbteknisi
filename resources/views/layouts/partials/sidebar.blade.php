@@ -28,15 +28,40 @@
             </a>
         @endrole
 
-        {{-- Monitoring (Manager & Super Admin) --}}
-        @can('view-monitoring')
-            <a href="{{ route('monitoring.index') }}"
-               class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('monitoring*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                <svg class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                </svg>
-                <span>Monitoring</span>
-            </a>
+        {{-- Management (Management Hub) --}}
+        @can('manage-sales-leads')
+            <div x-data="{ open: {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'true' : 'false' }} }">
+                <button @click="open = !open"
+                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+                    <x-icon name="briefcase" class="w-5 h-5" />
+                    <span>Management</span>
+                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div x-show="open" class="mt-1 ml-4 space-y-1">
+                    <a href="{{ route('manage-sales.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage-sales*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                        Manage Sales
+                    </a>
+                    <a href="{{ route('manage.marketing.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.marketing*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        Manage Marketing
+                    </a>
+                    <a href="{{ route('manage.technical.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.technical*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                        Manage Technical
+                    </a>
+                    <a href="{{ route('manage.admin.index') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.admin*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
+                        Manage Admin
+                    </a>
+                </div>
+            </div>
         @endcan
 
         <!-- Customer -->
@@ -136,6 +161,11 @@
                     </svg>
                 </button>
                 <div x-show="open" class="mt-1 ml-4 space-y-1">
+                    <a href="{{ route('sales.my-leads') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('sales.my-leads') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        My Leads
+                    </a>
                     <a href="{{ route('sales.meetings.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('sales.meetings.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>

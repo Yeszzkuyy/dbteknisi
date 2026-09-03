@@ -16,6 +16,10 @@ class DashboardController extends Controller
         if (!auth()->user()->hasAnyRole('manager', 'super-admin')) {
             $user = auth()->user();
 
+            if ($user->can('manage-sales-leads')) {
+                return redirect()->route('manage-sales.index');
+            }
+
             if ($user->can('view-marketing') || $user->can('manage-marketing')) {
                 return redirect()->route('marketing.dashboard');
             }

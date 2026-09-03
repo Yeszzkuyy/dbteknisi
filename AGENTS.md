@@ -8,14 +8,14 @@ ikuti aturan berikut supaya tidak saling menimpa kerjaan.
 
 | Folder | Branch | Topik |
 |---|---|---|
-| `/var/www/dbteknisi` | `main` | **Integrasi + yang dilayani website.** Jangan kerja fitur di sini |
-| `/var/www/dbteknisi-mkt` | `feature/div-marketing` | Lead, partner |
-| `/var/www/dbteknisi-tek` | `feature/div-teknisi` | Dashboard/jadwal teknisi |
-| `/var/www/dbteknisi-user` | `feature/user-management-avatar` | User, role, menu, avatar |
-| `/var/www/dbteknisi-mon` | `feature/div-mon` | Monitoring (progress per customer) |
+| `/var/www/3dyapp` | `main` | **Integrasi + yang dilayani website.** Jangan kerja fitur di sini |
+| `/var/www/3dyapp-mkt` | `feature/div-marketing` | Lead, partner |
+| `/var/www/3dyapp-tek` | `feature/div-teknisi` | Dashboard/jadwal teknisi |
+| `/var/www/3dyapp-user` | `feature/user-management-avatar` | User, role, menu, avatar |
+| `/var/www/3dyapp-mon` | `feature/div-mon` | Monitoring (progress per customer) |
 
 Worktree baru juga butuh: `composer install`, symlink `.env`, dan
-`ln -s /var/www/dbteknisi/public/build /var/www/dbteknisi-<nama>/public/build`.
+`ln -s /var/www/3dyapp/public/build /var/www/3dyapp-<nama>/public/build`.
 
 Rencana pembagian berikutnya (buat worktree-nya saat mulai dikerjakan):
 `feature/div-cus` (Customer), `feature/div-trash` (Trash), `feature/div-panel` (Admin Panel).
@@ -23,8 +23,8 @@ Rencana pembagian berikutnya (buat worktree-nya saat mulai dikerjakan):
 Butuh folder untuk topik baru?
 
 ```bash
-git worktree add /var/www/dbteknisi-<nama> feature/<branch>
-ln -sf /var/www/dbteknisi/.env /var/www/dbteknisi-<nama>/.env
+git worktree add /var/www/3dyapp-<nama> feature/<branch>
+ln -sf /var/www/3dyapp/.env /var/www/3dyapp-<nama>/.env
 ```
 
 **DILARANG pindah branch di dalam worktree milik sesi lain.**
@@ -53,7 +53,7 @@ Commit dulu atau `git stash push -m "pesan jelas"`.
 
 ## 5. Website dilayani dari `main`
 
-Folder utama (`/var/www/dbteknisi`) harus selalu berada di branch `main`.
+Folder utama (`/var/www/3dyapp`) harus selalu berada di branch `main`.
 Setelah merge ke main: `git pull`, lalu `npm run build` jika ada perubahan CSS/JS.
 
 ## 6. Jangan commit

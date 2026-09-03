@@ -35,6 +35,7 @@ class Lead extends Model
 
     protected $casts = [
         'incoming_date' => 'date',
+        'assigned_at' => 'datetime',
     ];
 
     public function customer()
