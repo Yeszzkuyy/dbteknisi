@@ -48,6 +48,13 @@ class DashboardAccessTest extends TestCase
             ->assertOk();
     }
 
+    public function test_management_can_access_general_dashboard(): void
+    {
+        $this->actingAs($this->userWithRole('management'))
+            ->get(route('dashboard'))
+            ->assertOk();
+    }
+
     public function test_super_admin_can_access_general_dashboard(): void
     {
         $this->actingAs($this->userWithRole('super-admin'))

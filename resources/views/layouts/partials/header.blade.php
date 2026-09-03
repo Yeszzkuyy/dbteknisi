@@ -49,15 +49,15 @@
 
         {{-- Notifikasi (Management: lead baru butuh di-assign) --}}
         @can('manage-sales-leads')
-            <div class="relative" x-data="notificationBell({{ auth()->user()->unreadNotifications()->count() }})">
-                <button @click="open = !open"
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open; $store.notif.refresh()"
                         class="relative p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition"
                         aria-label="Notifikasi">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.66V5a2 2 0 10-4 0v.34A6 6 0 006 11v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
-                    <template x-if="unread > 0">
-                        <span class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white" x-text="unread"></span>
+                    <template x-if="$store.notif.unread > 0">
+                        <span class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white" x-text="$store.notif.unread"></span>
                     </template>
                 </button>
                 <div x-show="open" @click.away="open = false"
@@ -72,7 +72,7 @@
                         @endif
                     </div>
                     @forelse (auth()->user()->notifications()->limit(10)->get() as $notification)
-                        <a href="{{ route('manage-sales.index') }}"
+                        <a href="{{ route('manage-sales.edit', $notification->data['lead_id']) }}"
                            class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition {{ $notification->read_at ? 'opacity-60' : '' }}">
                             <span class="mt-1.5 h-2 w-2 rounded-full shrink-0 {{ $notification->read_at ? 'bg-slate-300' : 'bg-red-500' }}"></span>
                             <span class="min-w-0">
@@ -85,18 +85,18 @@
                     @endforelse
                 </div>
 
-                {{-- Toast alert lead baru belum di-assign --}}
+                {{-- Toast kecil: lead baru belum di-assign --}}
                 <template x-teleport="body">
-                    <div x-show="toast"
+                    <div x-show="$store.notif.toast"
                          x-transition.opacity.duration.300ms
-                         class="fixed bottom-4 right-4 z-[100] w-80 max-w-[calc(100vw-2rem)]">
-                        <div class="flex items-start gap-3 rounded-xl bg-white shadow-xl border border-slate-200 p-4">
-                            <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500 animate-ping"></span>
-                            <div class="min-w-0 flex-1">
-                                <p class="text-sm font-semibold text-slate-800">Ada lead baru belum di-assign ke sales</p>
-                                <a href="{{ route('manage-sales.index') }}" class="text-xs text-blue-600 hover:text-blue-700">Kelola di Manage Sales &rarr;</a>
-                            </div>
-                            <button @click="toast = false" class="text-slate-400 hover:text-slate-600" aria-label="Tutup">&#10005;</button>
+                         class="fixed bottom-4 right-4 z-[100]">
+                        <div class="flex items-center gap-2.5 rounded-lg bg-white shadow-lg border border-slate-200 py-2.5 px-3.5">
+                            <span class="h-2 w-2 shrink-0 rounded-full bg-red-500 animate-ping"></span>
+                            <p class="text-sm text-slate-700">
+                                Lead baru belum di-assign &mdash;
+                                <a href="{{ route('manage-sales.index') }}" class="font-semibold text-blue-600 hover:text-blue-700">kelola</a>
+                            </p>
+                            <button @click="$store.notif.toast = false" class="text-slate-400 hover:text-slate-600" aria-label="Tutup">&#10005;</button>
                         </div>
                     </div>
                 </template>

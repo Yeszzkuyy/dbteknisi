@@ -13,7 +13,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->hasAnyRole('manager', 'super-admin')) {
+        if (!auth()->user()->hasAnyRole('manager', 'super-admin', 'management')) {
             $user = auth()->user();
 
             if ($user->can('manage-sales-leads')) {

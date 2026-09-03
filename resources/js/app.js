@@ -9,29 +9,35 @@ window.Sortable = Sortable;
 window.ApexCharts = ApexCharts;
 
 document.addEventListener('alpine:init', () => {
-    Alpine.data('notificationBell', (initialUnread = 0) => ({
-        open: false,
-        unread: initialUnread,
+    Alpine.store('notif', {
+        unread: window.notifInit?.unread ?? 0,
+        unassigned: window.notifInit?.unassigned ?? 0,
         toast: false,
         toastTimer: null,
         init() {
             this.refresh();
-            this.timer = setInterval(() => this.refresh(), 30000);
+            this.timer = setInterval(() => this.refresh(), 5000);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) this.refresh();
+            });
+            window.addEventListener('focus', () => this.refresh());
         },
         async refresh() {
             try {
-                const res = await fetch('/notifications/unread-count');
+                const res = await fetch('/notifications/status');
                 const data = await res.json();
-                if (data.count > this.unread) this.showToast();
-                this.unread = data.count;
+                if (data.unread > this.unread) this.showToast();
+                this.unread = data.unread;
+                this.unassigned = data.unassigned;
             } catch (e) {}
         },
         showToast() {
             this.toast = true;
             clearTimeout(this.toastTimer);
-            this.toastTimer = setTimeout(() => (this.toast = false), 10000);
+            this.toastTimer = setTimeout(() => (this.toast = false), 8000);
         },
-    }));
+    });
+    Alpine.store('notif').init();
 
     Alpine.data('counter', (target, duration = 900) => ({
         display: 0,

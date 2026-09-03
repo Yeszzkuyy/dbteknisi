@@ -15,12 +15,24 @@
 
     <script>if(localStorage.getItem('dark-mode')==='true'||(!('dark-mode' in localStorage)&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}</script>
 
+    @php
+        $notifInit = ['unread' => 0, 'unassigned' => 0];
+        if (auth()->check() && auth()->user()->can('manage-sales-leads')) {
+            $notifInit = [
+                'unread' => auth()->user()->unreadNotifications()->count(),
+                'unassigned' => \App\Models\Lead::whereNull('assigned_to')->count(),
+            ];
+        }
+    @endphp
+    <script>window.notifInit = @json($notifInit);</script>
+
     @livewireStyles
 
     @vite(['resources/css/app.css','resources/js/app.js'])
 
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
+        [x-cloak]{display:none!important}
         :root{--sidebar-bg:#fff;--sidebar-border:#e2e8f0;--card-bg:#fff;--card-border:#e2e8f0;--card-bg-hover:#f8fafc;--text-primary:#1e293b;--text-secondary:#64748b;--text-muted:#94a3b8;--input-bg:#f1f5f9;--input-border:#cbd5e1;--input-text:#1e293b}
         .dark{--sidebar-bg:#1e293b;--sidebar-border:#334155;--card-bg:#1e293b;--card-border:#334155;--card-bg-hover:#2d3a4e;--text-primary:#f1f5f9;--text-secondary:#cbd5e1;--text-muted:#64748b;--input-bg:#243244;--input-border:#475569;--input-text:#f1f5f9}
         .sidebar{position:fixed;top:0;left:0;height:100vh;width:280px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out;overflow-y:auto}

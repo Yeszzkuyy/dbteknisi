@@ -19,8 +19,8 @@
 
     {{-- Menu --}}
     <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
-        <!-- Dashboard (Manager & Super Admin saja) -->
-        @role('manager|super-admin')
+        <!-- Dashboard (Manager, Super Admin, Management) -->
+        @role('manager|super-admin|management')
             <a href="{{ route('dashboard') }}"
                class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                 <x-icon name="grid" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
@@ -30,24 +30,28 @@
 
         {{-- Management (Management Hub) --}}
         @can('manage-sales-leads')
-            @php $unassignedLeads = \App\Models\Lead::whereNull('assigned_to')->count(); @endphp
             <div x-data="{ open: {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                         class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
                     <x-icon name="briefcase" class="w-5 h-5" />
                     <span>Management</span>
-                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
+                    <span class="ml-auto flex items-center gap-1.5">
+                        <template x-if="$store.notif.unassigned > 0">
+                            <span class="h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
+                        </template>
+                        <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </span>
                 </button>
                 <div x-show="open" class="mt-1 ml-4 space-y-1">
                     <a href="{{ route('manage-sales.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage-sales*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
                         Manage Sales
-                        @if ($unassignedLeads > 0)
-                            <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="{{ $unassignedLeads }} lead belum di-assign"></span>
-                        @endif
+                        <template x-if="$store.notif.unassigned > 0">
+                            <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
+                        </template>
                     </a>
                     <a href="{{ route('manage.marketing.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.marketing*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">

@@ -92,7 +92,7 @@ class LeadNotificationTest extends TestCase
         $this->assertSame(0, $management->fresh()->unreadNotifications()->count());
     }
 
-    public function test_unread_count_endpoint_returns_json(): void
+    public function test_status_endpoint_returns_unread_and_unassigned(): void
     {
         $management = $this->loginAs('management');
         $lead = Lead::create([
@@ -105,8 +105,25 @@ class LeadNotificationTest extends TestCase
         $management->notify(new NewLeadNotification($lead));
 
         $this->actingAs($management)
-            ->get(route('notifications.unread-count'))
+            ->get(route('notifications.status'))
             ->assertOk()
-            ->assertJson(['count' => 1]);
+            ->assertJson(['unread' => 1, 'unassigned' => 1]);
+    }
+
+    public function test_management_can_open_lead_page_from_notification_link(): void
+    {
+        $management = $this->loginAs('management');
+        $lead = Lead::create([
+            'customer_id' => Customer::create(['name' => 'PT Link Notif'])->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'status' => 'new',
+            'incoming_date' => now()->toDateString(),
+        ]);
+
+        $this->actingAs($management)
+            ->get(route('manage-sales.edit', $lead))
+            ->assertOk()
+            ->assertSee('Manage Sales');
     }
 }
