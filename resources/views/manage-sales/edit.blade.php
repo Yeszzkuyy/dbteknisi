@@ -42,8 +42,8 @@
                     <label for="kebutuhan" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                         Kebutuhan
                     </label>
-                    <textarea id="kebutuhan" rows="2" readonly
-                              class="w-full rounded-xl border-slate-300 bg-slate-50">{{ $lead->kebutuhan }}</textarea>
+                    <textarea name="kebutuhan" id="kebutuhan" rows="2"
+                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
                 </div>
                 <div>
                     <label for="solusi" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">

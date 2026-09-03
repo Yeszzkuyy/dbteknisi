@@ -37,6 +37,7 @@ class ManageSalesController extends Controller
     public function update(Request $request, Lead $lead)
     {
         $validated = $request->validate([
+            'kebutuhan' => 'nullable|string|max:2000',
             'solusi' => 'nullable|string|max:2000',
             'progress_notes' => 'nullable|string|max:2000',
             'notes' => 'nullable',
