@@ -237,6 +237,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/{lead}/assign', [ManageSalesController::class, 'assign'])->name('assign');
     });
 
+    // ============================================
+    // MANAGEMENT — sub-modul baru (under development)
+    // ============================================
+    Route::middleware('permission:manage-sales-leads')->prefix('manage')->name('manage.')->group(function () {
+        Route::view('marketing', 'manage.placeholder', ['title' => 'Manage Marketing'])->name('marketing.index');
+        Route::view('technical', 'manage.placeholder', ['title' => 'Manage Technical'])->name('technical.index');
+        Route::view('admin', 'manage.placeholder', ['title' => 'Manage Admin'])->name('admin.index');
+    });
+
     // Lead milik sales (muncul di menu Sales)
     Route::middleware('permission:view-sales|manage-sales')->get('/sales/my-leads', [ManageSalesController::class, 'myLeads'])->name('sales.my-leads');
 
