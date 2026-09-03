@@ -58,9 +58,17 @@
                             </td>
                             <td class="px-6 py-4 text-center">
                                 @if($lead->assigned_to)
-                                    <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
-                                        ASSIGNED
-                                    </span>
+                                    <div class="flex flex-col items-center gap-1">
+                                        <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
+                                            ASSIGNED
+                                        </span>
+                                        @if($lead->assignee)
+                                            <div class="text-xs text-slate-500">
+                                                → {{ $lead->assignee->name }}
+                                                @if($lead->assigned_at) • {{ $lead->assigned_at->format('d M Y H:i') }} @endif
+                                            </div>
+                                        @endif
+                                    </div>
                                 @else
                                     <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
                                         NEW
@@ -97,12 +105,6 @@
                                         </svg>
                                     </button>
                                 </form>
-                                @if($lead->assignee)
-                                    <div class="mt-1 text-xs text-slate-500">
-                                        → {{ $lead->assignee->name }}
-                                        @if($lead->assigned_at) • {{ $lead->assigned_at->format('d M Y H:i') }} @endif
-                                    </div>
-                                @endif
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <a href="{{ route('manage-sales.edit', $lead) }}" title="Kelola lead (solusi, progress, catatan)"
