@@ -139,6 +139,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/trash/customers/{id}/restore', [TrashController::class, 'restoreCustomer'])->name('trash.restore-customer');
         Route::patch('/trash/projects/{id}/restore', [TrashController::class, 'restoreProject'])->name('trash.restore-project');
         Route::delete('/trash/customers/{id}/delete', [TrashController::class, 'destroyCustomer'])->name('trash.destroy-customer');
+        Route::delete('/trash/projects/{id}/delete', [TrashController::class, 'destroyProject'])->name('trash.destroy-project');
         Route::delete('/trash/clear', [TrashController::class, 'clear'])->name('trash.clear');
     });
 

@@ -5,16 +5,16 @@
 
 ## 1. Snapshot Kondisi Repo (per 26 Agu 2026)
 
-- Branch utama `/var/www/dbteknisi` ada di `main`, commit `ad15ea4`, **working tree bersih**.
+- Branch utama `/var/www/3dyapp` ada di `main`, commit `ad15ea4`, **working tree bersih**.
 - Semua worktree divisi sinkron dengan `main` (tidak ada kerjaan belum merge):
 
 | Folder | Branch | Status |
 |---|---|---|
-| `/var/www/dbteknisi` | `main` | Bersih, melayani website |
-| `/var/www/dbteknisi-mkt` | `feature/div-marketing` | Sinkron dgn main |
-| `/var/www/dbteknisi-tek` | `feature/div-teknisi` | Sinkron dgn main |
-| `/var/www/dbteknisi-user` | `feature/user-management-avatar` | Sinkron dgn main |
-| `/var/www/dbteknisi-mon` | `feature/div-mon` | Sinkron dgn main |
+| `/var/www/3dyapp` | `main` | Bersih, melayani website |
+| `/var/www/3dyapp-mkt` | `feature/div-marketing` | Sinkron dgn main |
+| `/var/www/3dyapp-tek` | `feature/div-teknisi` | Sinkron dgn main |
+| `/var/www/3dyapp-user` | `feature/user-management-avatar` | Sinkron dgn main |
+| `/var/www/3dyapp-mon` | `feature/div-mon` | Sinkron dgn main |
 
 - Laravel Framework 13.14.0. Sebelum mulai apa pun: baca `AGENTS.md` (aturan multi-sesi, warna tombol, larangan).
 
@@ -45,9 +45,9 @@
 ### a. Worktree divisi baru (sesuai rencana di AGENTS.md)
 Belum dibuat. Buat saat mulai dikerjakan:
 ```bash
-git worktree add /var/www/dbteknisi-cus feature/div-cus        # Customer
-git worktree add /var/www/dbteknisi-panel feature/div-panel    # Admin Panel
-ln -sf /var/www/dbteknisi/.env /var/www/dbteknisi-cus/.env     # (+ panel, + build symlink public/build)
+git worktree add /var/www/3dyapp-cus feature/div-cus        # Customer
+git worktree add /var/www/3dyapp-panel feature/div-panel    # Admin Panel
+ln -sf /var/www/3dyapp/.env /var/www/3dyapp-cus/.env     # (+ panel, + build symlink public/build)
 ```
 Catatan: **`feature/div-trash` kemungkinan sudah tidak perlu** — modul Trash sudah jadi di main (routes/admin.php:7-18). Konfirmasi dulu sebelum buat worktree.
 

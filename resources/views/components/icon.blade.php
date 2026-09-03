@@ -22,6 +22,8 @@ $icons = [
 
     'trash' => '<path d="M5 7h14" /><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" /><path d="M6.5 7l.8 12a2 2 0 002 1.9h5.4a2 2 0 002-1.9l.8-12" /><path d="M10 11v6" /><path d="M14 11v6" />',
 
+    'restore' => '<path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" />',
+
     'chevron-right' => '<path d="M9 5l7 7-7 7" />',
 
     'logout' => '<path d="M15 4H8a2 2 0 00-2 2v12a2 2 0 002 2h7" /><path d="M19 12H9" /><path d="M15 8l4 4-4 4" />',
