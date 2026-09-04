@@ -34,8 +34,8 @@ class AdminService
 
         if (!empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
-                $q->where('invoice_number', 'like', '%' . $filters['search'] . '%')
-                  ->orWhereHas('customer', fn($c) => $c->where('name', 'like', '%' . $filters['search'] . '%'));
+                $q->whereLike('invoice_number', $filters['search'])
+                  ->orWhereHas('customer', fn($c) => $c->whereLike('name', $filters['search']));
             });
         }
         if (!empty($filters['status'])) {
@@ -71,8 +71,8 @@ class AdminService
 
         if (!empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
-                $q->where('po_number', 'like', '%' . $filters['search'] . '%')
-                  ->orWhereHas('customer', fn($c) => $c->where('name', 'like', '%' . $filters['search'] . '%'));
+                $q->whereLike('po_number', $filters['search'])
+                  ->orWhereHas('customer', fn($c) => $c->whereLike('name', $filters['search']));
             });
         }
         if (!empty($filters['status'])) {
@@ -108,8 +108,8 @@ class AdminService
 
         if (!empty($filters['search'])) {
             $query->whereHas('invoice', function ($q) use ($filters) {
-                $q->where('invoice_number', 'like', '%' . $filters['search'] . '%')
-                  ->orWhereHas('customer', fn($c) => $c->where('name', 'like', '%' . $filters['search'] . '%'));
+                $q->whereLike('invoice_number', $filters['search'])
+                  ->orWhereHas('customer', fn($c) => $c->whereLike('name', $filters['search']));
             });
         }
 

@@ -61,7 +61,7 @@ function initCalendar() {
                 const params = new URLSearchParams({
                     start: info.startStr,
                     end: info.endStr,
-                    search: document.getElementById('filter-search')?.value || '',
+                    search: (document.getElementById('filter-search')?.value || '').trim(),
                 });
                 fetch(`${eventsUrl}?${params.toString()}`)
                     .then((r) => r.json())
