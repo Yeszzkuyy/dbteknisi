@@ -13,25 +13,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->hasAnyRole('manager', 'super-admin', 'management')) {
-            $user = auth()->user();
-
-            if ($user->can('manage-sales-leads')) {
-                return redirect()->route('manage-sales.index');
-            }
-
-            if ($user->can('view-marketing') || $user->can('manage-marketing')) {
-                return redirect()->route('marketing.dashboard');
-            }
-
-            if ($user->can('view-teknisi') || $user->can('manage-teknisi')) {
-                return redirect()->route('teknisi.dashboard');
-            }
-
-            // ponytail: sales & admin belum punya dashboard divisi; tambah redirect di sini saat dashboard mereka dibuat
-            abort(403, 'Anda tidak memiliki akses ke dashboard umum.');
-        }
-
         // Total Customer
         $customerCount = Customer::count();
 

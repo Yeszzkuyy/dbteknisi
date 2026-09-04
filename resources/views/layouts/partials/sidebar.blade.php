@@ -19,14 +19,12 @@
 
     {{-- Menu --}}
     <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
-        <!-- Dashboard (Manager, Super Admin, Management) -->
-        @role('manager|super-admin|management')
-            <a href="{{ route('dashboard') }}"
-               class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                <x-icon name="grid" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-                <span>Dashboard</span>
-            </a>
-        @endrole
+        {{-- Dashboard (semua user) --}}
+        <a href="{{ route('dashboard') }}"
+           class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+            <x-icon name="grid" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
+            <span>Dashboard</span>
+        </a>
 
         <!-- Customer -->
         <a href="{{ route('customers.index') }}"

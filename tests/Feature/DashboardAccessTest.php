@@ -20,25 +20,25 @@ class DashboardAccessTest extends TestCase
         return $user;
     }
 
-    public function test_marketing_is_redirected_to_marketing_dashboard(): void
+    public function test_marketing_can_access_general_dashboard(): void
     {
         $this->actingAs($this->userWithRole('marketing'))
             ->get(route('dashboard'))
-            ->assertRedirect(route('marketing.dashboard'));
+            ->assertOk();
     }
 
-    public function test_teknisi_is_redirected_to_teknisi_dashboard(): void
+    public function test_teknisi_can_access_general_dashboard(): void
     {
         $this->actingAs($this->userWithRole('teknisi'))
             ->get(route('dashboard'))
-            ->assertRedirect(route('teknisi.dashboard'));
+            ->assertOk();
     }
 
-    public function test_sales_cannot_access_general_dashboard(): void
+    public function test_sales_can_access_general_dashboard(): void
     {
         $this->actingAs($this->userWithRole('sales'))
             ->get(route('dashboard'))
-            ->assertForbidden();
+            ->assertOk();
     }
 
     public function test_manager_can_access_general_dashboard(): void
