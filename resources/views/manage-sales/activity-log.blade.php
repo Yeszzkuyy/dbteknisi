@@ -153,13 +153,8 @@
                             @php
                                 $meta = $actionMeta[$activity->action] ?? $actionMeta['default'];
                                 [$customerBadgeBg, $customerBadgeText] = ($logColor)($activity->lead?->customer_id);
-                                $firstField = $activity->changes ? array_key_first($activity->changes) : null;
-                                $firstChange = $firstField !== null ? $activity->changes[$firstField] : null;
-                                $firstOld = $firstChange && $firstChange['old'] !== null && $firstChange['old'] !== ''
-                                    ? ($formatLogValue)($firstField, $firstChange['old']) : null;
-                                $firstNew = $firstChange ? ($formatLogValue)($firstField, $firstChange['new']) : null;
                             @endphp
-                            <div x-data="{ open: false }" class="relative">
+                            <div class="relative">
                                 {{-- Ikon indikator aksi di garis timeline --}}
                                 <div class="absolute left-4 top-5 -translate-x-1/2 flex w-8 h-8 items-center justify-center rounded-full {{ $meta['color'] }} ring-4 ring-white dark:ring-slate-900 shadow-sm">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -194,52 +189,28 @@
                                                 @endif
                                             </div>
                                             <p class="text-xs text-slate-400 mt-1">{{ $activity->created_at->format('H:i') }} WIB</p>
-                                            @if($firstChange)
-                                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">
-                                                    <span class="font-medium">{{ \App\Models\LeadActivity::FIELD_LABELS[$firstField] ?? $firstField }}:</span>
-                                                    @if($firstOld)
-                                                        <span class="line-through text-red-400 mr-1">{{ $firstOld }}</span>
-                                                    @endif
-                                                    <span class="text-green-600 dark:text-green-400">{{ $firstNew }}</span>
-                                                </p>
+                                            @if($activity->changes)
+                                                <div class="mt-1.5 space-y-1">
+                                                    @foreach($activity->changes as $field => $change)
+                                                        @php
+                                                            $hasOld = $change['old'] !== null && $change['old'] !== '';
+                                                            $old = ($formatLogValue)($field, $change['old']);
+                                                            $new = ($formatLogValue)($field, $change['new']);
+                                                        @endphp
+                                                        <div class="flex flex-wrap items-start gap-x-2 gap-y-1 text-xs">
+                                                            <span class="font-semibold text-slate-600 dark:text-slate-300 min-w-[110px]">
+                                                                {{ \App\Models\LeadActivity::FIELD_LABELS[$field] ?? $field }}
+                                                            </span>
+                                                            @if($hasOld)
+                                                                <span class="text-red-500 line-through">{{ $old }}</span>
+                                                            @endif
+                                                            <span class="text-green-600 dark:text-green-400">→ {{ $new }}</span>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             @endif
                                         </div>
-
-                                        {{-- KANAN: tombol accordion --}}
-                                        @if($activity->changes)
-                                            <button type="button" x-on:click="open = !open"
-                                                    class="shrink-0 p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
-                                                    title="Detail perubahan" aria-label="Detail perubahan">
-                                                <svg class="w-5 h-5 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                                </svg>
-                                            </button>
-                                        @endif
                                     </div>
-
-                                    {{-- Detail perubahan lengkap (accordion) --}}
-                                    @if($activity->changes)
-                                        <div x-show="open" x-transition.opacity.duration.200ms x-cloak class="border-t border-slate-100 dark:border-slate-600 mt-3 pt-3">
-                                            <div class="space-y-1.5">
-                                                @foreach($activity->changes as $field => $change)
-                                                    @php
-                                                        $hasOld = $change['old'] !== null && $change['old'] !== '';
-                                                        $old = ($formatLogValue)($field, $change['old']);
-                                                        $new = ($formatLogValue)($field, $change['new']);
-                                                    @endphp
-                                                    <div class="flex flex-wrap items-start gap-x-2 gap-y-1 text-xs">
-                                                        <span class="font-semibold text-slate-600 dark:text-slate-300 min-w-[110px]">
-                                                            {{ \App\Models\LeadActivity::FIELD_LABELS[$field] ?? $field }}
-                                                        </span>
-                                                        @if($hasOld)
-                                                            <span class="text-red-500 line-through">{{ $old }}</span>
-                                                        @endif
-                                                        <span class="text-green-600 dark:text-green-400">→ {{ $new }}</span>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endif
                                 </div>
                             </div>
                         @endforeach
