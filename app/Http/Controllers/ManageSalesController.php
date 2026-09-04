@@ -117,7 +117,7 @@ class ManageSalesController extends Controller
 
     public function activityLog(Request $request)
     {
-        $managementIds = User::role('management')->pluck('id');
+        $managementIds = User::permission('manage-sales-leads')->pluck('id');
 
         $activities = LeadActivity::with(['lead.customer', 'user'])
             ->whereIn('user_id', $managementIds)
@@ -133,7 +133,7 @@ class ManageSalesController extends Controller
         return view('manage-sales.activity-log', compact('activities', 'filterUser'))
             ->with('customerNames', Customer::pluck('name', 'id'))
             ->with('userNames', User::pluck('name', 'id'))
-            ->with('managementUsers', User::role('management')->orderBy('name')->get(['id', 'name']));
+            ->with('managementUsers', User::permission('manage-sales-leads')->orderBy('name')->get(['id', 'name']));
     }
 
     private function trackAssignment(Lead $lead, ?int $assignedTo): void

@@ -28,6 +28,13 @@
             </a>
         @endrole
 
+        <!-- Customer -->
+        <a href="{{ route('customers.index') }}"
+           class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('customers*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
+            <x-icon name="users" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
+            <span>Customer</span>
+        </a>
+
         {{-- Management (Management Hub) --}}
         @can('manage-sales-leads')
             <div x-data="{ open: {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'true' : 'false' }} }">
@@ -53,11 +60,6 @@
                             <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
                         </template>
                     </a>
-                    <a href="{{ route('manage-sales.activity-log') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage-sales.activity-log') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                        Activity Log
-                    </a>
                     <a href="{{ route('manage.marketing.index') }}"
                        class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.marketing*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
@@ -73,16 +75,14 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
                         Manage Admin
                     </a>
+                    <a href="{{ route('manage-sales.activity-log') }}"
+                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage-sales.activity-log') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                        Activity Log
+                    </a>
                 </div>
             </div>
         @endcan
-
-        <!-- Customer -->
-        <a href="{{ route('customers.index') }}"
-           class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('customers*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-            <x-icon name="users" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-            <span>Customer</span>
-        </a>
 
         {{-- Teknisi --}}
         @can('view-teknisi')
