@@ -16,7 +16,7 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-6">
         <div class="p-4 mb-4 rounded-xl bg-slate-50 border border-slate-200">
             <form method="GET" action="{{ route('manage-sales.activity-log') }}" class="flex flex-wrap gap-4">
                 <div>
@@ -141,7 +141,7 @@
 
                     {{-- Header kelompok tanggal --}}
                     <div class="relative mb-5">
-                        <span class="absolute left-4 top-1/2 -translate-x-1/2 flex w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-500 ring-4 ring-white dark:ring-slate-900"></span>
+                        <span class="absolute left-4 top-1/2 -translate-x-1/2 flex w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-500 ring-2 ring-white dark:ring-slate-900"></span>
                         <div class="ml-12 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                             {{ $dateLabel($date) }}
                             <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 text-[10px] font-semibold">{{ count($items) }} aktivitas</span>
@@ -156,13 +156,13 @@
                             @endphp
                             <div class="relative">
                                 {{-- Ikon indikator aksi di garis timeline --}}
-                                <div class="absolute left-4 top-5 -translate-x-1/2 flex w-8 h-8 items-center justify-center rounded-full {{ $meta['color'] }} ring-4 ring-white dark:ring-slate-900 shadow-sm">
+                                <div class="absolute left-4 top-5 -translate-x-1/2 flex w-8 h-8 items-center justify-center rounded-full {{ $meta['color'] }} ring-2 ring-white dark:ring-slate-900">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         {!! $meta['icon'] !!}
                                     </svg>
                                 </div>
 
-                                <div class="ml-12 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-600 shadow-sm p-4">
+                                <div class="ml-12 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
                                     <div class="flex items-start gap-4">
                                         {{-- KIRI: avatar + nama + role --}}
                                         <div class="w-16 shrink-0 flex flex-col items-center gap-1 text-center">
