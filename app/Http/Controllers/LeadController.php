@@ -42,7 +42,7 @@ class LeadController extends Controller
 
         $query = Lead::with(['customer', 'assignee', 'partner'])
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
-                fn ($c) => $c->where('name', 'like', '%'.$request->search.'%')))
+                fn ($c) => $c->whereLike('name', $request->search)))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->when($request->filled('source'), fn ($q) => $q->where('source', $request->source))
             ->when($request->filled('date_from'), fn ($q) => $q->whereDate('incoming_date', '>=', $request->date_from))

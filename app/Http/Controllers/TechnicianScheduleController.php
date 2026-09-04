@@ -133,10 +133,10 @@ class TechnicianScheduleController extends Controller
                 $q->where('start_at', '<', $end)->where('end_at', '>', $start);
             })
             ->when($search, fn ($q, $s) => $q->where(function ($q) use ($s) {
-                $q->where('title', 'like', "%{$s}%")
-                    ->orWhere('location', 'like', "%{$s}%")
-                    ->orWhereHas('project', fn ($q) => $q->where('project_name', 'like', "%{$s}%"))
-                    ->orWhereHas('technician', fn ($q) => $q->where('name', 'like', "%{$s}%"));
+                $q->whereLike('title', $s)
+                    ->orWhereLike('location', $s)
+                    ->orWhereHas('project', fn ($q) => $q->whereLike('project_name', $s))
+                    ->orWhereHas('technician', fn ($q) => $q->whereLike('name', $s));
             }))
             ->orderBy('start_at')
             ->get();

@@ -16,7 +16,7 @@ class ManageSalesController extends Controller
     {
         $query = Lead::with(['customer', 'assignee', 'partner'])
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
-                fn ($c) => $c->where('name', 'like', '%'.$request->search.'%')))
+                fn ($c) => $c->whereLike('name', $request->search)))
             ->when($request->filled('assignment'), fn ($q) => $request->assignment === 'assigned'
                 ? $q->whereNotNull('assigned_to')
                 : $q->whereNull('assigned_to'));

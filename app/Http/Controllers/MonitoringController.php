@@ -129,8 +129,7 @@ class MonitoringController extends Controller
 
         // Search customer
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('company', 'like', '%' . $request->search . '%');
+            $query->whereLike(['name', 'company'], $request->search);
         }
 
         // Filter by divisi (latest update source)

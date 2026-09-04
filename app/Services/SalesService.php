@@ -15,7 +15,7 @@ class SalesService
 
         if (!empty($filters['search'])) {
             $query->whereHas('customer', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['search'] . '%');
+                $q->whereLike('name', $filters['search']);
             });
         }
 
@@ -59,7 +59,7 @@ class SalesService
 
         if (!empty($filters['search'])) {
             $query->whereHas('customer', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['search'] . '%');
+                $q->whereLike('name', $filters['search']);
             });
         }
 

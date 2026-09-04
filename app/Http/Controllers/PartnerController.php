@@ -12,11 +12,7 @@ class PartnerController extends Controller
         $query = Partner::withCount('leads');
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('contact_person', 'like', '%' . $request->search . '%')
-                    ->orWhere('phone', 'like', '%' . $request->search . '%');
-            });
+            $query->whereLike(['name', 'contact_person', 'phone'], $request->search);
         }
 
         if ($request->filled('type')) {

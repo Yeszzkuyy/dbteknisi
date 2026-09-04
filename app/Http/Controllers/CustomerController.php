@@ -19,12 +19,7 @@ class CustomerController extends Controller
                 $query->where('is_primary', true);
             }])
             ->when($request->filled('search'), function ($query) use ($request) {
-                $term = '%'.strtolower($request->string('search')).'%';
-                $query->where(function ($q) use ($term) {
-                    $q->whereRaw('LOWER(name) LIKE ?', [$term])
-                      ->orWhereRaw('LOWER(company) LIKE ?', [$term])
-                      ->orWhereRaw('LOWER(email) LIKE ?', [$term]);
-                });
+                $query->whereLike(['name', 'company', 'email'], $request->string('search'));
             })
             ->latest()
             ->get();
