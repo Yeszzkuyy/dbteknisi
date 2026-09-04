@@ -1,300 +1,433 @@
 @php
-    $currentRoute = request()->route()->getName();
+    $navLink = 'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-800';
+    $subNavLink = 'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-800';
+    $navActive = 'bg-blue-500/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300';
+    $navInactive = 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white';
+
+    $dashboardActive = request()->routeIs('dashboard*');
+    $customerActive = request()->routeIs('customers*');
+    $managementActive = request()->routeIs('manage-sales*') || request()->routeIs('manage.*');
+    $technicianActive = request()->routeIs('projects*') || request()->routeIs('teknisi.*');
+    $marketingActive = request()->routeIs(['leads*', 'partners*', 'marketing.dashboard']);
+    $salesActive = request()->routeIs('sales.*') || request()->routeIs('projects*');
+    $adminActive = request()->routeIs('admin.invoices.*') || request()->routeIs('admin.pos.*') || request()->routeIs('admin.payments.*');
+    $adminPanelActive = request()->routeIs('admin-panel*');
+
+    $roleName = auth()->user()->roles->first()?->name ?? 'User';
 @endphp
 
-<aside class="w-full h-full bg-[var(--sidebar-bg)] flex flex-col">
+<aside class="flex h-full w-full flex-col bg-[var(--sidebar-bg)]">
     {{-- Logo --}}
-    <div class="p-4 border-b border-[var(--sidebar-border)] flex-shrink-0">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+    <div class="flex-shrink-0 border-b border-[var(--sidebar-border)] p-4">
+        <a href="{{ route('dashboard') }}" class="group flex items-center gap-3">
             <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
-                 class="h-10 w-auto object-contain bg-white rounded-lg p-0.5 dark:bg-transparent dark:hidden">
+                 class="h-10 w-auto rounded-lg bg-white object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03] dark:hidden">
             <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
-                 class="h-10 w-auto object-contain bg-white rounded-lg p-0.5 hidden dark:block dark:bg-transparent">
+                 class="hidden h-10 w-auto rounded-lg bg-white object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03] dark:block dark:bg-transparent">
             <div class="min-w-0">
-                <h1 class="text-xl font-bold text-blue-600 truncate">3DY App</h1>
-                <p class="text-xs text-slate-400 mt-0.5">3DY Group</p>
+                <h1 class="truncate text-xl font-bold text-blue-600">3DY App</h1>
+                <p class="mt-0.5 text-xs text-slate-400">3DY Group</p>
             </div>
         </a>
     </div>
 
     {{-- Menu --}}
-    <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
-        {{-- Dashboard (semua user) --}}
-        <a href="{{ route('dashboard') }}"
-           class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-            <x-icon name="grid" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-            <span>Dashboard</span>
-        </a>
-
-        <!-- Customer -->
-        <a href="{{ route('customers.index') }}"
-           class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('customers*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-            <x-icon name="users" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-            <span>Customer</span>
-        </a>
-
-        {{-- Management (Management Hub) --}}
-        @can('manage-sales-leads')
-            <div x-data="{ open: {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('manage-sales*') || request()->routeIs('manage.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <x-icon name="briefcase" class="w-5 h-5" />
-                    <span>Management</span>
-                    <span class="ml-auto flex items-center gap-1.5">
-                        <template x-if="$store.notif.unassigned > 0">
-                            <span class="h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
-                        </template>
-                        <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </span>
-                </button>
-                <div x-show="open" class="mt-1 ml-4 space-y-1">
-                    <a href="{{ route('manage-sales.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage-sales*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                        Manage Sales
-                        <template x-if="$store.notif.unassigned > 0">
-                            <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
-                        </template>
+    <nav id="sidebar-navigation" aria-label="Navigasi utama" class="flex-1 overflow-y-auto px-3 py-4">
+        <div class="space-y-6">
+            <section aria-labelledby="sidebar-main-label">
+                <p id="sidebar-main-label" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Main</p>
+                <div class="space-y-1">
+                    <a href="{{ route('dashboard') }}"
+                       aria-current="{{ $dashboardActive ? 'page' : 'false' }}"
+                       class="{{ $navLink }} {{ $dashboardActive ? $navActive : $navInactive }}">
+                        <x-icon name="grid" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                        <span>Dashboard</span>
                     </a>
-                    <a href="{{ route('manage.marketing.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.marketing*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                        Manage Marketing
-                    </a>
-                    <a href="{{ route('manage.technical.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.technical*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                        Manage Technical
-                    </a>
-                    <a href="{{ route('manage.admin.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage.admin*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
-                        Manage Admin
-                    </a>
-                    <a href="{{ route('manage-sales.activity-log') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('manage-sales.activity-log') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                        Activity Log
+                    <a href="{{ route('customers.index') }}"
+                       aria-current="{{ $customerActive ? 'page' : 'false' }}"
+                       class="{{ $navLink }} {{ $customerActive ? $navActive : $navInactive }}">
+                        <x-icon name="users" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                        <span>Customer</span>
                     </a>
                 </div>
-            </div>
-        @endcan
+            </section>
 
-        {{-- Teknisi --}}
-        @can('view-teknisi')
-            <div x-data="{ open: {{ request()->routeIs('projects*') || request()->routeIs('teknisi.*') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('projects*') || request()->routeIs('teknisi.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <x-icon name="tools" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-                    <span>Teknisi</span>
-                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" class="mt-1 ml-4 space-y-1">
-                    <a href="{{ route('teknisi.dashboard') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('teknisi.dashboard*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-                        Dashboard Teknisi
-                    </a>
-                    <a href="{{ route('projects.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                        Project
-                    </a>
-                    <a href="{{ route('teknisi.jadwal') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('teknisi.jadwal*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
-                        Jadwal
-                    </a>
-                </div>
-            </div>
-        @endcan
+            @canany(['manage-sales-leads', 'view-teknisi', 'view-marketing', 'view-sales', 'view-admin'])
+                <section aria-labelledby="sidebar-departments-label">
+                    <p id="sidebar-departments-label" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Departments</p>
+                    <div class="space-y-1">
+                        {{-- Management (Management Hub) --}}
+                        @can('manage-sales-leads')
+                            <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }">
+                                <button type="button" @click="open = !open"
+                                        :aria-expanded="open"
+                                        aria-controls="sidebar-management-menu"
+                                        data-sidebar-active="{{ $managementActive ? 'true' : 'false' }}"
+                                        class="{{ $navLink }} w-full {{ $managementActive ? $navActive : $navInactive }}">
+                                    <x-icon name="briefcase" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                    <span>Management</span>
+                                    <span class="ml-auto flex items-center gap-1.5">
+                                        <template x-if="$store.notif.unassigned > 0">
+                                            <span class="h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
+                                        </template>
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </span>
+                                </button>
+                                <div id="sidebar-management-menu" x-cloak x-show="open"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="-translate-y-1 opacity-0"
+                                     x-transition:enter-end="translate-y-0 opacity-100"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="translate-y-0 opacity-100"
+                                     x-transition:leave-end="-translate-y-1 opacity-0"
+                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                    <a href="{{ route('manage-sales.index') }}"
+                                       aria-current="{{ request()->routeIs('manage-sales*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('manage-sales*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
+                                        <span>Manage Sales</span>
+                                        <template x-if="$store.notif.unassigned > 0">
+                                            <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
+                                        </template>
+                                    </a>
+                                    <a href="{{ route('manage.marketing.index') }}"
+                                       aria-current="{{ request()->routeIs('manage.marketing*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('manage.marketing*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true"></span>
+                                        <span>Manage Marketing</span>
+                                    </a>
+                                    <a href="{{ route('manage.technical.index') }}"
+                                       aria-current="{{ request()->routeIs('manage.technical*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('manage.technical*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
+                                        <span>Manage Technical</span>
+                                    </a>
+                                    <a href="{{ route('manage.admin.index') }}"
+                                       aria-current="{{ request()->routeIs('manage.admin*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('manage.admin*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
+                                        <span>Manage Admin</span>
+                                    </a>
+                                    <a href="{{ route('manage-sales.activity-log') }}"
+                                       aria-current="{{ request()->routeIs('manage-sales.activity-log') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('manage-sales.activity-log') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" aria-hidden="true"></span>
+                                        <span>Activity Log</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @endcan
 
-        {{-- Marketing --}}
-        @can('view-marketing')
-            <div x-data="{ open: {{ request()->routeIs('leads*') || request()->routeIs('partners*') || request()->routeIs('marketing.dashboard') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs(['leads*', 'partners*', 'marketing.dashboard']) ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <x-icon name="chart-bar" class="w-5 h-5" />
-                    <span>Marketing</span>
-                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" class="mt-1 ml-4 space-y-1">
-                    <a href="{{ route('marketing.dashboard') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('marketing.dashboard') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        Dashboard
-                    </a>
-                    <a href="{{ route('leads.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                        Lead / Opportunity
-                    </a>
-                    <a href="{{ route('leads.pipeline') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('leads.pipeline') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                        Pipeline
-                    </a>
-                    <a href="{{ route('partners.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('partners*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
-                        Data Partner
-                    </a>
-                    <a href="{{ route('leads.activities') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('leads.activities') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
-                        Log Aktivitas
-                    </a>
-                    @can('monitor-marketing')
-                        <a href="{{ route('leads.monitoring') }}"
-                           class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('leads.monitoring') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                            <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
-                            Monitoring
-                        </a>
-                    @endcan
-                </div>
-            </div>
-        @endcan
+                        {{-- Teknisi --}}
+                        @can('view-teknisi')
+                            <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }">
+                                <button type="button" @click="open = !open"
+                                        :aria-expanded="open"
+                                        aria-controls="sidebar-technician-menu"
+                                        data-sidebar-active="{{ $technicianActive ? 'true' : 'false' }}"
+                                        class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive : $navInactive }}">
+                                    <x-icon name="tools" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                    <span>Teknisi</span>
+                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div id="sidebar-technician-menu" x-cloak x-show="open"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="-translate-y-1 opacity-0"
+                                     x-transition:enter-end="translate-y-0 opacity-100"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="translate-y-0 opacity-100"
+                                     x-transition:leave-end="-translate-y-1 opacity-0"
+                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                    <a href="{{ route('teknisi.dashboard') }}"
+                                       aria-current="{{ request()->routeIs('teknisi.dashboard*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.dashboard*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
+                                        <span>Dashboard Teknisi</span>
+                                    </a>
+                                    <a href="{{ route('projects.index') }}"
+                                       aria-current="{{ request()->routeIs('projects*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('projects*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
+                                        <span>Project</span>
+                                    </a>
+                                    <a href="{{ route('teknisi.jadwal') }}"
+                                       aria-current="{{ request()->routeIs('teknisi.jadwal*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.jadwal*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
+                                        <span>Jadwal</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @endcan
 
-        @can('view-sales')
-            <div x-data="{ open: {{ request()->routeIs('sales.*') || request()->routeIs('projects*') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('sales.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <x-icon name="calendar" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-                    <span>Sales</span>
-                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" class="mt-1 ml-4 space-y-1">
-                    <a href="{{ route('sales.my-leads') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('sales.my-leads') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                        My Leads
-                    </a>
-                    <a href="{{ route('sales.meetings.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('sales.meetings.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-                        Tracker Meeting
-                    </a>
-                    <a href="{{ route('sales.follow-ups.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('sales.follow-ups.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                        Follow Up
-                    </a>
-                    @if(auth()->user()->can('view-teknisi') || auth()->user()->can('view-sales'))
-                        <a href="{{ route('projects.index') }}"
-                           class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('projects*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                            Project
-                        </a>
-                    @endif
-                </div>
-            </div>
-        @endcan
+                        {{-- Marketing --}}
+                        @can('view-marketing')
+                            <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }">
+                                <button type="button" @click="open = !open"
+                                        :aria-expanded="open"
+                                        aria-controls="sidebar-marketing-menu"
+                                        data-sidebar-active="{{ $marketingActive ? 'true' : 'false' }}"
+                                        class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive : $navInactive }}">
+                                    <x-icon name="chart-bar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                    <span>Marketing</span>
+                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div id="sidebar-marketing-menu" x-cloak x-show="open"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="-translate-y-1 opacity-0"
+                                     x-transition:enter-end="translate-y-0 opacity-100"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="translate-y-0 opacity-100"
+                                     x-transition:leave-end="-translate-y-1 opacity-0"
+                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                    <a href="{{ route('marketing.dashboard') }}"
+                                       aria-current="{{ request()->routeIs('marketing.dashboard') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('marketing.dashboard') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
+                                        <span>Dashboard</span>
+                                    </a>
+                                    <a href="{{ route('leads.index') }}"
+                                       aria-current="{{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true"></span>
+                                        <span>Lead / Opportunity</span>
+                                    </a>
+                                    <a href="{{ route('leads.pipeline') }}"
+                                       aria-current="{{ request()->routeIs('leads.pipeline') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('leads.pipeline') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400" aria-hidden="true"></span>
+                                        <span>Pipeline</span>
+                                    </a>
+                                    <a href="{{ route('partners.index') }}"
+                                       aria-current="{{ request()->routeIs('partners*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('partners*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" aria-hidden="true"></span>
+                                        <span>Data Partner</span>
+                                    </a>
+                                    <a href="{{ route('leads.activities') }}"
+                                       aria-current="{{ request()->routeIs('leads.activities') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('leads.activities') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400" aria-hidden="true"></span>
+                                        <span>Log Aktivitas</span>
+                                    </a>
+                                    @can('monitor-marketing')
+                                        <a href="{{ route('leads.monitoring') }}"
+                                           aria-current="{{ request()->routeIs('leads.monitoring') ? 'page' : 'false' }}"
+                                           class="{{ $subNavLink }} {{ request()->routeIs('leads.monitoring') ? $navActive : $navInactive }}">
+                                            <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
+                                            <span>Monitoring</span>
+                                        </a>
+                                    @endcan
+                                </div>
+                            </div>
+                        @endcan
 
-        <!-- Admin: Invoice, PO, Payment -->
-        @can('view-admin')
-            <div x-data="{ open: {{ request()->routeIs('admin.invoices.*') || request()->routeIs('admin.pos.*') || request()->routeIs('admin.payments.*') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.invoices.*') || request()->routeIs('admin.pos.*') || request()->routeIs('admin.payments.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <x-icon name="folder" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-                    <span>Admin</span>
-                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" class="mt-1 ml-4 space-y-1">
-                    <a href="{{ route('admin.invoices.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin.invoices.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Invoice
-                    </a>
-                    <a href="{{ route('admin.pos.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin.pos.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                        Purchase Order
-                    </a>
-                    <a href="{{ route('admin.payments.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin.payments.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-                        Payment
-                    </a>
-                </div>
-            </div>
-        @endcan
+                        {{-- Sales --}}
+                        @can('view-sales')
+                            <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }">
+                                <button type="button" @click="open = !open"
+                                        :aria-expanded="open"
+                                        aria-controls="sidebar-sales-menu"
+                                        data-sidebar-active="{{ $salesActive ? 'true' : 'false' }}"
+                                        class="{{ $navLink }} group w-full {{ $salesActive ? $navActive : $navInactive }}">
+                                    <x-icon name="calendar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                    <span>Sales</span>
+                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div id="sidebar-sales-menu" x-cloak x-show="open"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="-translate-y-1 opacity-0"
+                                     x-transition:enter-end="translate-y-0 opacity-100"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="translate-y-0 opacity-100"
+                                     x-transition:leave-end="-translate-y-1 opacity-0"
+                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                    <a href="{{ route('sales.my-leads') }}"
+                                       aria-current="{{ request()->routeIs('sales.my-leads') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('sales.my-leads') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true"></span>
+                                        <span>My Leads</span>
+                                    </a>
+                                    <a href="{{ route('sales.meetings.index') }}"
+                                       aria-current="{{ request()->routeIs('sales.meetings.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('sales.meetings.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
+                                        <span>Tracker Meeting</span>
+                                    </a>
+                                    <a href="{{ route('sales.follow-ups.index') }}"
+                                       aria-current="{{ request()->routeIs('sales.follow-ups.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('sales.follow-ups.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
+                                        <span>Follow Up</span>
+                                    </a>
+                                    @if(auth()->user()->can('view-teknisi') || auth()->user()->can('view-sales'))
+                                        <a href="{{ route('projects.index') }}"
+                                           aria-current="{{ request()->routeIs('projects*') ? 'page' : 'false' }}"
+                                           class="{{ $subNavLink }} {{ request()->routeIs('projects*') ? $navActive : $navInactive }}">
+                                            <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
+                                            <span>Project</span>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @endcan
 
-        <!-- Trash -->
-        @can('view-trash')
-            <a href="{{ route('trash.index') }}"
-               class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('trash*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                <x-icon name="trash" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
-                <span>Trash</span>
-            </a>
-        @endcan
+                        {{-- Admin: Invoice, PO, Payment --}}
+                        @can('view-admin')
+                            <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }">
+                                <button type="button" @click="open = !open"
+                                        :aria-expanded="open"
+                                        aria-controls="sidebar-admin-menu"
+                                        data-sidebar-active="{{ $adminActive ? 'true' : 'false' }}"
+                                        class="{{ $navLink }} group w-full {{ $adminActive ? $navActive : $navInactive }}">
+                                    <x-icon name="folder" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                    <span>Admin</span>
+                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div id="sidebar-admin-menu" x-cloak x-show="open"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="-translate-y-1 opacity-0"
+                                     x-transition:enter-end="translate-y-0 opacity-100"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="translate-y-0 opacity-100"
+                                     x-transition:leave-end="-translate-y-1 opacity-0"
+                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                    <a href="{{ route('admin.invoices.index') }}"
+                                       aria-current="{{ request()->routeIs('admin.invoices.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin.invoices.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
+                                        <span>Invoice</span>
+                                    </a>
+                                    <a href="{{ route('admin.pos.index') }}"
+                                       aria-current="{{ request()->routeIs('admin.pos.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin.pos.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" aria-hidden="true"></span>
+                                        <span>Purchase Order</span>
+                                    </a>
+                                    <a href="{{ route('admin.payments.index') }}"
+                                       aria-current="{{ request()->routeIs('admin.payments.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin.payments.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
+                                        <span>Payment</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @endcan
+                    </div>
+                </section>
+            @endcanany
 
-        {{-- Admin Panel (Super Admin only) --}}
-        @can('manage-monitoring')
-            <div x-data="{ open: {{ request()->routeIs('admin-panel*') ? 'true' : 'false' }} }">
-                <button @click="open = !open"
-                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin-panel*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }}">
-                    <svg class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span>Admin Panel</span>
-                    <svg class="w-4 h-4 ml-auto transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" class="mt-1 ml-4 space-y-1">
-                    <a href="{{ route('admin-panel.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.index') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-                        User Management
-                    </a>
-                    <a href="{{ route('admin-panel.account-managers.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.account-managers.*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Account Manager
-                    </a>
-                    <a href="{{ route('admin-panel.work-types.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.work-types.*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Work Type
-                    </a>
-                    <a href="{{ route('admin-panel.document-categories.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.document-categories.*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Document Category
-                    </a>
-                    <a href="{{ route('admin-panel.project-statuses.index') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.project-statuses.*') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Project Status
-                    </a>
-                    <a href="{{ route('admin-panel.audit-log') }}"
-                       class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm {{ request()->routeIs('admin-panel.audit-log') ? 'bg-purple-50 text-purple-700' : 'text-slate-600 hover:bg-slate-50' }} transition">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                        Audit Log
-                    </a>
-                </div>
-            </div>
-        @endcan
+            @canany(['view-trash', 'manage-monitoring'])
+                <section aria-labelledby="sidebar-system-label">
+                    <p id="sidebar-system-label" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">System</p>
+                    <div class="space-y-1">
+                        {{-- Trash --}}
+                        @can('view-trash')
+                            <a href="{{ route('trash.index') }}"
+                               aria-current="{{ request()->routeIs('trash*') ? 'page' : 'false' }}"
+                               class="{{ $navLink }} {{ request()->routeIs('trash*') ? $navActive : $navInactive }}">
+                                <x-icon name="trash" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                <span>Trash</span>
+                            </a>
+                        @endcan
+
+                        {{-- Admin Panel (Super Admin only) --}}
+                        @can('manage-monitoring')
+                            <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }">
+                                <button type="button" @click="open = !open"
+                                        :aria-expanded="open"
+                                        aria-controls="sidebar-admin-panel-menu"
+                                        data-sidebar-active="{{ $adminPanelActive ? 'true' : 'false' }}"
+                                        class="{{ $navLink }} group w-full {{ $adminPanelActive ? $navActive : $navInactive }}">
+                                    <x-icon name="settings" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                    <span>Admin Panel</span>
+                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div id="sidebar-admin-panel-menu" x-cloak x-show="open"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="-translate-y-1 opacity-0"
+                                     x-transition:enter-end="translate-y-0 opacity-100"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="translate-y-0 opacity-100"
+                                     x-transition:leave-end="-translate-y-1 opacity-0"
+                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                    <a href="{{ route('admin-panel.index') }}"
+                                       aria-current="{{ request()->routeIs('admin-panel.index') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.index') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
+                                        <span>User Management</span>
+                                    </a>
+                                    <a href="{{ route('admin-panel.account-managers.index') }}"
+                                       aria-current="{{ request()->routeIs('admin-panel.account-managers.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.account-managers.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
+                                        <span>Account Manager</span>
+                                    </a>
+                                    <a href="{{ route('admin-panel.work-types.index') }}"
+                                       aria-current="{{ request()->routeIs('admin-panel.work-types.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.work-types.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
+                                        <span>Work Type</span>
+                                    </a>
+                                    <a href="{{ route('admin-panel.document-categories.index') }}"
+                                       aria-current="{{ request()->routeIs('admin-panel.document-categories.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.document-categories.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
+                                        <span>Document Category</span>
+                                    </a>
+                                    <a href="{{ route('admin-panel.project-statuses.index') }}"
+                                       aria-current="{{ request()->routeIs('admin-panel.project-statuses.*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.project-statuses.*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
+                                        <span>Project Status</span>
+                                    </a>
+                                    <a href="{{ route('admin-panel.audit-log') }}"
+                                       aria-current="{{ request()->routeIs('admin-panel.audit-log') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.audit-log') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
+                                        <span>Audit Log</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @endcan
+                    </div>
+                </section>
+            @endcanany
+        </div>
     </nav>
 
+    {{-- User widget --}}
+    <div class="flex-shrink-0 border-t border-[var(--sidebar-border)] p-3">
+        <a href="{{ route('profile.edit') }}"
+           class="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 transition-all duration-300 hover:border-blue-200 hover:bg-blue-50/70 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10">
+            <x-user-avatar :user="auth()->user()" size="w-9 h-9" text="text-xs" :clickable="false" />
+            <span class="min-w-0 flex-1">
+                <span class="block truncate text-sm font-semibold text-slate-700 dark:text-slate-200">{{ auth()->user()->name }}</span>
+                <span class="mt-0.5 block truncate text-[11px] text-slate-400">{{ \Illuminate\Support\Str::headline($roleName) }}</span>
+            </span>
+            <x-icon name="chevron-right" class="h-4 w-4 shrink-0 text-slate-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-blue-500" />
+        </a>
+    </div>
+
     {{-- Logout --}}
-    <div class="p-3 border-t border-[var(--sidebar-border)] flex-shrink-0">
+    <div class="flex-shrink-0 px-3 pb-3">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" 
-                    class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200">
-                <x-icon name="logout" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
+            <button type="submit"
+                    class="group flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-red-600 transition-all duration-300 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 focus-visible:ring-offset-1 dark:text-red-300 dark:hover:bg-red-500/10 dark:hover:text-red-200 dark:focus-visible:ring-offset-slate-800">
+                <x-icon name="logout" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                 <span>Logout</span>
             </button>
         </form>

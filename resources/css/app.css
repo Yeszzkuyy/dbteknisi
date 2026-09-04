@@ -79,13 +79,20 @@ tbody tr { transition: background-color 0.2s ease; }
 /* ============================================================
    Sidebar — indikator aktif & ikon bergeser
    ============================================================ */
-.sidebar nav a { position: relative; }
-.sidebar nav a svg { transition: transform 0.25s var(--ease-out); }
+.sidebar nav a,
+.sidebar nav button { position: relative; }
+.sidebar nav a svg,
+.sidebar nav button svg { transition: transform 0.25s var(--ease-out); }
+.sidebar nav a > span,
+.sidebar nav button > span { transition: transform 0.25s var(--ease-out); }
 @media (hover: hover) {
-    .sidebar nav a:hover svg { transform: translateX(2px); }
+    .sidebar nav a:hover svg,
+    .sidebar nav button:hover svg { transform: translateX(2px); }
+    .sidebar nav a:hover > span:not(.ml-auto),
+    .sidebar nav button:hover > span:not(.ml-auto) { transform: translateX(2px); }
 }
-.sidebar nav a[class*="bg-blue-50"]::before,
-.sidebar nav a[class*="bg-purple-50"]::before {
+.sidebar nav a[aria-current="page"]::before,
+.sidebar nav [data-sidebar-active="true"]::before {
     content: "";
     position: absolute;
     left: 0;
@@ -93,8 +100,9 @@ tbody tr { transition: background-color 0.2s ease; }
     bottom: 22%;
     width: 3px;
     border-radius: 9999px;
-    background: currentColor;
-    opacity: 0.75;
+    background: #3b82f6;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
+    opacity: 0.9;
 }
 
 /* ============================================================
