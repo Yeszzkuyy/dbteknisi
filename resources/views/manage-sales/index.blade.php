@@ -57,21 +57,18 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                @if($lead->assigned_to)
-                                    <div class="flex flex-col items-center gap-1">
-                                        <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
-                                            ASSIGNED
-                                        </span>
-                                        @if($lead->assignee)
-                                            <div class="text-xs text-slate-500">
-                                                → {{ $lead->assignee->name }}
-                                                @if($lead->assigned_at) • {{ $lead->assigned_at->format('d M Y H:i') }} @endif
-                                            </div>
-                                        @endif
+                                @if($lead->assignee)
+                                    <div class="inline-flex items-center justify-center gap-2">
+                                        <x-user-avatar :user="$lead->assignee" size="w-7 h-7" text="text-[11px]" color="green" :clickable="false" />
+                                        <div class="flex flex-col items-start text-left leading-tight">
+                                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-100">{{ $lead->assignee->name }}</span>
+                                            <span class="text-[10px] uppercase tracking-wide text-green-600 dark:text-green-400">Assigned</span>
+                                        </div>
                                     </div>
                                 @else
-                                    <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
-                                        NEW
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-400">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                                        New
                                     </span>
                                 @endif
                             </td>
