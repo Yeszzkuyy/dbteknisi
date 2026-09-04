@@ -16,6 +16,7 @@ document.addEventListener('alpine:init', () => {
         toast: false,
         toastTimer: null,
         init() {
+            if (window.notifInit === undefined) return;
             this.refresh();
             this.timer = setInterval(() => this.refresh(), 5000);
             document.addEventListener('visibilitychange', () => {
@@ -24,6 +25,7 @@ document.addEventListener('alpine:init', () => {
             window.addEventListener('focus', () => this.refresh());
         },
         async refresh() {
+            if (window.notifInit === undefined) return;
             try {
                 const res = await fetch('/notifications/status');
                 const data = await res.json();
