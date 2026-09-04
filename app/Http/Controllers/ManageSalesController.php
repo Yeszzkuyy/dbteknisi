@@ -119,7 +119,7 @@ class ManageSalesController extends Controller
     {
         $managementIds = User::permission('manage-sales-leads')->pluck('id');
 
-        $activities = LeadActivity::with(['lead.customer', 'user'])
+        $activities = LeadActivity::with(['lead.customer', 'user.roles'])
             ->whereIn('user_id', $managementIds)
             ->when($request->filled('user'), fn ($q) => $q->where('user_id', $request->user))
             ->when($request->filled('date_from'), fn ($q) => $q->whereDate('created_at', '>=', $request->date_from))
@@ -130,7 +130,11 @@ class ManageSalesController extends Controller
 
         $filterUser = $request->filled('user') ? User::find($request->user) : null;
 
-        return view('manage-sales.activity-log', compact('activities', 'filterUser'))
+        $grouped = $activities->getCollection()
+            ->groupBy(fn ($a) => $a->created_at->toDateString())
+            ->sortKeysDesc();
+
+        return view('manage-sales.activity-log', compact('activities', 'filterUser', 'grouped'))
             ->with('customerNames', Customer::pluck('name', 'id'))
             ->with('userNames', User::pluck('name', 'id'))
             ->with('managementUsers', User::permission('manage-sales-leads')->orderBy('name')->get(['id', 'name']));
