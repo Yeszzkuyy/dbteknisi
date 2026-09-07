@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Teknisi</title>
+
+    <!-- Tailwind CSS (Play CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Inter (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        /* ===== Donut chart (conic-gradient murni, tanpa library/canvas) ===== */
+        .donut {
+            --pct: 0;                        /* ubah angka ini (0-100) untuk mengubah progress */
+            width: 200px;
+            height: 200px;
+            border-radius: 9999px;
+            background: conic-gradient(#10b981 calc(var(--pct) * 1%), rgba(51, 65, 85, 0.55) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 0 1px rgba(51, 65, 85, 0.5), 0 0 40px -12px rgba(16, 185, 129, 0.35);
+        }
+        .donut::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: radial-gradient(circle, transparent 66%, rgba(15, 23, 42, 0.6) 67%);
+            pointer-events: none;
+        }
+        .donut-hole {
+            width: 150px;
+            height: 150px;
+            border-radius: 9999px;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== Glow pada titik warna legend ===== */
+        .dot-glow-blue    { box-shadow: 0 0 12px rgba(59, 130, 246, 0.7); }
+        .dot-glow-amber   { box-shadow: 0 0 12px rgba(245, 158, 11, 0.7); }
+        .dot-glow-purple  { box-shadow: 0 0 12px rgba(168, 85, 247, 0.7); }
+        .dot-glow-red     { box-shadow: 0 0 12px rgba(239, 68, 68, 0.7); }
+        .dot-glow-emerald { box-shadow: 0 0 12px rgba(16, 185, 129, 0.7); }
+        .dot-glow-slate   { box-shadow: 0 0 12px rgba(100, 116, 139, 0.7); }
+        .dot-glow-cyan    { box-shadow: 0 0 12px rgba(6, 182, 212, 0.7); }
+    </style>
+</head>
+
+<body class="bg-slate-900 text-slate-100 antialiased min-h-screen">
+
+    <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ===== Header ===== -->
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Dashboard Teknisi</h1>
+                <p class="mt-1 text-sm text-slate-400" id="subtitle">Ringkasan pekerjaan teknisi hari ini, …</p>
+            </div>
+            <a href="#"
+               class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                Buka Jadwal
+            </a>
+        </div>
+
+        <!-- ===== Top Cards ===== -->
+        <section class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+            <!-- Card 1: Total Teknisi -->
+            <div class="rounded-2xl border border-slate-700/50 bg-slate-800/50 p-5 backdrop-blur">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Total Teknisi</p>
+                        <p class="mt-1 text-3xl font-bold text-white">18</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Teknisi Aktif -->
+            <div class="rounded-2xl border border-slate-700/50 bg-slate-800/50 p-5 backdrop-blur">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Teknisi Aktif</p>
+                        <p class="mt-1 text-3xl font-bold text-white">12</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Project Selesai -->
+            <div class="rounded-2xl border border-slate-700/50 bg-slate-800/50 p-5 backdrop-blur">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Project Selesai</p>
+                        <p class="mt-1 text-3xl font-bold text-white">15</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Project Berjalan -->
+            <div class="rounded-2xl border border-slate-700/50 bg-slate-800/50 p-5 backdrop-blur">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Project Berjalan</p>
+                        <p class="mt-1 text-3xl font-bold text-white">14</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Progress Pekerjaan ===== -->
+        <section class="mt-8 rounded-2xl border border-slate-700/50 bg-slate-800/50 p-6 backdrop-blur sm:p-8">
+            <h2 class="text-lg font-bold text-white">Progress Pekerjaan</h2>
+
+            <div class="mt-6 flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-center lg:gap-16">
+
+                <!-- Donut -->
+                <div class="donut">
+                    <div class="donut-hole">
+                        <span class="text-3xl font-extrabold text-white">0%</span>
+                        <span class="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">Selesai</span>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="w-full max-w-md flex-1">
+                    <div class="grid grid-cols-2 gap-3">
+
+                        <div class="flex items-center justify-between rounded-lg border border-slate-700/50 px-3 py-2.5">
+                            <span class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full bg-blue-500 dot-glow-blue"></span>
+                                <span class="text-sm text-slate-300">Open</span>
+                            </span>
+                            <span class="text-sm font-semibold text-white">4</span>
+                        </div>
+
+                        <div class="flex items-center justify-between rounded-lg border border-slate-700/50 px-3 py-2.5">
+                            <span class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full bg-amber-500 dot-glow-amber"></span>
+                                <span class="text-sm text-slate-300">On Progress</span>
+                            </span>
+                            <span class="text-sm font-semibold text-white">7</span>
+                        </div>
+
+                        <div class="flex items-center justify-between rounded-lg border border-slate-700/50 px-3 py-2.5">
+                            <span class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full bg-purple-500 dot-glow-purple"></span>
+                                <span class="text-sm text-slate-300">Pending</span>
+                            </span>
+                            <span class="text-sm font-semibold text-white">2</span>
+                        </div>
+
+                        <div class="flex items-center justify-between rounded-lg border border-slate-700/50 px-3 py-2.5">
+                            <span class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full bg-red-500 dot-glow-red"></span>
+                                <span class="text-sm text-slate-300">Hold</span>
+                            </span>
+                            <span class="text-sm font-semibold text-white">1</span>
+                        </div>
+
+                        <div class="flex items-center justify-between rounded-lg border border-slate-700/50 px-3 py-2.5">
+                            <span class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 dot-glow-emerald"></span>
+                                <span class="text-sm text-slate-300">Done</span>
+                            </span>
+                            <span class="text-sm font-semibold text-white">15</span>
+                        </div>
+
+                        <div class="flex items-center justify-between rounded-lg border border-slate-700/50 px-3 py-2.5">
+                            <span class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full bg-slate-500 dot-glow-slate"></span>
+                                <span class="text-sm text-slate-300">Cancelled</span>
+                            </span>
+                            <span class="text-sm font-semibold text-white">1</span>
+                        </div>
+
+                        <div class="flex items-center justify-between rounded-lg border border-slate-700/50 px-3 py-2.5">
+                            <span class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full bg-cyan-500 dot-glow-cyan"></span>
+                                <span class="text-sm text-slate-300">Warranty</span>
+                            </span>
+                            <span class="text-sm font-semibold text-white">3</span>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-between border-t border-slate-700/50 pt-4">
+                        <span class="text-sm font-medium text-slate-300">Total Project</span>
+                        <span class="text-base font-bold text-white">33</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Isi sub-judul dengan hari + tanggal lengkap (format Indonesia)
+        const now = new Date();
+        const subtitle = document.getElementById('subtitle');
+        const formatted = now.toLocaleDateString('id-ID', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
+        subtitle.textContent = `Ringkasan pekerjaan teknisi hari ini, ${formatted}`;
+    </script>
+
+</body>
+</html>
