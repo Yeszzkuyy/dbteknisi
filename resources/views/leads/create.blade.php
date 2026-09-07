@@ -17,10 +17,10 @@
         {{-- Info Umum --}}
         <section class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
             <div>
-                <label for="pt_group" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    PT <span class="text-red-500">*</span>
-                    <x-info-tip tip="Entitas perusahaan grup yang menangani lead ini: NTI, MGK, TPS, atau WANI." />
-                </label>
+<label for="pt_group" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                        Lead dari PT <span class="text-red-500">*</span>
+                        <x-info-tip tip="Entitas perusahaan grup yang menangani lead ini: NTI, MGK, TPS, atau WANI." />
+                    </label>
                 <select name="pt_group" id="pt_group" required
                         class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Pilih PT</option>
@@ -189,52 +189,12 @@
                               placeholder="cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi"
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan') }}</textarea>
                 </div>
-                <div>
-                    <label for="solusi" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Solusi
-                        <x-info-tip tip="Solusi yang ditawarkan untuk memenuhi kebutuhan customer." />
-                    </label>
-                    <textarea name="solusi" id="solusi" rows="2"
-                              placeholder="cth: Rekomendasi Cisco Webex Board 55S untuk ruang meeting"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('solusi') }}</textarea>
-                </div>
-                <div>
-                    <label for="progress_notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Progress FollowUp / Keterangan
-                        <x-info-tip tip="Catatan progress follow-up: sudah dihubungi, jadwal meeting, status negosiasi, dll." />
-                    </label>
-                    <textarea name="progress_notes" id="progress_notes" rows="2"
-                              placeholder="cth: Sudah telepon, menunggu balasan. Follow-up lagi Senin depan."
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('progress_notes') }}</textarea>
-                </div>
-                <div>
-                    <label for="notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Catatan Internal
-                        <x-info-tip tip="Catatan khusus tim, tidak ditampilkan ke customer." />
-                    </label>
-                    <textarea name="notes" id="notes" rows="2"
-                              placeholder="Catatan internal..."
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes') }}</textarea>
-                </div>
             </div>
         </section>
 
         {{-- Penugasan --}}
         <section class="border-t border-slate-200">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <div>
-                    <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Sales <span class="text-red-500">*</span>
-                        <x-info-tip tip="Orang yang bertanggung jawab follow-up lead ini." />
-                    </label>
-                    <select name="assigned_to" id="assigned_to" required
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Pilih Sales</option>
-                        @foreach($salesUsers as $user)
-                            <option value="{{ $user->id }}" {{ old('assigned_to') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
                 <div>
                     <label for="partner_id" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                         Partner Terkait

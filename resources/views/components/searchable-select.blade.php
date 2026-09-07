@@ -17,7 +17,7 @@
         query: {{ $selectedLabel !== null ? json_encode($selectedLabel, JSON_HEX_APOS | JSON_HEX_QUOT) : '""' }},
         open: false,
         get filtered() {
-            const q = this.query.toLowerCase();
+            const q = this.query.toLowerCase().trim();
             return Object.entries(this.options).filter(([id, label]) => !q || label.toLowerCase().includes(q));
         },
         select(id, label) {

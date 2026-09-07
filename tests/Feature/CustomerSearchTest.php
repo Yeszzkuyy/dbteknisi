@@ -61,4 +61,31 @@ class CustomerSearchTest extends TestCase
             ->getContent();
         $this->assertStringContainsString('Beta Ltd', $body);
     }
+
+    public function test_search_is_case_insensitive_partial_and_trimmed()
+    {
+        $u = $this->user();
+        Customer::create(['name' => 'PT Jepun', 'email' => 'jepun@example.com']);
+        Customer::create(['name' => 'Beta Ltd']);
+
+        // Case-insensitive: semua varian casing memberi hasil yang sama
+        foreach (['PT JEPUN', 'pt jepun', 'Pt Jepun'] as $query) {
+            $this->actingAs($u)->call('GET', '/customers', ['search' => $query])
+                ->assertOk()
+                ->assertSee('PT Jepun')
+                ->assertDontSee('Beta Ltd');
+        }
+
+        // Partial match: potongan kata tengah tetap cocok
+        $this->actingAs($u)->call('GET', '/customers', ['search' => 'pun'])
+            ->assertOk()
+            ->assertSee('PT Jepun')
+            ->assertDontSee('Beta Ltd');
+
+        // Auto-trim: spasi berlebih di awal/akhir diabaikan
+        $this->actingAs($u)->call('GET', '/customers', ['search' => '  PT Jepun  '])
+            ->assertOk()
+            ->assertSee('PT Jepun')
+            ->assertDontSee('Beta Ltd');
+    }
 }

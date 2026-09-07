@@ -9,6 +9,40 @@ window.Sortable = Sortable;
 window.ApexCharts = ApexCharts;
 
 document.addEventListener('alpine:init', () => {
+    Alpine.store('notif', {
+        unread: window.notifInit?.unread ?? 0,
+        unassigned: window.notifInit?.unassigned ?? 0,
+        items: window.notifInit?.items ?? [],
+        toast: false,
+        toastTimer: null,
+        init() {
+            if (window.notifInit === undefined) return;
+            this.refresh();
+            this.timer = setInterval(() => this.refresh(), 5000);
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) this.refresh();
+            });
+            window.addEventListener('focus', () => this.refresh());
+        },
+        async refresh() {
+            if (window.notifInit === undefined) return;
+            try {
+                const res = await fetch('/notifications/status');
+                const data = await res.json();
+                if (data.unread > this.unread) this.showToast();
+                this.unread = data.unread;
+                this.unassigned = data.unassigned;
+                this.items = data.items ?? [];
+            } catch (e) {}
+        },
+        showToast() {
+            this.toast = true;
+            clearTimeout(this.toastTimer);
+            this.toastTimer = setTimeout(() => (this.toast = false), 8000);
+        },
+    });
+    Alpine.store('notif').init();
+
     Alpine.data('counter', (target, duration = 900) => ({
         display: 0,
         start() {

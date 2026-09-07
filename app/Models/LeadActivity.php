@@ -49,6 +49,7 @@ class LeadActivity extends Model
             'attachment_deleted' => 'Menghapus lampiran lead',
             'converted' => 'Mengonversi lead menjadi Project',
             'status_changed' => 'Memindahkan posisi lead di pipeline',
+            'assigned' => 'Meng-assign lead ke sales',
             default => $this->action,
         };
     }

@@ -80,6 +80,15 @@ class TrashController extends Controller
             ->with('success', 'Customer "' . $customer->name . '" dihapus permanen');
     }
 
+    public function destroyProject(int $id)
+    {
+        $project = $this->findTrash(Project::class, $id);
+        $project->forceDelete();
+
+        return redirect()->route('trash.index')
+            ->with('success', 'Project "' . $project->project_name . '" dihapus permanen');
+    }
+
     /**
      * User biasa: hanya miliknya. Super Admin: seluruh trash.
      */

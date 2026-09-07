@@ -37,6 +37,9 @@ class RoleAndPermissionSeeder extends Seeder
         // Monitoring anggota divisi (khusus lead divisi)
         $permissions[] = 'monitor-marketing';
 
+        // Manage Sales: management melihat & meng-assign lead dari marketing ke sales
+        $permissions[] = 'manage-sales-leads';
+
         foreach ($permissions as $name) {
             Permission::create(['name' => $name, 'guard_name' => 'web']);
         }
@@ -77,6 +80,12 @@ class RoleAndPermissionSeeder extends Seeder
             'view-marketing', 'view-sales', 'view-admin', 'view-teknisi', 'view-monitoring',
         ]);
 
+        // Management (Bu Yanita, Bu Ayu): khusus Manage Sales, tanpa menu divisi lain
+        $management = Role::create(['name' => 'management', 'guard_name' => 'web']);
+        $management->givePermissionTo([
+            'manage-sales-leads', ...$common,
+        ]);
+
         $superAdmin = Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
         $superAdmin->givePermissionTo(Permission::all());
 
@@ -103,6 +112,8 @@ class RoleAndPermissionSeeder extends Seeder
                 $user->assignRole('marketing');
             } elseif ($oldRole === 'manager') {
                 $user->assignRole('manager');
+            } elseif ($oldRole === 'management') {
+                $user->assignRole('management');
             }
         }
 

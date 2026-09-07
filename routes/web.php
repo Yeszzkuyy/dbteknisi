@@ -20,6 +20,8 @@ use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\AdminPanelController;
+use App\Http\Controllers\ManageSalesController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\TechnicianScheduleController;
 use App\Http\Controllers\TechnicianDashboardController;
@@ -40,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
     Route::delete('/profile/avatar', [ProfileController::class, 'removeAvatar'])->name('profile.avatar.remove');
+
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::get('/notifications/status', [NotificationController::class, 'status'])->name('notifications.status');
 
     // ============================================
     // SALES — manage
@@ -138,6 +143,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/trash/customers/{id}/restore', [TrashController::class, 'restoreCustomer'])->name('trash.restore-customer');
         Route::patch('/trash/projects/{id}/restore', [TrashController::class, 'restoreProject'])->name('trash.restore-project');
         Route::delete('/trash/customers/{id}/delete', [TrashController::class, 'destroyCustomer'])->name('trash.destroy-customer');
+        Route::delete('/trash/projects/{id}/delete', [TrashController::class, 'destroyProject'])->name('trash.destroy-project');
         Route::delete('/trash/clear', [TrashController::class, 'clear'])->name('trash.clear');
     });
 
@@ -225,6 +231,29 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
     });
+
+    // ============================================
+    // MANAGE SALES — Management (assign lead ke sales)
+    // ============================================
+    Route::middleware('permission:manage-sales-leads')->prefix('manage-sales')->name('manage-sales.')->group(function () {
+        Route::get('/', [ManageSalesController::class, 'index'])->name('index');
+        Route::get('/activity-log', [ManageSalesController::class, 'activityLog'])->name('activity-log');
+        Route::get('/{lead}/edit', [ManageSalesController::class, 'edit'])->name('edit');
+        Route::put('/{lead}', [ManageSalesController::class, 'update'])->name('update');
+        Route::post('/{lead}/assign', [ManageSalesController::class, 'assign'])->name('assign');
+    });
+
+    // ============================================
+    // MANAGEMENT — sub-modul baru (under development)
+    // ============================================
+    Route::middleware('permission:manage-sales-leads')->prefix('manage')->name('manage.')->group(function () {
+        Route::view('marketing', 'manage.placeholder', ['title' => 'Manage Marketing'])->name('marketing.index');
+        Route::view('technical', 'manage.placeholder', ['title' => 'Manage Technical'])->name('technical.index');
+        Route::view('admin', 'manage.placeholder', ['title' => 'Manage Admin'])->name('admin.index');
+    });
+
+    // Lead milik sales (muncul di menu Sales)
+    Route::middleware('permission:view-sales|manage-sales')->get('/sales/my-leads', [ManageSalesController::class, 'myLeads'])->name('sales.my-leads');
 
     // ============================================
     // MONITORING — Manager & Super Admin

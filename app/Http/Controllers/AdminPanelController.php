@@ -103,11 +103,7 @@ class AdminPanelController extends Controller
     
     public function createRole()
     {
-        $permissions = Permission::all()->groupBy(function ($p) {
-            $prefix = explode('-', $p->name)[0];
-            return $prefix === 'manage' || $prefix === 'view' ? $prefix : 'other';
-        });
-        return view('admin-panel.roles.create', compact('permissions'));
+        return view('admin-panel.roles.create', ['permissions' => $this->groupedPermissions()]);
     }
 
     public function storeRole(Request $request)
@@ -133,11 +129,7 @@ class AdminPanelController extends Controller
             abort(403, 'Role super-admin tidak bisa diedit.');
         }
         
-        $permissions = Permission::all()->groupBy(function ($p) {
-            $prefix = explode('-', $p->name)[0];
-            return $prefix === 'manage' || $prefix === 'view' ? $prefix : 'other';
-        });
-        return view('admin-panel.roles.edit', compact('role', 'permissions'));
+        return view('admin-panel.roles.edit', compact('role') + ['permissions' => $this->groupedPermissions()]);
     }
 
     public function updateRole(Request $request, Role $role)
@@ -180,5 +172,13 @@ class AdminPanelController extends Controller
     {
         $logs = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
         return view('admin-panel.audit-log', compact('logs'));
+    }
+
+    private function groupedPermissions()
+    {
+        return Permission::all()->groupBy(function ($p) {
+            $parts = explode('-', $p->name);
+            return $parts[1] ?? $parts[0] ?? 'other';
+        });
     }
 }

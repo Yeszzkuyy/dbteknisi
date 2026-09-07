@@ -12,7 +12,9 @@ use App\Models\ProjectDocument;
 use App\Models\ProjectStatus;
 use App\Models\User;
 use App\Models\WorkType;
+use App\Notifications\NewLeadNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -40,7 +42,7 @@ class LeadController extends Controller
 
         $query = Lead::with(['customer', 'assignee', 'partner'])
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
-                fn ($c) => $c->where('name', 'like', '%'.$request->search.'%')))
+                fn ($c) => $c->whereLike('name', $request->search)))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->when($request->filled('source'), fn ($q) => $q->where('source', $request->source))
             ->when($request->filled('date_from'), fn ($q) => $q->whereDate('incoming_date', '>=', $request->date_from))
@@ -191,9 +193,8 @@ class LeadController extends Controller
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
-        $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
-        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups', 'salesUsers'));
+        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups'));
     }
 
     public function store(Request $request)
@@ -212,7 +213,7 @@ class LeadController extends Controller
             'customer_contact_person' => 'nullable|string|max:255',
             'partner_id' => 'nullable|exists:partners,id',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
-            'assigned_to' => 'required|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
@@ -258,6 +259,13 @@ class LeadController extends Controller
         $this->saveAttachments($request, $lead);
         $this->logActivity($lead, 'created');
 
+        if (empty($lead->assigned_to)) {
+            Notification::send(
+                User::permission('manage-sales-leads')->get(),
+                new NewLeadNotification($lead)
+            );
+        }
+
         return redirect()
             ->route('leads.index')
             ->with('success', 'Lead berhasil ditambahkan');
@@ -283,9 +291,8 @@ class LeadController extends Controller
         $segments = self::SEGMENTS;
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
-        $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
-        return view('leads.edit', compact('lead', 'customers', 'partners', 'segments', 'sources', 'ptGroups', 'salesUsers'));
+        return view('leads.edit', compact('lead', 'customers', 'partners', 'segments', 'sources', 'ptGroups'));
     }
 
     public function update(Request $request, Lead $lead)
@@ -304,7 +311,7 @@ class LeadController extends Controller
             'customer_contact_person' => 'nullable|string|max:255',
             'partner_id' => 'nullable|exists:partners,id',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
-            'assigned_to' => 'required|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',

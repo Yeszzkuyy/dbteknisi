@@ -129,7 +129,7 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 @if($lead->kebutuhan)
-                                    <span class="text-sm text-slate-700 truncate max-w-[200px] inline-block align-bottom" title="{{ $lead->kebutuhan }}">{{ Str::limit($lead->kebutuhan, 40) }}</span>
+                                    <span class="text-sm text-slate-700 whitespace-normal break-words min-w-[200px] inline-block align-bottom">{{ $lead->kebutuhan }}</span>
                                 @else
                                     <span class="text-slate-400">-</span>
                                 @endif

@@ -70,6 +70,20 @@ class TrashTest extends TestCase
         $this->get(route('trash.index'))->assertSee('Tidak ada customer yang terhapus.');
     }
 
+    public function test_hapus_permanen_project_menghilangkan_dari_trash(): void
+    {
+        $this->actingAs($this->adminUser());
+
+        $project = $this->projectWith('Project Akan Dihapus');
+        $project->delete();
+
+        $this->delete(route('trash.destroy-project', $project->id))
+            ->assertRedirect(route('trash.index'));
+
+        $this->assertDatabaseMissing('projects', ['id' => $project->id]);
+        $this->get(route('trash.index'))->assertSee('Tidak ada project yang terhapus.');
+    }
+
     public function test_hapus_semua_menghapus_history_sekaligus(): void
     {
         $this->actingAs($this->adminUser());
