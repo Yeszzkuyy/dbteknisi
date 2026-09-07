@@ -65,6 +65,7 @@
             </label>
             <input type="text" id="whatsapp" name="whatsapp" value="{{ old('whatsapp') }}"
                    placeholder="cth: 0812-3456-7890"
+                   inputmode="tel"
                    class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
             @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>

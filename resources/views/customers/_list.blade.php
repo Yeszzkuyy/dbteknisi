@@ -40,6 +40,14 @@
                                             {{ $customer->contacts->first()->phone }}
                                         </div>
 
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                                            WA: {{ $customer->whatsapp ?? '-' }}
+                                        </div>
+
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                                            {{ $customer->email ?? '-' }}
+                                        </div>
+
                                     @else
 
                                         <span class="text-slate-400 dark:text-slate-500 italic">

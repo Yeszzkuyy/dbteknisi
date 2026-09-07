@@ -81,6 +81,7 @@
                         <input type="text"
                                name="whatsapp"
                                value="{{ old('whatsapp', $customer->whatsapp) }}"
+                               inputmode="tel"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
