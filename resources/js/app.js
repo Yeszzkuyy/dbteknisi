@@ -3,10 +3,14 @@
 import Alpine from 'alpinejs';
 import Sortable from 'sortablejs';
 import ApexCharts from 'apexcharts';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 window.Alpine = Alpine;
 window.Sortable = Sortable;
 window.ApexCharts = ApexCharts;
+window.marked = marked;
+window.DOMPurify = DOMPurify;
 
 document.addEventListener('alpine:init', () => {
     Alpine.store('notif', {
