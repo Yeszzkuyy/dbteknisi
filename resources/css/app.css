@@ -148,6 +148,35 @@ tbody tr { transition: background-color 0.2s ease; }
     }
 }
 
+/* ============================================================
+   Detail Customer — indicator tab, stat card, baris info, timeline
+   ============================================================ */
+.tab-indicator {
+    transition: left .3s var(--ease-out), width .3s var(--ease-out);
+}
+
+.stat-card {
+    transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out);
+}
+@media (hover: hover) {
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lift);
+    }
+}
+
+.info-row { transition: background-color .2s ease; }
+.info-row:hover { background-color: rgba(241, 245, 249, .9); }
+.dark .info-row:hover { background-color: rgba(51, 65, 85, .45); }
+
+@media (prefers-reduced-motion: no-preference) {
+    [data-rise] { animation: rise .5s var(--ease-out) backwards; }
+    [data-rise="1"] { animation-delay: .06s; }
+    [data-rise="2"] { animation-delay: .13s; }
+    [data-rise="3"] { animation-delay: .2s; }
+    [data-rise="4"] { animation-delay: .27s; }
+}
+
 
 /* Kalender Teknisi (FullCalendar) */
 .teknisi-calendar .fc .fc-toolbar-title {

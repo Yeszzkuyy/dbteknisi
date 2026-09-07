@@ -1,88 +1,112 @@
 <x-app-layout>
     <div class="px-4 sm:px-6 lg:px-8">
         
-        {{-- Header --}}
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div class="min-w-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100 truncate">
-                    {{ $customer->name }}
-                </h1>
-                <p class="text-sm sm:text-base text-slate-500 mt-1 truncate">
-                    Detail Customer • {{ $customer->address ?? 'Alamat tidak tersedia' }}
-                </p>
-            </div>
-            <div class="flex gap-2 shrink-0">
-                @can('manage-sales')
-                    <a href="{{ route('customers.edit', $customer) }}" 
-                       class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium transition">
-                        Edit Customer
+        {{-- Banner Header --}}
+        <div data-rise class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 via-slate-900 to-indigo-950 px-5 py-6 sm:px-8 sm:py-7 mb-6">
+            <div class="pointer-events-none absolute -top-20 -right-16 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl"></div>
+            <div class="pointer-events-none absolute -bottom-24 -left-12 h-52 w-52 rounded-full bg-blue-500/10 blur-3xl"></div>
+
+            <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex min-w-0 items-center gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-600 text-lg font-bold text-white shadow-lg sm:h-14 sm:w-14 sm:text-xl">
+                        {{ strtoupper(Str::substr($customer->name, 0, 1)) }}
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="truncate text-2xl font-bold text-white sm:text-3xl">{{ $customer->name }}</h1>
+                        <p class="mt-1 flex items-center gap-1.5 truncate text-sm text-slate-300">
+                            <x-icon name="map-pin" class="h-4 w-4 shrink-0 text-slate-400" />
+                            Detail Customer • {{ $customer->address ?? 'Alamat tidak tersedia' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex shrink-0 gap-2">
+                    @can('manage-sales')
+                        <a href="{{ route('customers.edit', $customer) }}"
+                           class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium transition-all duration-200 hover:scale-[1.03]">
+                            Edit Customer
+                        </a>
+                    @endcan
+                    <a href="{{ route('customers.index') }}"
+                       class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl border border-white/30 text-white hover:bg-white/10 text-sm font-medium transition-all duration-200 hover:scale-[1.03]">
+                        Kembali
                     </a>
-                @endcan
-                <a href="{{ route('customers.index') }}" 
-                   class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
-                    Kembali
-                </a>
+                </div>
             </div>
         </div>
 
         {{-- Tabs --}}
-        <div x-data="{ tab: 'overview' }" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
-            
+        <div x-data="{
+                tab: 'overview',
+                moveIndicator(btn) {
+                    if (!btn) return;
+                    const i = this.$refs.indicator;
+                    i.style.width = btn.offsetWidth + 'px';
+                    i.style.left = btn.offsetLeft + 'px';
+                }
+             }"
+             x-init="$nextTick(() => moveIndicator($refs.tabs.querySelector('.tab-active')))"
+             @resize.window.debounce.150ms="moveIndicator($refs.tabs.querySelector('.tab-active'))"
+             data-rise="1"
+             class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
+
             {{-- Tab Navigation --}}
             <div class="border-b border-slate-200 dark:border-slate-600">
-                <nav class="flex gap-4 sm:gap-6 px-4 sm:px-6 overflow-x-auto whitespace-nowrap scrollbar-hide -mb-px" x-ref="tabs">
-                    <button @click="tab = 'overview'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'overview', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'overview' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                <nav x-ref="tabs" class="relative flex gap-4 sm:gap-6 px-4 sm:px-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                    <span x-ref="indicator" class="tab-indicator absolute bottom-0 left-0 h-0.5 w-0 rounded-full bg-indigo-500"></span>
+
+                    <button @click="tab = 'overview'; moveIndicator($el)"
+                            :class="tab === 'overview' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         📋 Overview
                     </button>
-                    <button @click="tab = 'projects'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'projects', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'projects' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'projects'; moveIndicator($el)"
+                            :class="tab === 'projects' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         📁 Projects
                     </button>
-                    <button @click="tab = 'contacts'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'contacts', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'contacts' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'contacts'; moveIndicator($el)"
+                            :class="tab === 'contacts' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         👤 Contacts
                     </button>
-                    <button @click="tab = 'documents'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'documents', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'documents' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'documents'; moveIndicator($el)"
+                            :class="tab === 'documents' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         📄 Documents
                     </button>
                     @can('view-sales')
-                    <button @click="tab = 'meetings'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'meetings', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'meetings' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'meetings'; moveIndicator($el)"
+                            :class="tab === 'meetings' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         🤝 Meetings
                     </button>
-                    <button @click="tab = 'followups'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'followups', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'followups' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'followups'; moveIndicator($el)"
+                            :class="tab === 'followups' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         📞 Follow Up
                     </button>
                     @endcan
                     @can('view-admin')
-                    <button @click="tab = 'invoices'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'invoices', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'invoices' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'invoices'; moveIndicator($el)"
+                            :class="tab === 'invoices' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         📋 Invoice
                     </button>
-                    <button @click="tab = 'pos'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'pos', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'pos' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'pos'; moveIndicator($el)"
+                            :class="tab === 'pos' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         📑 PO
                     </button>
-                    <button @click="tab = 'payments'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'payments', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'payments' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'payments'; moveIndicator($el)"
+                            :class="tab === 'payments' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         💳 Payment
                     </button>
                     @endcan
-                    <button @click="tab = 'activity'" 
-                            :class="{ 'border-indigo-500 text-indigo-600': tab === 'activity', 'border-transparent text-slate-500 hover:text-slate-700': tab !== 'activity' }"
-                            class="shrink-0 py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm transition">
+                    <button @click="tab = 'activity'; moveIndicator($el)"
+                            :class="tab === 'activity' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         📝 Activity
                     </button>
                 </nav>
@@ -93,91 +117,94 @@
                 
                 {{-- TAB 1: OVERVIEW --}}
                 <div x-show="tab === 'overview'" x-transition>
+                    @php
+                        $totalProjects = $customer->projects->count();
+                        $doneProjects = $customer->projects->where('project_status_id', 5)->count();
+                        $activeProjects = $customer->projects->where('project_status_id', '!=', 5)->where('project_status_id', '!=', 6)->count();
+                        $totalContacts = $customer->contacts->count();
+                        $activities = App\Models\ProjectActivity::whereIn('project_id', $customer->projects->pluck('id'))
+                            ->with(['project', 'user'])
+                            ->latest()
+                            ->take(5)
+                            ->get();
+                        $infoFields = [
+                            ['icon' => 'building', 'label' => 'Nama', 'value' => $customer->name],
+                            ['icon' => 'user', 'label' => 'PIC', 'value' => $customer->contact_person],
+                            ['icon' => 'map-pin', 'label' => 'Alamat', 'value' => $customer->address],
+                            ['icon' => 'phone', 'label' => 'Telepon', 'value' => $customer->phone],
+                            ['icon' => 'chat', 'label' => 'No WA', 'value' => $customer->whatsapp],
+                            ['icon' => 'mail', 'label' => 'Email', 'value' => $customer->email],
+                        ];
+                        $stats = [
+                            ['icon' => 'folder', 'label' => 'Total Project', 'value' => $totalProjects, 'chip' => 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400'],
+                            ['icon' => 'check-circle', 'label' => 'Project Selesai', 'value' => $doneProjects, 'chip' => 'bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400'],
+                            ['icon' => 'bolt', 'label' => 'Project Aktif', 'value' => $activeProjects, 'chip' => 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400'],
+                            ['icon' => 'users', 'label' => 'Total PIC', 'value' => $totalContacts, 'chip' => 'bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400'],
+                        ];
+                    @endphp
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- Info Perusahaan --}}
-                        <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
+                        <div data-rise="1" class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
                             <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Informasi Perusahaan</h3>
-                            <div class="space-y-3">
-                                <div>
-                                    <p class="text-xs text-slate-400">Nama</p>
-                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->name }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-slate-400">PIC</p>
-                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->contact_person ?? '-' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-slate-400">Alamat</p>
-                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->address ?? '-' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-slate-400">Telepon</p>
-                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->phone ?? '-' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-slate-400">No WA</p>
-                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->whatsapp ?? '-' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-slate-400">Email</p>
-                                    <p class="font-medium text-slate-800 dark:text-slate-100">{{ $customer->email ?? '-' }}</p>
-                                </div>
+                            <div class="space-y-1">
+                                @foreach($infoFields as $field)
+                                    <div class="info-row flex items-start gap-3 rounded-lg px-3 py-2 -mx-3">
+                                        <x-icon name="{{ $field['icon'] }}" class="w-4 h-4 mt-1 text-indigo-400 shrink-0" />
+                                        <div class="min-w-0">
+                                            <p class="text-xs text-slate-400">{{ $field['label'] }}</p>
+                                            <p class="font-medium text-slate-800 dark:text-slate-100">{{ $field['value'] ?? '-' }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
                         {{-- Statistik --}}
-                        <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
+                        <div data-rise="2" class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
                             <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Statistik</h3>
                             <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                                <div class="bg-white rounded-lg p-3 sm:p-4 text-center">
-                                    <p class="text-xl sm:text-2xl font-bold text-blue-600">{{ $customer->projects->count() }}</p>
-                                    <p class="text-[11px] sm:text-xs text-slate-500">Total Project</p>
-                                </div>
-                                <div class="bg-white rounded-lg p-4 text-center">
-                                    <p class="text-2xl font-bold text-green-600">
-                                        {{ $customer->projects->where('project_status_id', 5)->count() }}
-                                    </p>
-                                    <p class="text-xs text-slate-500">Project Selesai</p>
-                                </div>
-                                <div class="bg-white rounded-lg p-4 text-center">
-                                    <p class="text-2xl font-bold text-yellow-600">
-                                        {{ $customer->projects->where('project_status_id', '!=', 5)->where('project_status_id', '!=', 6)->count() }}
-                                    </p>
-                                    <p class="text-xs text-slate-500">Project Aktif</p>
-                                </div>
-                                <div class="bg-white rounded-lg p-4 text-center">
-                                    <p class="text-2xl font-bold text-purple-600">{{ $customer->contacts->count() }}</p>
-                                    <p class="text-xs text-slate-500">Total PIC</p>
-                                </div>
+                                @foreach($stats as $i => $stat)
+                                    <div class="stat-card bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm flex items-center gap-3" data-rise="{{ $i + 1 }}">
+                                        <span class="flex h-10 w-10 items-center justify-center rounded-lg {{ $stat['chip'] }} shrink-0">
+                                            <x-icon name="{{ $stat['icon'] }}" class="w-5 h-5" />
+                                        </span>
+                                        <div class="min-w-0">
+                                            <p class="text-2xl font-bold tabular-nums text-slate-800 dark:text-slate-100"
+                                               x-data="countUp({{ $stat['value'] }})" x-text="n"></p>
+                                            <p class="text-[11px] sm:text-xs text-slate-500">{{ $stat['label'] }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
 
-                    {{-- Recent Activity --}}
-                    <div class="mt-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
+                    {{-- Recent Activity: vertical timeline --}}
+                    <div data-rise="3" class="mt-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6">
                         <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Aktivitas Terbaru</h3>
-                        @php
-                            $activities = App\Models\ProjectActivity::whereIn('project_id', $customer->projects->pluck('id'))
-                                ->with(['project', 'user'])
-                                ->latest()
-                                ->take(5)
-                                ->get();
-                        @endphp
-                        @forelse($activities as $activity)
-                            <div class="flex items-start gap-3 py-2 border-b border-slate-200 last:border-0">
-                                <x-user-avatar :user="$activity->user" size="w-8 h-8" text="text-xs" />
-                                <div>
-                                    <p class="text-sm text-slate-800 dark:text-slate-100">
-                                        <span class="font-semibold">{{ $activity->user?->name ?? 'System' }}</span>
-                                        {{ $activity->title ?? 'Activity' }}
-                                        <span class="text-xs text-slate-400">· {{ $activity->created_at->diffForHumans() }}</span>
-                                    </p>
-                                    <p class="text-xs text-slate-500">{{ $activity->project?->name ?? 'Project' }}</p>
-                                </div>
+                        @if($activities->isNotEmpty())
+                            <div class="relative">
+                                <div class="absolute left-[15px] top-8 bottom-4 w-0.5 bg-slate-200 dark:bg-slate-700"></div>
+                                @foreach($activities as $activity)
+                                    <div class="relative pl-10 pb-5 last:pb-0" data-rise="{{ min($loop->iteration, 4) }}">
+                                        <div class="absolute left-0 top-0">
+                                            <x-user-avatar :user="$activity->user" size="w-8 h-8" text="text-xs" />
+                                        </div>
+                                        <div class="bg-white dark:bg-slate-800 rounded-xl p-3.5 shadow-sm">
+                                            <p class="text-sm text-slate-800 dark:text-slate-100">
+                                                <span class="font-semibold">{{ $activity->user?->name ?? 'System' }}</span>
+                                                {{ $activity->title ?? 'Activity' }}
+                                                <span class="text-xs text-slate-400">· {{ $activity->created_at->diffForHumans() }}</span>
+                                            </p>
+                                            <p class="text-xs text-slate-500 mt-0.5">{{ $activity->project?->name ?? 'Project' }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
-                        @empty
+                        @else
                             <p class="text-slate-400 text-sm text-center py-4">Belum ada aktivitas.</p>
-                        @endforelse
+                        @endif
                     </div>
                 </div>
 
@@ -647,4 +674,25 @@
         </div>
 
     </div>
+
+    <script>
+        function countUp(target, duration = 400) {
+            return {
+                n: 0,
+                init() {
+                    if (!target || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                        this.n = target;
+                        return;
+                    }
+                    const t0 = performance.now();
+                    const step = (t) => {
+                        const p = Math.min((t - t0) / duration, 1);
+                        this.n = Math.round(target * (1 - Math.pow(1 - p, 3)));
+                        if (p < 1) requestAnimationFrame(step);
+                    };
+                    requestAnimationFrame(step);
+                },
+            };
+        }
+    </script>
 </x-app-layout>
