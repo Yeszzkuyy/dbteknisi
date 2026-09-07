@@ -69,7 +69,6 @@
                                     <x-icon name="edit" class="h-4 w-4" />
                                 </a>
                             @endcan
->>>>>>> main
 
                             @can('manage-sales')
                                 <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline-flex" onsubmit="return confirm('Hapus customer ini?')">
