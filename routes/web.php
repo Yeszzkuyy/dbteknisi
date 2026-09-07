@@ -1,38 +1,40 @@
 <?php
 
+use App\Http\Controllers\AccountManagerController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminPanelController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CustomerContactController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentCategoryController;
+use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\KnowledgeBaseController;
+use App\Http\Controllers\LeadController;
+use App\Http\Controllers\ManageSalesController;
+use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\MonitoringController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OfficeAssistantController;
+use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectDocumentController;
+use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectSupportController;
 use App\Http\Controllers\ProjectTaskController;
-use App\Http\Controllers\TrashController;
-use App\Http\Controllers\DocumentCategoryController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\AccountManagerController;
-use App\Http\Controllers\WorkTypeController;
-use App\Http\Controllers\ProjectStatusController;
-use App\Http\Controllers\MeetingController;
-use App\Http\Controllers\LeadController;
-use App\Http\Controllers\FollowUpController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\MonitoringController;
-use App\Http\Controllers\AdminPanelController;
-use App\Http\Controllers\ManageSalesController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PartnerController;
-use App\Http\Controllers\TechnicianScheduleController;
 use App\Http\Controllers\TechnicianDashboardController;
+use App\Http\Controllers\TechnicianScheduleController;
+use App\Http\Controllers\TrashController;
+use App\Http\Controllers\WorkTypeController;
 use App\Livewire\ProjectStatusList;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
 
 Route::get('/dashboard',
-    [DashboardController::class,'index']
-)->middleware(['auth','verified'])->name('dashboard');
+    [DashboardController::class, 'index']
+)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
 
@@ -45,6 +47,22 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
     Route::get('/notifications/status', [NotificationController::class, 'status'])->name('notifications.status');
+
+    // ============================================
+    // AI ASSISTANT (OfficeAssistant)
+    // ============================================
+    Route::get('/ai/assistant', [OfficeAssistantController::class, 'index'])->name('ai.assistant.index');
+    Route::post('/ai/assistant', [OfficeAssistantController::class, 'send'])->name('ai.assistant.send');
+
+    // ============================================
+    // KNOWLEDGE BASE (AI / RAG) — Admin only
+    // ============================================
+    Route::middleware('permission:manage-admin')->prefix('knowledge-base')->name('knowledge-base.')->group(function () {
+        Route::get('/', [KnowledgeBaseController::class, 'index'])->name('index');
+        Route::post('/', [KnowledgeBaseController::class, 'store'])->name('store');
+        Route::post('/sync', [KnowledgeBaseController::class, 'sync'])->name('sync');
+        Route::delete('/{document}', [KnowledgeBaseController::class, 'destroy'])->name('destroy');
+    });
 
     // ============================================
     // SALES — manage
@@ -259,29 +277,29 @@ Route::middleware('auth')->group(function () {
     // MONITORING — Manager & Super Admin
     // ============================================
     Route::get('/monitoring',
-        [MonitoringController::class,'index']
-    )->middleware(['auth','verified','permission:view-monitoring|manage-monitoring'])->name('monitoring.index');
+        [MonitoringController::class, 'index']
+    )->middleware(['auth', 'verified', 'permission:view-monitoring|manage-monitoring'])->name('monitoring.index');
 
     // ============================================
     // ADMIN PANEL — Super Admin only (settings, config)
     // ============================================
     Route::middleware('permission:manage-monitoring')->prefix('admin-panel')->name('admin-panel.')->group(function () {
         Route::get('/', [AdminPanelController::class, 'index'])->name('index');
-        
+
         // Users
         Route::get('/users/create', [AdminPanelController::class, 'createUser'])->name('users.create');
         Route::post('/users', [AdminPanelController::class, 'storeUser'])->name('users.store');
         Route::get('/users/{user}/edit', [AdminPanelController::class, 'editUser'])->name('users.edit');
         Route::put('/users/{user}', [AdminPanelController::class, 'updateUser'])->name('users.update');
         Route::delete('/users/{user}', [AdminPanelController::class, 'destroyUser'])->name('users.destroy');
-        
+
         // Roles
         Route::get('/roles/create', [AdminPanelController::class, 'createRole'])->name('roles.create');
         Route::post('/roles', [AdminPanelController::class, 'storeRole'])->name('roles.store');
         Route::get('/roles/{role}/edit', [AdminPanelController::class, 'editRole'])->name('roles.edit');
         Route::put('/roles/{role}', [AdminPanelController::class, 'updateRole'])->name('roles.update');
         Route::delete('/roles/{role}', [AdminPanelController::class, 'destroyRole'])->name('roles.destroy');
-        
+
         // Audit Log
         Route::get('/audit-log', [AdminPanelController::class, 'auditLog'])->name('audit-log');
 

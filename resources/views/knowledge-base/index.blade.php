@@ -1,0 +1,148 @@
+<x-app-layout>
+    @php
+        $statusMeta = [
+            'indexing' => ['label' => 'Indexing', 'class' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'],
+            'ready' => ['label' => 'Siap', 'class' => 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-300'],
+            'failed' => ['label' => 'Gagal', 'class' => 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300'],
+        ];
+    @endphp
+
+    <div class="px-4 sm:px-6 lg:px-8">
+        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Knowledge Base</h1>
+                <p class="mt-1 text-slate-500 dark:text-slate-400">Unggah dokumen internal perusahaan untuk menjawab pertanyaan AI (SOP, proposal, dokumentasi, laporan).</p>
+            </div>
+            <form action="{{ route('knowledge-base.sync') }}" method="POST" class="shrink-0">
+                @csrf
+                <button type="submit" class="rounded-xl bg-green-100 px-5 py-2.5 text-sm font-semibold text-green-700 transition hover:bg-green-200">
+                    Periksa Status Indexing
+                </button>
+            </form>
+        </div>
+
+        @if($errors->has('sync') || $errors->has('delete'))
+            <div class="mb-4 rounded-xl bg-red-100 px-5 py-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                {{ $errors->first('sync') ?? $errors->first('delete') }}
+            </div>
+        @endif
+
+        {{-- Upload form --}}
+        <div class="mb-8 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700">
+            <h2 class="mb-4 text-lg font-bold text-slate-800 dark:text-slate-100">Unggah Dokumen</h2>
+            <form action="{{ route('knowledge-base.store') }}" method="POST" enctype="multipart/form-data" class="grid gap-4 md:grid-cols-2">
+                @csrf
+
+                <div>
+                    <x-input-label for="document" :value="'File Dokumen'" />
+                    <input type="file" name="document" id="document"
+                           class="mt-1 block w-full rounded-xl border-slate-300 text-sm dark:border-slate-600"
+                           accept=".pdf,.txt,.md,.html,.doc,.docx,.xls,.xlsx,.ppt,.pptx" required />
+                    <x-input-error :messages="$errors->get('document')" class="mt-1" />
+                    <p class="mt-1 text-xs text-slate-400">PDF, teks, markdown, HTML, atau dokumen Office (maks 20 MB).</p>
+                </div>
+
+                <div>
+                    <x-input-label for="category" :value="'Kategori'" />
+                    <select name="category" id="category" required
+                            class="mt-1 block w-full rounded-xl border-slate-300 text-sm dark:border-slate-600">
+                        <option value="">Pilih kategori…</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->value }}" @selected(old('category') === $category->value)>{{ $category->label() }}</option>
+                        @endforeach
+                    </select>
+                    <x-input-error :messages="$errors->get('category')" class="mt-1" />
+                </div>
+
+                <div>
+                    <x-input-label for="project_id" :value="'Project Terkait (opsional)'" />
+                    <select name="project_id" id="project_id"
+                            class="mt-1 block w-full rounded-xl border-slate-300 text-sm dark:border-slate-600">
+                        <option value="">Tidak ada</option>
+                        @foreach($projects as $project)
+                            <option value="{{ $project->id }}" @selected(old('project_id') == $project->id)>{{ $project->project_name }}</option>
+                        @endforeach
+                    </select>
+                    <x-input-error :messages="$errors->get('project_id')" class="mt-1" />
+                </div>
+
+                <div class="flex items-end">
+                    <button type="submit"
+                            class="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+                        Unggah Dokumen
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {{-- Filter --}}
+        <div class="mb-4 flex flex-wrap gap-2">
+            <a href="{{ route('knowledge-base.index') }}"
+               class="rounded-full px-4 py-1.5 text-xs font-semibold transition {{ blank($filters['category'] ?? null) ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                Semua Kategori
+            </a>
+            @foreach($categories as $category)
+                <a href="{{ route('knowledge-base.index', ['category' => $category->value, 'status' => $filters['status'] ?? null]) }}"
+                   class="rounded-full px-4 py-1.5 text-xs font-semibold transition {{ ($filters['category'] ?? null) === $category->value ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                    {{ $category->label() }}
+                </a>
+            @endforeach
+        </div>
+
+        {{-- Table --}}
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-600">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+                    <thead class="bg-slate-50 dark:bg-slate-700">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-200">File</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-200">Kategori</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-200">Project</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-200">Uploader</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-200">Tanggal</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-200">Status</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
+                        @forelse($documents as $document)
+                            <tr class="transition hover:bg-slate-50 dark:hover:bg-white/5">
+                                <td class="max-w-[220px] px-6 py-4">
+                                    <p class="truncate font-medium text-slate-800 dark:text-slate-100">{{ $document->original_name }}</p>
+                                    <p class="text-xs text-slate-400">{{ number_format($document->size / 1024, 1) }} KB</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+                                        {{ $document->category->label() }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $document->project?->name ?? '—' }}</td>
+                                <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $document->uploader?->name ?? '—' }}</td>
+                                <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $document->created_at->format('d M Y H:i') }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusMeta[$document->status]['class'] ?? 'bg-slate-100 text-slate-600' }}">
+                                        {{ $statusMeta[$document->status]['label'] ?? $document->status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <form action="{{ route('knowledge-base.destroy', $document) }}" method="POST"
+                                          onsubmit="return confirm('Hapus dokumen ini dari Knowledge Base?')" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="rounded-lg bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-200">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-sm text-slate-400">Belum ada dokumen di Knowledge Base.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

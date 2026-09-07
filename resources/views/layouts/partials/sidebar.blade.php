@@ -49,6 +49,12 @@
                         <x-icon name="users" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                         <span>Customer</span>
                     </a>
+                    <a href="{{ route('ai.assistant.index') }}"
+                       aria-current="{{ request()->routeIs('ai.assistant*') ? 'page' : 'false' }}"
+                       class="{{ $navLink }} {{ request()->routeIs('ai.assistant*') ? $navActive : $navInactive }}">
+                        <x-icon name="message" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                        <span>AI Assistant</span>
+                    </a>
                 </div>
             </section>
 
@@ -338,6 +344,16 @@
                                class="{{ $navLink }} {{ request()->routeIs('trash*') ? $navActive : $navInactive }}">
                                 <x-icon name="trash" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                                 <span>Trash</span>
+                            </a>
+                        @endcan
+
+                        {{-- Knowledge Base (Admin only) --}}
+                        @can('manage-admin')
+                            <a href="{{ route('knowledge-base.index') }}"
+                               aria-current="{{ request()->routeIs('knowledge-base*') ? 'page' : 'false' }}"
+                               class="{{ $navLink }} {{ request()->routeIs('knowledge-base*') ? $navActive : $navInactive }}">
+                                <x-icon name="book" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                <span>Knowledge Base</span>
                             </a>
                         @endcan
 
