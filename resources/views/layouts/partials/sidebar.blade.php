@@ -8,7 +8,7 @@
     $customerActive = request()->routeIs('customers*');
     $managementActive = request()->routeIs('manage-sales*') || request()->routeIs('manage.*');
     $technicianActive = request()->routeIs('projects*') || request()->routeIs('teknisi.*');
-    $marketingActive = request()->routeIs(['leads*', 'partners*', 'marketing.dashboard']);
+    $marketingActive = request()->routeIs(['leads*', 'partners*', 'marketing.dashboard', 'whatsapp-center*']);
     $salesActive = request()->routeIs('sales.*') || request()->routeIs('projects*');
     $adminActive = request()->routeIs('admin.invoices.*') || request()->routeIs('admin.pos.*') || request()->routeIs('admin.payments.*');
     $adminPanelActive = request()->routeIs('admin-panel*');
@@ -197,6 +197,12 @@
                                        class="{{ $subNavLink }} {{ request()->routeIs('marketing.dashboard') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
                                         <span>Dashboard</span>
+                                    </a>
+                                    <a href="{{ route('whatsapp-center.index') }}"
+                                       aria-current="{{ request()->routeIs('whatsapp-center*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('whatsapp-center*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
+                                        <span>WhatsApp Center</span>
                                     </a>
                                     <a href="{{ route('leads.index') }}"
                                        aria-current="{{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 'page' : 'false' }}"
