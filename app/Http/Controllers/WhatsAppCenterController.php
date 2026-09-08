@@ -119,15 +119,17 @@ class WhatsAppCenterController extends Controller
             'status' => 'queued',
         ]);
 
-        $gatewayMessageId = $this->gateway->sendText($account, $sender, $validated['message_body']);
-        $status = 'queued';
-
-        if ($gatewayMessageId) {
+        if (!$this->gateway->configured($account)) {
+            $status = 'queued';
+        } elseif ($gatewayMessageId = $this->gateway->sendText($account, $sender, $validated['message_body'])) {
             $message->update([
                 'gateway_message_id' => $gatewayMessageId,
                 'status' => 'sent',
             ]);
             $status = 'sent';
+        } else {
+            $message->update(['status' => 'failed']);
+            $status = 'failed';
         }
 
         return response()->json([
