@@ -30,7 +30,7 @@ class KnowledgeBaseCitations
 
     protected static function resolveOne(mixed $citation): ?array
     {
-        $url = $citation->url ?? null;
+        $url = is_array($citation) ? ($citation['url'] ?? null) : ($citation->url ?? null);
         $fileId = static::extractFileId($url);
 
         if ($fileId) {
@@ -53,8 +53,9 @@ class KnowledgeBaseCitations
             }
         }
 
-        if (! blank($citation->title ?? null)) {
-            return ['name' => $citation->title, 'category' => null];
+        $title = is_array($citation) ? ($citation['title'] ?? null) : ($citation->title ?? null);
+        if (! blank($title)) {
+            return ['name' => $title, 'category' => null];
         }
 
         return null;

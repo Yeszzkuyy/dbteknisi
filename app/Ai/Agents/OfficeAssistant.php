@@ -22,7 +22,7 @@ use Laravel\Ai\Promptable;
 use Laravel\Ai\Providers\Tools\FileSearch;
 use Stringable;
 
-#[Provider(Lab::Gemini)]
+#[Provider(Lab::OpenRouter)]
 #[Temperature(0.3)]
 #[MaxTokens(2048)]
 class OfficeAssistant implements Agent, Conversational, HasTools

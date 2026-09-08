@@ -2,192 +2,438 @@
     @php
         $chatInit = [
             'conversationId' => $conversation?->id,
-            'messages' => $messages,
+            'conversations' => $conversations ?? [],
+            'messages' => $messages ?? [],
         ];
     @endphp
     <script>window.chatInit = @json($chatInit);</script>
 
     <div class="ai-page" x-data="officeAssistant()">
-        {{-- Header halaman AI --}}
-        <header class="ai-header">
-            <span class="ai-header-icon"><x-icon name="message" class="h-5 w-5" /></span>
-            <div class="min-w-0">
-                <h2 class="ai-header-title">Office Assistant</h2>
-                <p class="ai-header-sub">AI Assistant · data realtime dari sistem</p>
-            </div>
-        </header>
-
-        {{-- Area percakapan --}}
-        <div class="ai-conversation" x-ref="messages" @scroll="onScroll">
-            {{-- Empty state --}}
-            <div x-show="messages.length === 0" class="ai-empty" x-cloak>
-                <span class="ai-empty-icon">✦</span>
-                <p class="ai-empty-title">Office Assistant</p>
-                <p class="ai-empty-desc">Ada yang bisa saya bantu?</p>
-                <p class="ai-empty-hint">Tanyakan tentang project, tugas, dokumen, atau data perusahaan.</p>
+        <aside class="ai-history" :class="historyOpen ? 'is-open' : ''" aria-label="Riwayat percakapan">
+            <div class="ai-history-head">
+                <div class="ai-history-brand">
+                    <span class="ai-history-mark"><x-icon name="message" class="h-4 w-4" /></span>
+                    <span>Office Assistant</span>
+                </div>
+                <button type="button" class="ai-icon-button ai-history-close" @click="historyOpen = false" aria-label="Tutup riwayat percakapan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                </button>
             </div>
 
-            <template x-for="msg in messages" :key="msg.id">
-                <div>
-                    {{-- Pesan AI: transparan, ikon di kiri --}}
-                    <div x-show="msg.role === 'assistant'" class="ai-row" x-cloak>
-                        <span class="ai-row-icon"><x-icon name="message" class="h-4 w-4" /></span>
-                        <div class="ai-content">
-                            <div class="md" x-html="renderMarkdown(msg.content)"></div>
-                            <div class="ai-sources" x-show="msg.sources && msg.sources.length" x-cloak>
-                                <template x-for="src in msg.sources" :key="src.name">
-                                    <span class="source-chip">📄 <span x-text="src.name"></span><span x-show="src.category" x-text="' · '+src.category"></span></span>
-                                </template>
-                            </div>
+            <button type="button" class="ai-new-chat" @click="newChat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14" />
+                </svg>
+                <span>New Chat</span>
+            </button>
+
+            <div class="ai-history-label">Riwayat chat</div>
+            <div class="ai-history-list">
+                <div x-show="conversations.length === 0" class="ai-history-empty" x-cloak>
+                    Belum ada percakapan.
+                </div>
+
+                <template x-for="chat in conversations" :key="chat.id">
+                    <div class="ai-history-item" :class="conversationId === chat.id ? 'is-active' : ''">
+                        <button type="button" class="ai-history-link" x-show="editingId !== chat.id" @click="openConversation(chat.id)" :aria-current="conversationId === chat.id ? 'page' : 'false'">
+                            <span class="ai-history-title" x-text="chat.title"></span>
+                            <span class="ai-history-date" x-text="formatDate(chat.updated_at)"></span>
+                        </button>
+                        <button type="button" class="ai-history-more" x-show="editingId !== chat.id" @click.stop="menuId = menuId === chat.id ? null : chat.id" :aria-expanded="menuId === chat.id" aria-label="Aksi percakapan">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
+                            </svg>
+                        </button>
+                        <div x-show="menuId === chat.id && editingId !== chat.id" x-cloak @click.outside="menuId = null" class="ai-history-menu">
+                            <button type="button" @click="beginRename(chat)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a2.121 2.121 0 013 3L7.5 18.849 3 20l1.151-4.5L16.862 3.487z" />
+                                </svg>
+                                Rename
+                            </button>
+                            <button type="button" class="is-danger" @click="deleteConversation(chat)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16m-10 4v6m4-6v6M9 7V4h6v3m-9 0 1 13h10l1-13" />
+                                </svg>
+                                Hapus
+                            </button>
+                        </div>
+                        <div x-show="editingId === chat.id" x-cloak class="ai-history-rename">
+                            <input type="text" x-model="renameDraft" maxlength="100" aria-label="Nama percakapan baru" @keydown.enter.prevent="saveRename(chat)" @keydown.escape="cancelRename">
+                            <button type="button" @click="saveRename(chat)" aria-label="Simpan nama percakapan">✓</button>
+                            <button type="button" @click="cancelRename" aria-label="Batalkan rename">&times;</button>
                         </div>
                     </div>
-                    {{-- Pesan user: kompak, rata kanan --}}
-                    <div x-show="msg.role === 'user'" class="user-row" x-cloak>
-                        <div class="user-msg" x-text="msg.content"></div>
+                </template>
+            </div>
+
+            <div class="ai-history-foot">
+                <span class="ai-status-dot" aria-hidden="true"></span>
+                <span>Data realtime dari sistem</span>
+            </div>
+        </aside>
+
+        <div class="ai-history-backdrop" x-show="historyOpen" x-cloak @click="historyOpen = false"></div>
+
+        <section class="ai-workspace">
+            <header class="ai-chat-header">
+                <div class="ai-chat-heading">
+                    <button type="button" class="ai-icon-button ai-mobile-history" @click="historyOpen = true" aria-label="Buka riwayat percakapan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <span class="ai-chat-icon"><x-icon name="message" class="h-5 w-5" /></span>
+                    <div class="min-w-0">
+                        <h1>Office Assistant</h1>
+                        <p><span class="ai-status-dot" aria-hidden="true"></span> Asisten AI internal</p>
                     </div>
                 </div>
-            </template>
+                <button type="button" class="ai-header-new" @click="newChat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14" />
+                    </svg>
+                    <span>New Chat</span>
+                </button>
+            </header>
 
-            {{-- Loading state --}}
-            <div x-show="busy" class="ai-row" x-cloak>
-                <span class="ai-row-icon"><x-icon name="message" class="h-4 w-4" /></span>
-                <div class="typing" role="status" aria-label="AI sedang berpikir">
+            <div class="ai-conversation" x-ref="messages" @scroll="onScroll" aria-live="polite">
+                <div x-show="messages.length === 0 && !loadingConversation" class="ai-empty" x-cloak>
+                    <div class="ai-empty-mark"><x-icon name="message" class="h-6 w-6" /></div>
+                    <h2>Mulai percakapan</h2>
+                    <p>Tanyakan tentang project, tugas, dokumen, atau data perusahaan.</p>
+                    <div class="ai-suggestions">
+                        <button type="button" @click="draft = 'Apa tugas saya yang paling dekat?'; focusInput()">Tugas saya</button>
+                        <button type="button" @click="draft = 'Tampilkan project terbaru saya'; focusInput()">Project terbaru</button>
+                        <button type="button" @click="draft = 'Bagaimana ringkasan penjualan terbaru?'; focusInput()">Ringkasan penjualan</button>
+                    </div>
+                </div>
+
+                <div x-show="loadingConversation" class="ai-loading-history" x-cloak role="status">
                     <span></span><span></span><span></span>
+                    Memuat percakapan…
+                </div>
+
+                <template x-for="msg in messages" :key="msg.id">
+                    <article class="ai-message" :class="msg.role === 'user' ? 'is-user' : 'is-assistant'">
+                        <template x-if="msg.role === 'assistant'">
+                            <div class="ai-assistant-row">
+                                <span class="ai-message-avatar"><x-icon name="message" class="h-4 w-4" /></span>
+                                <div class="ai-message-body">
+                                    <div class="ai-message-author">Office Assistant</div>
+                                    <div class="md" x-html="renderMarkdown(msg.content)"></div>
+                                    <div class="ai-sources" x-show="msg.sources && msg.sources.length" x-cloak>
+                                        <template x-for="src in msg.sources" :key="src.name">
+                                            <span class="ai-source-chip">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 3h8l4 4v14H6zM14 3v5h5" />
+                                                </svg>
+                                                <span x-text="src.name"></span>
+                                                <span x-show="src.category" x-text="' · '+src.category"></span>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template x-if="msg.role === 'user'">
+                            <div class="ai-user-row">
+                                <div class="ai-user-bubble">
+                                    <div x-show="msg.content" x-text="msg.content"></div>
+                                    <div class="ai-message-files" x-show="msg.attachments && msg.attachments.length" x-cloak>
+                                        <template x-for="file in msg.attachments" :key="file.name">
+                                            <span class="ai-file-chip">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6" />
+                                                </svg>
+                                                <span x-text="file.name"></span>
+                                            </span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </article>
+                </template>
+
+                <div x-show="busy" class="ai-assistant-row ai-thinking" x-cloak role="status" aria-label="AI sedang berpikir">
+                    <span class="ai-message-avatar"><x-icon name="message" class="h-4 w-4" /></span>
+                    <div class="ai-thinking-body"><span></span><span></span><span></span></div>
                 </div>
             </div>
 
-            {{-- Error state --}}
-            <div x-show="error" class="ai-error" x-cloak>
-                <p x-text="error"></p>
-                <button type="button" @click="error = ''" class="ai-error-close" aria-label="Tutup pesan kesalahan">✕</button>
-            </div>
-        </div>
-
-        {{-- Tombol kembali ke bawah --}}
-        <button type="button" class="ai-jump" x-show="!atBottom" @click="scrollToBottom(true)" x-cloak aria-label="Kembali ke pesan terbaru">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7-7-7m14-8l-7 7-7-7" />
-            </svg>
-        </button>
-
-        {{-- Composer --}}
-        <form class="ai-composer" @submit.prevent="send">
-            <textarea x-model="draft" x-ref="input" rows="1" placeholder="Tulis pesan…"
-                      aria-label="Tulis pesan untuk Office Assistant"
-                      @input="resize"
-                      @keydown.enter="onEnter($event)"></textarea>
-            <button type="submit" class="ai-send" :disabled="busy" aria-label="Kirim pesan" x-bind:title="busy ? 'Mengirim…' : 'Kirim'">
-                <svg x-show="!busy" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
-                    <path d="M3.4 20.6 21.5 12 3.4 3.4 3.4 10l12.9 2L3.4 14z" />
-                </svg>
-                <svg x-show="busy" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            <button type="button" class="ai-jump" x-show="!atBottom" @click="scrollToBottom(true)" x-cloak aria-label="Kembali ke pesan terbaru">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
                 </svg>
             </button>
-        </form>
+
+            <div class="ai-composer-area">
+                <div x-show="error" class="ai-error" x-cloak role="alert">
+                    <span x-text="error"></span>
+                    <button type="button" @click="error = ''" aria-label="Tutup pesan kesalahan">&times;</button>
+                </div>
+
+                <div x-show="attachments.length" class="ai-attachment-preview" x-cloak aria-label="Lampiran terpilih">
+                    <template x-for="(attachment, index) in attachments" :key="attachment.id">
+                        <div class="ai-attachment-card">
+                            <template x-if="attachment.isImage">
+                                <img :src="attachment.previewUrl" :alt="attachment.name">
+                            </template>
+                            <template x-if="!attachment.isImage">
+                                <span class="ai-attachment-file-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6" />
+                                    </svg>
+                                </span>
+                            </template>
+                            <span class="ai-attachment-meta">
+                                <strong x-text="attachment.name"></strong>
+                                <small x-text="formatBytes(attachment.size)"></small>
+                            </span>
+                            <button type="button" @click="removeAttachment(index)" aria-label="Hapus lampiran">
+                                &times;
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
+                <form class="ai-composer" @submit.prevent="send">
+                    <div class="ai-plus-wrap">
+                        <button type="button" class="ai-composer-button" @click="plusOpen = !plusOpen" :aria-expanded="plusOpen" aria-label="Tambah lampiran atau input suara">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" d="M12 5v14m-7-7h14" />
+                            </svg>
+                        </button>
+                        <div x-show="plusOpen" x-cloak @click.outside="plusOpen = false" class="ai-plus-menu">
+                            <button type="button" @click="$refs.imageInput.click(); plusOpen = false">
+                                <span class="ai-menu-icon is-image">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                        <rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9" r="1.5" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 16l4-4 3 3 3-3 8 7" />
+                                    </svg>
+                                </span>
+                                <span>Tambahkan gambar</span>
+                            </button>
+                            <button type="button" @click="$refs.fileInput.click(); plusOpen = false">
+                                <span class="ai-menu-icon is-file">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6" />
+                                    </svg>
+                                </span>
+                                <span>Tambahkan file</span>
+                            </button>
+                            <button type="button" @click="toggleSpeech(); plusOpen = false" :class="listening ? 'is-listening' : ''">
+                                <span class="ai-menu-icon is-mic">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                        <rect x="9" y="3" width="6" height="11" rx="3" /><path stroke-linecap="round" d="M5 11a7 7 0 0014 0M12 18v3m-3 0h6" />
+                                    </svg>
+                                </span>
+                                <span x-text="listening ? 'Berhenti merekam' : 'Input suara'"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <input x-ref="imageInput" class="sr-only" type="file" accept="image/jpeg,image/png,image/gif,image/webp" @change="addFiles($event)">
+                    <input x-ref="fileInput" class="sr-only" type="file" accept=".pdf,.txt,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" @change="addFiles($event)">
+
+                    <textarea x-model="draft" x-ref="input" rows="1" placeholder="Tulis pesan untuk Office Assistant…"
+                              aria-label="Tulis pesan untuk Office Assistant"
+                              @input="resize"
+                              @keydown.enter="onEnter($event)"></textarea>
+
+                    <span class="ai-listening" x-show="listening" x-cloak>Mendengarkan…</span>
+                    <button type="submit" class="ai-send" :disabled="busy || (!draft.trim() && !attachments.length)" aria-label="Kirim pesan" :title="busy ? 'Mengirim…' : 'Kirim pesan'">
+                        <svg x-show="!busy" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M3.4 20.6 21.5 12 3.4 3.4 3.4 10l12.9 2L3.4 14z" />
+                        </svg>
+                        <svg x-show="busy" class="ai-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" opacity=".25" />
+                            <path fill="currentColor" d="M12 3a9 9 0 018.66 6.56l-2.9.78A6 6 0 0012 6V3z" />
+                        </svg>
+                    </button>
+                </form>
+                <p class="ai-composer-hint">AI dapat membuat kesalahan. Verifikasi informasi penting dari sistem.</p>
+            </div>
+        </section>
     </div>
 
     <style>
-        /* ===== Full-screen: hanya aktif di halaman AI (style ini dimuat hanya di view ini) ===== */
         .main-content{height:100dvh;overflow:hidden}
-        .main-content main{display:flex;flex-direction:column;min-height:0;padding-bottom:0!important}
-        .ai-page{position:relative;height:100%;width:100%;max-width:850px;margin:0 auto;display:flex;flex-direction:column;min-height:0;padding:0 clamp(1rem,4vw,2rem)}
-
-        /* ===== Header halaman AI ===== */
-        .ai-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:.75rem;padding:.9rem 0;margin-bottom:.5rem;border-bottom:1px solid var(--card-border);background:var(--card-bg)}
-        .ai-header-icon{display:inline-flex;align-items:center;justify-content:center;width:2.4rem;height:2.4rem;flex:none;border-radius:.85rem;color:#fff;background:linear-gradient(135deg,#2563eb,#7c3aed);box-shadow:0 6px 16px -8px rgba(99,102,241,.55)}
-        .ai-header-title{font-size:1rem;font-weight:700;color:var(--text-primary);line-height:1.2}
-        .ai-header-sub{font-size:.75rem;color:var(--text-muted);line-height:1.3}
-
-        /* ===== Area percakapan ===== */
-        .ai-conversation{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:1.25rem;padding:1rem .25rem 1.25rem}
-        .ai-row{display:flex;gap:.75rem;align-items:flex-start}
-        .ai-row-icon{display:inline-flex;align-items:center;justify-content:center;width:1.75rem;height:1.75rem;flex:none;border-radius:.625rem;color:#fff;background:linear-gradient(135deg,#2563eb,#7c3aed);margin-top:.1rem}
-        .ai-content{flex:1;min-width:0}
-        .ai-content .md{line-height:1.6;color:var(--text-primary);font-size:.925rem;text-align:left}
-
-        /* ===== Pesan user ===== */
-        .user-row{display:flex;justify-content:flex-end}
-        .user-msg{max-width:75%;background:#eef2ff;color:#1e293b;border-radius:16px 16px 4px 16px;padding:.6rem 1rem;line-height:1.55;font-size:.925rem;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;border:1px solid #e0e7ff}
-        .dark .user-msg{background:#2D3748;color:#f1f5f9;border-color:#374151}
-
-        /* ===== Sumber KB ===== */
-        .ai-sources{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
-        .source-chip{display:inline-flex;align-items:center;gap:.3rem;border:1px solid var(--card-border);background:var(--card-bg-hover);color:var(--text-secondary);border-radius:.5rem;padding:.2rem .6rem;font-size:.75rem}
-
-        /* ===== Empty state ===== */
-        .ai-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 1rem;gap:.35rem}
-        .ai-empty-icon{font-size:1.6rem;color:var(--text-muted)}
-        .ai-empty-title{font-size:1.05rem;font-weight:700;color:var(--text-primary)}
-        .ai-empty-desc{font-size:.95rem;color:var(--text-secondary)}
-        .ai-empty-hint{font-size:.8rem;color:var(--text-muted);max-width:30rem}
-
-        /* ===== Loading & error ===== */
-        .typing{display:inline-flex;gap:.3rem;align-items:center;padding:.65rem 1rem;border-radius:1rem;background:var(--card-bg-hover)}
-        .typing span{width:.4rem;height:.4rem;border-radius:50%;background:var(--text-muted);animation:typing 1.2s infinite ease-in-out}
-        .typing span:nth-child(2){animation-delay:.15s}
-        .typing span:nth-child(3){animation-delay:.3s}
-        @keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
-        .ai-error{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;border:1px solid rgba(220,38,38,.3);background:rgba(254,226,226,.85);color:#b91c1c;border-radius:.75rem;padding:.6rem .85rem;font-size:.85rem}
-        .dark .ai-error{background:rgba(127,29,29,.5);color:#fecaca;border-color:rgba(248,113,113,.35)}
-        .ai-error-close{flex:none;background:none;border:none;color:inherit;cursor:pointer;font-size:.85rem;padding:.1rem .3rem;border-radius:.375rem}
-        .ai-error-close:hover{background:rgba(0,0,0,.06)}
-
-        /* ===== Tombol kembali ke bawah ===== */
-        .ai-jump{position:absolute;right:clamp(.5rem,3vw,2rem);bottom:7rem;display:inline-flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;border-radius:9999px;color:var(--text-secondary);background:var(--card-bg);border:1px solid var(--card-border);box-shadow:var(--shadow-lift);cursor:pointer;transition:transform .1s,background-color .15s}
-        .ai-jump:hover{background:var(--card-bg-hover)}
-        .ai-jump:active{transform:scale(.94)}
-
-        /* ===== Composer ===== */
-        .ai-composer{position:relative;display:flex;align-items:flex-end;gap:.6rem;padding:.55rem;margin-bottom:clamp(.75rem,2vh,1.5rem);border-radius:24px;background:var(--card-bg);border:1px solid var(--card-border);box-shadow:var(--shadow-lift)}
-        .ai-composer:focus-within{border-color:rgba(59,130,246,.6);box-shadow:var(--shadow-lift),0 0 0 3px rgba(59,130,246,.15)}
-        .ai-composer textarea{flex:1;resize:none;background:transparent!important;border:none!important;outline:none!important;box-shadow:none!important;color:var(--input-text)!important;font-size:.925rem;line-height:1.5;padding:.45rem .65rem;max-height:180px;overflow-y:auto}
+        .main-content main{display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:0!important}
+        .ai-page{position:relative;display:flex;flex:1;min-height:0;width:100%;overflow:hidden;background:var(--card-bg);color:var(--text-primary)}
+        .ai-history{position:relative;z-index:40;display:flex;width:17rem;flex:none;flex-direction:column;border-right:1px solid var(--card-border);background:var(--card-bg-hover);transition:transform .25s var(--ease-out)}
+        .ai-history-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:1.1rem 1rem .9rem}
+        .ai-history-brand{display:flex;align-items:center;gap:.6rem;font-size:.85rem;font-weight:700;letter-spacing:-.01em}
+        .ai-history-mark,.ai-chat-icon,.ai-message-avatar{display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff;background:#2563eb}
+        .ai-history-mark{width:1.8rem;height:1.8rem;border-radius:.55rem}
+        .ai-icon-button{display:inline-flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;border:1px solid transparent;border-radius:.65rem;color:var(--text-secondary);background:transparent;cursor:pointer}
+        .ai-icon-button svg{width:1.1rem;height:1.1rem}
+        .ai-icon-button:hover{background:var(--card-bg);color:var(--text-primary);border-color:var(--card-border)}
+        .ai-history-close,.ai-mobile-history{display:none}
+        .ai-new-chat{display:flex;align-items:center;justify-content:center;gap:.55rem;margin:0 1rem .9rem;padding:.65rem .85rem;border:1px solid #2563eb;border-radius:.65rem;color:#fff;background:#2563eb;font-size:.83rem;font-weight:700;cursor:pointer}
+        .ai-new-chat:hover{background:#1d4ed8;border-color:#1d4ed8}
+        .ai-new-chat svg{width:1rem;height:1rem}
+        .ai-history-label{padding:.25rem 1rem .5rem;color:var(--text-muted);font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+        .ai-history-list{min-height:0;flex:1;overflow-y:auto;padding:0 .55rem}
+        .ai-history-empty{padding:1.5rem .6rem;color:var(--text-muted);font-size:.78rem;line-height:1.5;text-align:center}
+        .ai-history-item{position:relative;display:flex;align-items:center;margin:.15rem 0;border:1px solid transparent;border-radius:.65rem;color:var(--text-secondary)}
+        .ai-history-item:hover,.ai-history-item.is-active{background:var(--card-bg);border-color:var(--card-border);color:var(--text-primary)}
+        .ai-history-item.is-active{box-shadow:var(--shadow-rest)}
+        .ai-history-link{display:flex;min-width:0;flex:1;flex-direction:column;gap:.2rem;padding:.62rem .4rem .62rem .65rem;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}
+        .ai-history-title{overflow:hidden;font-size:.78rem;font-weight:600;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
+        .ai-history-date{color:var(--text-muted);font-size:.65rem}
+        .ai-history-rename{display:flex;align-items:center;gap:.2rem;width:100%;padding:.35rem}
+        .ai-history-rename input{min-width:0;flex:1;padding:.35rem .4rem!important;border:1px solid var(--input-border)!important;border-radius:.4rem!important;background:var(--input-bg)!important;font-size:.72rem}
+        .ai-history-rename button{display:inline-flex;align-items:center;justify-content:center;width:1.5rem;height:1.8rem;border:0;border-radius:.35rem;color:var(--text-secondary);background:transparent;cursor:pointer}
+        .ai-history-rename button:hover{color:#2563eb;background:var(--card-bg-hover)}
+        .ai-history-more{display:inline-flex;align-items:center;justify-content:center;width:2.1rem;height:2.3rem;margin-right:.2rem;border:0;border-radius:.45rem;color:var(--text-muted);background:transparent;cursor:pointer;opacity:0}
+        .ai-history-item:hover .ai-history-more,.ai-history-item.is-active .ai-history-more,.ai-history-more:focus-visible{opacity:1}
+        .ai-history-more:hover{background:var(--card-bg-hover);color:var(--text-primary)}
+        .ai-history-more svg{width:1rem;height:1rem}
+        .ai-history-menu{position:absolute;top:2.4rem;right:.35rem;z-index:60;width:8.5rem;padding:.3rem;border:1px solid var(--card-border);border-radius:.65rem;background:var(--card-bg);box-shadow:var(--shadow-lift)}
+        .ai-history-menu button{display:flex;align-items:center;gap:.45rem;width:100%;padding:.48rem .55rem;border:0;border-radius:.4rem;color:var(--text-secondary);background:transparent;font-size:.75rem;text-align:left;cursor:pointer}
+        .ai-history-menu button:hover{background:var(--card-bg-hover);color:var(--text-primary)}
+        .ai-history-menu button.is-danger:hover{color:#dc2626;background:rgba(254,226,226,.65)}
+        .ai-history-menu svg{width:.85rem;height:.85rem}
+        .ai-history-foot{display:flex;align-items:center;gap:.45rem;padding:.8rem 1rem 1rem;border-top:1px solid var(--card-border);color:var(--text-muted);font-size:.68rem}
+        .ai-status-dot{display:inline-block;width:.42rem;height:.42rem;flex:none;border-radius:9999px;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.12)}
+        .ai-history-backdrop{display:none}
+        .ai-workspace{position:relative;display:flex;min-width:0;min-height:0;flex:1;flex-direction:column;background:var(--card-bg)}
+        .ai-chat-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:4.25rem;padding:.75rem clamp(1rem,3vw,2.5rem);border-bottom:1px solid var(--card-border);background:var(--card-bg)}
+        .ai-chat-heading{display:flex;align-items:center;gap:.7rem;min-width:0}
+        .ai-chat-icon{width:2.2rem;height:2.2rem;border-radius:.7rem}
+        .ai-chat-heading h1{overflow:hidden;margin:0;font-size:.94rem;font-weight:700;line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
+        .ai-chat-heading p{display:flex;align-items:center;gap:.4rem;margin-top:.2rem;color:var(--text-muted);font-size:.7rem}
+        .ai-header-new{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem .7rem;border:1px solid var(--card-border);border-radius:.6rem;color:var(--text-secondary);background:var(--card-bg);font-size:.75rem;font-weight:600;cursor:pointer}
+        .ai-header-new:hover{border-color:#93c5fd;color:#1d4ed8;background:#eff6ff}
+        .dark .ai-header-new:hover{color:#bfdbfe;background:rgba(37,99,235,.15)}
+        .ai-header-new svg{width:1rem;height:1rem}
+        .ai-conversation{display:flex;min-height:0;flex:1;flex-direction:column;gap:1.4rem;overflow-y:auto;overflow-x:hidden;padding:clamp(1rem,3vw,2.25rem) clamp(1rem,5vw,5rem) 1rem}
+        .ai-message{width:100%;max-width:58rem;margin:0 auto}
+        .ai-assistant-row{display:flex;align-items:flex-start;gap:.8rem}
+        .ai-message-avatar{width:1.8rem;height:1.8rem;margin-top:.05rem;border-radius:.55rem}
+        .ai-message-body{min-width:0;flex:1}
+        .ai-message-author{margin-bottom:.35rem;color:var(--text-secondary);font-size:.73rem;font-weight:700}
+        .ai-message-body .md{color:var(--text-primary);font-size:.9rem;line-height:1.65}
+        .ai-user-row{display:flex;justify-content:flex-end}
+        .ai-user-bubble{max-width:min(75%,38rem);padding:.7rem .95rem;border:1px solid rgba(96,165,250,.22);border-radius:1rem 1rem .25rem 1rem;color:#1e3a5f;background:#eff6ff;font-size:.9rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+        .dark .ai-user-bubble{border-color:rgba(96,165,250,.22);color:#dbeafe;background:rgba(37,99,235,.18)}
+        .ai-sources,.ai-message-files{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.65rem}
+        .ai-source-chip,.ai-file-chip{display:inline-flex;align-items:center;gap:.35rem;max-width:100%;padding:.25rem .5rem;border:1px solid var(--card-border);border-radius:.45rem;color:var(--text-secondary);background:var(--card-bg-hover);font-size:.7rem}
+        .ai-source-chip svg,.ai-file-chip svg{width:.8rem;height:.8rem;flex:none}
+        .ai-file-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .ai-empty{display:flex;align-items:center;justify-content:center;min-height:100%;flex:1;flex-direction:column;padding:3rem 1rem;text-align:center}
+        .ai-empty-mark{display:inline-flex;align-items:center;justify-content:center;width:3.1rem;height:3.1rem;margin-bottom:1rem;border:1px solid #bfdbfe;border-radius:1rem;color:#2563eb;background:#eff6ff}
+        .dark .ai-empty-mark{border-color:rgba(96,165,250,.3);background:rgba(37,99,235,.15);color:#93c5fd}
+        .ai-empty h2{font-size:1.1rem;font-weight:700}
+        .ai-empty p{max-width:28rem;margin:.45rem 0 1.2rem;color:var(--text-secondary);font-size:.82rem;line-height:1.55}
+        .ai-suggestions{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem}
+        .ai-suggestions button{padding:.5rem .7rem;border:1px solid var(--card-border);border-radius:.6rem;color:var(--text-secondary);background:var(--card-bg);font-size:.72rem;cursor:pointer}
+        .ai-suggestions button:hover{border-color:#93c5fd;color:#1d4ed8;background:#eff6ff}
+        .dark .ai-suggestions button:hover{color:#bfdbfe;background:rgba(37,99,235,.15)}
+        .ai-thinking{max-width:58rem;margin:0 auto;width:100%}
+        .ai-thinking-body{display:flex;align-items:center;gap:.28rem;height:1.8rem;padding:0 .75rem;border:1px solid var(--card-border);border-radius:.65rem;background:var(--card-bg-hover)}
+        .ai-thinking-body span,.ai-loading-history span{width:.35rem;height:.35rem;border-radius:9999px;background:var(--text-muted);animation:ai-pulse 1.15s infinite ease-in-out}
+        .ai-thinking-body span:nth-child(2),.ai-loading-history span:nth-child(2){animation-delay:.15s}
+        .ai-thinking-body span:nth-child(3),.ai-loading-history span:nth-child(3){animation-delay:.3s}
+        .ai-loading-history{display:flex;align-items:center;justify-content:center;gap:.3rem;padding:1rem;color:var(--text-muted);font-size:.75rem}
+        .ai-loading-history span{animation-delay:0s}
+        @keyframes ai-pulse{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-3px);opacity:1}}
+        .ai-jump{position:absolute;right:1.5rem;bottom:8rem;display:inline-flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;border:1px solid var(--card-border);border-radius:9999px;color:var(--text-secondary);background:var(--card-bg);box-shadow:var(--shadow-lift);cursor:pointer}
+        .ai-jump:hover{color:var(--text-primary);background:var(--card-bg-hover)}
+        .ai-jump svg{width:1rem;height:1rem}
+        .ai-composer-area{width:100%;max-width:58rem;margin:0 auto;padding:.5rem clamp(1rem,5vw,5rem) max(.8rem, env(safe-area-inset-bottom))}
+        .ai-error{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.55rem;padding:.55rem .75rem;border:1px solid rgba(248,113,113,.4);border-radius:.6rem;color:#b91c1c;background:rgba(254,226,226,.85);font-size:.78rem}
+        .dark .ai-error{color:#fecaca;background:rgba(127,29,29,.45)}
+        .ai-error button{border:0;color:inherit;background:transparent;font-size:1.1rem;line-height:1;cursor:pointer}
+        .ai-attachment-preview{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.55rem}
+        .ai-attachment-card{position:relative;display:flex;align-items:center;gap:.5rem;min-width:10rem;max-width:14rem;padding:.4rem .5rem;border:1px solid var(--card-border);border-radius:.65rem;background:var(--card-bg-hover)}
+        .ai-attachment-card img,.ai-attachment-file-icon{display:inline-flex;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;flex:none;border-radius:.4rem;object-fit:cover;background:var(--card-bg)}
+        .ai-attachment-file-icon{color:#2563eb}
+        .ai-attachment-file-icon svg{width:1.15rem;height:1.15rem}
+        .ai-attachment-meta{display:flex;min-width:0;flex:1;flex-direction:column;gap:.1rem}
+        .ai-attachment-meta strong{overflow:hidden;font-size:.7rem;text-overflow:ellipsis;white-space:nowrap}
+        .ai-attachment-meta small{color:var(--text-muted);font-size:.62rem}
+        .ai-attachment-card button{display:inline-flex;align-items:center;justify-content:center;width:1.5rem;height:1.5rem;border:0;border-radius:9999px;color:var(--text-muted);background:transparent;font-size:1rem;cursor:pointer}
+        .ai-attachment-card button:hover{color:#dc2626;background:rgba(254,226,226,.7)}
+        .ai-composer{position:relative;display:flex;align-items:flex-end;gap:.45rem;padding:.45rem;border:1px solid var(--card-border);border-radius:1rem;background:var(--card-bg);box-shadow:var(--shadow-lift)}
+        .ai-composer:focus-within{border-color:rgba(59,130,246,.7);box-shadow:var(--shadow-lift),0 0 0 3px rgba(59,130,246,.12)}
+        .ai-plus-wrap{position:relative;flex:none}
+        .ai-composer-button{display:inline-flex;align-items:center;justify-content:center;width:2.7rem;height:2.7rem;border:0;border-radius:.7rem;color:var(--text-secondary);background:transparent;cursor:pointer}
+        .ai-composer-button:hover{color:#2563eb;background:#eff6ff}
+        .dark .ai-composer-button:hover{color:#bfdbfe;background:rgba(37,99,235,.15)}
+        .ai-composer-button svg{width:1.2rem;height:1.2rem}
+        .ai-plus-menu{position:absolute;bottom:3.15rem;left:0;z-index:70;width:14rem;padding:.35rem;border:1px solid var(--card-border);border-radius:.75rem;background:var(--card-bg);box-shadow:var(--shadow-lift)}
+        .ai-plus-menu button{display:flex;align-items:center;gap:.65rem;width:100%;padding:.55rem .5rem;border:0;border-radius:.5rem;color:var(--text-secondary);background:transparent;font-size:.76rem;text-align:left;cursor:pointer}
+        .ai-plus-menu button:hover,.ai-plus-menu button.is-listening{color:#1d4ed8;background:#eff6ff}
+        .dark .ai-plus-menu button:hover,.dark .ai-plus-menu button.is-listening{color:#bfdbfe;background:rgba(37,99,235,.15)}
+        .ai-menu-icon{display:inline-flex;align-items:center;justify-content:center;width:1.8rem;height:1.8rem;border-radius:.5rem}
+        .ai-menu-icon svg{width:1rem;height:1rem}
+        .ai-menu-icon.is-image{color:#2563eb;background:#eff6ff}.ai-menu-icon.is-file{color:#0f766e;background:#ccfbf1}.ai-menu-icon.is-mic{color:#c2410c;background:#ffedd5}
+        .dark .ai-menu-icon.is-image{color:#bfdbfe;background:rgba(37,99,235,.2)}.dark .ai-menu-icon.is-file{color:#99f6e4;background:rgba(13,148,136,.2)}.dark .ai-menu-icon.is-mic{color:#fed7aa;background:rgba(194,65,12,.2)}
+        .ai-composer textarea{min-height:2.7rem;max-height:10rem;flex:1;resize:none;padding:.62rem .35rem;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;color:var(--input-text)!important;font-size:.88rem;line-height:1.45;overflow-y:auto}
         .ai-composer textarea::placeholder{color:var(--text-muted)}
-        .ai-send{flex:none;display:inline-flex;align-items:center;justify-content:center;width:2.7rem;height:2.7rem;border-radius:9999px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;transition:opacity .15s,transform .1s}
-        .ai-send:hover:not(:disabled){opacity:.92}
-        .ai-send:active:not(:disabled){transform:scale(.94)}
-        .ai-send:disabled{opacity:.5;cursor:not-allowed}
-
-        /* ===== Markdown ===== */
-        .md>:first-child{margin-top:0}.md>:last-child{margin-bottom:0}
-        .md p{margin:.5rem 0}
-        .md ul,.md ol{margin:.5rem 0;padding-left:1.4rem;display:flex;flex-direction:column;gap:.25rem}
-        .md ul{list-style:disc}.md ol{list-style:decimal}
-        .md li>ul,.md li>ol{margin:.25rem 0}
-        .md h1,.md h2,.md h3,.md h4{font-weight:700;line-height:1.3;margin:1rem 0 .5rem}
-        .md h1{font-size:1.25rem}.md h2{font-size:1.125rem}.md h3{font-size:1rem}
-        .md a{color:#2563eb;text-decoration:underline;text-underline-offset:2px}.dark .md a{color:#60a5fa}
-        .md strong{font-weight:700}
-        .md code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.875em;background:var(--card-bg-hover);padding:.15rem .35rem;border-radius:.375rem}
-        .md pre{background:var(--card-bg-hover);border:1px solid var(--card-border);border-radius:.75rem;padding:.75rem 1rem;overflow-x:auto;margin:.75rem 0;max-width:100%}
-        .md pre code{background:transparent;padding:0;border-radius:0}
-        .md blockquote{border-left:3px solid var(--card-border);padding-left:1rem;color:var(--text-secondary);margin:.75rem 0}
-        .md table{display:block;width:fit-content;max-width:100%;overflow-x:auto;border-collapse:collapse;margin:.75rem 0;font-size:.875rem;white-space:nowrap}
-        .md th,.md td{border:1px solid var(--card-border);padding:.45rem .75rem;text-align:left}
-        .md th{background:var(--card-bg-hover);font-weight:600}
-        .md hr{border:none;border-top:1px solid var(--card-border);margin:1rem 0}
-
-        /* ===== Reduced motion ===== */
-        @media (prefers-reduced-motion: reduce){
-            .typing span{animation:none;opacity:.6}
+        .ai-send{display:inline-flex;align-items:center;justify-content:center;width:2.7rem;height:2.7rem;flex:none;border:0;border-radius:.7rem;color:#fff;background:#2563eb;cursor:pointer}
+        .ai-send:hover:not(:disabled){background:#1d4ed8}
+        .ai-send:disabled{cursor:not-allowed;opacity:.45}
+        .ai-send svg{width:1.15rem;height:1.15rem}
+        .ai-spin{animation:ai-spin 1s linear infinite}@keyframes ai-spin{to{transform:rotate(360deg)}}
+        .ai-listening{position:absolute;right:4.25rem;bottom:.95rem;color:#dc2626;font-size:.68rem;font-weight:600}
+        .ai-composer-hint{margin:.45rem 0 0;color:var(--text-muted);font-size:.64rem;text-align:center}
+        .md>:first-child{margin-top:0}.md>:last-child{margin-bottom:0}.md p{margin:.5rem 0}.md ul,.md ol{display:flex;flex-direction:column;gap:.25rem;margin:.5rem 0;padding-left:1.4rem}.md ul{list-style:disc}.md ol{list-style:decimal}.md li>ul,.md li>ol{margin:.25rem 0}.md h1,.md h2,.md h3,.md h4{margin:1rem 0 .5rem;font-weight:700;line-height:1.3}.md h1{font-size:1.25rem}.md h2{font-size:1.125rem}.md h3{font-size:1rem}.md a{color:#2563eb;text-decoration:underline;text-underline-offset:2px}.dark .md a{color:#93c5fd}.md strong{font-weight:700}.md code{padding:.15rem .35rem;border-radius:.35rem;background:var(--card-bg-hover);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.875em}.md pre{max-width:100%;margin:.75rem 0;padding:.75rem 1rem;overflow-x:auto;border:1px solid var(--card-border);border-radius:.65rem;background:var(--card-bg-hover)}.md pre code{padding:0;background:transparent}.md blockquote{margin:.75rem 0;padding-left:1rem;border-left:3px solid var(--card-border);color:var(--text-secondary)}.md table{display:block;width:fit-content;max-width:100%;margin:.75rem 0;overflow-x:auto;border-collapse:collapse;font-size:.875rem;white-space:nowrap}.md th,.md td{padding:.45rem .75rem;border:1px solid var(--card-border);text-align:left}.md th{background:var(--card-bg-hover);font-weight:600}.md hr{margin:1rem 0;border:0;border-top:1px solid var(--card-border)}
+        @media(max-width:767px){
+            .ai-history{position:absolute;inset:0 auto 0 0;width:min(17rem,86vw);transform:translateX(-102%);box-shadow:var(--shadow-lift)}
+            .ai-history.is-open{transform:translateX(0)}
+            .ai-history-close,.ai-mobile-history{display:inline-flex}
+            .ai-history-backdrop{position:absolute;inset:0;z-index:30;background:rgba(15,23,42,.42)}
+            .ai-header-new{padding:.5rem}.ai-header-new span{display:none}
+            .ai-conversation{padding:1rem .8rem}.ai-composer-area{padding-left:.8rem;padding-right:.8rem}.ai-user-bubble{max-width:88%}
+            .ai-jump{right:.8rem;bottom:8rem}
         }
+        @media(prefers-reduced-motion:reduce){.ai-thinking-body span,.ai-loading-history span{animation:none;opacity:.6}.ai-history,.ai-spin{transition:none;animation:none}}
     </style>
 
     <script>
         function officeAssistant() {
             return {
-                conversationId: window.chatInit.conversationId,
-                messages: window.chatInit.messages ?? [],
+                conversationId: window.chatInit?.conversationId ?? null,
+                conversations: window.chatInit?.conversations ?? [],
+                messages: window.chatInit?.messages ?? [],
                 draft: '',
+                attachments: [],
                 busy: false,
+                loadingConversation: false,
                 error: '',
                 atBottom: true,
+                historyOpen: false,
+                plusOpen: false,
+                menuId: null,
+                editingId: null,
+                renameDraft: '',
+                listening: false,
+                speechSupported: false,
+                recognition: null,
+                speechBase: '',
+                showUrl: @js(route('ai.assistant.conversations.show', ['conversation' => '__CONVERSATION__'])),
+                renameUrl: @js(route('ai.assistant.conversations.rename', ['conversation' => '__CONVERSATION__'])),
+                deleteUrl: @js(route('ai.assistant.conversations.destroy', ['conversation' => '__CONVERSATION__'])),
                 init() {
+                    this.speechSupported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
                     this.scrollToBottom(false);
                     this.$nextTick(() => {
-                        if (window.matchMedia('(min-width: 768px)').matches) this.$refs.input?.focus();
+                        if (window.matchMedia('(min-width: 768px)').matches) this.focusInput();
                     });
+                },
+                headers(json = false) {
+                    const headers = {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    };
+                    if (json) headers['Content-Type'] = 'application/json';
+                    return headers;
                 },
                 onScroll() {
                     const el = this.$refs.messages;
@@ -197,24 +443,27 @@
                     const el = this.$refs.input;
                     if (!el) return;
                     el.style.height = 'auto';
-                    el.style.height = Math.min(el.scrollHeight, 180) + 'px';
+                    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
                 },
-                onEnter(e) {
-                    if (e.isComposing) return;
-                    if (e.shiftKey) {
+                focusInput() {
+                    this.$nextTick(() => this.$refs.input?.focus());
+                },
+                onEnter(event) {
+                    if (event.isComposing) return;
+                    if (event.shiftKey) {
                         this.$nextTick(() => this.resize());
                         return;
                     }
-                    e.preventDefault();
+                    event.preventDefault();
                     this.send();
                 },
                 renderMarkdown(content) {
                     try {
                         return window.DOMPurify.sanitize(window.marked.parse(content ?? '', { breaks: true }));
-                    } catch (e) {
-                        const el = document.createElement('span');
-                        el.textContent = content ?? '';
-                        return el.innerHTML;
+                    } catch (error) {
+                        const element = document.createElement('span');
+                        element.textContent = content ?? '';
+                        return element.innerHTML;
                     }
                 },
                 scrollToBottom(smooth) {
@@ -226,40 +475,226 @@
                 reducedMotion() {
                     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 },
+                setUrl(id = null) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('new');
+                    if (id) url.searchParams.set('conversation_id', id);
+                    else url.searchParams.set('new', '1');
+                    window.history.replaceState({}, '', url);
+                },
+                newChat() {
+                    if (this.busy) return;
+                    this.stopSpeech();
+                    this.revokeAttachments(this.attachments);
+                    this.conversationId = null;
+                    this.messages = [];
+                    this.draft = '';
+                    this.attachments = [];
+                    this.error = '';
+                    this.plusOpen = false;
+                    this.menuId = null;
+                    this.editingId = null;
+                    this.historyOpen = false;
+                    this.setUrl();
+                    this.scrollToBottom(false);
+                    this.focusInput();
+                },
+                async openConversation(id) {
+                    this.menuId = null;
+                    this.editingId = null;
+                    if (this.busy || this.loadingConversation) return;
+                    if (this.conversationId === id) {
+                        this.historyOpen = false;
+                        return;
+                    }
+                    this.loadingConversation = true;
+                    this.error = '';
+                    try {
+                        const response = await fetch(this.showUrl.replace('__CONVERSATION__', encodeURIComponent(id)), { headers: this.headers() });
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Percakapan tidak dapat dimuat.');
+                        this.conversationId = data.conversation.id;
+                        this.messages = data.messages ?? [];
+                        this.setUrl(this.conversationId);
+                        this.historyOpen = false;
+                        this.scrollToBottom(false);
+                    } catch (error) {
+                        this.error = error.message || 'Percakapan tidak dapat dimuat.';
+                    } finally {
+                        this.loadingConversation = false;
+                    }
+                },
+                beginRename(chat) {
+                    this.menuId = null;
+                    this.editingId = chat.id;
+                    this.renameDraft = chat.title;
+                },
+                cancelRename() {
+                    this.editingId = null;
+                    this.renameDraft = '';
+                },
+                async saveRename(chat) {
+                    const title = this.renameDraft.trim();
+                    if (!title) return;
+                    try {
+                        const response = await fetch(this.renameUrl.replace('__CONVERSATION__', encodeURIComponent(chat.id)), {
+                            method: 'PATCH',
+                            headers: this.headers(true),
+                            body: JSON.stringify({ title }),
+                        });
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Nama chat tidak dapat diubah.');
+                        this.conversations = this.conversations.map(item => item.id === chat.id ? data.conversation : item);
+                        this.cancelRename();
+                    } catch (error) {
+                        this.error = error.message || 'Nama chat tidak dapat diubah.';
+                    }
+                },
+                async deleteConversation(chat) {
+                    if (this.busy) return;
+                    this.menuId = null;
+                    if (!window.confirm(`Hapus percakapan "${chat.title}"?`)) return;
+                    try {
+                        const response = await fetch(this.deleteUrl.replace('__CONVERSATION__', encodeURIComponent(chat.id)), {
+                            method: 'DELETE',
+                            headers: this.headers(),
+                        });
+                        const data = await response.json();
+                        if (!response.ok || !data.deleted) throw new Error(data.message || 'Percakapan tidak dapat dihapus.');
+                        this.conversations = this.conversations.filter(item => item.id !== chat.id);
+                        if (this.conversationId === chat.id) this.newChat();
+                    } catch (error) {
+                        this.error = error.message || 'Percakapan tidak dapat dihapus.';
+                    }
+                },
+                upsertConversation(conversation) {
+                    this.conversations = [conversation, ...this.conversations.filter(item => item.id !== conversation.id)];
+                },
+                addFiles(event) {
+                    const files = Array.from(event.target.files ?? []);
+                    const available = Math.max(0, 3 - this.attachments.length);
+                    const exceeded = files.length > available;
+                    if (exceeded) this.error = 'Maksimal 3 lampiran per pesan.';
+                    files.slice(0, available).forEach(file => {
+                        this.attachments.push({
+                            id: `${file.name}-${file.lastModified}-${Math.random()}`,
+                            file,
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            isImage: file.type.startsWith('image/'),
+                            previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
+                        });
+                    });
+                    event.target.value = '';
+                    if (!exceeded) this.error = '';
+                },
+                removeAttachment(index) {
+                    const [attachment] = this.attachments.splice(index, 1);
+                    this.revokeAttachments([attachment]);
+                },
+                revokeAttachments(attachments) {
+                    attachments.forEach(attachment => {
+                        if (attachment?.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
+                    });
+                },
+                formatBytes(bytes) {
+                    if (!bytes) return '0 B';
+                    const units = ['B', 'KB', 'MB', 'GB'];
+                    const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+                    return `${(bytes / Math.pow(1024, index)).toFixed(index ? 1 : 0)} ${units[index]}`;
+                },
+                formatDate(value) {
+                    if (!value) return '';
+                    return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short' }).format(new Date(value));
+                },
+                toggleSpeech() {
+                    if (this.listening) {
+                        this.stopSpeech();
+                        return;
+                    }
+                    if (!this.speechSupported) {
+                        this.error = 'Input suara tidak didukung browser ini. Gunakan Chrome atau Edge terbaru.';
+                        return;
+                    }
+                    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new Recognition();
+                    this.recognition.lang = 'id-ID';
+                    this.recognition.interimResults = true;
+                    this.recognition.continuous = false;
+                    this.speechBase = this.draft.trim();
+                    this.recognition.onresult = event => {
+                        const transcript = Array.from(event.results).map(result => result[0].transcript).join('');
+                        this.draft = [this.speechBase, transcript.trim()].filter(Boolean).join(' ');
+                        this.$nextTick(() => this.resize());
+                    };
+                    this.recognition.onerror = event => {
+                        if (event.error !== 'aborted') this.error = 'Input suara gagal. Silakan coba lagi.';
+                        this.listening = false;
+                    };
+                    this.recognition.onend = () => {
+                        this.listening = false;
+                        this.focusInput();
+                    };
+                    this.error = '';
+                    this.recognition.start();
+                    this.listening = true;
+                },
+                stopSpeech() {
+                    this.recognition?.stop();
+                    this.listening = false;
+                },
                 async send() {
                     const text = this.draft.trim();
-                    if (!text || this.busy) return;
+                    if ((!text && !this.attachments.length) || this.busy) return;
+
+                    const pendingAttachments = this.attachments.map(attachment => ({ ...attachment }));
+                    const visibleAttachments = pendingAttachments.map(({ file, ...attachment }) => attachment);
+                    const tempId = `temp-${Date.now()}`;
                     this.error = '';
-                    this.messages.push({ id: 'temp-' + Date.now(), role: 'user', content: text });
+                    this.messages.push({
+                        id: tempId,
+                        role: 'user',
+                        content: text || 'Lampiran dikirim',
+                        attachments: visibleAttachments,
+                    });
                     this.draft = '';
+                    this.attachments = [];
                     this.busy = true;
                     this.$nextTick(() => this.resize());
                     this.scrollToBottom(true);
+
+                    const payload = new FormData();
+                    payload.append('message', text);
+                    if (this.conversationId) payload.append('conversation_id', this.conversationId);
+                    pendingAttachments.forEach(attachment => payload.append('attachments[]', attachment.file));
+
                     try {
-                        const res = await fetch('{{ route('ai.assistant.send') }}', {
+                        const response = await fetch('{{ route('ai.assistant.send') }}', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            },
-                            body: JSON.stringify({ message: text, conversation_id: this.conversationId }),
+                            headers: this.headers(),
+                            body: payload,
                         });
-                        const data = await res.json();
-                        if (!res.ok) {
-                            this.error = data.message || 'Terjadi kesalahan saat menghubungi AI. Silakan coba lagi.';
-                            this.messages.pop();
-                            return;
-                        }
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Terjadi kesalahan saat menghubungi AI.');
                         this.conversationId = data.conversation_id;
-                        this.messages.push({ id: data.conversation_id + '-' + Date.now(), role: 'assistant', content: data.message, sources: data.sources ?? [] });
+                        this.upsertConversation(data.conversation);
+                        this.setUrl(this.conversationId);
+                        this.messages.push({ id: `${data.conversation_id}-${Date.now()}`, role: 'assistant', content: data.message, sources: data.sources ?? [], attachments: [] });
                         this.scrollToBottom(true);
-                    } catch (e) {
-                        this.error = 'Gagal terhubung ke server. Silakan coba lagi.';
-                        this.messages.pop();
+                    } catch (error) {
+                        this.messages = this.messages.filter(message => message.id !== tempId);
+                        this.draft = text;
+                        this.attachments = pendingAttachments;
+                        this.error = error.message || 'Gagal terhubung ke server. Silakan coba lagi.';
                     } finally {
                         this.busy = false;
+                        this.focusInput();
                     }
+                },
+                destroy() {
+                    this.stopSpeech();
+                    this.revokeAttachments(this.attachments);
                 },
             };
         }
