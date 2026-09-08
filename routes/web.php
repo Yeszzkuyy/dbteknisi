@@ -25,6 +25,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\TechnicianScheduleController;
 use App\Http\Controllers\TechnicianDashboardController;
+use App\Http\Controllers\WhatsAppCenterController;
 use App\Livewire\ProjectStatusList;
 use Illuminate\Support\Facades\Route;
 
@@ -233,6 +234,22 @@ Route::middleware('auth')->group(function () {
     });
 
     // ============================================
+    // WHATSAPP CENTER MARKETING (inbox 4 WA Company)
+    // ============================================
+    Route::middleware('permission:view-marketing|manage-marketing')->prefix('whatsapp-center')->name('whatsapp-center.')->group(function () {
+        Route::get('/', [WhatsAppCenterController::class, 'index'])->name('index');
+        Route::get('/status', [WhatsAppCenterController::class, 'status'])->name('status');
+        Route::get('/{account}/conversations', [WhatsAppCenterController::class, 'conversations'])->name('conversations');
+        Route::get('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'messages'])->name('messages');
+
+        Route::middleware('permission:manage-marketing')->group(function () {
+            Route::post('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'store'])->name('reply');
+            Route::post('/{account}/convert/{sender}', [WhatsAppCenterController::class, 'convert'])->name('convert');
+            Route::post('/{account}/simulate', [WhatsAppCenterController::class, 'simulate'])->name('simulate');
+        });
+    });
+
+    // ============================================
     // MANAGE SALES — Management (assign lead ke sales)
     // ============================================
     Route::middleware('permission:manage-sales-leads')->prefix('manage-sales')->name('manage-sales.')->group(function () {
@@ -312,3 +329,7 @@ Route::middleware('auth')->group(function () {
     });
 });
 require __DIR__.'/auth.php';
+
+// Webhook gateway WhatsApp (dipanggil provider/gateway, tanpa CSRF)
+Route::post('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'webhook'])
+    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);

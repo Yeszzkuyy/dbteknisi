@@ -40,6 +40,9 @@ class DatabaseSeeder extends Seeder
         DocumentCategory::firstOrCreate(['name' => 'Report Instalasi']);
         DocumentCategory::firstOrCreate(['name' => 'Dokumen Pendukung']);
 
+        // 2b. Akun WhatsApp Company (WhatsApp Center Marketing)
+        $this->call(WhatsappAccountSeeder::class);
+
         // 3. Data contoh (user per divisi, customer, project, aktivitas)
         $this->call(SampleDataSeeder::class);
     }

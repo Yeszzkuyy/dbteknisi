@@ -21,6 +21,7 @@ class Lead extends Model
     protected $fillable = [
         'customer_id',
         'partner_id',
+        'whatsapp_account_id',
         'pt_group',
         'segment',
         'status',
@@ -67,5 +68,10 @@ class Lead extends Model
     public function projects()
     {
         return $this->customer->projects();
+    }
+
+    public function whatsappAccount()
+    {
+        return $this->belongsTo(WhatsappAccount::class, 'whatsapp_account_id');
     }
 }

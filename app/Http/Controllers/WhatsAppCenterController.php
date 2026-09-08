@@ -1,0 +1,298 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Customer;
+use App\Models\Lead;
+use App\Models\LeadActivity;
+use App\Models\User;
+use App\Models\WhatsappAccount;
+use App\Models\WhatsappMessage;
+use App\Notifications\NewLeadNotification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+
+class WhatsAppCenterController extends Controller
+{
+    public function index()
+    {
+        $accounts = $this->visibleAccounts()->get();
+        $accountTabs = $accounts->map(fn ($a) => [
+            'id' => $a->id,
+            'account_code' => $a->account_code,
+            'label' => 'WA ' . strtoupper(substr($a->account_code, 3)),
+        ])->values();
+
+        return view('whatsapp-center.index', compact('accounts', 'accountTabs'));
+    }
+
+    public function status()
+    {
+        $data = $this->visibleAccounts()->get()->map(function ($account) {
+            return [
+                'id' => $account->id,
+                'account_code' => $account->account_code,
+                'unread' => $this->unreadCount($account),
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+    public function conversations(WhatsappAccount $account)
+    {
+        $this->authorizeAccount($account);
+
+        $rows = WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->orderBy('id')
+            ->get()
+            ->groupBy('sender_number')
+            ->map(function ($messages, $sender) {
+                $last = $messages->last();
+                $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
+                $lead = $messages->whereNotNull('lead_id')->first()?->lead;
+
+                return [
+                    'sender_number' => $sender,
+                    'sender_name' => $last->sender_name ?? 'Kontak WA',
+                    'last_message' => $last->message_body,
+                    'last_direction' => $last->direction,
+                    'last_at' => $last->created_at->toIso8601String(),
+                    'unread' => $messages->where('direction', 'inbound')->where('id', '>', $lastOutboundId)->count(),
+                    'customer' => $this->findCustomer($sender),
+                    'lead_id' => $lead?->id,
+                ];
+            })
+            ->values()
+            ->sortByDesc('last_at')
+            ->values();
+
+        return response()->json($rows);
+    }
+
+    public function messages(WhatsappAccount $account, string $sender)
+    {
+        $this->authorizeAccount($account);
+
+        $messages = WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->where('sender_number', $sender)
+            ->orderBy('id')
+            ->get()
+            ->map(fn ($m) => [
+                'id' => $m->id,
+                'direction' => $m->direction,
+                'message_body' => $m->message_body,
+                'created_at' => $m->created_at->format('d M H:i'),
+            ]);
+
+        return response()->json([
+            'messages' => $messages,
+            'customer' => $this->findCustomer($sender),
+        ]);
+    }
+
+    public function store(Request $request, WhatsappAccount $account, string $sender)
+    {
+        $this->authorizeAccount($account);
+        $this->authorize('manage-marketing');
+
+        $validated = $request->validate([
+            'message_body' => 'required|string|max:4000',
+        ]);
+
+        $message = WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => $sender,
+            'sender_name' => WhatsappMessage::where('whatsapp_account_id', $account->id)
+                ->where('sender_number', $sender)->first()?->sender_name,
+            'message_body' => $validated['message_body'],
+            'direction' => 'outbound',
+        ]);
+
+        return response()->json([
+            'id' => $message->id,
+            'direction' => 'outbound',
+            'message_body' => $message->message_body,
+            'created_at' => $message->created_at->format('d M H:i'),
+        ]);
+    }
+
+    public function convert(Request $request, WhatsappAccount $account, string $sender)
+    {
+        $this->authorizeAccount($account);
+        $this->authorize('manage-marketing');
+
+        $validated = $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'segment' => 'required|in:' . implode(',', LeadController::SEGMENTS),
+            'kebutuhan' => 'nullable|string|max:2000',
+        ]);
+
+        $number = $this->normalizeNumber($sender);
+        $customer = $this->findCustomer($number);
+
+        if (!$customer) {
+            $customer = Customer::create([
+                'name' => $validated['customer_name'],
+                'company' => $validated['customer_name'],
+                'whatsapp' => $sender,
+                'contact_person' => $validated['customer_name'],
+            ]);
+        }
+
+        $ptGroup = strtoupper(substr($account->account_code, 3));
+        if (!in_array($ptGroup, Lead::PT_GROUPS)) {
+            $ptGroup = Lead::PT_GROUPS[0];
+        }
+
+        $lead = Lead::create([
+            'customer_id' => $customer->id,
+            'pt_group' => $ptGroup,
+            'whatsapp_account_id' => $account->id,
+            'segment' => $validated['segment'],
+            'source' => 'whatsapp',
+            'status' => 'new',
+            'kebutuhan' => $validated['kebutuhan'] ?? null,
+            'incoming_date' => now()->toDateString(),
+        ]);
+
+        LeadActivity::create([
+            'lead_id' => $lead->id,
+            'user_id' => auth()->id(),
+            'action' => 'created',
+            'changes' => ['source' => 'whatsapp', 'sender' => $sender],
+        ]);
+
+        WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->where('sender_number', $sender)
+            ->where('direction', 'inbound')
+            ->whereNull('lead_id')
+            ->latest('id')
+            ->first()
+            ?->update(['lead_id' => $lead->id]);
+
+        if (empty($lead->assigned_to)) {
+            Notification::send(
+                User::permission('manage-sales-leads')->get(),
+                new NewLeadNotification($lead)
+            );
+        }
+
+        return response()->json(['lead_id' => $lead->id, 'redirect' => route('leads.show', $lead)]);
+    }
+
+    public function webhook(Request $request)
+    {
+        $validated = $request->validate([
+            'account_code' => 'required|string',
+            'sender_number' => 'required|string',
+            'sender_name' => 'nullable|string|max:255',
+            'message_body' => 'required|string',
+            'wa_message_id' => 'nullable|string',
+        ]);
+
+        $account = WhatsappAccount::where('account_code', $validated['account_code'])->first();
+
+        if (!$account) {
+            return response()->json(['error' => 'unknown account'], 422);
+        }
+
+        if (!empty($validated['wa_message_id'])
+            && WhatsappMessage::where('wa_message_id', $validated['wa_message_id'])->exists()) {
+            return response()->json(['status' => 'duplicate']);
+        }
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => $validated['sender_number'],
+            'sender_name' => $validated['sender_name'] ?? null,
+            'message_body' => $validated['message_body'],
+            'direction' => 'inbound',
+            'wa_message_id' => $validated['wa_message_id'] ?? null,
+        ]);
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    public function simulate(Request $request, WhatsappAccount $account)
+    {
+        if (app()->isProduction()) {
+            abort(404);
+        }
+
+        $this->authorizeAccount($account);
+
+        $validated = $request->validate([
+            'sender_number' => 'required|string',
+            'sender_name' => 'nullable|string|max:255',
+            'message_body' => 'required|string|max:4000',
+        ]);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => $validated['sender_number'],
+            'sender_name' => $validated['sender_name'] ?? 'Kontak Baru',
+            'message_body' => $validated['message_body'],
+            'direction' => 'inbound',
+        ]);
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    private function visibleAccounts()
+    {
+        $user = auth()->user();
+
+        return WhatsappAccount::where('is_active', true)
+            ->when(
+                !$user->hasRole('super-admin') && !$user->hasPermissionTo('manage-sales-leads'),
+                fn ($q) => $q->where('assigned_to', $user->id)
+            )
+            ->orderBy('account_code');
+    }
+
+    private function authorizeAccount(WhatsappAccount $account): void
+    {
+        if (!$this->visibleAccounts()->whereKey($account->id)->exists()) {
+            abort(403);
+        }
+    }
+
+    private function unreadCount(WhatsappAccount $account): int
+    {
+        return WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->orderBy('id')
+            ->get()
+            ->groupBy('sender_number')
+            ->sum(function ($messages) {
+                $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
+                return $messages->where('direction', 'inbound')->where('id', '>', $lastOutboundId)->count();
+            });
+    }
+
+    private function findCustomer(string $number): ?Customer
+    {
+        $normalized = $this->normalizeNumber($number);
+
+        if (!$normalized) {
+            return null;
+        }
+
+        return Customer::whereNotNull('whatsapp')->orWhereNotNull('phone')->get()
+            ->first(fn ($c) => $this->normalizeNumber($c->whatsapp ?? '') === $normalized
+                || $this->normalizeNumber($c->phone ?? '') === $normalized);
+    }
+
+    private function normalizeNumber(string $number): string
+    {
+        $digits = preg_replace('/\D/', '', $number);
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '62' . substr($digits, 1);
+        } elseif (str_starts_with($digits, '8')) {
+            $digits = '62' . $digits;
+        }
+
+        return $digits;
+    }
+}
