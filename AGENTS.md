@@ -13,12 +13,16 @@ ikuti aturan berikut supaya tidak saling menimpa kerjaan.
 | `/var/www/3dyapp-tek` | `feature/div-teknisi` | Dashboard/jadwal teknisi |
 | `/var/www/3dyapp-user` | `feature/user-management-avatar` | User, role, menu, avatar |
 | `/var/www/3dyapp-mon` | `feature/div-mon` | Monitoring (progress per customer) |
+| `/var/www/3dyapp-cus` | `feature/div-cus` | Customer |
+| `/var/www/3dyapp-dash` | `feature/general-dashboard` | Dashboard umum |
+| `/var/www/3dyapp-management` | `feature/management` | Management (Activity Log, assign lead) |
+| `/var/www/3dyapp-sec` | `feature/security-hardening` | Security hardening |
 
 Worktree baru juga butuh: `composer install`, symlink `.env`, dan
 `ln -s /var/www/3dyapp/public/build /var/www/3dyapp-<nama>/public/build`.
 
 Rencana pembagian berikutnya (buat worktree-nya saat mulai dikerjakan):
-`feature/div-cus` (Customer), `feature/div-trash` (Trash), `feature/div-panel` (Admin Panel).
+`feature/div-trash` (Trash), `feature/div-panel` (Admin Panel).
 
 Butuh folder untuk topik baru?
 
