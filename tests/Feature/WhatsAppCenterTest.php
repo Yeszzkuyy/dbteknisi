@@ -215,6 +215,32 @@ class WhatsAppCenterTest extends TestCase
         $this->assertDatabaseHas('whatsapp_messages', ['direction' => 'outbound', 'status' => 'queued']);
     }
 
+    public function test_reply_marked_failed_when_gateway_send_fails(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123']);
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Halo',
+            'direction' => 'inbound',
+        ]);
+
+        Http::fake([
+            'api.green-api.com/*' => Http::response(['error' => 'quota'], 466),
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.reply', [$account, '6281234567890']), ['message_body' => 'Baik'])
+            ->assertOk()
+            ->assertJsonPath('status', 'failed');
+
+        $this->assertDatabaseHas('whatsapp_messages', ['direction' => 'outbound', 'status' => 'failed']);
+    }
+
     public function test_green_api_webhook_stores_inbound_text(): void
     {
         $account = $this->makeAccount();
