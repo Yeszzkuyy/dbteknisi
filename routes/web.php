@@ -54,6 +54,9 @@ Route::middleware('auth')->group(function () {
     // ============================================
     Route::get('/ai/assistant', [OfficeAssistantController::class, 'index'])->name('ai.assistant.index');
     Route::post('/ai/assistant', [OfficeAssistantController::class, 'send'])->name('ai.assistant.send');
+    Route::get('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'showConversation'])->name('ai.assistant.conversations.show');
+    Route::patch('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'renameConversation'])->name('ai.assistant.conversations.rename');
+    Route::delete('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'destroyConversation'])->name('ai.assistant.conversations.destroy');
 
     // ============================================
     // KNOWLEDGE BASE (AI / RAG) — Admin only

@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Ai\Agents\OfficeAssistant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Ai\Models\Conversation;
 use Laravel\Ai\Models\ConversationMessage;
 use Tests\TestCase;
@@ -114,5 +116,107 @@ class OfficeAssistantTest extends TestCase
             ->assertJsonPath('message', 'Percakapan tidak valid. Silakan mulai percakapan baru.');
 
         $this->assertSame(1, Conversation::where('id', $conversationId)->count());
+    }
+
+    public function test_user_can_list_and_open_owned_conversations(): void
+    {
+        $user = $this->actingUser();
+        $older = Conversation::create([
+            'id' => '00000000-0000-0000-0000-000000000001',
+            'user_id' => $user->id,
+            'title' => 'Chat Lama',
+        ]);
+        $newer = Conversation::create([
+            'id' => '00000000-0000-0000-0000-000000000002',
+            'user_id' => $user->id,
+            'title' => 'Chat Terbaru',
+        ]);
+
+        $older->messages()->create([
+            'id' => '00000000-0000-0000-0001-000000000001',
+            'user_id' => $user->id,
+            'agent' => OfficeAssistant::class,
+            'role' => 'user',
+            'content' => 'Pesan lama',
+            'attachments' => '[]',
+            'tool_calls' => '[]',
+            'tool_results' => '[]',
+            'usage' => '[]',
+            'meta' => '[]',
+        ]);
+
+        $this->get(route('ai.assistant.index'))
+            ->assertOk()
+            ->assertSee('Chat Lama')
+            ->assertSee('Chat Terbaru');
+
+        $this->getJson(route('ai.assistant.conversations.show', $older))
+            ->assertOk()
+            ->assertJsonPath('conversation.title', 'Chat Lama')
+            ->assertJsonPath('messages.0.content', 'Pesan lama');
+
+        $this->assertNotNull($newer->id);
+    }
+
+    public function test_user_can_rename_and_delete_owned_conversation(): void
+    {
+        $user = $this->actingUser();
+        $conversation = Conversation::create([
+            'id' => '00000000-0000-0000-0000-000000000003',
+            'user_id' => $user->id,
+            'title' => 'Sebelum Rename',
+        ]);
+
+        $this->patchJson(route('ai.assistant.conversations.rename', $conversation), [
+            'title' => 'Nama Baru',
+        ])->assertOk()->assertJsonPath('conversation.title', 'Nama Baru');
+
+        $this->deleteJson(route('ai.assistant.conversations.destroy', $conversation))
+            ->assertOk()
+            ->assertJsonPath('deleted', true);
+
+        $this->assertDatabaseMissing('agent_conversations', ['id' => $conversation->id]);
+    }
+
+    public function test_conversation_actions_are_scoped_to_the_owner(): void
+    {
+        $owner = User::factory()->create();
+        $conversation = Conversation::create([
+            'id' => '00000000-0000-0000-0000-000000000004',
+            'user_id' => $owner->id,
+            'title' => 'Private Chat',
+        ]);
+
+        $this->actingAs(User::factory()->create())
+            ->getJson(route('ai.assistant.conversations.show', $conversation))
+            ->assertNotFound();
+    }
+
+    public function test_uploaded_attachment_is_stored_privately_and_removed_with_conversation(): void
+    {
+        Storage::fake('local');
+        config()->set('ai.providers.openrouter.key', 'test-key');
+        OfficeAssistant::fake(['Balasan dengan lampiran']);
+
+        $this->actingUser();
+
+        $response = $this->post(route('ai.assistant.send'), [
+            'message' => 'Tolong lihat gambar ini',
+            'attachments' => [UploadedFile::fake()->image('contoh.png')],
+        ])->assertOk();
+
+        $conversationId = $response->json('conversation_id');
+        $message = ConversationMessage::where('conversation_id', $conversationId)
+            ->where('role', 'user')
+            ->firstOrFail();
+        $attachment = $message->attachments[0];
+
+        $this->assertSame('stored-image', $attachment['type']);
+        Storage::disk('local')->assertExists($attachment['path']);
+
+        $this->deleteJson(route('ai.assistant.conversations.destroy', $conversationId))
+            ->assertOk();
+
+        Storage::disk('local')->assertMissing($attachment['path']);
     }
 }
