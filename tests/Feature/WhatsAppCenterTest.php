@@ -148,4 +148,18 @@ class WhatsAppCenterTest extends TestCase
 
         $this->actingAs($user)->get(route('whatsapp-center.conversations', $other))->assertForbidden();
     }
+
+    public function test_super_admin_sees_all_accounts(): void
+    {
+        $a = $this->makeAccount('wa_nti');
+        $b = $this->makeAccount('wa_mgk');
+        $admin = \App\Models\User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        $response = $this->actingAs($admin)->get(route('whatsapp-center.index'))->assertOk();
+
+        $accounts = collect($response->viewData('accounts'));
+        $this->assertTrue($accounts->contains('id', $a->id));
+        $this->assertTrue($accounts->contains('id', $b->id));
+    }
 }
