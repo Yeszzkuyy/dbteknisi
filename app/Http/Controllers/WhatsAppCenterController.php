@@ -9,11 +9,17 @@ use App\Models\User;
 use App\Models\WhatsappAccount;
 use App\Models\WhatsappMessage;
 use App\Notifications\NewLeadNotification;
+use App\Services\WhatsappGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 
 class WhatsAppCenterController extends Controller
 {
+    public function __construct(
+        private readonly WhatsappGateway $gateway,
+    ) {
+    }
+
     public function index()
     {
         $accounts = $this->visibleAccounts()->get();
@@ -21,6 +27,7 @@ class WhatsAppCenterController extends Controller
             'id' => $a->id,
             'account_code' => $a->account_code,
             'label' => 'WA ' . strtoupper(substr($a->account_code, 3)),
+            'gateway_status' => $a->gateway_status,
         ])->values();
 
         return view('whatsapp-center.index', compact('accounts', 'accountTabs'));
@@ -33,6 +40,7 @@ class WhatsAppCenterController extends Controller
                 'id' => $account->id,
                 'account_code' => $account->account_code,
                 'unread' => $this->unreadCount($account),
+                'gateway_status' => $account->gateway_status,
             ];
         });
 
@@ -81,6 +89,7 @@ class WhatsAppCenterController extends Controller
             ->map(fn ($m) => [
                 'id' => $m->id,
                 'direction' => $m->direction,
+                'status' => $m->status,
                 'message_body' => $m->message_body,
                 'created_at' => $m->created_at->format('d M H:i'),
             ]);
@@ -107,11 +116,24 @@ class WhatsAppCenterController extends Controller
                 ->where('sender_number', $sender)->first()?->sender_name,
             'message_body' => $validated['message_body'],
             'direction' => 'outbound',
+            'status' => 'queued',
         ]);
+
+        $gatewayMessageId = $this->gateway->sendText($account, $sender, $validated['message_body']);
+        $status = 'queued';
+
+        if ($gatewayMessageId) {
+            $message->update([
+                'gateway_message_id' => $gatewayMessageId,
+                'status' => 'sent',
+            ]);
+            $status = 'sent';
+        }
 
         return response()->json([
             'id' => $message->id,
             'direction' => 'outbound',
+            'status' => $status,
             'message_body' => $message->message_body,
             'created_at' => $message->created_at->format('d M H:i'),
         ]);
@@ -182,6 +204,100 @@ class WhatsAppCenterController extends Controller
     }
 
     public function webhook(Request $request)
+    {
+        $payload = $request->json()->all();
+        $type = data_get($payload, 'typeWebhook');
+
+        if (!$type) {
+            return $this->storeInboundFromLegacy($request);
+        }
+
+        $instance = data_get($payload, 'instanceData.idInstance');
+        $account = $instance
+            ? WhatsappAccount::where('gateway_instance', $instance)->first()
+            : null;
+
+        if (!$account) {
+            return response()->json(['error' => 'unknown instance'], 422);
+        }
+
+        $body = data_get($payload, 'body', []);
+
+        return match ($type) {
+            'incomingMessageReceived' => $this->handleIncoming($account, $body),
+            'outgoingMessageStatus' => $this->handleOutgoingStatus($account, $body),
+            'instanceStatus' => $this->handleInstanceStatus($account, $body),
+            default => response()->json(['status' => 'ignored', 'type' => $type]),
+        };
+    }
+
+    public function updateCredentials(Request $request, WhatsappAccount $account)
+    {
+        if (!auth()->user()->hasRole('super-admin') && !auth()->user()->hasPermissionTo('manage-sales-leads')) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'gateway_instance' => 'nullable|string|max:255',
+            'gateway_token' => 'nullable|string|max:255',
+        ]);
+
+        $account->update(array_merge($validated, ['gateway_status' => null]));
+
+        return redirect()->route('whatsapp-center.index')
+            ->with('success', 'Kredensial gateway disimpan.');
+    }
+
+    private function handleIncoming(WhatsappAccount $account, array $body): \Illuminate\Http\JsonResponse
+    {
+        $messageData = data_get($body, 'messageData', []);
+
+        if (data_get($messageData, 'typeMessage') !== 'textMessage') {
+            return response()->json(['status' => 'ignored', 'type' => data_get($messageData, 'typeMessage')]);
+        }
+
+        $chatId = data_get($body, 'senderData.chatId', '');
+        $idMessage = data_get($body, 'idMessage');
+        $senderNumber = preg_replace('/@.*$/', '', $chatId);
+
+        if ($idMessage && WhatsappMessage::where('wa_message_id', $idMessage)->exists()) {
+            return response()->json(['status' => 'duplicate']);
+        }
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => $senderNumber,
+            'sender_name' => data_get($body, 'senderData.senderName') ?? 'Kontak WA',
+            'message_body' => data_get($messageData, 'textMessageData.textMessage'),
+            'direction' => 'inbound',
+            'status' => 'inbound',
+            'wa_message_id' => $idMessage,
+            'created_at' => data_get($body, 'timestamp') ? now()->setTimestamp(data_get($body, 'timestamp')) : now(),
+        ]);
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    private function handleOutgoingStatus(WhatsappAccount $account, array $body): \Illuminate\Http\JsonResponse
+    {
+        $idMessage = data_get($body, 'idMessage');
+        $status = data_get($body, 'status');
+
+        WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->where('gateway_message_id', $idMessage)
+            ->update(['status' => $status]);
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    private function handleInstanceStatus(WhatsappAccount $account, array $body): \Illuminate\Http\JsonResponse
+    {
+        $account->update(['gateway_status' => data_get($body, 'stateInstance')]);
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    private function storeInboundFromLegacy(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
             'account_code' => 'required|string',

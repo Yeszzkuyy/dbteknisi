@@ -264,6 +264,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'store'])->name('reply');
             Route::post('/{account}/convert/{sender}', [WhatsAppCenterController::class, 'convert'])->name('convert');
             Route::post('/{account}/simulate', [WhatsAppCenterController::class, 'simulate'])->name('simulate');
+            Route::put('/{account}/credentials', [WhatsAppCenterController::class, 'updateCredentials'])->name('credentials');
         });
     });
 

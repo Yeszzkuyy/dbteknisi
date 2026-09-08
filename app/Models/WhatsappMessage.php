@@ -12,7 +12,9 @@ class WhatsappMessage extends Model
         'sender_name',
         'message_body',
         'direction',
+        'status',
         'wa_message_id',
+        'gateway_message_id',
         'lead_id',
     ];
 

@@ -15,6 +15,9 @@ class WhatsappAccount extends Model
         'name',
         'phone_number',
         'account_code',
+        'gateway_instance',
+        'gateway_token',
+        'gateway_status',
         'assigned_to',
         'is_active',
     ];
@@ -22,6 +25,8 @@ class WhatsappAccount extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    protected $hidden = ['gateway_token'];
 
     public function assignee()
     {

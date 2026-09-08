@@ -15,6 +15,48 @@
         @endif
     </div>
 
+    @if(auth()->user()->hasRole('super-admin') || auth()->user()->hasPermissionTo('manage-sales-leads'))
+        <div x-data="{ open: false }" class="mb-4 flex-shrink-0">
+            <button type="button" @click="open = !open"
+                    class="text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition flex items-center gap-1">
+                <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+                Pengaturan Gateway WhatsApp
+            </button>
+            <div x-show="open" x-cloak class="mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-2xl shadow-sm p-4">
+                <p class="text-xs text-slate-400 mb-3">Isi IdInstance & ApiTokenInstance dari Green API. Status koneksi diperbarui otomatis via webhook <code class="text-indigo-500">/api/whatsapp/webhook</code>.</p>
+                <div class="grid gap-3 md:grid-cols-2">
+                    @foreach($accounts as $account)
+                        <form method="POST" action="{{ route('whatsapp-center.credentials', $account) }}" class="border border-slate-100 dark:border-slate-700 rounded-xl p-3">
+                            @csrf
+                            @method('PUT')
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium text-sm text-slate-700 dark:text-slate-200">{{ $account->name }}</span>
+                                @if($account->gateway_status)
+                                    <span class="text-xs px-2 py-0.5 rounded-full {{ $account->gateway_status === 'authorized' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                        {{ $account->gateway_status }}
+                                    </span>
+                                @else
+                                    <span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300">belum dikonfigurasi</span>
+                                @endif
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="text" name="gateway_instance" placeholder="IdInstance" value="{{ $account->gateway_instance }}"
+                                       class="w-1/2 px-2 py-1.5 rounded-lg text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="password" name="gateway_token" placeholder="ApiTokenInstance" value="{{ $account->gateway_token }}"
+                                       class="w-1/2 px-2 py-1.5 rounded-lg text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button type="submit" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition flex-shrink-0">
+                                    Simpan
+                                </button>
+                            </div>
+                        </form>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div x-data="whatsappCenter()" x-init="init()" class="flex flex-col flex-1 min-h-0" x-cloak>
 
         {{-- Tabs WA Company --}}
@@ -26,6 +68,14 @@
                         :class="acc.id === activeAccount.id
                             ? 'bg-blue-600 text-white shadow-sm'
                             : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700'">
+                    <span class="relative flex h-2 w-2 flex-shrink-0">
+                        <span x-show="acc.gateway_status === 'authorized'"
+                              class="h-2 w-2 rounded-full bg-green-500" title="Terhubung"></span>
+                        <span x-show="acc.gateway_status && acc.gateway_status !== 'authorized'"
+                              class="h-2 w-2 rounded-full bg-red-500" :title="'Status: ' + acc.gateway_status"></span>
+                        <span x-show="!acc.gateway_status"
+                              class="h-2 w-2 rounded-full bg-slate-400" title="Belum terhubung gateway"></span>
+                    </span>
                     <span x-text="acc.label"></span>
                     <span x-show="unread[acc.account_code] > 0"
                           x-text="unread[acc.account_code]"
@@ -133,7 +183,16 @@
                                             ? 'bg-blue-600 text-white rounded-br-md'
                                             : 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-md'">
                                         <p class="whitespace-pre-wrap break-words" x-text="msg.message_body"></p>
-                                        <p class="text-[10px] mt-1 opacity-70" x-text="msg.created_at"></p>
+                                        <p class="text-[10px] mt-1 opacity-70 flex items-center gap-1 justify-end">
+                                            <span x-text="msg.created_at"></span>
+                                            <template x-if="msg.direction === 'outbound'">
+                                                <span x-show="msg.status === 'read'" class="text-blue-300" title="Dibaca">✓✓</span>
+                                                <span x-show="msg.status === 'delivered'" class="opacity-100" title="Terkirim">✓✓</span>
+                                                <span x-show="msg.status === 'sent'" title="Terkirim">✓</span>
+                                                <span x-show="msg.status === 'failed'" class="text-red-300" title="Gagal">✕</span>
+                                                <span x-show="!msg.status || msg.status === 'queued'" class="opacity-60" title="Menunggu pengiriman">⋯</span>
+                                            </template>
+                                        </p>
                                     </div>
                                 </div>
                             </template>

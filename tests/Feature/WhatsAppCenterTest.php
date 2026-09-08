@@ -8,6 +8,7 @@ use App\Models\WhatsappAccount;
 use App\Models\WhatsappMessage;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class WhatsAppCenterTest extends TestCase
@@ -161,5 +162,160 @@ class WhatsAppCenterTest extends TestCase
         $accounts = collect($response->viewData('accounts'));
         $this->assertTrue($accounts->contains('id', $a->id));
         $this->assertTrue($accounts->contains('id', $b->id));
+    }
+
+    public function test_reply_sends_via_green_api_when_configured(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123']);
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Halo',
+            'direction' => 'inbound',
+        ]);
+
+        Http::fake([
+            'api.green-api.com/*' => Http::response(['idMessage' => 'g_msg_1']),
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.reply', [$account, '6281234567890']), ['message_body' => 'Baik'])
+            ->assertOk()
+            ->assertJsonPath('status', 'sent');
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'direction' => 'outbound',
+            'status' => 'sent',
+            'gateway_message_id' => 'g_msg_1',
+        ]);
+    }
+
+    public function test_reply_stored_only_when_gateway_unconfigured(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Halo',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.reply', [$account, '6281234567890']), ['message_body' => 'Baik'])
+            ->assertOk()
+            ->assertJsonPath('status', 'queued');
+
+        $this->assertDatabaseHas('whatsapp_messages', ['direction' => 'outbound', 'status' => 'queued']);
+    }
+
+    public function test_green_api_webhook_stores_inbound_text(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101']);
+
+        $payload = [
+            'typeWebhook' => 'incomingMessageReceived',
+            'instanceData' => ['idInstance' => 1101],
+            'body' => [
+                'idMessage' => 'A1B2C3',
+                'timestamp' => now()->timestamp,
+                'senderData' => ['chatId' => '6281234567890@c.us', 'senderName' => 'Rina Putri'],
+                'messageData' => ['typeMessage' => 'textMessage', 'textMessageData' => ['textMessage' => 'Minta penawaran']],
+            ],
+        ];
+
+        $this->postJson('/api/whatsapp/webhook', $payload)->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina Putri',
+            'message_body' => 'Minta penawaran',
+            'wa_message_id' => 'A1B2C3',
+        ]);
+
+        // Duplicate webhook ditolak via idMessage
+        $this->postJson('/api/whatsapp/webhook', $payload)->assertOk();
+        $this->assertSame(1, WhatsappMessage::count());
+    }
+
+    public function test_green_api_webhook_updates_outgoing_status(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101']);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'Baik',
+            'direction' => 'outbound',
+            'status' => 'sent',
+            'gateway_message_id' => 'g_msg_1',
+        ]);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'typeWebhook' => 'outgoingMessageStatus',
+            'instanceData' => ['idInstance' => 1101],
+            'body' => ['idMessage' => 'g_msg_1', 'status' => 'delivered'],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', ['gateway_message_id' => 'g_msg_1', 'status' => 'delivered']);
+    }
+
+    public function test_green_api_webhook_updates_instance_status(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101']);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'typeWebhook' => 'instanceStatus',
+            'instanceData' => ['idInstance' => 1101],
+            'body' => ['stateInstance' => 'authorized'],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_accounts', ['id' => $account->id, 'gateway_status' => 'authorized']);
+    }
+
+    public function test_green_api_webhook_rejects_unknown_instance(): void
+    {
+        $this->makeAccount();
+        $this->postJson('/api/whatsapp/webhook', [
+            'typeWebhook' => 'incomingMessageReceived',
+            'instanceData' => ['idInstance' => 9999],
+            'body' => [],
+        ])->assertStatus(422);
+    }
+
+    public function test_super_admin_can_update_gateway_credentials(): void
+    {
+        $account = $this->makeAccount();
+        $admin = \App\Models\User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        $this->actingAs($admin)
+            ->put(route('whatsapp-center.credentials', $account), [
+                'gateway_instance' => '1102',
+                'gateway_token' => 'tok-abc',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('whatsapp_accounts', ['id' => $account->id, 'gateway_instance' => '1102']);
+    }
+
+    public function test_marketing_user_cannot_update_gateway_credentials(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        $this->actingAs($user)
+            ->put(route('whatsapp-center.credentials', $account), ['gateway_instance' => '999'])
+            ->assertForbidden();
     }
 }
