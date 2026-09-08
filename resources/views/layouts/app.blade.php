@@ -134,6 +134,11 @@
             document.addEventListener('keydown',function(e){e.key==='Escape'&&s.classList.contains('open')&&close()});
             var t=document.getElementById('darkToggle');
             t&&t.addEventListener('click',function(){var d=document.documentElement.classList.toggle('dark');localStorage.setItem('dark-mode',d)});
+            var nav=document.getElementById('sidebar-navigation');
+            if(nav){
+                nav.scrollTop=+(sessionStorage.getItem('sidebar-scroll')||0);
+                nav.addEventListener('scroll',function(){sessionStorage.setItem('sidebar-scroll',nav.scrollTop)});
+            }
             // Reveal saat scroll — hormati prefers-reduced-motion
             if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){
                 var io=new IntersectionObserver(function(entries){
