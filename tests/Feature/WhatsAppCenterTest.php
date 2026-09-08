@@ -327,6 +327,28 @@ class WhatsAppCenterTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_green_api_webhook_stores_extended_text_message(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101']);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'typeWebhook' => 'incomingMessageReceived',
+            'instanceData' => ['idInstance' => 1101],
+            'body' => [
+                'idMessage' => 'EXT1',
+                'timestamp' => now()->timestamp,
+                'senderData' => ['chatId' => '6281234567891@c.us', 'senderName' => 'Budi'],
+                'messageData' => ['typeMessage' => 'extendedTextMessage', 'extendedTextMessageData' => ['text' => 'Pesan dari extendedTextMessage']],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'message_body' => 'Pesan dari extendedTextMessage',
+        ]);
+    }
+
     public function test_receive_command_polls_inbound_and_acknowledges(): void
     {
         $account = $this->makeAccount();

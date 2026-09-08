@@ -262,9 +262,16 @@ class WhatsAppCenterController extends Controller
     private function handleIncoming(WhatsappAccount $account, array $body): \Illuminate\Http\JsonResponse
     {
         $messageData = data_get($body, 'messageData', []);
+        $type = data_get($messageData, 'typeMessage');
 
-        if (data_get($messageData, 'typeMessage') !== 'textMessage') {
-            return response()->json(['status' => 'ignored', 'type' => data_get($messageData, 'typeMessage')]);
+        $text = match ($type) {
+            'textMessage' => data_get($messageData, 'textMessageData.textMessage'),
+            'extendedTextMessage' => data_get($messageData, 'extendedTextMessageData.text'),
+            default => null,
+        };
+
+        if ($text === null) {
+            return response()->json(['status' => 'ignored', 'type' => $type]);
         }
 
         $chatId = data_get($body, 'senderData.chatId', '');
@@ -279,7 +286,7 @@ class WhatsAppCenterController extends Controller
             'whatsapp_account_id' => $account->id,
             'sender_number' => $senderNumber,
             'sender_name' => data_get($body, 'senderData.senderName') ?? 'Kontak WA',
-            'message_body' => data_get($messageData, 'textMessageData.textMessage'),
+            'message_body' => $text,
             'direction' => 'inbound',
             'status' => 'inbound',
             'wa_message_id' => $idMessage,
