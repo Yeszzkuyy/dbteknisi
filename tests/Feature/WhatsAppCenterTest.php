@@ -223,12 +223,10 @@ class WhatsAppCenterTest extends TestCase
         $payload = [
             'typeWebhook' => 'incomingMessageReceived',
             'instanceData' => ['idInstance' => 1101],
-            'body' => [
-                'idMessage' => 'A1B2C3',
-                'timestamp' => now()->timestamp,
-                'senderData' => ['chatId' => '6281234567890@c.us', 'senderName' => 'Rina Putri'],
-                'messageData' => ['typeMessage' => 'textMessage', 'textMessageData' => ['textMessage' => 'Minta penawaran']],
-            ],
+            'idMessage' => 'A1B2C3',
+            'timestamp' => now()->timestamp,
+            'senderData' => ['chatId' => '6281234567890@c.us', 'senderName' => 'Rina Putri'],
+            'messageData' => ['typeMessage' => 'textMessage', 'textMessageData' => ['textMessage' => 'Minta penawaran']],
         ];
 
         $this->postJson('/api/whatsapp/webhook', $payload)->assertOk();
@@ -263,7 +261,8 @@ class WhatsAppCenterTest extends TestCase
         $this->postJson('/api/whatsapp/webhook', [
             'typeWebhook' => 'outgoingMessageStatus',
             'instanceData' => ['idInstance' => 1101],
-            'body' => ['idMessage' => 'g_msg_1', 'status' => 'delivered'],
+            'idMessage' => 'g_msg_1',
+            'status' => 'delivered',
         ])->assertOk();
 
         $this->assertDatabaseHas('whatsapp_messages', ['gateway_message_id' => 'g_msg_1', 'status' => 'delivered']);
@@ -277,7 +276,7 @@ class WhatsAppCenterTest extends TestCase
         $this->postJson('/api/whatsapp/webhook', [
             'typeWebhook' => 'instanceStatus',
             'instanceData' => ['idInstance' => 1101],
-            'body' => ['stateInstance' => 'authorized'],
+            'stateInstance' => 'authorized',
         ])->assertOk();
 
         $this->assertDatabaseHas('whatsapp_accounts', ['id' => $account->id, 'gateway_status' => 'authorized']);
@@ -289,7 +288,6 @@ class WhatsAppCenterTest extends TestCase
         $this->postJson('/api/whatsapp/webhook', [
             'typeWebhook' => 'incomingMessageReceived',
             'instanceData' => ['idInstance' => 9999],
-            'body' => [],
         ])->assertStatus(422);
     }
 
@@ -335,12 +333,10 @@ class WhatsAppCenterTest extends TestCase
         $this->postJson('/api/whatsapp/webhook', [
             'typeWebhook' => 'incomingMessageReceived',
             'instanceData' => ['idInstance' => 1101],
-            'body' => [
-                'idMessage' => 'EXT1',
-                'timestamp' => now()->timestamp,
-                'senderData' => ['chatId' => '6281234567891@c.us', 'senderName' => 'Budi'],
-                'messageData' => ['typeMessage' => 'extendedTextMessage', 'extendedTextMessageData' => ['text' => 'Pesan dari extendedTextMessage']],
-            ],
+            'idMessage' => 'EXT1',
+            'timestamp' => now()->timestamp,
+            'senderData' => ['chatId' => '6281234567891@c.us', 'senderName' => 'Budi'],
+            'messageData' => ['typeMessage' => 'extendedTextMessage', 'extendedTextMessageData' => ['text' => 'Pesan dari extendedTextMessage']],
         ])->assertOk();
 
         $this->assertDatabaseHas('whatsapp_messages', [
@@ -361,12 +357,10 @@ class WhatsAppCenterTest extends TestCase
                 'body' => [
                     'typeWebhook' => 'incomingMessageReceived',
                     'instanceData' => ['idInstance' => 1101],
-                    'body' => [
-                        'idMessage' => 'POLL1',
-                        'timestamp' => now()->timestamp,
-                        'senderData' => ['chatId' => '6281234567890@c.us', 'senderName' => 'Rina Poll'],
-                        'messageData' => ['typeMessage' => 'textMessage', 'textMessageData' => ['textMessage' => 'Halo dari polling']],
-                    ],
+                    'idMessage' => 'POLL1',
+                    'timestamp' => now()->timestamp,
+                    'senderData' => ['chatId' => '6281234567890@c.us', 'senderName' => 'Rina Poll'],
+                    'messageData' => ['typeMessage' => 'textMessage', 'textMessageData' => ['textMessage' => 'Halo dari polling']],
                 ],
             ]),
             'api.green-api.com/waInstance1101/deleteNotification/*' => Http::response(['result' => true]),

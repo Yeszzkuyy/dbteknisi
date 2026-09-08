@@ -228,12 +228,10 @@ class WhatsAppCenterController extends Controller
             return response()->json(['error' => 'unknown instance'], 422);
         }
 
-        $body = data_get($payload, 'body', []);
-
         return match ($type) {
-            'incomingMessageReceived' => $this->handleIncoming($account, $body),
-            'outgoingMessageStatus' => $this->handleOutgoingStatus($account, $body),
-            'instanceStatus' => $this->handleInstanceStatus($account, $body),
+            'incomingMessageReceived' => $this->handleIncoming($account, $payload),
+            'outgoingMessageStatus' => $this->handleOutgoingStatus($account, $payload),
+            'instanceStatus' => $this->handleInstanceStatus($account, $payload),
             default => response()->json(['status' => 'ignored', 'type' => $type]),
         };
     }
@@ -259,9 +257,9 @@ class WhatsAppCenterController extends Controller
             ->with('success', 'Kredensial gateway disimpan.');
     }
 
-    private function handleIncoming(WhatsappAccount $account, array $body): \Illuminate\Http\JsonResponse
+    private function handleIncoming(WhatsappAccount $account, array $payload): \Illuminate\Http\JsonResponse
     {
-        $messageData = data_get($body, 'messageData', []);
+        $messageData = data_get($payload, 'messageData', []);
         $type = data_get($messageData, 'typeMessage');
 
         $text = match ($type) {
@@ -274,8 +272,8 @@ class WhatsAppCenterController extends Controller
             return response()->json(['status' => 'ignored', 'type' => $type]);
         }
 
-        $chatId = data_get($body, 'senderData.chatId', '');
-        $idMessage = data_get($body, 'idMessage');
+        $chatId = data_get($payload, 'senderData.chatId', '');
+        $idMessage = data_get($payload, 'idMessage');
         $senderNumber = preg_replace('/@.*$/', '', $chatId);
 
         if ($idMessage && WhatsappMessage::where('wa_message_id', $idMessage)->exists()) {
@@ -285,32 +283,33 @@ class WhatsAppCenterController extends Controller
         WhatsappMessage::create([
             'whatsapp_account_id' => $account->id,
             'sender_number' => $senderNumber,
-            'sender_name' => data_get($body, 'senderData.senderName') ?? 'Kontak WA',
+            'sender_name' => data_get($payload, 'senderData.senderName') ?? 'Kontak WA',
             'message_body' => $text,
             'direction' => 'inbound',
             'status' => 'inbound',
             'wa_message_id' => $idMessage,
-            'created_at' => data_get($body, 'timestamp') ? now()->setTimestamp(data_get($body, 'timestamp')) : now(),
+            'created_at' => data_get($payload, 'timestamp') ? now()->setTimestamp(data_get($payload, 'timestamp')) : now(),
         ]);
 
         return response()->json(['status' => 'ok']);
     }
 
-    private function handleOutgoingStatus(WhatsappAccount $account, array $body): \Illuminate\Http\JsonResponse
+    private function handleOutgoingStatus(WhatsappAccount $account, array $payload): \Illuminate\Http\JsonResponse
     {
-        $idMessage = data_get($body, 'idMessage');
-        $status = data_get($body, 'status');
-
         WhatsappMessage::where('whatsapp_account_id', $account->id)
-            ->where('gateway_message_id', $idMessage)
-            ->update(['status' => $status]);
+            ->where('gateway_message_id', data_get($payload, 'idMessage'))
+            ->update(['status' => data_get($payload, 'status')]);
 
         return response()->json(['status' => 'ok']);
     }
 
-    private function handleInstanceStatus(WhatsappAccount $account, array $body): \Illuminate\Http\JsonResponse
+    private function handleInstanceStatus(WhatsappAccount $account, array $payload): \Illuminate\Http\JsonResponse
     {
-        $account->update(['gateway_status' => data_get($body, 'stateInstance')]);
+        $state = data_get($payload, 'stateInstance') ?? data_get($payload, 'body.stateInstance');
+
+        if ($state) {
+            $account->update(['gateway_status' => $state]);
+        }
 
         return response()->json(['status' => 'ok']);
     }
