@@ -318,4 +318,49 @@ class WhatsAppCenterTest extends TestCase
             ->put(route('whatsapp-center.credentials', $account), ['gateway_instance' => '999'])
             ->assertForbidden();
     }
+
+    public function test_receive_command_polls_inbound_and_acknowledges(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123']);
+
+        Http::fake([
+            'api.green-api.com/waInstance1101/receiveNotification/*' => Http::response([
+                'receiptId' => 5,
+                'body' => [
+                    'typeWebhook' => 'incomingMessageReceived',
+                    'instanceData' => ['idInstance' => 1101],
+                    'body' => [
+                        'idMessage' => 'POLL1',
+                        'timestamp' => now()->timestamp,
+                        'senderData' => ['chatId' => '6281234567890@c.us', 'senderName' => 'Rina Poll'],
+                        'messageData' => ['typeMessage' => 'textMessage', 'textMessageData' => ['textMessage' => 'Halo dari polling']],
+                    ],
+                ],
+            ]),
+            'api.green-api.com/waInstance1101/deleteNotification/*' => Http::response(['result' => true]),
+        ]);
+
+        $this->artisan('whatsapp:receive')->assertExitCode(0);
+
+        // Notifikasi yang sama hanya disimpan sekali (dedupe idMessage)
+        $this->assertSame(1, WhatsappMessage::count());
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'Halo dari polling',
+            'wa_message_id' => 'POLL1',
+        ]);
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), '/deleteNotification/'));
+    }
+
+    public function test_receive_command_skips_account_without_credentials(): void
+    {
+        $this->makeAccount();
+        Http::fake();
+
+        $this->artisan('whatsapp:receive')->assertExitCode(0);
+        Http::assertNothingSent();
+    }
 }

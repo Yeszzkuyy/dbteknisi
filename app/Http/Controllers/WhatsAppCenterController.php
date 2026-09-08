@@ -205,11 +205,18 @@ class WhatsAppCenterController extends Controller
 
     public function webhook(Request $request)
     {
-        $payload = $request->json()->all();
+        return $this->handleNotification($request->json()->all());
+    }
+
+    /**
+     * Proses notifikasi Green API (dipakai webhook & polling receiveNotification).
+     */
+    public function handleNotification(array $payload): \Illuminate\Http\JsonResponse
+    {
         $type = data_get($payload, 'typeWebhook');
 
         if (!$type) {
-            return $this->storeInboundFromLegacy($request);
+            return $this->storeInboundFromLegacy($payload);
         }
 
         $instance = data_get($payload, 'instanceData.idInstance');
@@ -297,15 +304,15 @@ class WhatsAppCenterController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    private function storeInboundFromLegacy(Request $request): \Illuminate\Http\JsonResponse
+    private function storeInboundFromLegacy(array $payload): \Illuminate\Http\JsonResponse
     {
-        $validated = $request->validate([
+        $validated = \Illuminate\Support\Facades\Validator::make($payload, [
             'account_code' => 'required|string',
             'sender_number' => 'required|string',
             'sender_name' => 'nullable|string|max:255',
             'message_body' => 'required|string',
             'wa_message_id' => 'nullable|string',
-        ]);
+        ])->validate();
 
         $account = WhatsappAccount::where('account_code', $validated['account_code'])->first();
 

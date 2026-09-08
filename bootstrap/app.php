@@ -25,4 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+        // Polling pesan masuk & status WhatsApp (Green API) — untuk localhost tanpa webhook publik
+        $schedule->command('whatsapp:receive')->everyThirtySeconds()
+            ->withoutOverlapping();
+    })
     ->create();
