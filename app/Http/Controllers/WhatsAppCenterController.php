@@ -251,6 +251,10 @@ class WhatsAppCenterController extends Controller
 
         $account->update(array_merge($validated, ['gateway_status' => null]));
 
+        if ($state = $this->gateway->getState($account)) {
+            $account->update(['gateway_status' => $state]);
+        }
+
         return redirect()->route('whatsapp-center.index')
             ->with('success', 'Kredensial gateway disimpan.');
     }
