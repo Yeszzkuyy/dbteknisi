@@ -299,6 +299,10 @@ class WhatsAppCenterTest extends TestCase
         $admin = \App\Models\User::factory()->create();
         $admin->assignRole('super-admin');
 
+        Http::fake([
+            'api.green-api.com/waInstance1102/getStateInstance/*' => Http::response(['stateInstance' => 'authorized']),
+        ]);
+
         $this->actingAs($admin)
             ->put(route('whatsapp-center.credentials', $account), [
                 'gateway_instance' => '1102',
@@ -306,7 +310,11 @@ class WhatsAppCenterTest extends TestCase
             ])
             ->assertRedirect();
 
-        $this->assertDatabaseHas('whatsapp_accounts', ['id' => $account->id, 'gateway_instance' => '1102']);
+        $this->assertDatabaseHas('whatsapp_accounts', [
+            'id' => $account->id,
+            'gateway_instance' => '1102',
+            'gateway_status' => 'authorized',
+        ]);
     }
 
     public function test_marketing_user_cannot_update_gateway_credentials(): void
@@ -325,6 +333,7 @@ class WhatsAppCenterTest extends TestCase
         $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123']);
 
         Http::fake([
+            'api.green-api.com/waInstance1101/getStateInstance/*' => Http::response(['stateInstance' => 'authorized']),
             'api.green-api.com/waInstance1101/receiveNotification/*' => Http::response([
                 'receiptId' => 5,
                 'body' => [
@@ -342,6 +351,9 @@ class WhatsAppCenterTest extends TestCase
         ]);
 
         $this->artisan('whatsapp:receive')->assertExitCode(0);
+
+        // Status koneksi ikut diperbarui dari getStateInstance
+        $this->assertDatabaseHas('whatsapp_accounts', ['id' => $account->id, 'gateway_status' => 'authorized']);
 
         // Notifikasi yang sama hanya disimpan sekali (dedupe idMessage)
         $this->assertSame(1, WhatsappMessage::count());

@@ -45,6 +45,30 @@ class WhatsappGateway
     }
 
     /**
+     * Ambil status koneksi instance dari Green API (getStateInstance).
+     * Mengembalikan stateInstance (mis. 'authorized') atau null bila gagal.
+     */
+    public function getState(WhatsappAccount $account): ?string
+    {
+        if (!$this->configured($account)) {
+            return null;
+        }
+
+        $response = Http::timeout(20)->get(sprintf(
+            '%s/waInstance%s/getStateInstance/%s',
+            rtrim(config('whatsapp.base_url'), '/'),
+            $account->gateway_instance,
+            $account->gateway_token
+        ));
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        return $response->json('stateInstance');
+    }
+
+    /**
      * Ambil satu notifikasi antrean dari Green API (polling).
      * Mengembalikan ['receiptId' => ..., 'payload' => [...]] atau null bila kosong.
      */

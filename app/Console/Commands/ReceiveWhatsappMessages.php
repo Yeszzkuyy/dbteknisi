@@ -27,6 +27,10 @@ class ReceiveWhatsappMessages extends Command
         $processed = 0;
 
         foreach ($accounts as $account) {
+            if ($state = $gateway->getState($account)) {
+                $account->update(['gateway_status' => $state]);
+            }
+
             for ($i = 0; $i < 50; $i++) {
                 $notification = $gateway->receive($account);
 
