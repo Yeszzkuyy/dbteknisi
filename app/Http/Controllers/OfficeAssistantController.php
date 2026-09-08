@@ -39,9 +39,9 @@ class OfficeAssistantController extends Controller
 
         $user = $request->user();
 
-        if (blank(config('ai.providers.gemini.key'))) {
+        if (blank(config('ai.providers.openrouter.key'))) {
             return response()->json([
-                'message' => 'Asisten AI belum aktif karena API key Gemini belum dikonfigurasi. Hubungi administrator.',
+                'message' => 'Asisten AI belum aktif karena API key OpenRouter belum dikonfigurasi. Hubungi administrator.',
             ], 422);
         }
 

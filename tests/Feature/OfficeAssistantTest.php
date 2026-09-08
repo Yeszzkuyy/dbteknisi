@@ -35,20 +35,20 @@ class OfficeAssistantTest extends TestCase
             ->assertSee('AI Assistant');
     }
 
-    public function test_send_returns_error_when_gemini_key_is_missing(): void
+    public function test_send_returns_error_when_openrouter_key_is_missing(): void
     {
-        config()->set('ai.providers.gemini.key', '');
+        config()->set('ai.providers.openrouter.key', '');
 
         $this->actingUser();
 
         $this->postJson(route('ai.assistant.send'), ['message' => 'Halo'])
             ->assertStatus(422)
-            ->assertJsonPath('message', 'Asisten AI belum aktif karena API key Gemini belum dikonfigurasi. Hubungi administrator.');
+            ->assertJsonPath('message', 'Asisten AI belum aktif karena API key OpenRouter belum dikonfigurasi. Hubungi administrator.');
     }
 
     public function test_message_requires_text(): void
     {
-        config()->set('ai.providers.gemini.key', 'test-key');
+        config()->set('ai.providers.openrouter.key', 'test-key');
         OfficeAssistant::fake(['Balasan test']);
 
         $this->actingUser();
@@ -60,7 +60,7 @@ class OfficeAssistantTest extends TestCase
 
     public function test_send_creates_conversation_and_returns_reply(): void
     {
-        config()->set('ai.providers.gemini.key', 'test-key');
+        config()->set('ai.providers.openrouter.key', 'test-key');
         OfficeAssistant::fake(['Balasan test']);
 
         $this->actingUser();
@@ -78,7 +78,7 @@ class OfficeAssistantTest extends TestCase
 
     public function test_send_continues_existing_conversation(): void
     {
-        config()->set('ai.providers.gemini.key', 'test-key');
+        config()->set('ai.providers.openrouter.key', 'test-key');
         OfficeAssistant::fake(['Balasan pertama', 'Balasan kedua']);
 
         $this->actingUser();
@@ -98,7 +98,7 @@ class OfficeAssistantTest extends TestCase
 
     public function test_send_rejects_conversation_owned_by_other_user(): void
     {
-        config()->set('ai.providers.gemini.key', 'test-key');
+        config()->set('ai.providers.openrouter.key', 'test-key');
         OfficeAssistant::fake(['Balasan test']);
 
         $owner = $this->actingAs(User::factory()->create());
