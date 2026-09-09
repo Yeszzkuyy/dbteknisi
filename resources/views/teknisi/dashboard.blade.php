@@ -144,7 +144,14 @@
 
                 <div class="mt-6 flex flex-col items-center gap-6">
                     {{-- Donut progress (ApexCharts) --}}
-                    <div id="teknisi-donut-chart" class="w-full max-w-[260px]"></div>
+                    <div class="relative w-full max-w-[260px]">
+                        <div id="teknisi-donut-chart" class="w-full"></div>
+                        <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-xs font-medium text-slate-400 dark:text-slate-500">Selesai</span>
+                            <span class="text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100"
+                                  x-data="counter({{ $donePct }})" x-init="start()" x-text="display + '%'">0%</span>
+                        </div>
+                    </div>
 
                     <ul class="w-full space-y-1.5">
                         @forelse($topStatuses as $status)
@@ -330,17 +337,6 @@
                     pie: {
                         donut: {
                             size: '75%',
-                            labels: {
-                                show: true,
-                                total: {
-                                    show: true,
-                                    label: 'Selesai',
-                                    fontSize: '13px',
-                                    fontWeight: 500,
-                                    color: isDark ? '#94a3b8' : '#64748b',
-                                    formatter: () => '{{ $donePct }}%',
-                                },
-                            },
                         },
                     },
                 },
