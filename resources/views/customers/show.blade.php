@@ -58,56 +58,56 @@
                     <button @click="tab = 'overview'; moveIndicator($el)"
                             :class="tab === 'overview' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        📋 Overview
+                        <x-icon name="grid" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Overview
                     </button>
                     <button @click="tab = 'projects'; moveIndicator($el)"
                             :class="tab === 'projects' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        📁 Projects
+                        <x-icon name="folder" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Projects
                     </button>
                     <button @click="tab = 'contacts'; moveIndicator($el)"
                             :class="tab === 'contacts' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        👤 Contacts
+                        <x-icon name="users" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Contacts
                     </button>
                     <button @click="tab = 'documents'; moveIndicator($el)"
                             :class="tab === 'documents' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        📄 Documents
+                        <x-icon name="book" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Documents
                     </button>
                     @can('view-sales')
                     <button @click="tab = 'meetings'; moveIndicator($el)"
                             :class="tab === 'meetings' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        🤝 Meetings
+                        <x-icon name="handshake" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Meetings
                     </button>
                     <button @click="tab = 'followups'; moveIndicator($el)"
                             :class="tab === 'followups' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        📞 Follow Up
+                        <x-icon name="phone" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Follow Up
                     </button>
                     @endcan
                     @can('view-admin')
                     <button @click="tab = 'invoices'; moveIndicator($el)"
                             :class="tab === 'invoices' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        📋 Invoice
+                        <x-icon name="receipt" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Invoice
                     </button>
                     <button @click="tab = 'pos'; moveIndicator($el)"
                             :class="tab === 'pos' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        📑 PO
+                        <x-icon name="file-text" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> PO
                     </button>
                     <button @click="tab = 'payments'; moveIndicator($el)"
                             :class="tab === 'payments' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        💳 Payment
+                        <x-icon name="credit-card" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Payment
                     </button>
                     @endcan
                     <button @click="tab = 'activity'; moveIndicator($el)"
                             :class="tab === 'activity' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
-                        📝 Activity
+                        <x-icon name="activity" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Activity
                     </button>
                 </nav>
             </div>
