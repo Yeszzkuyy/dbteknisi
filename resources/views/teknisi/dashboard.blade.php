@@ -47,26 +47,14 @@
         $topStatuses = $donutStatuses->take(5);
         $othersCount = $donutStatuses->skip(5)->sum('count');
         $totalShown = $donutStatuses->sum('count');
-        $total = $totalShown > 0 ? $totalShown : 1;
 
-        $segments = '';
-        $cursor = 0;
-        foreach ($topStatuses as $status) {
-            $deg = round($status['count'] / $total * 360);
-            if ($deg > 0) {
-                $segments .= ($segments ? ', ' : '') . ($statusBarColors[$status['name']] ?? '#64748b') . ' ' . $cursor . 'deg ' . ($cursor + $deg) . 'deg';
-                $cursor += $deg;
-            }
-        }
+        $donutData = $topStatuses->map(fn ($s) => [
+            'label' => $s['name'],
+            'value' => $s['count'],
+            'color' => $statusBarColors[$s['name']] ?? '#64748b',
+        ])->values();
         if ($othersCount > 0) {
-            $deg = round($othersCount / $total * 360);
-            if ($deg > 0) {
-                $segments .= ($segments ? ', ' : '') . '#64748b ' . $cursor . 'deg ' . ($cursor + $deg) . 'deg';
-                $cursor += $deg;
-            }
-        }
-        if ($cursor < 360) {
-            $segments .= ($segments ? ', ' : '') . '#e2e8f0 ' . $cursor . 'deg 360deg';
+            $donutData->push(['label' => 'Lainnya', 'value' => $othersCount, 'color' => '#64748b']);
         }
 
         $doneCount = $statusCounts->firstWhere('name', 'Done')['count'] ?? 0;
@@ -155,35 +143,8 @@
                 </div>
 
                 <div class="mt-6 flex flex-col items-center gap-6">
-                    {{-- Donut progress: animasi muncul + angka menghitung naik saat halaman dibuka --}}
-                    <div
-                        x-data="{
-                            started: false,
-                            pct: 0,
-                            target: {{ $donePct }},
-                            animate() {
-                                this.started = true;
-                                if (this.target <= 0) return;
-                                const step = Math.max(1, Math.round(this.target / 30));
-                                const timer = setInterval(() => {
-                                    this.pct = Math.min(this.target, this.pct + step);
-                                    if (this.pct >= this.target) clearInterval(timer);
-                                }, 30);
-                            }
-                        }"
-                        x-init="setTimeout(() => animate(), 200)"
-                        class="relative h-44 w-44 shrink-0 rounded-full transition-all duration-700 ease-out"
-                        :class="started ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-75 -rotate-90'"
-                        style="background: conic-gradient({{ $segments }}); box-shadow: inset 0 10px 18px rgba(255,255,255,.30), inset 0 -10px 20px rgba(15,23,42,.18), 0 12px 32px rgba(15,23,42,.15); filter: drop-shadow(0 6px 20px rgba(59,130,246,.30));"
-                    >
-                        <div class="pointer-events-none absolute inset-0 rounded-full" style="background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.42), transparent 44%); mix-blend-mode: overlay;"></div>
-                        <div class="absolute inset-6 flex flex-col items-center justify-center rounded-full bg-white shadow-[inset_0_2px_8px_rgba(15,23,42,.06)] dark:bg-slate-800">
-                            <span class="text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100">
-                                <span x-text="pct">{{ $donePct }}</span>%
-                            </span>
-                            <span class="mt-1 text-xs text-slate-500">Selesai</span>
-                        </div>
-                    </div>
+                    {{-- Donut progress (ApexCharts) --}}
+                    <div id="teknisi-donut-chart" class="w-full max-w-[260px]"></div>
 
                     <ul class="w-full space-y-1.5">
                         @forelse($topStatuses as $status)
@@ -336,4 +297,68 @@
             </section>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const donutData = @json($donutData);
+            if (!donutData.length || typeof window.ApexCharts === 'undefined') return;
+
+            const isDark = document.documentElement.classList.contains('dark');
+
+            new ApexCharts(document.querySelector('#teknisi-donut-chart'), {
+                chart: {
+                    type: 'donut',
+                    height: 240,
+                    width: '100%',
+                    toolbar: { show: false },
+                    background: 'transparent',
+                    animations: {
+                        enabled: true,
+                        easing: 'easeout',
+                        speed: 700,
+                    },
+                },
+                series: donutData.map(d => d.value),
+                labels: donutData.map(d => d.label),
+                colors: donutData.map(d => d.color),
+                theme: { mode: isDark ? 'dark' : 'light' },
+                stroke: { width: 3, colors: [isDark ? '#1e293b' : '#ffffff'] },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        shadeIntensity: 0.35,
+                        opacityFrom: 1,
+                        opacityTo: 0.8,
+                    },
+                },
+                dataLabels: { enabled: false },
+                legend: { show: false },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '75%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Selesai',
+                                    fontSize: '13px',
+                                    fontWeight: 500,
+                                    color: isDark ? '#94a3b8' : '#64748b',
+                                    formatter: () => '{{ $donePct }}%',
+                                },
+                            },
+                        },
+                    },
+                },
+                tooltip: {
+                    enabled: true,
+                    theme: isDark ? 'dark' : 'light',
+                    y: { formatter: (val) => val + ' project' },
+                },
+            }).render();
+        });
+    </script>
 </x-app-layout>
