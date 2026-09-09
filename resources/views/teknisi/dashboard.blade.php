@@ -157,9 +157,10 @@
                     x-init="setTimeout(() => animate(), 200)"
                     class="relative h-48 w-48 shrink-0 rounded-full transition-all duration-700 ease-out"
                     :class="started ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-75 -rotate-90'"
-                    style="background: conic-gradient({{ $segments }})"
+                    style="background: conic-gradient({{ $segments }}); box-shadow: inset 0 10px 18px rgba(255,255,255,.30), inset 0 -10px 20px rgba(15,23,42,.18), 0 12px 32px rgba(15,23,42,.15); filter: drop-shadow(0 6px 20px rgba(59,130,246,.30));"
                 >
-                    <div class="absolute inset-6 flex flex-col items-center justify-center rounded-full bg-white dark:bg-slate-800">
+                    <div class="pointer-events-none absolute inset-0 rounded-full" style="background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.42), transparent 44%); mix-blend-mode: overlay;"></div>
+                    <div class="absolute inset-6 flex flex-col items-center justify-center rounded-full bg-white shadow-[inset_0_2px_8px_rgba(15,23,42,.06)] dark:bg-slate-800">
                         <span class="text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100">
                             <span x-text="pct">{{ $donePct }}</span>%
                         </span>

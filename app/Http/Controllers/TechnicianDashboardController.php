@@ -15,19 +15,23 @@ class TechnicianDashboardController extends Controller
     private const STATUS_BADGE_COLORS = [
         'Open' => 'blue',
         'On Progress' => 'yellow',
+        'Pending' => 'orange',
         'Hold' => 'red',
         'Done' => 'green',
-        'Maintenance' => 'purple',
         'Cancelled' => 'slate',
+        'Warranty' => 'cyan',
+        'Maintenance' => 'purple',
     ];
 
     private const STATUS_BAR_COLORS = [
-        'Open' => '#1c71d8',
+        'Open' => '#3b82f6',
         'On Progress' => '#eab308',
+        'Pending' => '#f97316',
         'Hold' => '#dc2626',
-        'Done' => '#16a34a',
-        'Maintenance' => '#d946ef',
+        'Done' => '#22c55e',
         'Cancelled' => '#64748b',
+        'Warranty' => '#06b6d4',
+        'Maintenance' => '#a855f7',
     ];
 
     public function index()
