@@ -323,16 +323,7 @@
                 colors: donutData.map(d => d.color),
                 theme: { mode: isDark ? 'dark' : 'light' },
                 stroke: { width: 3, colors: [isDark ? '#1e293b' : '#ffffff'] },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shade: 'light',
-                        type: 'vertical',
-                        shadeIntensity: 0.35,
-                        opacityFrom: 1,
-                        opacityTo: 0.8,
-                    },
-                },
+                fill: { type: 'solid' },
                 dataLabels: { enabled: false },
                 legend: { show: false },
                 plotOptions: {
