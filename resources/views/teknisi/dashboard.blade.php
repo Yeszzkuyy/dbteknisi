@@ -21,7 +21,7 @@
                 'label' => 'Project Selesai',
                 'value' => $doneProjects,
                 'description' => 'Status project Done',
-                'icon' => 'check',
+                'icon' => 'check-circle',
                 'iconClass' => 'bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-300',
                 'washClass' => 'bg-green-500/5 dark:bg-green-400/10',
             ],
