@@ -181,7 +181,24 @@ class LeadController extends Controller
             'key'   => $status,
         ]);
 
-        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo', 'funnel'));
+        // Detail lead per status (untuk tabel dinamis di dashboard)
+        $leadsByStatus = Lead::with(['customer', 'partner'])
+            ->whereDate('incoming_date', '>=', $dateFrom)
+            ->whereDate('incoming_date', '<=', $dateTo)
+            ->get(['id', 'customer_id', 'partner_id', 'status', 'source', 'segment', 'incoming_date'])
+            ->groupBy('status')
+            ->map(fn ($leads) => $leads->map(fn ($lead) => [
+                'id' => $lead->id,
+                'name' => $lead->customer?->name ?? '-',
+                'company' => $lead->customer?->company && $lead->customer->company !== $lead->customer?->name
+                    ? $lead->customer->company
+                    : null,
+                'source' => $lead->source ? ucfirst(str_replace('_', ' ', $lead->source)) : '-',
+                'partner' => $lead->partner?->name ?? '-',
+                'date' => $lead->incoming_date?->format('d M Y') ?? '-',
+            ]));
+
+        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo', 'funnel', 'leadsByStatus'));
     }
 
     public function create()

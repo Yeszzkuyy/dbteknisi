@@ -169,10 +169,86 @@
         </div>
     </div>
 
-    {{-- Donut Lead per Status (ApexCharts) --}}
-    <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4">
+    {{-- Donut Lead per Status (ApexCharts) + tabel dinamis --}}
+    <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4" x-data="{
+        selectedStatus: null,
+        leads: @js($leadsByStatus),
+        select(status) {
+            this.selectedStatus = this.selectedStatus === status ? null : status;
+            this.applyMuted();
+        },
+        applyMuted() {
+            const chart = window.marketingDonutChart;
+            if (!chart) return;
+            const slices = document.querySelectorAll('#status-donut-chart .apexcharts-pie-series path');
+            const index = this.selectedStatus
+                ? chart.w.globals.labels.map(l => l.toLowerCase()).indexOf(this.selectedStatus)
+                : -1;
+            slices.forEach((slice, i) => {
+                slice.style.opacity = this.selectedStatus && i !== index ? '0.35' : '1';
+            });
+        }
+    }">
         <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Pipeline Lead per Status</h2>
-        <div id="status-donut-chart" class="w-full"></div>
+        <p class="text-sm text-slate-500 dark:text-slate-400 -mt-2 mb-4">Klik segmen untuk melihat detail lead pada status tersebut.</p>
+        <div class="relative w-full max-w-[420px] mx-auto">
+            <div id="status-donut-chart" class="w-full"></div>
+            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">Total Lead</span>
+                <span class="mt-0.5 text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100">{{ $stats['total'] }}</span>
+            </div>
+        </div>
+
+        {{-- Tabel dinamis per status --}}
+        <div x-cloak x-show="selectedStatus !== null" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-2"
+             class="mt-6 border-t border-slate-100 dark:border-slate-700 pt-5">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold text-slate-700 dark:text-slate-200">
+                    Detail Lead <span class="text-blue-600 dark:text-blue-400 uppercase" x-text="selectedStatus"></span>
+                    <span class="text-sm font-medium text-slate-400">(<span x-text="(leads[selectedStatus] || []).length"></span> lead)</span>
+                </h3>
+                <button type="button" @click="select(selectedStatus)"
+                        class="text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition">
+                    Tutup
+                </button>
+            </div>
+
+            <template x-if="(leads[selectedStatus] || []).length > 0">
+                <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
+                    <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-900/40">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Lead / Customer</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Sumber</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Partner</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Tanggal Masuk</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+                            <template x-for="lead in leads[selectedStatus]" :key="lead.id">
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
+                                    <td class="px-4 py-3">
+                                        <p class="font-medium text-slate-800 dark:text-slate-100" x-text="lead.name"></p>
+                                        <p class="text-xs text-slate-500" x-show="lead.company" x-text="lead.company"></p>
+                                    </td>
+                                    <td class="px-4 py-3 text-slate-600 dark:text-slate-300 capitalize" x-text="lead.source"></td>
+                                    <td class="px-4 py-3 text-slate-600 dark:text-slate-300" x-text="lead.partner"></td>
+                                    <td class="px-4 py-3 text-right text-slate-500 whitespace-nowrap" x-text="lead.date"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <template x-if="(leads[selectedStatus] || []).length === 0">
+                <div class="rounded-xl bg-slate-50 dark:bg-slate-900/40 px-5 py-8 text-center">
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Tidak ada lead berstatus <span class="uppercase" x-text="selectedStatus"></span> pada rentang tanggal ini.</p>
+                </div>
+            </template>
+        </div>
+
         <script>
             // Tunggu DOM siap: bundle Vite dimuat sebagai module (deferred),
             // jadi window.ApexCharts baru tersedia setelah DOMContentLoaded.
@@ -194,32 +270,32 @@
 
                 const isDark = document.documentElement.classList.contains('dark');
 
-                new ApexCharts(document.querySelector('#status-donut-chart'), {
+                window.marketingDonutChart = new ApexCharts(document.querySelector('#status-donut-chart'), {
                     chart: {
                         type: 'donut',
                         height: 380,
                         width: '100%', // responsif mengikuti container
                         toolbar: { show: false },
                         background: 'transparent',
+                        events: {
+                            dataPointSelection: (event, chartContext, config) => {
+                                const status = config.w.config.labels[config.dataPointIndex].toLowerCase();
+                                // Akses state Alpine via scope dari elemen dengan x-data yang membungkus donut
+                                const scope = Alpine.$data(document.querySelector('#status-donut-chart').closest('[x-data]'));
+                                scope.select(status);
+                            }
+                        },
                     },
                     series: funnelData.map(s => s.value),
                     labels: funnelData.map(s => s.label),
                     colors: funnelData.map(s => statusColors[s.key]),
                     theme: { mode: isDark ? 'dark' : 'light' },
+                    stroke: { width: 3, colors: [isDark ? '#1e293b' : '#ffffff'] },
+                    fill: { type: 'solid' },
                     plotOptions: {
                         pie: {
                             donut: {
                                 size: '70%', // rasio lubang tengah donut agar proporsional
-                                labels: {
-                                    show: true,
-                                    total: {
-                                        show: true,
-                                        label: 'Total Lead',
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        color: isDark ? '#cbd5e1' : '#475569',
-                                    },
-                                },
                             },
                         },
                     },
@@ -227,36 +303,11 @@
                         show: true,
                         position: 'bottom',
                         fontSize: '13px',
+                        formatter: (label, opts) => `${label} — ${opts.w.globals.series[opts.seriesIndex]} lead`,
                     },
-                    dataLabels: {
-                        enabled: true,
-                        formatter: (val, opts) => opts.w.globals.series[opts.seriesIndex],
-                    },
+                    dataLabels: { enabled: false },
                 }).render();
             });
         </script>
-    </div>
-
-    {{-- Ringkasan per status --}}
-    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4">
-        <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Ringkasan per Status</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            @foreach(['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'] as $status)
-                <a href="{{ route('leads.index', ['status' => $status]) }}"
-                   class="group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-4 text-center transition hover:scale-[1.02] active:scale-[0.99]
-                    @switch($status)
-                        @case('new') bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/30 @break
-                        @case('contacted') bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300 dark:hover:bg-amber-900/30 @break
-                        @case('qualified') bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/30 @break
-                        @case('proposal') bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100 dark:bg-orange-900/20 dark:border-orange-800 dark:text-orange-300 dark:hover:bg-orange-900/30 @break
-                        @case('won') bg-green-50 border-green-200 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300 dark:hover:bg-green-900/30 @break
-                        @default bg-red-50 border-red-200 text-red-700 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/30
-                    @endswitch
-                   ">
-                    <span class="text-2xl font-extrabold leading-none">{{ $statusCounts[$status] ?? 0 }}</span>
-                    <span class="text-xs font-semibold uppercase tracking-wider">{{ ucfirst($status) }}</span>
-                </a>
-            @endforeach
-        </div>
     </div>
 </x-app-layout>
