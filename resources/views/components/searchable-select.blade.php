@@ -25,6 +25,7 @@
             this.selectedLabel = label;
             this.query = label;
             this.open = false;
+            this.$dispatch('searchable-select:changed', { id, label });
         }
     }"
     class="relative"

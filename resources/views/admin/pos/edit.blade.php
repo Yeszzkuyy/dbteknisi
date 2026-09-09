@@ -18,10 +18,15 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Proyek Terkait</label>
-                    <select name="project_id" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <select name="project_id" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                            x-data="{ customerId: '{{ old('customer_id', $purchaseOrder->customer_id) }}' }"
+                            @searchable-select:changed.window="customerId = $event.detail.id; $el.value = ''">
                         <option value="">-- Tidak terkait proyek --</option>
-                        @foreach($projects as $p) <option value="{{ $p->id }}" {{ old('project_id', $purchaseOrder->project_id) == $p->id ? 'selected' : '' }}>{{ $p->project_name }}</option> @endforeach
+                        @foreach($projects as $p) <option value="{{ $p->id }}" data-customer="{{ $p->customer_id }}"
+                                x-show="!customerId || customerId == '{{ $p->customer_id }}'"
+                                {{ old('project_id', $purchaseOrder->project_id) == $p->id ? 'selected' : '' }}>{{ $p->project_name }}</option> @endforeach
                     </select>
+                    @error('project_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Item <span class="text-red-500">*</span></label>

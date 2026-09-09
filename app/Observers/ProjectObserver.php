@@ -18,6 +18,11 @@ class ProjectObserver
             'title'         => 'Project Dibuat',
             'description'   => 'Project baru berhasil dibuat',
         ]);
+
+        // Sinkronisasi status customer: punya project = sudah deal/berjalan.
+        if ($project->customer && $project->customer->status === 'lead') {
+            $project->customer->update(['status' => 'deal']);
+        }
     }
 
     public function updated(Project $project): void

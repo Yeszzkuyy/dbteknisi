@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\Invoice;
+use App\Models\Project;
 use App\Models\PurchaseOrder;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AdminService
 {
@@ -47,6 +49,8 @@ class AdminService
 
     public function createInvoice(array $data): Invoice
     {
+        $this->assertProjectBelongsToCustomer($data);
+
         return DB::transaction(function () use ($data) {
             $data['invoice_number'] = $this->generateInvoiceNumber();
             $data['created_by'] = auth()->id();
@@ -56,6 +60,8 @@ class AdminService
 
     public function updateInvoice(Invoice $invoice, array $data): Invoice
     {
+        $this->assertProjectBelongsToCustomer($data);
+
         $invoice->update($data);
         return $invoice;
     }
@@ -84,6 +90,8 @@ class AdminService
 
     public function createPurchaseOrder(array $data): PurchaseOrder
     {
+        $this->assertProjectBelongsToCustomer($data);
+
         return DB::transaction(function () use ($data) {
             $data['po_number'] = $this->generatePoNumber();
             $data['created_by'] = auth()->id();
@@ -93,6 +101,8 @@ class AdminService
 
     public function updatePurchaseOrder(PurchaseOrder $po, array $data): PurchaseOrder
     {
+        $this->assertProjectBelongsToCustomer($data);
+
         $po->update($data);
         return $po;
     }
@@ -140,5 +150,19 @@ class AdminService
                 $invoice->update(['status' => 'unpaid']);
             }
         });
+    }
+
+    private function assertProjectBelongsToCustomer(array $data): void
+    {
+        if (empty($data['project_id'])) {
+            return;
+        }
+
+        $project = Project::withTrashed()->find($data['project_id']);
+        if (! $project || (int) $project->customer_id !== (int) ($data['customer_id'] ?? null)) {
+            throw ValidationException::withMessages([
+                'project_id' => 'Project yang dipilih tidak sesuai dengan customer.',
+            ]);
+        }
     }
 }
