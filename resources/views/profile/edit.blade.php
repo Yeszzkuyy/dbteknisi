@@ -26,22 +26,22 @@
                   x-data="{ preview: @js($user->avatar ? asset('storage/' . $user->avatar) : null) }">
                 @csrf
 
-                {{-- Foto profil: klik untuk mengganti --}}
+                {{-- Foto profil — klik untuk mengganti --}}
                 <button type="button" @click="$refs.avatar.click()"
                         class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                         aria-label="{{ __('Ubah foto profil') }}">
-                    <img x-show="preview" x-cloak :src="preview"
+                    <img x-show="preview" x-cloak :src="preview" alt="{{ __('Foto profil') }}"
                          class="h-32 w-32 rounded-full object-cover ring-4 ring-slate-100 shadow dark:ring-slate-700">
-                    <div x-show="!preview" x-cloak
+                    <div x-show="!preview" x-cloak aria-hidden="true"
                          class="flex h-32 w-32 items-center justify-center rounded-full bg-blue-100 ring-4 ring-slate-100 dark:bg-blue-900/40 dark:ring-slate-700">
                         <span class="text-4xl font-bold text-blue-600 dark:text-blue-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                     </div>
 
-                    {{-- Overlay hover --}}
+                    {{-- Overlay hover: gelap + ikon kamera --}}
                     <span class="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
                         <x-icon name="camera" class="h-8 w-8" />
                     </span>
-                    {{-- Badge kamera (selalu terlihat) --}}
+                    {{-- Badge kamera, selalu terlihat --}}
                     <span class="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white ring-2 ring-white dark:ring-slate-800">
                         <x-icon name="camera" class="h-4 w-4" />
                     </span>
