@@ -21,6 +21,10 @@
         <x-profile-tabs />
 
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-600 dark:bg-slate-800">
+            @include('settings.partials.update-account-form')
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-600 dark:bg-slate-800">
             @include('profile.partials.update-password-form')
         </div>
 

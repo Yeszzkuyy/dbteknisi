@@ -72,7 +72,27 @@ class SettingsTest extends TestCase
             ->withSession(['auth.password_confirmed_at' => now()->getTimestamp()])
             ->get(route('settings.advanced'))
             ->assertOk()
-            ->assertSee('Pengaturan Lanjutan');
+            ->assertSee('Pengaturan Lanjutan')
+            ->assertSee('Informasi Akun');
+    }
+
+    public function test_account_info_can_be_updated_from_advanced(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->withSession(['auth.password_confirmed_at' => now()->getTimestamp()])
+            ->patch(route('profile.update'), [
+                'name' => 'Nama Baru',
+                'email' => 'baru@example.com',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('settings.advanced'));
+
+        $user->refresh();
+
+        $this->assertSame('Nama Baru', $user->name);
+        $this->assertSame('baru@example.com', $user->email);
     }
 
     public function test_locale_preference_switches_app_language(): void
