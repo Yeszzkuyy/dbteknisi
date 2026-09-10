@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::get('/settings/advanced', [SettingsController::class, 'advanced'])
-        ->middleware('password.confirm')
+        ->middleware('password.confirm:password.confirm,1')
         ->name('settings.advanced');
 
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
