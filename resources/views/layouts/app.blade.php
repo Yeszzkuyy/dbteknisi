@@ -76,6 +76,8 @@
         .dark .bg-slate-100{background-color:#243244!important}
         .dark .bg-slate-200{background-color:#334155!important}
         .dark .bg-slate-300{background-color:#475569!important}
+        /* Toggle ON tetap biru walau dark-mode mengoverride bg-slate-300 (lebar selektor lebih spesifik) */
+        .peer:checked ~ .peer-checked\:bg-blue-600{background-color:#2563eb!important}
         .dark .bg-gray-300{background-color:#475569!important}
         .dark .bg-gray-100{background-color:#243244!important}
         .dark .hover\:bg-slate-100:hover{background-color:#243244!important}

@@ -94,7 +94,7 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_email" value="1" class="peer sr-only" @checked($notifyEmail)>
-                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-green-500 dark:bg-slate-600"></span>
+                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-blue-600 dark:bg-slate-600"></span>
                             <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
@@ -106,7 +106,7 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_system" value="1" class="peer sr-only" @checked($notifySystem)>
-                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-green-500 dark:bg-slate-600"></span>
+                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-blue-600 dark:bg-slate-600"></span>
                             <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
