@@ -16,10 +16,21 @@ class WhatsappGateway
      * Kirim pesan teks via Green API. Mengembalikan idMessage dari gateway,
      * atau null bila akun belum dikonfigurasi / gagal terkirim.
      */
+    private const META_ACCOUNT_CODES = ['wa_wani'];
+
+    public function isMeta(WhatsappAccount $account): bool
+    {
+        return in_array($account->account_code, self::META_ACCOUNT_CODES, true);
+    }
+
     public function sendText(WhatsappAccount $account, string $number, string $text): ?string
     {
         if (!$this->configured($account)) {
             return null;
+        }
+
+        if ($this->isMeta($account)) {
+            return $this->sendTextMeta($account, $number, $text);
         }
 
         $response = Http::timeout(20)
@@ -54,6 +65,10 @@ class WhatsappGateway
             return null;
         }
 
+        if ($this->isMeta($account)) {
+            return $this->getStateMeta($account);
+        }
+
         $response = Http::timeout(20)->get(sprintf(
             '%s/waInstance%s/getStateInstance/%s',
             rtrim(config('whatsapp.base_url'), '/'),
@@ -66,6 +81,51 @@ class WhatsappGateway
         }
 
         return $response->json('stateInstance');
+    }
+
+    private function sendTextMeta(WhatsappAccount $account, string $number, string $text): ?string
+    {
+        $response = Http::timeout(20)
+            ->withToken($account->gateway_token)
+            ->post(
+                sprintf(
+                    '%s/%s/%s/messages',
+                    rtrim(config('whatsapp.meta.graph_base_url'), '/'),
+                    config('whatsapp.meta.api_version'),
+                    $account->gateway_instance
+                ),
+                [
+                    'messaging_product' => 'whatsapp',
+                    'recipient_type' => 'individual',
+                    'to' => $number,
+                    'type' => 'text',
+                    'text' => [
+                        'preview_url' => false,
+                        'body' => $text,
+                    ],
+                ]
+            );
+
+        if ($response->failed()) {
+            report(new \RuntimeException('Meta sendMessage gagal: ' . $response->body()));
+            return null;
+        }
+
+        return data_get($response->json(), 'messages.0.id');
+    }
+
+    private function getStateMeta(WhatsappAccount $account): ?string
+    {
+        $response = Http::timeout(20)
+            ->withToken($account->gateway_token)
+            ->get(sprintf(
+                '%s/%s/%s',
+                rtrim(config('whatsapp.meta.graph_base_url'), '/'),
+                config('whatsapp.meta.api_version'),
+                $account->gateway_instance
+            ));
+
+        return $response->successful() ? 'authorized' : null;
     }
 
     /**

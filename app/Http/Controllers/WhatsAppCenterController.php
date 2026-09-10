@@ -47,6 +47,28 @@ class WhatsAppCenterController extends Controller
         return response()->json($data);
     }
 
+    public function checkStatus(WhatsappAccount $account)
+    {
+        $this->authorizeAccount($account);
+
+        // Cek status manual (satu kali), khusus untuk akun Meta agar tidak
+        // memicu rate limit lewat polling otomatis tiap 5 detik.
+        if (!$this->gateway->isMeta($account)) {
+            return response()->json([
+                'gateway_status' => $account->gateway_status,
+            ]);
+        }
+
+        $state = $this->gateway->getState($account);
+        $status = $state ?? $account->gateway_status;
+
+        if ($status !== $account->gateway_status) {
+            $account->update(['gateway_status' => $status]);
+        }
+
+        return response()->json(['gateway_status' => $status]);
+    }
+
     public function conversations(WhatsappAccount $account)
     {
         $this->authorizeAccount($account);
@@ -205,9 +227,30 @@ class WhatsAppCenterController extends Controller
         return response()->json(['lead_id' => $lead->id, 'redirect' => route('leads.show', $lead)]);
     }
 
+    public function verifyWebhook(Request $request)
+    {
+        $mode = $request->query('hub_mode');
+        $token = $request->query('hub_verify_token');
+        $challenge = $request->query('hub_challenge');
+
+        if ($mode === 'subscribe'
+            && $token
+            && hash_equals(config('whatsapp.meta.verify_token'), $token)) {
+            return response($challenge);
+        }
+
+        abort(403, 'Verifikasi webhook Meta gagal.');
+    }
+
     public function webhook(Request $request)
     {
-        return $this->handleNotification($request->json()->all());
+        $payload = $request->json()->all();
+
+        if (data_get($payload, 'entry.0.changes.0.value')) {
+            return $this->handleMetaNotification($payload);
+        }
+
+        return $this->handleNotification($payload);
     }
 
     /**
@@ -236,6 +279,67 @@ class WhatsAppCenterController extends Controller
             'instanceStatus' => $this->handleInstanceStatus($account, $payload),
             default => response()->json(['status' => 'ignored', 'type' => $type]),
         };
+    }
+
+    /**
+     * Proses notifikasi webhook Meta WhatsApp Business Cloud API.
+     */
+    public function handleMetaNotification(array $payload): \Illuminate\Http\JsonResponse
+    {
+        $account = WhatsappAccount::where('account_code', 'wa_wani')->first();
+
+        if (!$account) {
+            return response()->json(['error' => 'unknown account'], 422);
+        }
+
+        foreach (data_get($payload, 'entry.0.changes', []) as $change) {
+            $value = data_get($change, 'value', []);
+
+            foreach (data_get($value, 'statuses', []) as $status) {
+                WhatsappMessage::where('whatsapp_account_id', $account->id)
+                    ->where('wa_message_id', data_get($status, 'id'))
+                    ->update(['status' => data_get($status, 'status')]);
+            }
+
+            foreach (data_get($value, 'messages', []) as $msg) {
+                $this->storeMetaInbound($account, $msg);
+            }
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    private function storeMetaInbound(WhatsappAccount $account, array $msg): void
+    {
+        $messageId = data_get($msg, 'id');
+
+        if ($messageId && WhatsappMessage::where('wa_message_id', $messageId)->exists()) {
+            return;
+        }
+
+        $text = null;
+        if (data_get($msg, 'type') === 'text') {
+            $text = data_get($msg, 'text.body');
+        }
+
+        if ($text === null) {
+            return;
+        }
+
+        $waId = data_get($msg, 'from');
+        $senderName = data_get($msg, 'from') ?? 'Kontak WA';
+        $timestamp = data_get($msg, 'timestamp');
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => $waId,
+            'sender_name' => $senderName,
+            'message_body' => $text,
+            'direction' => 'inbound',
+            'status' => 'inbound',
+            'wa_message_id' => $messageId,
+            'created_at' => $timestamp ? now()->setTimestamp((int) $timestamp) : now(),
+        ]);
     }
 
     public function updateCredentials(Request $request, WhatsappAccount $account)

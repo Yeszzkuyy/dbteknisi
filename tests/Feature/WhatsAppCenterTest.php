@@ -417,4 +417,123 @@ class WhatsAppCenterTest extends TestCase
         $this->artisan('whatsapp:receive')->assertExitCode(0);
         Http::assertNothingSent();
     }
+
+    public function test_meta_webhook_verification_returns_challenge(): void
+    {
+        config(['whatsapp.meta.verify_token' => 'secret-token']);
+
+        $this->get('/api/whatsapp/webhook?hub_mode=subscribe&hub_verify_token=secret-token&hub_challenge=12345')
+            ->assertOk()
+            ->assertSee('12345');
+    }
+
+    public function test_meta_webhook_verification_rejects_bad_token(): void
+    {
+        config(['whatsapp.meta.verify_token' => 'secret-token']);
+
+        $this->get('/api/whatsapp/webhook?hub_mode=subscribe&hub_verify_token=wrong&hub_challenge=12345')
+            ->assertForbidden();
+    }
+
+    public function test_meta_webhook_stores_inbound_message(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'changes' => [[
+                    'value' => [
+                        'messages' => [[
+                            'id' => 'META-1',
+                            'from' => '6281234567890',
+                            'type' => 'text',
+                            'text' => ['body' => 'Halo dari Meta Cloud API'],
+                            'timestamp' => now()->timestamp,
+                        ]],
+                    ],
+                ]],
+            ]],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'Halo dari Meta Cloud API',
+            'direction' => 'inbound',
+        ]);
+    }
+
+    public function test_meta_webhook_updates_outgoing_status(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'Balasan',
+            'direction' => 'outbound',
+            'status' => 'sent',
+            'wa_message_id' => 'META-OUT-1',
+        ]);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'changes' => [[
+                    'value' => [
+                        'statuses' => [[
+                            'id' => 'META-OUT-1',
+                            'status' => 'delivered',
+                        ]],
+                    ],
+                ]],
+            ]],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'wa_message_id' => 'META-OUT-1',
+            'status' => 'delivered',
+        ]);
+    }
+
+    public function test_status_endpoint_does_not_call_meta_graph_api(): void
+    {
+        $admin = \App\Models\User::factory()->create();
+        $admin->assignRole('super-admin');
+        Http::fake();
+
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => '123', 'gateway_token' => 'tok', 'gateway_status' => 'authorized']);
+
+        $this->actingAs($admin)
+            ->getJson(route('whatsapp-center.status'))
+            ->assertOk()
+            ->assertJsonFragment(['account_code' => 'wa_wani', 'gateway_status' => 'authorized']);
+
+        Http::assertNothingSent();
+    }
+
+    public function test_check_status_meta_updates_authorized(): void
+    {
+        $admin = \App\Models\User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => '123', 'gateway_token' => 'tok', 'gateway_status' => null]);
+
+        Http::fake([
+            'graph.facebook.com/v19.0/123' => Http::response(['id' => '123']),
+        ]);
+
+        $this->actingAs($admin)
+            ->getJson(route('whatsapp-center.check-status', $account))
+            ->assertOk()
+            ->assertJson(['gateway_status' => 'authorized']);
+
+        $this->assertDatabaseHas('whatsapp_accounts', [
+            'id' => $account->id,
+            'gateway_status' => 'authorized',
+        ]);
+    }
 }

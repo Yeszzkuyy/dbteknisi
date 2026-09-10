@@ -25,7 +25,7 @@
                 Pengaturan Gateway WhatsApp
             </button>
             <div x-show="open" x-cloak class="mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-2xl shadow-sm p-4">
-                <p class="text-xs text-slate-400 mb-3">Isi IdInstance & ApiTokenInstance dari Green API. Status koneksi diperbarui otomatis via webhook <code class="text-indigo-500">/api/whatsapp/webhook</code>.</p>
+                <p class="text-xs text-slate-400 mb-3">Isi kredensial gateway (Green API / Meta Cloud API). Status koneksi diperbarui otomatis via webhook <code class="text-indigo-500">/api/whatsapp/webhook</code>.</p>
                 <div class="grid gap-3 md:grid-cols-2">
                     @foreach($accounts as $account)
                         <form method="POST" action="{{ route('whatsapp-center.credentials', $account) }}" class="border border-slate-100 dark:border-slate-700 rounded-xl p-3">
@@ -42,14 +42,23 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-2">
-                                <input type="text" name="gateway_instance" placeholder="IdInstance" value="{{ $account->gateway_instance }}"
+                                @php($meta = $account->account_code === 'wa_wani')
+                                <input type="text" name="gateway_instance" placeholder="{{ $meta ? 'Phone Number ID (Meta)' : 'IdInstance' }}" value="{{ $account->gateway_instance }}"
                                        class="w-1/2 px-2 py-1.5 rounded-lg text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="password" name="gateway_token" placeholder="ApiTokenInstance" value="{{ $account->gateway_token }}"
+                                <input type="password" name="gateway_token" placeholder="{{ $meta ? 'System User Access Token (Meta)' : 'ApiTokenInstance' }}" value="{{ $account->gateway_token }}"
                                        class="w-1/2 px-2 py-1.5 rounded-lg text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <button type="submit" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition flex-shrink-0">
                                     Simpan
                                 </button>
+                                @if($meta)
+                                    <button type="button" @click="checkGatewayStatus({{ $account->id }}, $el)"
+                                            class="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium transition flex-shrink-0">
+                                        Cek Status
+                                    </button>
+                                @endif
                             </div>
+                            <p x-show="statusMsg !== null && {{ $meta ? 'true' : 'false' }}" x-text="statusMsg"
+                               class="mt-2 text-xs"></p>
                         </form>
                     @endforeach
                 </div>
@@ -281,6 +290,7 @@
             unread: {},
             convertName: '',
             modalOpen: false,
+            statusMsg: null,
             timer: null,
 
             init() {
@@ -318,6 +328,28 @@
                     const data = await res.json();
                     this.unread = Object.fromEntries(data.map(d => [d.account_code, d.unread]));
                 } catch (e) {}
+            },
+
+            async checkGatewayStatus(accountId, btn) {
+                const label = btn.textContent;
+                btn.textContent = 'Mengecek...';
+                btn.disabled = true;
+                this.statusMsg = null;
+                try {
+                    const res = await fetch('{{ route('whatsapp-center.check-status', ['account' => ':id']) }}'.replace(':id', accountId));
+                    const data = await res.json();
+                    const st = data.gateway_status;
+                    this.statusMsg = st === 'authorized'
+                        ? '✓ Terhubung (authorized)'
+                        : (st ? 'Status: ' + st : 'Belum terkonfigurasi / gagal cek. Coba lagi nanti.');
+                    this.refreshStatus();
+                    this.loadConversations();
+                } catch (e) {
+                    this.statusMsg = 'Gagal mengecek status.';
+                } finally {
+                    btn.textContent = label;
+                    btn.disabled = false;
+                }
             },
 
             async loadConversations() {
