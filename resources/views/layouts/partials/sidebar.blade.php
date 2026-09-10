@@ -16,9 +16,16 @@
     $roleName = auth()->user()->roles->first()?->name ?? 'User';
 @endphp
 
-<aside class="flex h-full w-full flex-col bg-[var(--sidebar-bg)]">
+<aside class="relative flex h-full w-full flex-col overflow-hidden bg-[var(--sidebar-bg)]">
+    {{-- Aurora mesh background (dekoratif, di belakang konten) --}}
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
+        <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blue-500/15 blur-3xl dark:bg-blue-500/20"></div>
+        <div class="absolute -left-24 top-1/3 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl dark:bg-indigo-500/15"></div>
+        <div class="absolute -bottom-24 right-0 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl dark:bg-cyan-400/15"></div>
+    </div>
+
     {{-- Logo --}}
-    <div class="flex-shrink-0 border-b border-[var(--sidebar-border)] p-4">
+    <div class="relative z-10 flex-shrink-0 border-b border-[var(--sidebar-border)] p-4">
         <a href="{{ route('dashboard') }}" class="group flex items-center gap-3">
             <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
                  class="h-10 w-auto rounded-lg bg-white object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03] dark:hidden">
@@ -32,7 +39,7 @@
     </div>
 
     {{-- Menu --}}
-    <nav id="sidebar-navigation" aria-label="Navigasi utama" class="flex-1 overflow-y-auto px-3 py-4">
+    <nav id="sidebar-navigation" aria-label="Navigasi utama" class="relative z-10 flex-1 overflow-y-auto px-3 py-4">
         <div class="space-y-6">
             <section aria-labelledby="sidebar-main-label">
                 <p id="sidebar-main-label" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Main</p>
@@ -431,7 +438,7 @@
     </nav>
 
     {{-- User widget --}}
-    <div class="flex-shrink-0 border-t border-[var(--sidebar-border)] p-3">
+    <div class="relative z-10 flex-shrink-0 border-t border-[var(--sidebar-border)] p-3">
         <a href="{{ route('profile.edit') }}"
            class="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 transition-all duration-300 hover:border-blue-200 hover:bg-blue-50/70 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10">
             <x-user-avatar :user="auth()->user()" size="w-9 h-9" text="text-xs" :clickable="false" />
@@ -444,7 +451,7 @@
     </div>
 
     {{-- Logout --}}
-    <div class="flex-shrink-0 px-3 pb-3">
+    <div class="relative z-10 flex-shrink-0 px-3 pb-3">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit"
