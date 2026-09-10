@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="mx-auto max-w-4xl space-y-6">
+    <div class="mx-auto max-w-xl space-y-6">
         {{-- Header --}}
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -20,29 +20,55 @@
 
         <x-profile-tabs />
 
-        {{-- Kartu identitas --}}
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-600 dark:bg-slate-800">
-            <div class="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:text-left">
-                <x-user-avatar :user="$user" size="w-20 h-20" text="text-2xl" :clickable="false" />
+        {{-- Kartu profil --}}
+        <section class="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm sm:p-10 dark:border-slate-600 dark:bg-slate-800">
+            <form method="POST" action="{{ route('profile.avatar.update') }}" enctype="multipart/form-data"
+                  x-data="{ preview: @js($user->avatar ? asset('storage/' . $user->avatar) : null) }">
+                @csrf
 
-                <div class="min-w-0 space-y-1">
-                    <h2 class="truncate text-xl font-bold text-slate-800">{{ $user->name }}</h2>
-                    <div>
-                        <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                            {{ $user->roles->first()?->name ?? __('Tanpa Role') }}
-                        </span>
+                {{-- Foto profil: klik untuk mengganti --}}
+                <button type="button" @click="$refs.avatar.click()"
+                        class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
+                        aria-label="{{ __('Ubah foto profil') }}">
+                    <img x-show="preview" x-cloak :src="preview"
+                         class="h-32 w-32 rounded-full object-cover ring-4 ring-slate-100 shadow dark:ring-slate-700">
+                    <div x-show="!preview" x-cloak
+                         class="flex h-32 w-32 items-center justify-center rounded-full bg-blue-100 ring-4 ring-slate-100 dark:bg-blue-900/40 dark:ring-slate-700">
+                        <span class="text-4xl font-bold text-blue-600 dark:text-blue-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                     </div>
-                    <p class="flex items-center justify-center gap-1.5 text-sm text-slate-500 sm:justify-start">
-                        <x-icon name="mail" class="h-4 w-4" />
-                        {{ $user->email }}
-                    </p>
-                </div>
-            </div>
-        </div>
 
-        {{-- Form edit informasi --}}
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-600 dark:bg-slate-800">
-            @include('profile.partials.update-profile-information-form')
-        </div>
+                    {{-- Overlay hover --}}
+                    <span class="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                        <x-icon name="camera" class="h-8 w-8" />
+                    </span>
+                    {{-- Badge kamera (selalu terlihat) --}}
+                    <span class="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white ring-2 ring-white dark:ring-slate-800">
+                        <x-icon name="camera" class="h-4 w-4" />
+                    </span>
+                </button>
+
+                <input type="file" x-ref="avatar" name="avatar" class="hidden"
+                       accept="image/png,image/jpeg,image/webp,image/gif"
+                       x-on:change="preview = URL.createObjectURL($event.target.files[0]); $el.form.submit()">
+            </form>
+
+            {{-- Informasi read-only --}}
+            <div class="mt-6 space-y-1">
+                <h2 class="text-2xl font-bold text-slate-800">{{ $user->name }}</h2>
+                <div>
+                    <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                        {{ $user->roles->first()?->name ?? __('Tanpa Role') }}
+                    </span>
+                </div>
+                <p class="flex items-center justify-center gap-1.5 pt-1 text-sm text-slate-500">
+                    <x-icon name="mail" class="h-4 w-4" />
+                    {{ $user->email }}
+                </p>
+            </div>
+
+            <p class="mt-6 text-xs text-slate-400">{{ __('Klik foto untuk mengganti foto profil') }}</p>
+
+            <x-input-error class="mt-3" :messages="$errors->get('avatar')" />
+        </section>
     </div>
 </x-app-layout>
