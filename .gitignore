@@ -27,3 +27,6 @@ Homestead.yaml
 Thumbs.db
 .aider*
 backups/
+graphify-out/
+__pycache__/
+*.pyc
