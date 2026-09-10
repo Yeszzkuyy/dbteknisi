@@ -12,17 +12,6 @@ class TechnicianDashboardController extends Controller
 {
     private const ACTIVE_STATUSES = ['Open', 'On Progress'];
 
-    private const STATUS_BADGE_COLORS = [
-        'Open' => 'blue',
-        'On Progress' => 'yellow',
-        'Pending' => 'orange',
-        'Hold' => 'red',
-        'Done' => 'green',
-        'Cancelled' => 'slate',
-        'Warranty' => 'cyan',
-        'Maintenance' => 'purple',
-    ];
-
     private const STATUS_BAR_COLORS = [
         'Open' => '#3b82f6',
         'On Progress' => '#eab308',
@@ -54,11 +43,11 @@ class TechnicianDashboardController extends Controller
             ->map(fn ($status) => [
                 'name' => $status->name,
                 'count' => $status->projects_count,
-                'color' => self::STATUS_BADGE_COLORS[$status->name] ?? 'slate',
+                'color' => ProjectStatus::BADGE_COLORS[$status->name] ?? 'slate',
             ]);
 
         $totalProjects = $statusCounts->sum('count');
-        $statusBadgeColors = self::STATUS_BADGE_COLORS;
+        $statusBadgeColors = ProjectStatus::BADGE_COLORS;
         $statusBarColors = self::STATUS_BAR_COLORS;
 
         $recentProjects = Project::with(['customer', 'status'])

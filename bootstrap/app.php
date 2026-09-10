@@ -21,6 +21,21 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
+
+        // Preferensi bahasa per-user (Profil > Setting > Bahasa).
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
+        ]);
+
+        // Percayai proxy (nginx/ngrok) agar Laravel melihat skema https asli
+        // dari header X-Forwarded-Proto, bukan hanya http dari request internal.
+        $middleware->trustProxies(at: '*');
+
+        // Webhook gateway WhatsApp (Green API & Meta) dipanggil dari luar tanpa
+        // sesi/CSRF — kecualikan dari validasi token CSRF.
+        $middleware->validateCsrfTokens(except: [
+            'api/whatsapp/webhook',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

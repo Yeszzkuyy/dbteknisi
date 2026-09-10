@@ -18,6 +18,7 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'preferences',
     ];
 
     protected $hidden = [
@@ -30,6 +31,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'preferences' => 'array',
         ];
+    }
+
+    public function preference(string $key, mixed $default = null): mixed
+    {
+        return data_get($this->preferences, $key, $default);
     }
 }

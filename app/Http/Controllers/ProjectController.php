@@ -41,7 +41,9 @@ class ProjectController extends Controller
             ], true))
             ->count();
 
-        return view('projects.index', compact('projects', 'totalProjects', 'activeProjects'));
+        $statusBadgeColors = ProjectStatus::BADGE_COLORS;
+
+        return view('projects.index', compact('projects', 'totalProjects', 'activeProjects', 'statusBadgeColors'));
     }
 
     public function create(Request $request)

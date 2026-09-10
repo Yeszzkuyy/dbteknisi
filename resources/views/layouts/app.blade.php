@@ -13,7 +13,22 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
 
-    <script>if(localStorage.getItem('dark-mode')==='true'||(!('dark-mode' in localStorage)&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}</script>
+    @php
+        $themePref = auth()->check() ? auth()->user()->preference('theme', 'system') : 'system';
+    @endphp
+    <script>
+        (function () {
+            var pref = @json($themePref);
+            var stored = localStorage.getItem('dark-mode');
+            var dark;
+            if (stored === 'true') { dark = true; }
+            else if (stored === 'false') { dark = false; }
+            else if (pref === 'dark') { dark = true; }
+            else if (pref === 'light') { dark = false; }
+            else { dark = window.matchMedia('(prefers-color-scheme:dark)').matches; }
+            document.documentElement.classList.toggle('dark', dark);
+        })();
+    </script>
 
     @php
         $notifInit = ['unread' => 0, 'unassigned' => 0, 'items' => []];

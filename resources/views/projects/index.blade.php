@@ -1,7 +1,7 @@
 <x-app-layout>
-<div class="px-4 sm:px-6 lg:px-8">
+<div class="max-w-[1400px] mx-auto space-y-8">
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Daftar Project</h1>
             <p class="text-slate-500 mt-1">Semua project, termasuk yang selesai atau di-hold</p>
@@ -21,14 +21,14 @@
     </div>
 
     {{-- Statistik --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 sm:p-6">
             <p class="text-sm text-slate-500">Total Project</p>
-            <p class="text-2xl font-bold text-slate-800">{{ $totalProjects ?? 0 }}</p>
+            <p class="mt-2 text-3xl font-bold text-slate-800 tabular-nums">{{ $totalProjects ?? 0 }}</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 sm:p-6">
             <p class="text-sm text-slate-500">Project Aktif (Open + Progress)</p>
-            <p class="text-2xl font-bold text-green-600">{{ $activeProjects ?? 0 }}</p>
+            <p class="mt-2 text-3xl font-bold text-green-600 tabular-nums">{{ $activeProjects ?? 0 }}</p>
         </div>
     </div>
 
@@ -38,37 +38,37 @@
             <table class="min-w-full">
                 <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Project</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Customer</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Jenis Pekerjaan</th>
+                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200 whitespace-nowrap">Project</th>
+                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200 whitespace-nowrap">Customer</th>
+                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200 whitespace-nowrap">Jenis Pekerjaan</th>
                         {{-- <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">PIC Engineer</th> --}}
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Status</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Progress</th>
-                        <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
+                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200 whitespace-nowrap">Status</th>
+                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200 whitespace-nowrap">Progress</th>
+                        <th class="px-6 py-3.5 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200 whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                     @forelse($projects as $project)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition group">
-                            <td class="px-6 py-4 font-semibold text-slate-800">{{ $project->project_name }}</td>
-                            <td class="px-6 py-4 text-slate-600">{{ $project->customer?->name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-slate-600">{{ $project->workType?->name ?? '-' }}</td>
+                            <td class="px-6 py-5 font-semibold text-slate-800 whitespace-nowrap">{{ $project->project_name }}</td>
+                            <td class="px-6 py-5 text-slate-600 whitespace-nowrap">{{ $project->customer?->name ?? '-' }}</td>
+                            <td class="px-6 py-5 text-slate-600 whitespace-nowrap">{{ $project->workType?->name ?? '-' }}</td>
                             {{-- <td class="px-6 py-4 text-slate-600">{{ $project->pic_engineer ?? '-' }}</td> --}}
-                            <td class="px-6 py-4">
-                                <x-status-badge :color="$project->status?->color ?? 'slate'">
+                            <td class="px-6 py-5 whitespace-nowrap">
+                                <x-status-badge :color="$statusBadgeColors[$project->status?->name] ?? 'slate'">
                                     {{ $project->status?->name ?? 'Belum Memulai' }}
                                 </x-status-badge>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <td class="px-6 py-5 whitespace-nowrap">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-20 h-2 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
                                         <div class="h-full bg-blue-600 rounded-full" style="width: {{ $project->progress ?? 0 }}%"></div>
                                     </div>
-                                    <span class="text-xs text-slate-600">{{ $project->progress ?? 0 }}%</span>
+                                    <span class="text-xs font-medium text-slate-600 tabular-nums">{{ $project->progress ?? 0 }}%</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                            <td class="px-6 py-5 whitespace-nowrap">
+                                <div class="flex justify-end gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                                     <a href="{{ route('customers.show', $project->customer_id) }}"
                                        title="Lihat customer"
                                        class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">

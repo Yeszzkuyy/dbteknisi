@@ -9,6 +9,21 @@ class ProjectStatus extends Model
 {
     use SoftDeletes;
 
+    /**
+     * Palet warna badge per nama status, satu sumber untuk dashboard teknisi
+     * dan daftar project. Nilai = kunci warna komponen <x-status-badge>.
+     */
+    public const BADGE_COLORS = [
+        'Open' => 'blue',
+        'On Progress' => 'yellow',
+        'Pending' => 'orange',
+        'Hold' => 'red',
+        'Done' => 'green',
+        'Cancelled' => 'slate',
+        'Warranty' => 'cyan',
+        'Maintenance' => 'purple',
+    ];
+
     protected $fillable = [
         'name',
         'color',

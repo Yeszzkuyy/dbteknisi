@@ -23,6 +23,7 @@ use App\Http\Controllers\ProjectDocumentController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectSupportController;
 use App\Http\Controllers\ProjectTaskController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TechnicianDashboardController;
 use App\Http\Controllers\TechnicianScheduleController;
 use App\Http\Controllers\TrashController;
@@ -45,6 +46,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
     Route::delete('/profile/avatar', [ProfileController::class, 'removeAvatar'])->name('profile.avatar.remove');
+
+    // Settings (preferensi aplikasi)
+    Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
+    Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::get('/settings/advanced', [SettingsController::class, 'advanced'])
+        ->middleware('password.confirm')
+        ->name('settings.advanced');
 
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
     Route::get('/notifications/status', [NotificationController::class, 'status'])->name('notifications.status');
@@ -262,6 +270,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/status', [WhatsAppCenterController::class, 'status'])->name('status');
         Route::get('/{account}/conversations', [WhatsAppCenterController::class, 'conversations'])->name('conversations');
         Route::get('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'messages'])->name('messages');
+        Route::get('/{account}/check-status', [WhatsAppCenterController::class, 'checkStatus'])->name('check-status');
 
         Route::middleware('permission:manage-marketing')->group(function () {
             Route::post('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'store'])->name('reply');
@@ -352,6 +361,7 @@ Route::middleware('auth')->group(function () {
 });
 require __DIR__.'/auth.php';
 
-// Webhook gateway WhatsApp (dipanggil provider/gateway, tanpa CSRF)
-Route::post('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'webhook'])
-    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
+// Webhook gateway WhatsApp (dipanggil provider/gateway). CSRF dikecualikan
+// di bootstrap/app.php lewat validateCsrfTokens(except: ['api/whatsapp/webhook']).
+Route::get('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'verifyWebhook']);
+Route::post('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'webhook']);
