@@ -11,10 +11,15 @@ class WhatsappAccount extends Model
 
     public const GROUPS = ['NTI', 'MGK', 'TPS', 'WANI'];
 
+    public const GATEWAY_GREEN = 'green_api';
+
+    public const GATEWAY_META = 'meta';
+
     protected $fillable = [
         'name',
         'phone_number',
         'account_code',
+        'gateway_type',
         'gateway_instance',
         'gateway_token',
         'gateway_status',
@@ -27,6 +32,11 @@ class WhatsappAccount extends Model
     ];
 
     protected $hidden = ['gateway_token'];
+
+    public function isMetaGateway(): bool
+    {
+        return $this->gateway_type === self::GATEWAY_META;
+    }
 
     public function assignee()
     {

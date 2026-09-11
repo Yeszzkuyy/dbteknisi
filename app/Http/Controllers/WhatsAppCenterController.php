@@ -283,21 +283,35 @@ class WhatsAppCenterController extends Controller
 
     /**
      * Proses notifikasi webhook Meta WhatsApp Business Cloud API.
+     * Akun dituju dicocokkan lewat value.metadata.phone_number_id
+     * dengan kolom gateway_instance, sehingga mendukung banyak akun Meta.
      */
     public function handleMetaNotification(array $payload): \Illuminate\Http\JsonResponse
     {
-        $account = WhatsappAccount::where('account_code', 'wa_wani')->first();
-
-        if (!$account) {
-            return response()->json(['error' => 'unknown account'], 422);
-        }
-
         foreach (data_get($payload, 'entry.0.changes', []) as $change) {
             $value = data_get($change, 'value', []);
+            $phoneNumberId = data_get($value, 'metadata.phone_number_id');
+
+            if (!$phoneNumberId) {
+                return response()->json(['error' => 'missing phone_number_id'], 422);
+            }
+
+            $account = WhatsappAccount::where('gateway_type', WhatsappAccount::GATEWAY_META)
+                ->where('gateway_instance', $phoneNumberId)
+                ->where('is_active', true)
+                ->first();
+
+            if (!$account) {
+                return response()->json(['error' => 'unknown account'], 422);
+            }
 
             foreach (data_get($value, 'statuses', []) as $status) {
+                $id = data_get($status, 'id');
                 WhatsappMessage::where('whatsapp_account_id', $account->id)
-                    ->where('wa_message_id', data_get($status, 'id'))
+                    ->where(function ($q) use ($id) {
+                        $q->where('wa_message_id', $id)
+                            ->orWhere('gateway_message_id', $id);
+                    })
                     ->update(['status' => data_get($status, 'status')]);
             }
 
