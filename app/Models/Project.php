@@ -86,4 +86,25 @@ class Project extends Model
     {
         return $this->hasMany(ProjectSupport::class);
     }
+
+    // Relasi ke Technical Workflow
+    public function surveys()
+    {
+        return $this->hasMany(Survey::class);
+    }
+
+    public function sizingProjects()
+    {
+        return $this->hasMany(SizingProject::class);
+    }
+
+    public function requestHargas()
+    {
+        return $this->hasMany(RequestHarga::class);
+    }
+
+    public function instalasis()
+    {
+        return $this->hasMany(Instalasi::class);
+    }
 }

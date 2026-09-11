@@ -1,0 +1,90 @@
+<x-app-layout>
+@php
+    $statuses = [
+        'draft' => 'Draft',
+        'in_progress' => 'In Progress',
+        'waiting_approval' => 'Waiting Approval',
+        'completed' => 'Completed',
+    ];
+
+    $statusColors = [
+        'draft' => 'slate',
+        'in_progress' => 'yellow',
+        'waiting_approval' => 'orange',
+        'completed' => 'green',
+    ];
+@endphp
+
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Sizing Project</h1>
+            <x-status-badge color="{{ $statusColors[$sizingProject->status] ?? 'slate' }}">
+                {{ $statuses[$sizingProject->status] ?? $sizingProject->status }}
+            </x-status-badge>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('teknisi.sizing-projects.edit', $sizingProject) }}"
+               class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl text-sm font-medium">
+                Edit
+            </a>
+            <a href="{{ route('teknisi.sizing-projects.index') }}"
+               class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 rounded-xl text-sm">
+                Kembali
+            </a>
+        </div>
+    </div>
+
+    @if (session('success'))
+        <div class="mb-4 px-4 py-3 rounded-xl bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            <div>
+                <dt class="text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Project</dt>
+                <dd class="mt-1 text-sm text-slate-800 dark:text-slate-100">{{ $sizingProject->project->project_name ?? '—' }}</dd>
+            </div>
+
+            <div>
+                <dt class="text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Customer</dt>
+                <dd class="mt-1 text-sm text-slate-800 dark:text-slate-100">{{ $sizingProject->project?->customer?->name ?? '—' }}</dd>
+            </div>
+
+            <div>
+                <dt class="text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Sales PIC</dt>
+                <dd class="mt-1 text-sm text-slate-800 dark:text-slate-100">{{ $sizingProject->sales_pic ?? '—' }}</dd>
+            </div>
+
+            <div>
+                <dt class="text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Quantity</dt>
+                <dd class="mt-1 text-sm text-slate-800 dark:text-slate-100">{{ $sizingProject->quantity ?? '—' }}</dd>
+            </div>
+        </dl>
+
+        <div class="grid grid-cols-1 gap-4 mt-6">
+            @php
+                $sections = [
+                    'Customer Needs' => $sizingProject->customer_needs,
+                    'Rekomendasi' => $sizingProject->recommendation,
+                    'Spesifikasi' => $sizingProject->specifications,
+                    'Topologi' => $sizingProject->topology,
+                    'Catatan Teknis' => $sizingProject->technical_notes,
+                    'Notes' => $sizingProject->notes,
+                ];
+            @endphp
+
+            @foreach ($sections as $label => $value)
+                <div>
+                    <dt class="text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">{{ $label }}</dt>
+                    <dd class="mt-1 text-sm text-slate-800 dark:text-slate-100 whitespace-pre-line">
+                        {{ $value ?: '—' }}
+                    </dd>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+</x-app-layout>
