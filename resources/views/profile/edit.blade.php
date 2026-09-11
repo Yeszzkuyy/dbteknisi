@@ -30,7 +30,7 @@
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
             {{-- Kiri: Ringkasan Profil --}}
-            <section class="rounded-2xl border border-slate-200/60 bg-white p-8 text-center shadow-lg dark:border-slate-700/50 dark:bg-slate-800 dark:shadow-black/20">
+            <section class="rounded-2xl border border-slate-200/60 bg-white p-6 text-center shadow-lg dark:border-slate-700/50 dark:bg-slate-800 dark:shadow-black/20">
                 <form method="POST" action="{{ route('profile.avatar.update') }}" enctype="multipart/form-data"
                       x-data="{ preview: @js($user->avatar ? asset('storage/' . $user->avatar) : null) }">
                     @csrf
@@ -40,19 +40,19 @@
                             class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                             aria-label="{{ __('Ubah foto profil') }}">
                         <img x-show="preview" x-cloak :src="preview" alt="{{ __('Foto profil') }}"
-                             class="h-32 w-32 rounded-full object-cover ring-4 ring-blue-100 shadow-lg lg:h-36 lg:w-36 dark:ring-blue-900/50">
+                             class="h-24 w-24 rounded-full object-cover ring-4 ring-blue-100 shadow-lg lg:h-28 lg:w-28 dark:ring-blue-900/50">
                         <div x-show="!preview" x-cloak aria-hidden="true"
-                             class="flex h-32 w-32 items-center justify-center rounded-full bg-blue-100 ring-4 ring-blue-100 shadow-lg lg:h-36 lg:w-36 dark:bg-blue-900/40 dark:ring-blue-900/50">
-                            <span class="text-4xl font-bold text-blue-600 dark:text-blue-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                             class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 ring-4 ring-blue-100 shadow-lg lg:h-28 lg:w-28 dark:bg-blue-900/40 dark:ring-blue-900/50">
+                            <span class="text-3xl font-bold text-blue-600 lg:text-4xl dark:text-blue-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                         </div>
 
                         {{-- Overlay hover: gelap + ikon kamera --}}
                         <span class="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-                            <x-icon name="camera" class="h-8 w-8" />
+                            <x-icon name="camera" class="h-6 w-6" />
                         </span>
                         {{-- Badge kamera, selalu terlihat --}}
-                        <span class="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg ring-2 ring-white dark:ring-slate-800">
-                            <x-icon name="camera" class="h-4 w-4" />
+                        <span class="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg ring-2 ring-white dark:ring-slate-800">
+                            <x-icon name="camera" class="h-3.5 w-3.5" />
                         </span>
                     </button>
 
@@ -75,7 +75,7 @@
                     </p>
                 </div>
 
-                <p class="mt-8 text-xs text-slate-400 dark:text-slate-500">{{ __('Klik foto untuk mengganti foto profil') }}</p>
+                <p class="mt-6 text-xs text-slate-400 dark:text-slate-500">{{ __('Klik foto untuk mengganti foto profil') }}</p>
 
                 <x-input-error class="mt-3" :messages="$errors->get('avatar')" />
             </section>
