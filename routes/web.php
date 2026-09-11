@@ -167,6 +167,44 @@ Route::middleware('auth')->group(function () {
     });
 
     // ============================================
+    // TEKNISI — Technical Workflow (Survey, Sizing, Request Harga, Instalasi, Document)
+    // ============================================
+    Route::middleware('permission:view-teknisi|manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+        Route::get('/surveys', [\App\Http\Controllers\SurveyController::class, 'index'])->name('surveys.index');
+        Route::get('/surveys/create', [\App\Http\Controllers\SurveyController::class, 'create'])->name('surveys.create');
+        Route::get('/surveys/{survey}', [\App\Http\Controllers\SurveyController::class, 'show'])->name('surveys.show');
+        Route::get('/sizing-projects', [\App\Http\Controllers\SizingProjectController::class, 'index'])->name('sizing-projects.index');
+        Route::get('/sizing-projects/create', [\App\Http\Controllers\SizingProjectController::class, 'create'])->name('sizing-projects.create');
+        Route::get('/sizing-projects/{sizingProject}', [\App\Http\Controllers\SizingProjectController::class, 'show'])->name('sizing-projects.show');
+        Route::get('/request-hargas', [\App\Http\Controllers\RequestHargaController::class, 'index'])->name('request-hargas.index');
+        Route::get('/request-hargas/create', [\App\Http\Controllers\RequestHargaController::class, 'create'])->name('request-hargas.create');
+        Route::get('/request-hargas/{requestHarga}', [\App\Http\Controllers\RequestHargaController::class, 'show'])->name('request-hargas.show');
+        Route::get('/instalasis', [\App\Http\Controllers\InstalasiController::class, 'index'])->name('instalasis.index');
+        Route::get('/instalasis/create', [\App\Http\Controllers\InstalasiController::class, 'create'])->name('instalasis.create');
+        Route::get('/instalasis/{instalasi}', [\App\Http\Controllers\InstalasiController::class, 'show'])->name('instalasis.show');
+        Route::get('/documents', [\App\Http\Controllers\DocumentRepositoryController::class, 'index'])->name('documents.index');
+    });
+
+    Route::middleware('permission:manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+        Route::post('/surveys', [\App\Http\Controllers\SurveyController::class, 'store'])->name('surveys.store');
+        Route::put('/surveys/{survey}', [\App\Http\Controllers\SurveyController::class, 'update'])->name('surveys.update');
+        Route::delete('/surveys/{survey}', [\App\Http\Controllers\SurveyController::class, 'destroy'])->name('surveys.destroy');
+        Route::get('/surveys/{survey}/edit', [\App\Http\Controllers\SurveyController::class, 'edit'])->name('surveys.edit');
+        Route::post('/sizing-projects', [\App\Http\Controllers\SizingProjectController::class, 'store'])->name('sizing-projects.store');
+        Route::put('/sizing-projects/{sizingProject}', [\App\Http\Controllers\SizingProjectController::class, 'update'])->name('sizing-projects.update');
+        Route::delete('/sizing-projects/{sizingProject}', [\App\Http\Controllers\SizingProjectController::class, 'destroy'])->name('sizing-projects.destroy');
+        Route::get('/sizing-projects/{sizingProject}/edit', [\App\Http\Controllers\SizingProjectController::class, 'edit'])->name('sizing-projects.edit');
+        Route::post('/request-hargas', [\App\Http\Controllers\RequestHargaController::class, 'store'])->name('request-hargas.store');
+        Route::put('/request-hargas/{requestHarga}', [\App\Http\Controllers\RequestHargaController::class, 'update'])->name('request-hargas.update');
+        Route::delete('/request-hargas/{requestHarga}', [\App\Http\Controllers\RequestHargaController::class, 'destroy'])->name('request-hargas.destroy');
+        Route::get('/request-hargas/{requestHarga}/edit', [\App\Http\Controllers\RequestHargaController::class, 'edit'])->name('request-hargas.edit');
+        Route::post('/instalasis', [\App\Http\Controllers\InstalasiController::class, 'store'])->name('instalasis.store');
+        Route::put('/instalasis/{instalasi}', [\App\Http\Controllers\InstalasiController::class, 'update'])->name('instalasis.update');
+        Route::delete('/instalasis/{instalasi}', [\App\Http\Controllers\InstalasiController::class, 'destroy'])->name('instalasis.destroy');
+        Route::get('/instalasis/{instalasi}/edit', [\App\Http\Controllers\InstalasiController::class, 'edit'])->name('instalasis.edit');
+    });
+
+    // ============================================
     // ADMIN — Trash
     // ============================================
     Route::middleware('permission:manage-admin')->group(function () {

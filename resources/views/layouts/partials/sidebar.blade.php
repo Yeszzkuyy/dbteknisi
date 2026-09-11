@@ -173,6 +173,36 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
                                         <span>Jadwal</span>
                                     </a>
+                                    <a href="{{ route('teknisi.surveys.index') }}"
+                                       aria-current="{{ request()->routeIs('teknisi.surveys*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.surveys*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-yellow-400" aria-hidden="true"></span>
+                                        <span>Survey</span>
+                                    </a>
+                                    <a href="{{ route('teknisi.sizing-projects.index') }}"
+                                       aria-current="{{ request()->routeIs('teknisi.sizing-projects*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.sizing-projects*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" aria-hidden="true"></span>
+                                        <span>Sizing Project</span>
+                                    </a>
+                                    <a href="{{ route('teknisi.request-hargas.index') }}"
+                                       aria-current="{{ request()->routeIs('teknisi.request-hargas*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.request-hargas*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" aria-hidden="true"></span>
+                                        <span>Request Harga</span>
+                                    </a>
+                                    <a href="{{ route('teknisi.instalasis.index') }}"
+                                       aria-current="{{ request()->routeIs('teknisi.instalasis*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.instalasis*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
+                                        <span>Instalasi</span>
+                                    </a>
+                                    <a href="{{ route('teknisi.documents.index') }}"
+                                       aria-current="{{ request()->routeIs('teknisi.documents*') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.documents*') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true"></span>
+                                        <span>Document</span>
+                                    </a>
                                 </div>
                             </div>
                         @endcan
