@@ -69,7 +69,7 @@
                             <input type="radio" name="theme" value="{{ $option['value'] }}" class="peer sr-only"
                                    x-model="theme" @change="apply('{{ $option['value'] }}')"
                                    @checked($currentTheme === $option['value'])>
-                            <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm font-semibold text-slate-600 transition peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 dark:border-slate-600 dark:bg-slate-900/40 dark:text-slate-300 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-900/30 dark:peer-checked:text-blue-300">
+                            <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm font-semibold text-slate-600 transition peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:ring-2 peer-checked:ring-blue-500 dark:border-slate-600 dark:bg-slate-900/40 dark:text-slate-300 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-900/30 dark:peer-checked:text-blue-300 dark:peer-checked:ring-blue-400">
                                 <x-icon name="{{ $option['icon'] }}" class="h-5 w-5" />
                                 {{ $option['label'] }}
                             </span>
