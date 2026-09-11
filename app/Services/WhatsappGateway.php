@@ -16,11 +16,9 @@ class WhatsappGateway
      * Kirim pesan teks via Green API. Mengembalikan idMessage dari gateway,
      * atau null bila akun belum dikonfigurasi / gagal terkirim.
      */
-    private const META_ACCOUNT_CODES = ['wa_wani'];
-
     public function isMeta(WhatsappAccount $account): bool
     {
-        return in_array($account->account_code, self::META_ACCOUNT_CODES, true);
+        return $account->isMetaGateway();
     }
 
     public function sendText(WhatsappAccount $account, string $number, string $text): ?string

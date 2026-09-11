@@ -27,6 +27,7 @@ class WhatsappAccountSeeder extends Seeder
                 [
                     'name' => $a['name'],
                     'phone_number' => $a['phone_number'],
+                    'gateway_type' => $a['account_code'] === 'wa_wani' ? WhatsappAccount::GATEWAY_META : WhatsappAccount::GATEWAY_GREEN,
                     'assigned_to' => $user?->id,
                     'is_active' => true,
                 ]

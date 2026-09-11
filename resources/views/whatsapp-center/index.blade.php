@@ -1,5 +1,5 @@
 <x-app-layout>
-<div class="flex flex-col h-[calc(100vh-8rem)]">
+<div x-data="whatsappCenter()" x-init="init()" class="flex flex-col h-[calc(100vh-8rem)]" x-cloak>
 
     {{-- Header --}}
     <div class="flex items-center justify-between mb-4 flex-shrink-0">
@@ -42,7 +42,7 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-2">
-                                @php($meta = $account->account_code === 'wa_wani')
+                                @php($meta = $account->gateway_type === 'meta')
                                 <input type="text" name="gateway_instance" placeholder="{{ $meta ? 'Phone Number ID (Meta)' : 'IdInstance' }}" value="{{ $account->gateway_instance }}"
                                        class="w-1/2 px-2 py-1.5 rounded-lg text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <input type="password" name="gateway_token" placeholder="{{ $meta ? 'System User Access Token (Meta)' : 'ApiTokenInstance' }}" value="{{ $account->gateway_token }}"
@@ -66,7 +66,7 @@
         </div>
     @endif
 
-    <div x-data="whatsappCenter()" x-init="init()" class="flex flex-col flex-1 min-h-0" x-cloak>
+    <div class="flex flex-col flex-1 min-h-0">
 
         {{-- Tabs WA Company --}}
         <div class="flex gap-2 mb-4 flex-shrink-0 flex-wrap">

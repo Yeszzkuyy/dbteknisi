@@ -33,12 +33,13 @@ class WhatsAppCenterTest extends TestCase
         return $user;
     }
 
-    private function makeAccount(string $code = 'wa_nti'): WhatsappAccount
+    private function makeAccount(string $code = 'wa_nti', ?string $gatewayType = null): WhatsappAccount
     {
         return WhatsappAccount::create([
             'name' => "WA {$code}",
             'phone_number' => '6281111111101',
             'account_code' => $code,
+            'gateway_type' => $gatewayType ?? ($code === 'wa_wani' ? WhatsappAccount::GATEWAY_META : WhatsappAccount::GATEWAY_GREEN),
             'assigned_to' => null,
             'is_active' => true,
         ]);
@@ -438,12 +439,14 @@ class WhatsAppCenterTest extends TestCase
     public function test_meta_webhook_stores_inbound_message(): void
     {
         $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_ID_1']);
 
         $this->postJson('/api/whatsapp/webhook', [
             'object' => 'whatsapp_business_account',
             'entry' => [[
                 'changes' => [[
                     'value' => [
+                        'metadata' => ['phone_number_id' => 'PHONE_ID_1'],
                         'messages' => [[
                             'id' => 'META-1',
                             'from' => '6281234567890',
@@ -467,6 +470,7 @@ class WhatsAppCenterTest extends TestCase
     public function test_meta_webhook_updates_outgoing_status(): void
     {
         $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_ID_1']);
 
         WhatsappMessage::create([
             'whatsapp_account_id' => $account->id,
@@ -482,6 +486,7 @@ class WhatsAppCenterTest extends TestCase
             'entry' => [[
                 'changes' => [[
                     'value' => [
+                        'metadata' => ['phone_number_id' => 'PHONE_ID_1'],
                         'statuses' => [[
                             'id' => 'META-OUT-1',
                             'status' => 'delivered',
@@ -494,6 +499,101 @@ class WhatsAppCenterTest extends TestCase
         $this->assertDatabaseHas('whatsapp_messages', [
             'wa_message_id' => 'META-OUT-1',
             'status' => 'delivered',
+        ]);
+    }
+
+    public function test_meta_webhook_routes_to_correct_account_by_phone_number_id(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $wani->update(['gateway_instance' => 'PHONE_WANI']);
+
+        $mgk = $this->makeAccount('wa_mgk', WhatsappAccount::GATEWAY_META);
+        $mgk->update(['gateway_instance' => 'PHONE_MGK']);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'changes' => [[
+                    'value' => [
+                        'metadata' => ['phone_number_id' => 'PHONE_MGK'],
+                        'messages' => [[
+                            'id' => 'META-MGK-1',
+                            'from' => '6281234567890',
+                            'type' => 'text',
+                            'text' => ['body' => 'Pesan untuk MGK'],
+                            'timestamp' => now()->timestamp,
+                        ]],
+                    ],
+                ]],
+            ]],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $mgk->id,
+            'wa_message_id' => 'META-MGK-1',
+        ]);
+        $this->assertDatabaseMissing('whatsapp_messages', [
+            'whatsapp_account_id' => $wani->id,
+            'wa_message_id' => 'META-MGK-1',
+        ]);
+    }
+
+    public function test_meta_webhook_rejects_unknown_phone_number_id(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_WANI']);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'changes' => [[
+                    'value' => [
+                        'metadata' => ['phone_number_id' => 'PHONE_UNKNOWN'],
+                        'messages' => [[
+                            'id' => 'META-X',
+                            'from' => '6281234567890',
+                            'type' => 'text',
+                            'text' => ['body' => 'Orphan'],
+                            'timestamp' => now()->timestamp,
+                        ]],
+                    ],
+                ]],
+            ]],
+        ])->assertStatus(422);
+    }
+
+    public function test_meta_webhook_updates_outgoing_status_by_gateway_message_id(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_ID_1']);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'Balasan kirim',
+            'direction' => 'outbound',
+            'status' => 'sent',
+            'gateway_message_id' => 'wamid.OUT.123',
+        ]);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'changes' => [[
+                    'value' => [
+                        'metadata' => ['phone_number_id' => 'PHONE_ID_1'],
+                        'statuses' => [[
+                            'id' => 'wamid.OUT.123',
+                            'status' => 'read',
+                        ]],
+                    ],
+                ]],
+            ]],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'gateway_message_id' => 'wamid.OUT.123',
+            'status' => 'read',
         ]);
     }
 
