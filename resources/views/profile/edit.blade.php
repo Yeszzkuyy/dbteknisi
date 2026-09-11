@@ -40,19 +40,19 @@
                             class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                             aria-label="{{ __('Ubah foto profil') }}">
                         <img x-show="preview" x-cloak :src="preview" alt="{{ __('Foto profil') }}"
-                             class="h-24 w-24 rounded-full object-cover ring-4 ring-blue-100 shadow-lg lg:h-28 lg:w-28 dark:ring-blue-900/50">
+                             class="h-16 w-16 rounded-full object-cover ring-2 ring-blue-100 shadow dark:ring-blue-900/50 lg:h-20 lg:w-20">
                         <div x-show="!preview" x-cloak aria-hidden="true"
-                             class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 ring-4 ring-blue-100 shadow-lg lg:h-28 lg:w-28 dark:bg-blue-900/40 dark:ring-blue-900/50">
-                            <span class="text-3xl font-bold text-blue-600 lg:text-4xl dark:text-blue-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                             class="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 ring-2 ring-blue-100 shadow lg:h-20 lg:w-20 dark:bg-blue-900/40 dark:ring-blue-900/50">
+                            <span class="text-xl font-bold text-blue-600 lg:text-2xl dark:text-blue-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                         </div>
 
                         {{-- Overlay hover: gelap + ikon kamera --}}
                         <span class="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
-                            <x-icon name="camera" class="h-6 w-6" />
+                            <x-icon name="camera" class="h-4 w-4" />
                         </span>
                         {{-- Badge kamera, selalu terlihat --}}
-                        <span class="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg ring-2 ring-white dark:ring-slate-800">
-                            <x-icon name="camera" class="h-3.5 w-3.5" />
+                        <span class="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white shadow ring-2 ring-white dark:ring-slate-800">
+                            <x-icon name="camera" class="h-3 w-3" />
                         </span>
                     </button>
 
