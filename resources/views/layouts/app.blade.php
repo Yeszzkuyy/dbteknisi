@@ -124,7 +124,7 @@
         .dark input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]){color-scheme:dark}
     </style>
 </head>
-<body class="bg-[#f1f5f9] dark:bg-[#121927] dark:bg-noise font-sans antialiased">
+<body class="bg-slate-100 dark:bg-[#121927] dark:bg-noise font-sans antialiased">
 
     <div id="sidebarOverlay" class="sidebar-overlay dark:bg-black/60"></div>
 
