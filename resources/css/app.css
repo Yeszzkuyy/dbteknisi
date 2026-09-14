@@ -16,6 +16,15 @@
     --bg-dark: #0A0A0A;
     --glass-bg: rgba(15, 15, 15, 0.55);
     --glass-blur: 18px;
+
+    /* Palet halaman auth versi terang (clean light) */
+    --auth-bg: #F8FAFC;
+    --auth-surface: #FFFFFF;
+    --auth-fg: #1E293B;
+    --auth-muted: #64748B;
+    --auth-border: #E2E8F0;
+    --auth-panel-from: #EFF6FF;
+    --auth-panel-to: #DBEAFE;
 }
 
 .dark {
@@ -321,55 +330,56 @@ tbody tr { transition: background-color 0.2s ease; }
 /* ============================================================
    Halaman Auth — split-screen login (blueprint 3DY GROUP)
    ============================================================ */
-.auth-shell { background: var(--bg-dark); }
+.auth-shell { background: var(--auth-bg); }
 
 [x-cloak] { display: none !important; }
 
+/* Field input: putih, rounded, fokus ring biru lembut */
 .auth-input {
-    background: transparent;
-    border: 0;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.16);
-    border-radius: 0;
-    color: #fff;
-    transition: border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+    width: 100%;
+    background: var(--auth-surface);
+    border: 1px solid var(--auth-border);
+    border-radius: 0.75rem;
+    color: var(--auth-fg);
+    transition: border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
 
-.auth-input::placeholder { color: transparent; }
+.auth-input::placeholder { color: #94a3b8; }
+
+.auth-input:hover { border-color: #cbd5e1; }
 
 .auth-input:focus {
     outline: none;
     border-color: rgb(var(--accent));
-    box-shadow: 0 4px 0 -2px rgba(var(--accent), 0.35);
+    box-shadow: 0 0 0 4px rgba(var(--accent), 0.15);
 }
 
 .auth-input:-webkit-autofill,
 .auth-input:-webkit-autofill:hover,
 .auth-input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #fff;
-    -webkit-box-shadow: 0 0 0 1000px var(--bg-dark) inset;
+    -webkit-text-fill-color: var(--auth-fg);
+    -webkit-box-shadow: 0 0 0 1000px var(--auth-surface) inset;
     transition: background-color 9999s ease-out;
 }
 
-/* Shimmer pada tombol (setiap 5 detik) */
-.auth-btn { position: relative; overflow: hidden; isolation: isolate; }
-
-.auth-btn::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.35) 50%, transparent 65%);
-    transform: translateX(-130%);
-    animation: auth-shimmer 5s ease-in-out infinite;
+/* Pola titik halus untuk panel visual */
+.auth-dots {
+    background-image: radial-gradient(rgba(37, 99, 235, 0.22) 1.4px, transparent 1.4px);
+    background-size: 22px 22px;
 }
 
-@keyframes auth-shimmer {
-    0%, 82% { transform: translateX(-130%); }
-    94%, 100% { transform: translateX(130%); }
+/* Chip brand mengambang di panel visual */
+.auth-float { animation: auth-float 7s ease-in-out infinite; }
+.auth-float.f1 { animation-delay: 0.8s; }
+.auth-float.f2 { animation-delay: 1.6s; }
+
+@keyframes auth-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
-/* Jaringan "The Living Network" */
-.net-spin { transform-origin: 300px 300px; animation: net-spin 60s linear infinite; }
+/* Jaringan "The Living Network" (versi terang) */
+.net-spin { transform-box: view-box; transform-origin: 300px 300px; animation: net-spin 60s linear infinite; }
 .net-link {
     stroke: rgb(var(--accent));
     stroke-width: 2;
@@ -378,7 +388,7 @@ tbody tr { transition: background-color 0.2s ease; }
     animation: net-dash 2.4s linear infinite;
 }
 .net-link.alt { animation-duration: 3.6s; animation-direction: reverse; }
-.net-node { animation: net-pulse 3s ease-in-out infinite; transform-origin: center; }
+.net-node { transform-box: fill-box; transform-origin: center; animation: net-pulse 3s ease-in-out infinite; }
 .net-node.d1 { animation-delay: 0.4s; }
 .net-node.d2 { animation-delay: 0.8s; }
 .net-node.d3 { animation-delay: 1.2s; }
@@ -397,6 +407,5 @@ tbody tr { transition: background-color 0.2s ease; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .auth-btn::after { animation: none; opacity: 0; }
-    .net-spin, .net-link, .net-node, .net-drift { animation: none !important; }
+    .net-spin, .net-link, .net-node, .net-drift, .auth-float { animation: none !important; }
 }
