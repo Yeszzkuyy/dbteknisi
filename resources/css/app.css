@@ -17,14 +17,16 @@
     --glass-bg: rgba(15, 15, 15, 0.55);
     --glass-blur: 18px;
 
-    /* Palet halaman auth versi terang (clean light) */
-    --auth-bg: #F8FAFC;
-    --auth-surface: #FFFFFF;
-    --auth-fg: #1E293B;
-    --auth-muted: #64748B;
-    --auth-border: #E2E8F0;
-    --auth-panel-from: #EFF6FF;
-    --auth-panel-to: #DBEAFE;
+    /* Palet halaman auth — dark flat (Tridaya App) */
+    --auth-bg: #141922;
+    --auth-surface: #1E2530;
+    --auth-panel: #262E3A;
+    --auth-border: #3B4552;
+    --auth-fg: #E4E8ED;
+    --auth-muted: #8B96A5;
+    --auth-teal: #34C3A6;
+    --auth-teal-strong: #2FAE93;
+    --auth-coral: #E85C4A;
 }
 
 .dark {
@@ -328,84 +330,55 @@ tbody tr { transition: background-color 0.2s ease; }
 }
 
 /* ============================================================
-   Halaman Auth — split-screen login (blueprint 3DY GROUP)
+   Halaman Auth — login dark flat (Tridaya App / 3DY Group)
    ============================================================ */
-.auth-shell { background: var(--auth-bg); }
+.auth-shell {
+    background: var(--auth-bg);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+}
+
+.auth-mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
 
 [x-cloak] { display: none !important; }
 
-/* Field input: putih, rounded, fokus ring biru lembut */
+/* Field input: kotak border tipis, fokus teal (flat, tanpa glow) */
 .auth-input {
     width: 100%;
-    background: var(--auth-surface);
+    background: var(--auth-bg);
     border: 1px solid var(--auth-border);
-    border-radius: 0.75rem;
+    border-radius: 10px;
     color: var(--auth-fg);
     transition: border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
 
-.auth-input::placeholder { color: #94a3b8; }
+.auth-input::placeholder { color: #6B7684; }
 
-.auth-input:hover { border-color: #cbd5e1; }
+.auth-input:hover { border-color: #4A5563; }
 
 .auth-input:focus {
     outline: none;
-    border-color: rgb(var(--accent));
-    box-shadow: 0 0 0 4px rgba(var(--accent), 0.15);
+    border-color: var(--auth-teal);
+    box-shadow: 0 0 0 3px rgba(52, 195, 166, 0.20);
 }
 
 .auth-input:-webkit-autofill,
 .auth-input:-webkit-autofill:hover,
 .auth-input:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--auth-fg);
-    -webkit-box-shadow: 0 0 0 1000px var(--auth-surface) inset;
+    -webkit-box-shadow: 0 0 0 1000px var(--auth-bg) inset;
     transition: background-color 9999s ease-out;
 }
 
-/* Pola titik halus untuk panel visual */
-.auth-dots {
-    background-image: radial-gradient(rgba(37, 99, 235, 0.22) 1.4px, transparent 1.4px);
-    background-size: 22px 22px;
+/* Satu-satunya animasi: dot status live berdenyut pelan */
+.live-dot {
+    animation: live-pulse 2.4s ease-in-out infinite;
 }
 
-/* Chip brand mengambang di panel visual */
-.auth-float { animation: auth-float 7s ease-in-out infinite; }
-.auth-float.f1 { animation-delay: 0.8s; }
-.auth-float.f2 { animation-delay: 1.6s; }
-
-@keyframes auth-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Jaringan "The Living Network" (versi terang) */
-.net-spin { transform-box: view-box; transform-origin: 300px 300px; animation: net-spin 60s linear infinite; }
-.net-link {
-    stroke: rgb(var(--accent));
-    stroke-width: 2;
-    stroke-dasharray: 6 10;
-    opacity: 0.55;
-    animation: net-dash 2.4s linear infinite;
-}
-.net-link.alt { animation-duration: 3.6s; animation-direction: reverse; }
-.net-node { transform-box: fill-box; transform-origin: center; animation: net-pulse 3s ease-in-out infinite; }
-.net-node.d1 { animation-delay: 0.4s; }
-.net-node.d2 { animation-delay: 0.8s; }
-.net-node.d3 { animation-delay: 1.2s; }
-.net-node.d4 { animation-delay: 1.6s; }
-.net-drift { animation: net-drift 9s ease-in-out infinite; }
-
-@keyframes net-dash { to { stroke-dashoffset: -32; } }
-@keyframes net-spin { to { transform: rotate(360deg); } }
-@keyframes net-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.85; }
-    50% { transform: scale(1.12); opacity: 1; }
-}
-@keyframes net-drift {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .net-spin, .net-link, .net-node, .net-drift, .auth-float { animation: none !important; }
+    .live-dot { animation: none !important; }
 }
