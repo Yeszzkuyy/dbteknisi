@@ -22,7 +22,7 @@
             <div>
                 <a href="/">
                     <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="{{ config('app.name') }}"
-                         class="h-16 w-auto object-contain bg-white rounded-xl shadow-sm p-1">
+                         class="h-16 w-auto object-contain">
                 </a>
             </div>
 
