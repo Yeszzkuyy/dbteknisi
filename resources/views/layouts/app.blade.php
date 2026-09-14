@@ -30,6 +30,12 @@
         })();
     </script>
 
+    <script>
+        (function () {
+            try { if (localStorage.getItem('sidebar-collapsed') === '1') document.documentElement.classList.add('sidebar-collapsed'); } catch (e) {}
+        })();
+    </script>
+
     @php
         $notifInit = ['unread' => 0, 'unassigned' => 0, 'items' => []];
         if (auth()->check() && auth()->user()->can('manage-sales-leads')) {
@@ -49,13 +55,14 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         [x-cloak]{display:none!important}
+        .icon-expand{display:none}
         :root{--sidebar-bg:#fff;--sidebar-border:#e2e8f0;--card-bg:#fff;--card-border:#e2e8f0;--card-bg-hover:#f8fafc;--text-primary:#1e293b;--text-secondary:#64748b;--text-muted:#94a3b8;--input-bg:#f1f5f9;--input-border:#cbd5e1;--input-text:#1e293b}
         .dark{--sidebar-bg:#1e293b;--sidebar-border:#334155;--card-bg:#1e293b;--card-border:#334155;--card-bg-hover:#2d3a4e;--text-primary:#f1f5f9;--text-secondary:#cbd5e1;--text-muted:#64748b;--input-bg:#243244;--input-border:#475569;--input-text:#f1f5f9}
-        .sidebar{position:fixed;top:0;left:0;height:100vh;width:280px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out;overflow-y:auto}
+        .sidebar{position:fixed;top:0;left:0;height:100vh;width:280px;background:#0a192f;border-right:1px solid rgba(255,255,255,.06);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out,width .3s cubic-bezier(.16,1,.3,1);overflow-y:auto}
         .sidebar.open{transform:translateX(0)}
         .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998}
         .sidebar-overlay.active{display:block}
-        .main-content{margin-left:0;width:100%;min-height:100vh;display:flex;flex-direction:column}
+        .main-content{margin-left:0;width:100%;min-height:100vh;display:flex;flex-direction:column;transition:margin-left .3s cubic-bezier(.16,1,.3,1),width .3s cubic-bezier(.16,1,.3,1)}
 
         @media(min-width:1024px){
             .sidebar{position:fixed;left:0;top:0;transform:translateX(0)!important;width:280px;height:100vh;overflow:hidden}
@@ -63,6 +70,23 @@
             .main-content{margin-left:280px;width:calc(100% - 280px);flex:1;min-width:0}
             .app-wrapper{display:flex;min-height:100vh}
             #hamburgerBtn{display:none!important}
+
+            /* Sidebar minimized (icons only) */
+            html.sidebar-collapsed .sidebar{width:76px}
+            html.sidebar-collapsed .main-content{margin-left:76px;width:calc(100% - 76px)}
+            html.sidebar-collapsed .sidebar-hide{display:none!important}
+            html.sidebar-collapsed .sidebar nav a > span,
+            html.sidebar-collapsed .sidebar nav button > span{display:none!important}
+            html.sidebar-collapsed .sidebar nav a,
+            html.sidebar-collapsed .sidebar nav button{justify-content:center;padding-left:0;padding-right:0}
+            html.sidebar-collapsed .sidebar nav{padding-left:.5rem;padding-right:.5rem}
+            html.sidebar-collapsed .sidebar-logo{padding-left:.5rem;padding-right:.5rem;justify-content:center}
+            html.sidebar-collapsed .sidebar-logo img{height:1.75rem}
+            html.sidebar-collapsed .sidebar-toggle-row #sidebarCollapseBtn{margin-left:auto;margin-right:auto}
+            html.sidebar-collapsed .icon-collapse{display:none}
+            html.sidebar-collapsed .icon-expand{display:block}
+            html.sidebar-collapsed .sidebar-user,
+            html.sidebar-collapsed .sidebar-logout{justify-content:center;padding-left:0;padding-right:0}
         }
         @media(max-width:1023px){
             .app-wrapper{display:flex;min-height:100vh}
@@ -146,6 +170,32 @@
             function close(){s.classList.remove('open');o.classList.remove('active')}
             h&&h.addEventListener('click',function(){s.classList.contains('open')?close():open()});
             o.addEventListener('click',close);
+
+            var root=document.documentElement;
+            var cb=document.getElementById('sidebarCollapseBtn');
+            function syncTitles(){
+                var collapsed=root.classList.contains('sidebar-collapsed');
+                s.querySelectorAll('.sidebar nav a, .sidebar nav button, .sidebar-user, .sidebar-logout').forEach(function(el){
+                    var t=el.textContent.replace(/\s+/g,' ').trim();
+                    if(collapsed&&t){el.setAttribute('title',t)}else{el.removeAttribute('title')}
+                });
+            }
+            function setCollapsed(v){
+                root.classList.toggle('sidebar-collapsed',v);
+                try{localStorage.setItem('sidebar-collapsed',v?'1':'0')}catch(e){}
+                if(cb){cb.setAttribute('aria-expanded',String(!v));cb.setAttribute('aria-label',v?'Perluas sidebar':'Perkecil sidebar')}
+                syncTitles();
+            }
+            syncTitles();
+            cb&&cb.addEventListener('click',function(){
+                if(window.innerWidth<1024){close();return}
+                setCollapsed(!root.classList.contains('sidebar-collapsed'));
+            });
+            // Klik menu grup saat minimized → lebarkan sidebar dulu
+            s.querySelectorAll('nav button[type="button"]').forEach(function(b){
+                b.addEventListener('click',function(){if(window.innerWidth>=1024&&root.classList.contains('sidebar-collapsed'))setCollapsed(false)});
+            });
+
             s.querySelectorAll('a,button[type="submit"]').forEach(function(e){e.addEventListener('click',function(){window.innerWidth<1024&&close()})});
             window.addEventListener('resize',function(){window.innerWidth>=1024&&close()});
             document.addEventListener('keydown',function(e){e.key==='Escape'&&s.classList.contains('open')&&close()});
