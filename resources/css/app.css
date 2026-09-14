@@ -9,24 +9,6 @@
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --shadow-rest: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
     --shadow-lift: 0 12px 32px -12px rgba(15, 23, 42, 0.16), 0 4px 12px -6px rgba(15, 23, 42, 0.08);
-
-    /* Brand accent — satu sumber untuk seluruh halaman auth */
-    --accent: 37, 99, 235;        /* blue-600 #2563EB */
-    --accent-strong: 29, 78, 216; /* blue-700 #1D4ED8 */
-    --bg-dark: #0A0A0A;
-    --glass-bg: rgba(15, 15, 15, 0.55);
-    --glass-blur: 18px;
-
-    /* Palet halaman auth — dark flat (Tridaya App) */
-    --auth-bg: #141922;
-    --auth-surface: #1E2530;
-    --auth-panel: #262E3A;
-    --auth-border: #3B4552;
-    --auth-fg: #E4E8ED;
-    --auth-muted: #8B96A5;
-    --auth-teal: #34C3A6;
-    --auth-teal-strong: #2FAE93;
-    --auth-coral: #E85C4A;
 }
 
 .dark {
@@ -327,58 +309,4 @@ tbody tr { transition: background-color 0.2s ease; }
 
 .teknisi-calendar .fc .fc-timegrid-now-indicator-line {
     border-color: #3b82f6;
-}
-
-/* ============================================================
-   Halaman Auth — login dark flat (Tridaya App / 3DY Group)
-   ============================================================ */
-.auth-shell {
-    background: var(--auth-bg);
-    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
-}
-
-.auth-mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
-
-[x-cloak] { display: none !important; }
-
-/* Field input: kotak border tipis, fokus teal (flat, tanpa glow) */
-.auth-input {
-    width: 100%;
-    background: var(--auth-bg);
-    border: 1px solid var(--auth-border);
-    border-radius: 10px;
-    color: var(--auth-fg);
-    transition: border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
-}
-
-.auth-input::placeholder { color: #6B7684; }
-
-.auth-input:hover { border-color: #4A5563; }
-
-.auth-input:focus {
-    outline: none;
-    border-color: var(--auth-teal);
-    box-shadow: 0 0 0 3px rgba(52, 195, 166, 0.20);
-}
-
-.auth-input:-webkit-autofill,
-.auth-input:-webkit-autofill:hover,
-.auth-input:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--auth-fg);
-    -webkit-box-shadow: 0 0 0 1000px var(--auth-bg) inset;
-    transition: background-color 9999s ease-out;
-}
-
-/* Satu-satunya animasi: dot status live berdenyut pelan */
-.live-dot {
-    animation: live-pulse 2.4s ease-in-out infinite;
-}
-
-@keyframes live-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .live-dot { animation: none !important; }
 }
