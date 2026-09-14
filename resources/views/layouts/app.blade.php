@@ -77,6 +77,7 @@
             html.sidebar-collapsed .sidebar-hide{display:none!important}
             html.sidebar-collapsed .sidebar nav a > span,
             html.sidebar-collapsed .sidebar nav button > span{display:none!important}
+            html.sidebar-collapsed .sidebar nav button > svg.ml-auto{display:none!important}
             html.sidebar-collapsed .sidebar nav a,
             html.sidebar-collapsed .sidebar nav button{justify-content:center;padding-left:0;padding-right:0}
             html.sidebar-collapsed .sidebar nav{padding-left:.5rem;padding-right:.5rem}
