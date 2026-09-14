@@ -82,11 +82,10 @@
             html.sidebar-collapsed .sidebar nav{padding-left:.5rem;padding-right:.5rem}
             html.sidebar-collapsed .sidebar-logo{padding-left:.5rem;padding-right:.5rem;justify-content:center}
             html.sidebar-collapsed .sidebar-logo img{height:1.75rem}
-            html.sidebar-collapsed .sidebar-toggle-row #sidebarCollapseBtn{margin-left:auto;margin-right:auto}
             html.sidebar-collapsed .icon-collapse{display:none}
             html.sidebar-collapsed .icon-expand{display:block}
             html.sidebar-collapsed .sidebar-user,
-            html.sidebar-collapsed .sidebar-logout{justify-content:center;padding-left:0;padding-right:0}
+            html.sidebar-collapsed .sidebar-collapse{justify-content:center;padding-left:0;padding-right:0}
         }
         @media(max-width:1023px){
             .app-wrapper{display:flex;min-height:100vh}
@@ -175,7 +174,7 @@
             var cb=document.getElementById('sidebarCollapseBtn');
             function syncTitles(){
                 var collapsed=root.classList.contains('sidebar-collapsed');
-                s.querySelectorAll('.sidebar nav a, .sidebar nav button, .sidebar-user, .sidebar-logout').forEach(function(el){
+                s.querySelectorAll('.sidebar nav a, .sidebar nav button, .sidebar-user, .sidebar-collapse').forEach(function(el){
                     var t=el.textContent.replace(/\s+/g,' ').trim();
                     if(collapsed&&t){el.setAttribute('title',t)}else{el.removeAttribute('title')}
                 });

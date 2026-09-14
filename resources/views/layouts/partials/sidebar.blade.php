@@ -24,20 +24,6 @@
         <div class="absolute -bottom-24 right-0 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl"></div>
     </div>
 
-    {{-- Toggle collapse / expand (paling atas, di atas logo) --}}
-    <div class="sidebar-toggle-row relative z-10 flex flex-shrink-0 items-center border-b border-white/10 p-3">
-        <button id="sidebarCollapseBtn" type="button"
-                class="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50"
-                aria-label="Perkecil sidebar" aria-controls="sidebar" aria-expanded="true">
-            <svg class="icon-collapse h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
-            </svg>
-            <svg class="icon-expand h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h10M4 12h10M4 17h10M13 12h7M17 9l3 3-3 3"/>
-            </svg>
-        </button>
-    </div>
-
     {{-- Logo --}}
     <div class="sidebar-logo relative z-10 flex flex-shrink-0 items-center border-b border-white/10 p-4">
         <a href="{{ route('dashboard') }}" class="group flex items-center gap-3">
@@ -494,15 +480,18 @@
         </a>
     </div>
 
-    {{-- Logout --}}
+    {{-- Toggle collapse / expand (posisi bawah, dulu logout) --}}
     <div class="relative z-10 flex-shrink-0 px-3 pb-3">
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit"
-                    class="sidebar-logout group flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-red-300 transition-all duration-300 hover:bg-red-500/10 hover:text-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50">
-                <x-icon name="logout" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                <span class="sidebar-hide">Logout</span>
-            </button>
-        </form>
+        <button id="sidebarCollapseBtn" type="button"
+                class="sidebar-collapse group flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50"
+                aria-label="Perkecil sidebar" aria-controls="sidebar" aria-expanded="true">
+            <svg class="icon-collapse h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
+            </svg>
+            <svg class="icon-expand h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h10M4 12h10M4 17h10M13 12h7M17 9l3 3-3 3"/>
+            </svg>
+            <span class="sidebar-hide">Perkecil</span>
+        </button>
     </div>
 </aside>
