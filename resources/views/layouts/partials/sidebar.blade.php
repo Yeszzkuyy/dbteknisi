@@ -1,8 +1,8 @@
 @php
-    $navLink = 'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-800';
-    $subNavLink = 'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-800';
-    $navActive = 'bg-blue-500/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300';
-    $navInactive = 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white';
+    $navLink = 'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50';
+    $subNavLink = 'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50';
+    $navActive = 'bg-blue-500/15 text-white';
+    $navInactive = 'text-slate-300 hover:bg-white/5 hover:text-white';
 
     $dashboardActive = request()->routeIs('dashboard*');
     $customerActive = request()->routeIs('customers*');
@@ -16,33 +16,47 @@
     $roleName = auth()->user()->roles->first()?->name ?? 'User';
 @endphp
 
-<aside class="relative flex h-full w-full flex-col overflow-hidden bg-[var(--sidebar-bg)]">
+<aside class="relative flex h-full w-full flex-col overflow-hidden">
     {{-- Aurora mesh background (dekoratif, di belakang konten) --}}
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-        <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blue-500/15 blur-3xl dark:bg-blue-500/20"></div>
-        <div class="absolute -left-24 top-1/3 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl dark:bg-indigo-500/15"></div>
-        <div class="absolute -bottom-24 right-0 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl dark:bg-cyan-400/15"></div>
+        <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blue-500/15 blur-3xl"></div>
+        <div class="absolute -left-24 top-1/3 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl"></div>
+        <div class="absolute -bottom-24 right-0 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl"></div>
+    </div>
+
+    {{-- Toggle collapse / expand (paling atas, di atas logo) --}}
+    <div class="sidebar-toggle-row relative z-10 flex flex-shrink-0 items-center border-b border-white/10 p-3">
+        <button id="sidebarCollapseBtn" type="button"
+                class="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50"
+                aria-label="Perkecil sidebar" aria-controls="sidebar" aria-expanded="true">
+            <svg class="icon-collapse h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
+            </svg>
+            <svg class="icon-expand h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h10M4 12h10M4 17h10M13 12h7M17 9l3 3-3 3"/>
+            </svg>
+        </button>
     </div>
 
     {{-- Logo --}}
-    <div class="relative z-10 flex-shrink-0 border-b border-[var(--sidebar-border)] p-4">
+    <div class="sidebar-logo relative z-10 flex flex-shrink-0 items-center border-b border-white/10 p-4">
         <a href="{{ route('dashboard') }}" class="group flex items-center gap-3">
             <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
                  class="h-10 w-auto rounded-lg bg-white object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03] dark:hidden">
             <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
                  class="hidden h-10 w-auto rounded-lg bg-white object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03] dark:block dark:bg-transparent">
-            <div class="min-w-0">
-                <h1 class="truncate text-xl font-bold text-blue-600">3DY App</h1>
+            <div class="sidebar-hide min-w-0">
+                <h1 class="truncate text-xl font-bold text-blue-300">3DY App</h1>
                 <p class="mt-0.5 text-xs text-slate-400">3DY Group</p>
             </div>
         </a>
     </div>
 
     {{-- Menu --}}
-    <nav id="sidebar-navigation" aria-label="Navigasi utama" class="relative z-10 flex-1 overflow-y-auto px-3 py-4">
+    <nav id="sidebar-navigation" aria-label="Navigasi utama" class="sidebar-nav relative z-10 flex-1 overflow-y-auto px-3 py-4">
         <div class="space-y-6">
             <section aria-labelledby="sidebar-main-label">
-                <p id="sidebar-main-label" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Main</p>
+                <p id="sidebar-main-label" class="sidebar-hide px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Main</p>
                 <div class="space-y-1">
                     <a href="{{ route('dashboard') }}"
                        aria-current="{{ $dashboardActive ? 'page' : 'false' }}"
@@ -67,7 +81,7 @@
 
             @canany(['manage-sales-leads', 'view-teknisi', 'view-marketing', 'view-sales', 'view-admin'])
                 <section aria-labelledby="sidebar-departments-label">
-                    <p id="sidebar-departments-label" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Departments</p>
+                    <p id="sidebar-departments-label" class="sidebar-hide px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Departments</p>
                     <div class="space-y-1">
                         {{-- Management (Management Hub) --}}
                         @can('manage-sales-leads')
@@ -95,7 +109,7 @@
                                      x-transition:leave="transition ease-in duration-150"
                                      x-transition:leave-start="translate-y-0 opacity-100"
                                      x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
                                     <a href="{{ route('manage-sales.index') }}"
                                        aria-current="{{ request()->routeIs('manage-sales*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('manage-sales*') ? $navActive : $navInactive }}">
@@ -154,7 +168,7 @@
                                      x-transition:leave="transition ease-in duration-150"
                                      x-transition:leave-start="translate-y-0 opacity-100"
                                      x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
                                     <a href="{{ route('teknisi.dashboard') }}"
                                        aria-current="{{ request()->routeIs('teknisi.dashboard*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('teknisi.dashboard*') ? $navActive : $navInactive }}">
@@ -228,7 +242,7 @@
                                      x-transition:leave="transition ease-in duration-150"
                                      x-transition:leave-start="translate-y-0 opacity-100"
                                      x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
                                     <a href="{{ route('marketing.dashboard') }}"
                                        aria-current="{{ request()->routeIs('marketing.dashboard') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('marketing.dashboard') ? $navActive : $navInactive }}">
@@ -298,7 +312,7 @@
                                      x-transition:leave="transition ease-in duration-150"
                                      x-transition:leave-start="translate-y-0 opacity-100"
                                      x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
                                     <a href="{{ route('sales.my-leads') }}"
                                        aria-current="{{ request()->routeIs('sales.my-leads') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('sales.my-leads') ? $navActive : $navInactive }}">
@@ -350,7 +364,7 @@
                                      x-transition:leave="transition ease-in duration-150"
                                      x-transition:leave-start="translate-y-0 opacity-100"
                                      x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
                                     <a href="{{ route('admin.invoices.index') }}"
                                        aria-current="{{ request()->routeIs('admin.invoices.*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('admin.invoices.*') ? $navActive : $navInactive }}">
@@ -378,7 +392,7 @@
 
             @canany(['view-trash', 'manage-monitoring'])
                 <section aria-labelledby="sidebar-system-label">
-                    <p id="sidebar-system-label" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">System</p>
+                    <p id="sidebar-system-label" class="sidebar-hide px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">System</p>
                     <div class="space-y-1">
                         {{-- Trash --}}
                         @can('view-trash')
@@ -421,7 +435,7 @@
                                      x-transition:leave="transition ease-in duration-150"
                                      x-transition:leave-start="translate-y-0 opacity-100"
                                      x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-700">
+                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
                                     <a href="{{ route('admin-panel.index') }}"
                                        aria-current="{{ request()->routeIs('admin-panel.index') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.index') ? $navActive : $navInactive }}">
@@ -468,15 +482,15 @@
     </nav>
 
     {{-- User widget --}}
-    <div class="relative z-10 flex-shrink-0 border-t border-[var(--sidebar-border)] p-3">
+    <div class="relative z-10 flex-shrink-0 border-t border-white/10 p-3">
         <a href="{{ route('profile.edit') }}"
-           class="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 transition-all duration-300 hover:border-blue-200 hover:bg-blue-50/70 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10">
+           class="sidebar-user group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 transition-all duration-300 hover:border-blue-400/30 hover:bg-white/10">
             <x-user-avatar :user="auth()->user()" size="w-9 h-9" text="text-xs" :clickable="false" />
-            <span class="min-w-0 flex-1">
-                <span class="block truncate text-sm font-semibold text-slate-700 dark:text-slate-200">{{ auth()->user()->name }}</span>
+            <span class="sidebar-hide min-w-0 flex-1">
+                <span class="block truncate text-sm font-semibold text-slate-200">{{ auth()->user()->name }}</span>
                 <span class="mt-0.5 block truncate text-[11px] text-slate-400">{{ \Illuminate\Support\Str::headline($roleName) }}</span>
             </span>
-            <x-icon name="chevron-right" class="h-4 w-4 shrink-0 text-slate-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-blue-500" />
+            <x-icon name="chevron-right" class="sidebar-hide h-4 w-4 shrink-0 text-slate-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-blue-300" />
         </a>
     </div>
 
@@ -485,9 +499,9 @@
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit"
-                    class="group flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-red-600 transition-all duration-300 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 focus-visible:ring-offset-1 dark:text-red-300 dark:hover:bg-red-500/10 dark:hover:text-red-200 dark:focus-visible:ring-offset-slate-800">
+                    class="sidebar-logout group flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-red-300 transition-all duration-300 hover:bg-red-500/10 hover:text-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50">
                 <x-icon name="logout" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                <span>Logout</span>
+                <span class="sidebar-hide">Logout</span>
             </button>
         </form>
     </div>
