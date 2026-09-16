@@ -417,4 +417,61 @@ class WhatsAppCenterTest extends TestCase
         $this->artisan('whatsapp:receive')->assertExitCode(0);
         Http::assertNothingSent();
     }
+
+    public function test_chat_endpoints_paginate_mark_read_save_contact_and_store_preferences(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Pesan pertama',
+            'direction' => 'inbound',
+        ]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Pesan kedua',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->getJson(route('whatsapp-center.messages', [$account, '6281234567890']) . '?limit=1')
+            ->assertOk()
+            ->assertJsonPath('has_more', true)
+            ->assertJsonCount(1, 'messages');
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.mark-read', [$account, '6281234567890']))
+            ->assertOk()
+            ->assertJsonPath('read', true);
+
+        $this->assertSame(2, WhatsappMessage::whereNotNull('read_at')->count());
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.preference', [$account, '6281234567890']), [
+                'is_pinned' => true,
+                'is_muted' => true,
+            ])
+            ->assertOk()
+            ->assertJsonPath('is_pinned', true)
+            ->assertJsonPath('is_muted', true);
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $account), [
+                'name' => 'Rina Tersimpan',
+                'whatsapp' => '6281234567890',
+                'notes' => 'Kontak dari WhatsApp',
+            ])
+            ->assertOk()
+            ->assertJsonPath('name', 'Rina Tersimpan');
+
+        $this->assertDatabaseHas('customers', [
+            'whatsapp' => '6281234567890',
+            'name' => 'Rina Tersimpan',
+        ]);
+    }
 }

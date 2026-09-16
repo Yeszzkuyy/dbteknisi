@@ -261,11 +261,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [WhatsAppCenterController::class, 'index'])->name('index');
         Route::get('/status', [WhatsAppCenterController::class, 'status'])->name('status');
         Route::get('/{account}/conversations', [WhatsAppCenterController::class, 'conversations'])->name('conversations');
+        Route::get('/{account}/contacts', [WhatsAppCenterController::class, 'contacts'])->name('contacts');
         Route::get('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'messages'])->name('messages');
+        Route::post('/{account}/messages/{sender}/read', [WhatsAppCenterController::class, 'markRead'])->name('mark-read');
+        Route::post('/{account}/conversations/{sender}/preference', [WhatsAppCenterController::class, 'preference'])->name('preference');
 
         Route::middleware('permission:manage-marketing')->group(function () {
             Route::post('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'store'])->name('reply');
             Route::post('/{account}/convert/{sender}', [WhatsAppCenterController::class, 'convert'])->name('convert');
+            Route::post('/{account}/contacts', [WhatsAppCenterController::class, 'saveContact'])->name('contact-save');
             Route::post('/{account}/simulate', [WhatsAppCenterController::class, 'simulate'])->name('simulate');
             Route::put('/{account}/credentials', [WhatsAppCenterController::class, 'updateCredentials'])->name('credentials');
         });
