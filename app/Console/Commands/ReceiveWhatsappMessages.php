@@ -16,7 +16,8 @@ class ReceiveWhatsappMessages extends Command
     public function handle(WhatsappGateway $gateway, WhatsAppCenterController $controller): int
     {
         $accounts = WhatsappAccount::where('is_active', true)->get()
-            ->filter(fn ($a) => $gateway->configured($a));
+            ->filter(fn ($a) => $gateway->configured($a))
+            ->reject(fn ($a) => $a->isMetaGateway());
 
         if ($accounts->isEmpty()) {
             $this->warn('Tidak ada akun WhatsApp dengan kredensial gateway terisi.');
