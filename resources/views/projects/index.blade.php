@@ -1,5 +1,4 @@
 <x-app-layout>
-<div class="px-4 sm:px-6 lg:px-8">
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
         <div>
@@ -38,28 +37,28 @@
             <table class="min-w-full">
                 <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Project</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Customer</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Jenis Pekerjaan</th>
-                        {{-- <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500">PIC Engineer</th> --}}
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Status</th>
-                        <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Progress</th>
-                        <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
+                        <th class="px-4 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Project</th>
+                        <th class="px-4 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Customer</th>
+                        <th class="px-4 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Jenis Pekerjaan</th>
+                        {{-- <th class="px-4 py-4 text-left text-xs uppercase tracking-wider text-slate-500">PIC Engineer</th> --}}
+                        <th class="px-4 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Status</th>
+                        <th class="px-4 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Progress</th>
+                        <th class="px-4 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                     @forelse($projects as $project)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition group">
-                            <td class="px-6 py-4 font-semibold text-slate-800">{{ $project->project_name }}</td>
-                            <td class="px-6 py-4 text-slate-600">{{ $project->customer?->name ?? '-' }}</td>
-                            <td class="px-6 py-4 text-slate-600">{{ $project->workType?->name ?? '-' }}</td>
-                            {{-- <td class="px-6 py-4 text-slate-600">{{ $project->pic_engineer ?? '-' }}</td> --}}
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-4 font-semibold text-slate-800 max-w-[200px] truncate">{{ $project->project_name }}</td>
+                            <td class="px-4 py-4 text-slate-600 max-w-[160px] truncate">{{ $project->customer?->name ?? '-' }}</td>
+                            <td class="px-4 py-4 text-slate-600 max-w-[160px] truncate">{{ $project->workType?->name ?? '-' }}</td>
+                            {{-- <td class="px-4 py-4 text-slate-600">{{ $project->pic_engineer ?? '-' }}</td> --}}
+                            <td class="px-4 py-4">
                                 <x-status-badge :color="$project->status?->color ?? 'slate'">
                                     {{ $project->status?->name ?? 'Belum Memulai' }}
                                 </x-status-badge>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-4">
                                 <div class="flex items-center gap-2">
                                     <div class="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
                                         <div class="h-full bg-blue-600 rounded-full" style="width: {{ $project->progress ?? 0 }}%"></div>
@@ -67,7 +66,7 @@
                                     <span class="text-xs text-slate-600">{{ $project->progress ?? 0 }}%</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-4">
                                 <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                     <a href="{{ route('customers.show', $project->customer_id) }}"
                                        title="Lihat customer"
@@ -107,5 +106,4 @@
             </table>
         </div>
     </div>
-</div>
 </x-app-layout>
