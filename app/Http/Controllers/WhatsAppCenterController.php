@@ -7,8 +7,10 @@ use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\User;
 use App\Models\WhatsappAccount;
+use App\Models\WhatsappConversationPreference;
 use App\Models\WhatsappMessage;
 use App\Notifications\NewLeadNotification;
+use App\Rules\WhatsappNumber;
 use App\Services\WhatsappGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -26,7 +28,9 @@ class WhatsAppCenterController extends Controller
         $accountTabs = $accounts->map(fn ($a) => [
             'id' => $a->id,
             'account_code' => $a->account_code,
-            'label' => 'WA ' . strtoupper(substr($a->account_code, 3)),
+            'label' => $a->name ?: 'WA ' . strtoupper(substr($a->account_code, 3)),
+            'name' => $a->name,
+            'phone_number' => $a->phone_number,
             'gateway_status' => $a->gateway_status,
         ])->values();
 
@@ -73,6 +77,11 @@ class WhatsAppCenterController extends Controller
     {
         $this->authorizeAccount($account);
 
+        $preferences = WhatsappConversationPreference::where('user_id', auth()->id())
+            ->where('whatsapp_account_id', $account->id)
+            ->get()
+            ->keyBy('sender_number');
+
         $rows = WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->orderBy('id')
             ->get()
@@ -81,6 +90,7 @@ class WhatsAppCenterController extends Controller
                 $last = $messages->last();
                 $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
                 $lead = $messages->whereNotNull('lead_id')->first()?->lead;
+                $preference = $preferences->get($sender);
 
                 return [
                     'sender_number' => $sender,
@@ -88,38 +98,141 @@ class WhatsAppCenterController extends Controller
                     'last_message' => $last->message_body,
                     'last_direction' => $last->direction,
                     'last_at' => $last->created_at->toIso8601String(),
-                    'unread' => $messages->where('direction', 'inbound')->where('id', '>', $lastOutboundId)->count(),
+                    'unread' => $messages->where('direction', 'inbound')->where('id', '>', $lastOutboundId)->whereNull('read_at')->count(),
                     'customer' => $this->findCustomer($sender),
                     'lead_id' => $lead?->id,
+                    'is_pinned' => (bool) $preference?->is_pinned,
+                    'is_muted' => (bool) $preference?->is_muted,
+                    'is_archived' => (bool) $preference?->is_archived,
                 ];
             })
             ->values()
-            ->sortByDesc('last_at')
+            ->sortByDesc(fn ($conversation) => ($conversation['is_pinned'] ? '1' : '0') . $conversation['last_at'])
             ->values();
 
         return response()->json($rows);
     }
 
-    public function messages(WhatsappAccount $account, string $sender)
+    public function messages(Request $request, WhatsappAccount $account, string $sender)
     {
         $this->authorizeAccount($account);
 
-        $messages = WhatsappMessage::where('whatsapp_account_id', $account->id)
+        $limit = min(max($request->integer('limit', 50), 1), 100);
+        $query = WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->where('sender_number', $sender)
-            ->orderBy('id')
-            ->get()
+            ->when($request->filled('before'), fn ($query) => $query->where('id', '<', $request->integer('before')))
+            ->when($request->filled('q'), fn ($query) => $query->where('message_body', 'like', '%' . $request->string('q') . '%'))
+            ->orderByDesc('id');
+
+        $messages = $query->limit($limit + 1)->get();
+        $hasMore = $messages->count() > $limit;
+        $messages = $messages->take($limit)->sortBy('id')->values()
             ->map(fn ($m) => [
                 'id' => $m->id,
                 'direction' => $m->direction,
                 'status' => $m->status,
                 'message_body' => $m->message_body,
                 'created_at' => $m->created_at->format('d M H:i'),
+                'created_iso' => $m->created_at->toIso8601String(),
             ]);
 
         return response()->json([
             'messages' => $messages,
+            'has_more' => $hasMore,
+            'next_before' => $hasMore ? $messages->first()['id'] : null,
             'customer' => $this->findCustomer($sender),
         ]);
+    }
+
+    public function contacts(Request $request, WhatsappAccount $account)
+    {
+        $this->authorizeAccount($account);
+
+        $term = trim((string) $request->input('q', ''));
+        $customers = Customer::query()
+            ->when($term !== '', function ($query) use ($term) {
+                $query->where(function ($query) use ($term) {
+                    $query->whereLike(['name', 'company', 'whatsapp', 'phone', 'email'], $term);
+                });
+            })
+            ->where(function ($query) {
+                $query->whereNotNull('whatsapp')->orWhereNotNull('phone');
+            })
+            ->latest()
+            ->limit(30)
+            ->get()
+            ->map(fn (Customer $customer) => $this->contactPayload($customer));
+
+        return response()->json($customers->values());
+    }
+
+    public function saveContact(Request $request, WhatsappAccount $account)
+    {
+        $this->authorizeAccount($account);
+        $this->authorize('manage-marketing');
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'whatsapp' => ['required', 'string', 'max:50', new WhatsappNumber],
+            'notes' => 'nullable|string|max:2000',
+        ]);
+
+        $customer = $this->findCustomer($validated['whatsapp']);
+
+        if (!$customer) {
+            $customer = Customer::create([
+                'name' => $validated['name'],
+                'company' => $validated['name'],
+                'contact_person' => $validated['name'],
+                'whatsapp' => $validated['whatsapp'],
+                'notes' => $validated['notes'] ?? null,
+            ]);
+        } else {
+            $customer->update([
+                'name' => $validated['name'],
+                'contact_person' => $customer->contact_person ?: $validated['name'],
+                'whatsapp' => $validated['whatsapp'],
+                'notes' => $validated['notes'] ?? $customer->notes,
+            ]);
+        }
+
+        return response()->json($this->contactPayload($customer->fresh()));
+    }
+
+    public function markRead(Request $request, WhatsappAccount $account, string $sender)
+    {
+        $this->authorizeAccount($account);
+
+        $read = $request->boolean('read', true);
+        $updated = WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->where('sender_number', $sender)
+            ->where('direction', 'inbound')
+            ->when($read, fn ($query) => $query->whereNull('read_at'))
+            ->update(['read_at' => $read ? now() : null]);
+
+        return response()->json(['updated' => $updated, 'read' => $read]);
+    }
+
+    public function preference(Request $request, WhatsappAccount $account, string $sender)
+    {
+        $this->authorizeAccount($account);
+
+        $validated = $request->validate([
+            'is_pinned' => 'sometimes|boolean',
+            'is_muted' => 'sometimes|boolean',
+            'is_archived' => 'sometimes|boolean',
+        ]);
+
+        $preference = WhatsappConversationPreference::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'whatsapp_account_id' => $account->id,
+                'sender_number' => $sender,
+            ],
+            $validated,
+        );
+
+        return response()->json($preference->only(['is_pinned', 'is_muted', 'is_archived']));
     }
 
     public function store(Request $request, WhatsappAccount $account, string $sender)
@@ -514,12 +627,14 @@ class WhatsAppCenterController extends Controller
     private function unreadCount(WhatsappAccount $account): int
     {
         return WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->where('direction', 'inbound')
             ->orderBy('id')
             ->get()
             ->groupBy('sender_number')
             ->sum(function ($messages) {
                 $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
-                return $messages->where('direction', 'inbound')->where('id', '>', $lastOutboundId)->count();
+
+                return $messages->where('id', '>', $lastOutboundId)->whereNull('read_at')->count();
             });
     }
 
@@ -547,5 +662,17 @@ class WhatsAppCenterController extends Controller
         }
 
         return $digits;
+    }
+
+    private function contactPayload(Customer $customer): array
+    {
+        return [
+            'id' => $customer->id,
+            'name' => $customer->name,
+            'company' => $customer->company,
+            'whatsapp' => $customer->whatsapp ?? $customer->phone,
+            'notes' => $customer->notes,
+            'url' => route('customers.show', $customer),
+        ];
     }
 }

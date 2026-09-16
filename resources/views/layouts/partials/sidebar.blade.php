@@ -28,9 +28,9 @@
     <div class="sidebar-logo relative z-10 flex flex-shrink-0 items-center border-b border-white/10 p-4">
         <a href="{{ route('dashboard') }}" class="group flex items-center gap-3">
             <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
-                 class="h-10 w-auto rounded-lg bg-white object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03] dark:hidden">
+                 class="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03] dark:hidden">
             <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
-                 class="hidden h-10 w-auto rounded-lg bg-white object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03] dark:block dark:bg-transparent">
+                 class="hidden h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03] dark:block">
             <div class="sidebar-hide min-w-0">
                 <h1 class="truncate text-xl font-bold text-blue-300">3DY App</h1>
                 <p class="mt-0.5 text-xs text-slate-400">3DY Group</p>
