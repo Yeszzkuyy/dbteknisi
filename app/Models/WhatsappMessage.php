@@ -16,6 +16,11 @@ class WhatsappMessage extends Model
         'wa_message_id',
         'gateway_message_id',
         'lead_id',
+        'read_at',
+    ];
+
+    protected $casts = [
+        'read_at' => 'datetime',
     ];
 
     public function account()
