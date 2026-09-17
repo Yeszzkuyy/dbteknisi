@@ -51,107 +51,226 @@
             z-index: 0;
             inset: 0;
             overflow: hidden;
-            background: #2f2ac4;
+            background:
+                radial-gradient(circle at 76% 44%, rgba(129, 140, 248, 0.5), transparent 30%),
+                linear-gradient(135deg, #181b68 0%, #3028b4 48%, #5750d8 100%);
         }
 
-        .login-visual-image {
+        .login-background-layer {
             position: absolute;
-            top: -4%;
-            right: -5%;
-            bottom: -4%;
-            left: 24%;
-            width: auto;
-            height: 108%;
-            max-width: none;
-            object-fit: cover;
-            object-position: center;
-            transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0) scale(1.04);
-            transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1;
+            pointer-events: none;
+            transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0);
             will-change: transform;
+        }
+
+        .login-background-grid {
+            top: -12%;
+            right: -8%;
+            bottom: -12%;
+            left: 28%;
+            opacity: 0.13;
+            background-image:
+                linear-gradient(rgba(224, 231, 255, 0.22) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(224, 231, 255, 0.22) 1px, transparent 1px);
+            background-size: 5rem 5rem;
+            animation: background-drift 34s linear infinite;
+        }
+
+        .login-background-glow {
+            top: -14%;
+            right: -12%;
+            width: min(58vw, 52rem);
+            height: min(58vw, 52rem);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(129, 140, 248, 0.1) 38%, transparent 70%);
+            filter: blur(18px);
+            opacity: 0.86;
+            animation: background-breathe 12s ease-in-out infinite alternate;
+        }
+
+        .login-background-dust {
+            inset: 0;
+            opacity: 0.38;
+            background-image:
+                radial-gradient(circle at 74% 24%, rgba(255, 255, 255, 0.65) 0 1px, transparent 1.5px),
+                radial-gradient(circle at 87% 68%, rgba(224, 231, 255, 0.5) 0 1px, transparent 1.5px),
+                radial-gradient(circle at 61% 78%, rgba(244, 114, 182, 0.46) 0 1px, transparent 1.5px);
+            background-size: 11rem 13rem, 15rem 17rem, 19rem 21rem;
         }
 
         .login-visual-fade {
             position: absolute;
-            z-index: 2;
+            z-index: 8;
             inset: 0;
             pointer-events: none;
             background:
-                linear-gradient(90deg, var(--login-paper) 0%, rgba(247, 249, 252, 0.98) 13%, rgba(247, 249, 252, 0.78) 24%, rgba(247, 249, 252, 0) 48%),
+                linear-gradient(90deg, var(--login-paper) 0%, rgba(247, 249, 252, 0.98) 13%, rgba(247, 249, 252, 0.68) 27%, rgba(247, 249, 252, 0) 48%),
                 linear-gradient(0deg, rgba(15, 23, 42, 0.16), transparent 28%, rgba(15, 23, 42, 0.08));
         }
 
-        .visual-layer {
+        .login-composition {
             position: absolute;
-            z-index: 3;
+            z-index: 6;
+            top: 50%;
+            left: 70%;
+            width: min(58vw, 52rem);
+            aspect-ratio: 1;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        .login-composition::before,
+        .login-composition::after {
+            position: absolute;
+            border: 1px solid rgba(224, 231, 255, 0.13);
+            border-radius: 50%;
+            content: '';
+        }
+
+        .login-composition::before {
+            inset: 8%;
+            transform: rotate(-18deg) scaleX(0.76);
+        }
+
+        .login-composition::after {
+            inset: 16%;
+            border-color: rgba(196, 181, 253, 0.1);
+            transform: rotate(24deg) scaleY(0.72);
+        }
+
+        .login-parallax-layer {
+            position: absolute;
             pointer-events: none;
             transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0);
             transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform;
         }
 
-        .visual-glow {
-            top: 6%;
-            right: -5%;
-            width: min(42vw, 38rem);
-            height: min(42vw, 38rem);
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.25), rgba(115, 107, 255, 0.05) 42%, transparent 70%);
-            filter: blur(8px);
-            opacity: 0.72;
-            animation: visual-breathe 8s ease-in-out infinite alternate;
+        .login-connectors-parallax,
+        .login-asset-orbit-parallax,
+        .login-character-parallax {
+            inset: 0;
         }
 
-        .visual-orbit {
-            top: 13%;
-            right: 8%;
-            width: min(38vw, 34rem);
-            height: min(38vw, 34rem);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 50%;
-            box-shadow: 0 0 0 28px rgba(255, 255, 255, 0.035), 0 0 0 56px rgba(255, 255, 255, 0.025);
-        }
-
-        .visual-orbit::before,
-        .visual-orbit::after {
+        .login-connectors {
             position: absolute;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            z-index: 1;
+            inset: 4%;
+            width: 92%;
+            height: 92%;
+            overflow: visible;
+        }
+
+        .connector-base,
+        .connector-flow {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .connector-base {
+            stroke: rgba(224, 231, 255, 0.24);
+            stroke-width: 0.55;
+        }
+
+        .connector-flow {
+            stroke: #e0e7ff;
+            stroke-width: 1.2;
+            stroke-dasharray: 1 8;
+            filter: url(#connector-glow);
+            animation: connector-flow 10s linear infinite;
+        }
+
+        .connector-flow.flow-two { animation-delay: -2.2s; }
+        .connector-flow.flow-three { animation-delay: -4.6s; }
+        .connector-flow.flow-four { animation-delay: -6.8s; }
+        .connector-flow.flow-five { animation-delay: -8.4s; }
+        .connector-flow.flow-six { animation-delay: -1.1s; }
+
+        .login-asset-orbit {
+            position: absolute;
+            z-index: 3;
+            inset: 0;
+            animation: icon-orbit 32s linear infinite;
+        }
+
+        .login-icon {
+            position: absolute;
+            width: 14%;
+            aspect-ratio: 1;
+        }
+
+        .login-icon-frame {
+            position: relative;
+            display: grid;
+            width: 100%;
+            height: 100%;
+            place-items: center;
+            animation: icon-float var(--float-duration, 6s) ease-in-out var(--float-delay, 0s) infinite;
+        }
+
+        .login-icon-frame::before {
+            position: absolute;
+            z-index: -1;
+            inset: 13%;
             border-radius: 50%;
+            background: radial-gradient(circle, var(--icon-glow, rgba(165, 180, 252, 0.8)), transparent 70%);
+            filter: blur(11px);
+            opacity: 0.82;
             content: '';
         }
 
-        .visual-orbit::before {
-            top: 18%;
-            right: -8%;
-            width: 2.75rem;
-            height: 2.75rem;
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .visual-orbit::after {
-            bottom: 10%;
-            left: -5%;
-            width: 1rem;
-            height: 1rem;
-            background: #f9a8d4;
-            box-shadow: 0 0 22px rgba(249, 168, 212, 0.9);
-        }
-
-        .visual-network {
-            top: 11%;
-            right: 17%;
-            width: min(31vw, 28rem);
-            height: min(31vw, 28rem);
-            opacity: 0.24;
-        }
-
-        .visual-network svg {
+        .login-icon-frame img {
             width: 100%;
             height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 7px var(--icon-glow, rgba(224, 231, 255, 0.65)));
+        }
+
+        .login-icon-one { top: 6%; left: 42%; --icon-glow: rgba(186, 230, 253, 0.95); --float-duration: 6.4s; --float-delay: -1.2s; }
+        .login-icon-two { top: 26%; left: 12%; --icon-glow: rgba(196, 181, 253, 0.95); --float-duration: 7.2s; --float-delay: -3.4s; }
+        .login-icon-three { top: 59%; left: 5%; --icon-glow: rgba(249, 168, 212, 0.92); --float-duration: 5.8s; --float-delay: -2.3s; }
+        .login-icon-four { top: 20%; right: 10%; --icon-glow: rgba(253, 230, 138, 0.95); --float-duration: 6.8s; --float-delay: -4.1s; }
+        .login-icon-five { top: 54%; right: 2%; --icon-glow: rgba(253, 186, 116, 0.92); --float-duration: 7.6s; --float-delay: -1.8s; }
+        .login-icon-six { right: 38%; bottom: 1%; --icon-glow: rgba(252, 165, 165, 0.95); --float-duration: 6.1s; --float-delay: -4.8s; }
+
+        .login-character-parallax {
+            z-index: 5;
+        }
+
+        .login-character-float {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 43%;
+            transform: translate(-50%, -50%);
+            animation: character-float 8s ease-in-out infinite;
+        }
+
+        .login-character-float::before {
+            position: absolute;
+            z-index: -1;
+            right: 7%;
+            bottom: 7%;
+            left: 7%;
+            height: 22%;
+            border-radius: 50%;
+            background: rgba(129, 140, 248, 0.48);
+            filter: blur(22px);
+            content: '';
+        }
+
+        .login-character-float img {
+            display: block;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 18px 18px rgba(23, 37, 84, 0.26));
         }
 
         .visual-copy {
             position: absolute;
-            z-index: 4;
+            z-index: 9;
             right: clamp(1.5rem, 7vw, 7rem);
             bottom: clamp(2rem, 8vh, 6rem);
             width: min(22rem, 30vw);
@@ -159,28 +278,8 @@
             text-align: right;
         }
 
-        .visual-copy-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: rgba(255, 255, 255, 0.76);
-            font-size: 0.67rem;
-            font-weight: 800;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-        }
-
-        .visual-copy-label::before {
-            width: 0.45rem;
-            height: 0.45rem;
-            border-radius: 50%;
-            background: #f9a8d4;
-            box-shadow: 0 0 14px rgba(249, 168, 212, 0.9);
-            content: '';
-        }
-
         .visual-copy h2 {
-            margin: 0.7rem 0 0;
+            margin: 0;
             color: #ffffff;
             font-size: clamp(1.15rem, 2.3vw, 2rem);
             font-weight: 700;
@@ -389,35 +488,37 @@
             text-align: center;
         }
 
-        .login-footer {
-            display: flex;
-            max-width: 23rem;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-top: clamp(2.25rem, 7vh, 5rem);
-            color: #8a98aa;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        .login-footer span:last-child {
-            color: #a1acba;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: none;
-        }
-
         @keyframes login-rise {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes visual-breathe {
-            from { opacity: 0.5; transform: scale(0.98); }
-            to { opacity: 0.8; transform: scale(1.03); }
+        @keyframes background-drift {
+            from { background-position: 0 0, 0 0; }
+            to { background-position: 5rem 3rem, -3rem 4rem; }
+        }
+
+        @keyframes background-breathe {
+            from { opacity: 0.58; }
+            to { opacity: 0.9; }
+        }
+
+        @keyframes connector-flow {
+            to { stroke-dashoffset: -90; }
+        }
+
+        @keyframes icon-orbit {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes icon-float {
+            0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
+            50% { transform: translate3d(0, -0.65rem, 0) rotate(3deg); }
+        }
+
+        @keyframes character-float {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-1deg); }
+            50% { transform: translate(-50%, calc(-50% - 0.8rem)) rotate(1deg); }
         }
 
         @media (max-width: 900px) {
@@ -439,15 +540,19 @@
                 flex: none;
             }
 
-            .login-visual-image {
-                top: -5%;
-                right: -4%;
-                bottom: -5%;
-                left: -4%;
-                width: 108%;
-                height: 110%;
-                object-position: center 42%;
-                transform: scale(1.03);
+            .login-background-grid {
+                top: -18%;
+                right: -18%;
+                bottom: -18%;
+                left: -18%;
+                background-size: 4rem 4rem;
+            }
+
+            .login-background-glow {
+                top: -10%;
+                right: -28%;
+                width: 22rem;
+                height: 22rem;
             }
 
             .login-visual-fade {
@@ -456,25 +561,15 @@
                     linear-gradient(0deg, rgba(15, 23, 42, 0.14), transparent 45%);
             }
 
-            .visual-glow {
-                top: -16%;
-                right: -18%;
-                width: 20rem;
-                height: 20rem;
+            .login-composition {
+                top: 48%;
+                left: 50%;
+                width: min(92vw, 24rem);
+                transform: translate(-50%, -50%);
             }
 
-            .visual-orbit {
-                top: 8%;
-                right: 10%;
-                width: 16rem;
-                height: 16rem;
-            }
-
-            .visual-network {
-                top: 7%;
-                right: 14%;
-                width: 14rem;
-                height: 14rem;
+            .login-asset-orbit {
+                animation-duration: 40s;
             }
 
             .visual-copy {
@@ -509,9 +604,6 @@
                 margin-top: 2.2rem;
             }
 
-            .login-footer {
-                margin-top: 2.35rem;
-            }
         }
 
         @media (max-width: 420px) {
@@ -530,23 +622,22 @@
                 font-size: 1.85rem;
             }
 
-            .login-footer {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 0.4rem;
-            }
         }
 
         @media (prefers-reduced-motion: reduce) {
             .login-heading,
-            .login-form,
-            .login-visual-image,
-            .visual-glow {
+            .login-form {
                 animation: none;
                 transition: none;
             }
 
-            .visual-layer {
+            .login-background-grid,
+            .login-background-glow,
+            .connector-flow,
+            .login-asset-orbit,
+            .login-character-float,
+            .login-parallax-layer {
+                animation: none;
                 transition: none;
             }
         }
@@ -571,10 +662,11 @@
                 cancelAnimationFrame(this.raf);
                 this.raf = requestAnimationFrame(() => {
                     const layers = [
-                        [this.$refs.image, -7, -5],
-                        [this.$refs.glow, 14, 10],
-                        [this.$refs.orbit, -18, -12],
-                        [this.$refs.network, 10, 7],
+                        [this.$refs.backgroundGrid, -2, -2],
+                        [this.$refs.backgroundGlow, 6, 4],
+                        [this.$refs.connectors, -7, -5],
+                        [this.$refs.orbit, 12, 8],
+                        [this.$refs.character, -8, -6],
                     ];
 
                     layers.forEach(([element, xFactor, yFactor]) => {
@@ -587,7 +679,7 @@
             reset() {
                 if (this.reducedMotion || this.coarsePointer) return;
                 cancelAnimationFrame(this.raf);
-                [this.$refs.image, this.$refs.glow, this.$refs.orbit, this.$refs.network].forEach((element) => {
+                [this.$refs.backgroundGrid, this.$refs.backgroundGlow, this.$refs.connectors, this.$refs.orbit, this.$refs.character].forEach((element) => {
                     if (!element) return;
                     element.style.setProperty('--parallax-x', '0px');
                     element.style.setProperty('--parallax-y', '0px');
@@ -601,30 +693,89 @@
             x-on:pointermove="move($event)"
             x-on:pointerleave="reset()"
         >
-            <img
-                x-ref="image"
-                src="{{ asset('images/logo/Desain Ilustrasi.jpg') }}"
-                alt=""
-                class="login-visual-image"
-                fetchpriority="high"
-                decoding="async"
-            >
-            <div class="login-visual-fade"></div>
-            <div x-ref="glow" class="visual-layer visual-glow"></div>
-            <div x-ref="orbit" class="visual-layer visual-orbit"></div>
-            <div x-ref="network" class="visual-layer visual-network">
-                <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M35 203L115 70L238 104L282 237L150 270L35 203Z" stroke="white" stroke-width="1" stroke-dasharray="5 8" />
-                    <path d="M115 70L150 270M238 104L35 203M282 237L115 70" stroke="white" stroke-width="1" opacity="0.55" />
-                    <circle cx="35" cy="203" r="4" fill="#F9A8D4" />
-                    <circle cx="115" cy="70" r="4" fill="#C4B5FD" />
-                    <circle cx="238" cy="104" r="4" fill="#FDE68A" />
-                    <circle cx="282" cy="237" r="4" fill="#BAE6FD" />
-                    <circle cx="150" cy="270" r="4" fill="#FCA5A5" />
-                </svg>
+            <div x-ref="backgroundGrid" class="login-background-layer login-background-grid"></div>
+            <div x-ref="backgroundGlow" class="login-background-layer login-background-glow"></div>
+            <div class="login-background-layer login-background-dust"></div>
+
+            <div class="login-composition">
+                <div x-ref="connectors" class="login-parallax-layer login-connectors-parallax">
+                    <svg class="login-connectors" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="connector-glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="1.2" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <path class="connector-base" d="M50 49C50 38 47 26 46 14" />
+                        <path class="connector-flow flow-one" d="M50 49C50 38 47 26 46 14" />
+                        <path class="connector-base" d="M46 50C36 44 27 37 18 31" />
+                        <path class="connector-flow flow-two" d="M46 50C36 44 27 37 18 31" />
+                        <path class="connector-base" d="M45 56C34 62 23 68 11 70" />
+                        <path class="connector-flow flow-three" d="M45 56C34 62 23 68 11 70" />
+                        <path class="connector-base" d="M54 48C64 42 74 35 85 27" />
+                        <path class="connector-flow flow-four" d="M54 48C64 42 74 35 85 27" />
+                        <path class="connector-base" d="M55 56C67 59 78 61 90 63" />
+                        <path class="connector-flow flow-five" d="M55 56C67 59 78 61 90 63" />
+                        <path class="connector-base" d="M49 57C47 69 47 79 45 91" />
+                        <path class="connector-flow flow-six" d="M49 57C47 69 47 79 45 91" />
+
+                        <circle cx="46" cy="14" r="1.2" fill="#BAE6FD" />
+                        <circle cx="18" cy="31" r="1.2" fill="#C4B5FD" />
+                        <circle cx="11" cy="70" r="1.2" fill="#F9A8D4" />
+                        <circle cx="85" cy="27" r="1.2" fill="#FDE68A" />
+                        <circle cx="90" cy="63" r="1.2" fill="#FDBA74" />
+                        <circle cx="45" cy="91" r="1.2" fill="#FCA5A5" />
+                    </svg>
+                </div>
+
+                <div x-ref="orbit" class="login-parallax-layer login-asset-orbit-parallax">
+                    <div class="login-asset-orbit">
+                        <div class="login-icon login-icon-one">
+                            <div class="login-icon-frame">
+                                <img src="{{ asset('images/Asset_LoginPage/icon1.svg') }}" alt="" decoding="async">
+                            </div>
+                        </div>
+                        <div class="login-icon login-icon-two">
+                            <div class="login-icon-frame">
+                                <img src="{{ asset('images/Asset_LoginPage/icon2.svg') }}" alt="" decoding="async">
+                            </div>
+                        </div>
+                        <div class="login-icon login-icon-three">
+                            <div class="login-icon-frame">
+                                <img src="{{ asset('images/Asset_LoginPage/icon3.svg') }}" alt="" decoding="async">
+                            </div>
+                        </div>
+                        <div class="login-icon login-icon-four">
+                            <div class="login-icon-frame">
+                                <img src="{{ asset('images/Asset_LoginPage/icon4.svg') }}" alt="" decoding="async">
+                            </div>
+                        </div>
+                        <div class="login-icon login-icon-five">
+                            <div class="login-icon-frame">
+                                <img src="{{ asset('images/Asset_LoginPage/icon5.svg') }}" alt="" decoding="async">
+                            </div>
+                        </div>
+                        <div class="login-icon login-icon-six">
+                            <div class="login-icon-frame">
+                                <img src="{{ asset('images/Asset_LoginPage/icon6.svg') }}" alt="" decoding="async">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-ref="character" class="login-parallax-layer login-character-parallax">
+                    <div class="login-character-float">
+                        <img src="{{ asset('images/Asset_LoginPage/character.svg') }}" alt="" fetchpriority="high" decoding="async">
+                    </div>
+                </div>
             </div>
+
+            <div class="login-visual-fade"></div>
             <div class="visual-copy">
-                <span class="visual-copy-label">PTNTI / Tridaya</span>
                 <h2>Connecting People, Empowering Business</h2>
                 <p>Technology and communication that keeps your team connected.</p>
             </div>
@@ -781,10 +932,6 @@
                 @endif
             </div>
 
-            <div class="login-footer">
-                <span>PTNTI / Tridaya</span>
-                <span>Internal workspace</span>
-            </div>
         </section>
     </main>
 </body>
