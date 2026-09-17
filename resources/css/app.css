@@ -106,6 +106,29 @@ tbody tr { transition: background-color 0.2s ease; }
 }
 
 /* ============================================================
+   Sidebar — tema adaptif (halus override utility dark-only)
+   ============================================================ */
+.sidebar nav a,
+.sidebar nav button { color: var(--nav-text); }
+.sidebar nav a:hover,
+.sidebar nav button:hover { color: var(--nav-hover-text); background: var(--nav-hover-bg); }
+.sidebar nav a[aria-current="page"],
+.sidebar nav [data-sidebar-active="true"] { color: var(--nav-active-text); background: var(--nav-active-bg); }
+.sidebar nav p { color: var(--nav-muted); }
+.sidebar .border-white\/10 { border-color: var(--sidebar-border-soft); }
+.sidebar .sidebar-logo h1 { color: var(--sidebar-logo-text); }
+.sidebar .sidebar-logo p { color: var(--nav-muted); }
+.sidebar .sidebar-logo { border-color: var(--sidebar-border-soft); }
+.sidebar .sidebar-user { border-color: var(--sidebar-border-soft); background: var(--sidebar-panel-bg); }
+.sidebar .sidebar-user:hover { border-color: rgba(59, 130, 246, 0.3); background: var(--nav-hover-bg); }
+.sidebar .sidebar-user .text-slate-200 { color: var(--text-primary); }
+.sidebar .sidebar-user .text-slate-400 { color: var(--text-secondary); }
+.sidebar .sidebar-user svg { color: var(--nav-muted); }
+.sidebar .sidebar-user:hover svg { color: var(--nav-active-text); }
+.sidebar .sidebar-collapse { color: var(--nav-text); }
+.sidebar .sidebar-collapse:hover { color: var(--nav-hover-text); background: var(--nav-hover-bg); }
+
+/* ============================================================
    Animasi masuk — stagger lembut (hormati reduced motion)
    ============================================================ */
 @media (prefers-reduced-motion: no-preference) {
