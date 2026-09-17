@@ -390,21 +390,6 @@
             animation: halo-breathe 9s ease-in-out infinite;
         }
 
-        .login-circle {
-            position: absolute;
-            z-index: 1;
-            top: 50%;
-            left: 50%;
-            width: 92%;
-            aspect-ratio: 1;
-            border: 1px solid rgba(165, 180, 252, 0.4);
-            border-radius: 50%;
-            background: radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.85) 0%, #3730a3 48%, #1e1b4b 100%);
-            box-shadow: 0 0 70px rgba(79, 70, 229, 0.4), inset 0 0 90px rgba(30, 27, 75, 0.55);
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-
         .login-parallax {
             position: absolute;
             inset: 0;
@@ -778,7 +763,6 @@
 
                 <div class="login-visual" aria-hidden="true">
                     <div class="login-visual-halo"></div>
-                    <div class="login-circle"></div>
 
                     <div x-ref="connectors" class="login-parallax">
                         <svg class="login-connectors" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
