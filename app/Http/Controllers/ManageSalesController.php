@@ -44,6 +44,7 @@ class ManageSalesController extends Controller
             'solusi' => 'nullable|string|max:2000',
             'progress_notes' => 'nullable|string|max:2000',
             'notes' => 'nullable',
+            'pt_group' => 'nullable|in:NTI,MGK,TPS,WANI',
             'assigned_to' => 'nullable|exists:users,id',
         ]);
 

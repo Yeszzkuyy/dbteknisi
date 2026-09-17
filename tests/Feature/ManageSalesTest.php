@@ -111,6 +111,19 @@ class ManageSalesTest extends TestCase
         $this->assertNotNull($lead->assigned_at);
     }
 
+    public function test_management_can_change_lead_pt_group(): void
+    {
+        $management = $this->loginAs('management');
+        $lead = $this->makeLead();
+
+        $this->actingAs($management)
+            ->put(route('manage-sales.update', $lead), ['pt_group' => 'MGK'])
+            ->assertRedirect(route('manage-sales.index'));
+
+        $this->assertSame('MGK', $lead->fresh()->pt_group);
+        $this->assertNotNull(LeadActivity::where('lead_id', $lead->id)->where('action', 'updated')->first());
+    }
+
     public function test_sales_sees_only_own_assigned_leads(): void
     {
         $sales = $this->loginAs('sales');
