@@ -49,7 +49,7 @@ class MeetingController extends Controller
         $this->salesService->createMeeting($validated);
 
         return redirect()->route('sales.meetings.index')
-            ->with('success', 'Meeting berhasil dicatat.');
+            ->with('success', __('Meeting berhasil dicatat.'));
     }
 
     public function show(Meeting $meeting)
@@ -87,7 +87,7 @@ class MeetingController extends Controller
         $this->salesService->updateMeeting($meeting, $validated);
 
         return redirect()->route('sales.meetings.index')
-            ->with('success', 'Meeting berhasil diupdate.');
+            ->with('success', __('Meeting berhasil diupdate.'));
     }
 
     public function destroy(Meeting $meeting)
@@ -95,6 +95,6 @@ class MeetingController extends Controller
         $this->salesService->deleteMeeting($meeting);
 
         return redirect()->route('sales.meetings.index')
-            ->with('success', 'Meeting berhasil dihapus.');
+            ->with('success', __('Meeting berhasil dihapus.'));
     }
 }

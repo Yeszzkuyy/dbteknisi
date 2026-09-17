@@ -48,7 +48,7 @@ class FollowUpController extends Controller
         $this->salesService->createFollowUp($validated);
 
         return redirect()->route('sales.follow-ups.index')
-            ->with('success', 'Follow up berhasil dicatat.');
+            ->with('success', __('Follow up berhasil dicatat.'));
     }
 
     public function show(FollowUp $followUp)
@@ -78,7 +78,7 @@ class FollowUpController extends Controller
         $this->salesService->updateFollowUp($followUp, $validated);
 
         return redirect()->route('sales.follow-ups.index')
-            ->with('success', 'Follow up berhasil diupdate.');
+            ->with('success', __('Follow up berhasil diupdate.'));
     }
 
     public function destroy(FollowUp $followUp)
@@ -86,6 +86,6 @@ class FollowUpController extends Controller
         $this->salesService->deleteFollowUp($followUp);
 
         return redirect()->route('sales.follow-ups.index')
-            ->with('success', 'Follow up berhasil dihapus.');
+            ->with('success', __('Follow up berhasil dihapus.'));
     }
 }
