@@ -2,7 +2,6 @@ import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import idLocale from '@fullcalendar/core/locales/id';
 
 function initCalendar() {
     const el = document.getElementById('teknisi-calendar');
@@ -25,7 +24,7 @@ function initCalendar() {
         for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
         return palette[h % palette.length];
     };
-    const fmtTime = (d) => new Intl.DateTimeFormat('id-ID', {
+    const fmtTime = (d) => new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false,
     }).format(d);
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
@@ -34,7 +33,6 @@ function initCalendar() {
 
     const calendar = new Calendar(el, {
         plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-        locale: idLocale,
         timeZone: 'Asia/Jakarta',
         initialView: 'dayGridMonth',
         firstDay: 1,
@@ -44,15 +42,9 @@ function initCalendar() {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay addButton',
         },
-        buttonText: {
-            today: 'Hari Ini',
-            month: 'Bulan',
-            week: 'Minggu',
-            day: 'Hari',
-        },
         customButtons: {
             addButton: {
-                text: '+ Tambah Jadwal',
+                text: '+ Add Schedule',
                 click: () => window.teknisiSchedule.openCreate(new Date()),
             },
         },
@@ -77,7 +69,7 @@ function initCalendar() {
                 url: '/teknisi/jadwal/google-events',
                 method: 'GET',
                 failure: function (err) {
-                    console.error('Google Calendar gagal dimuat', err);
+                    console.error('Failed to load Google Calendar', err);
                 },
             },
         ],
@@ -86,7 +78,7 @@ function initCalendar() {
             const ev = arg.event;
             const start = fmtTime(ev.start);
             const end = ev.end ? fmtTime(ev.end) : start;
-            const tech = ev.extendedProps.technician ? `<div class="fc-event-line">Teknisi: ${esc(ev.extendedProps.technician)}</div>` : '';
+            const tech = ev.extendedProps.technician ? `<div class="fc-event-line">Technician: ${esc(ev.extendedProps.technician)}</div>` : '';
             const cust = ev.extendedProps.customer ? `<div class="fc-event-line">Customer: ${esc(ev.extendedProps.customer)}</div>` : '';
             return {
                 html: `<div class="fc-event-card">
@@ -105,7 +97,7 @@ function initCalendar() {
             if (sync === 'not_connected') el.classList.add('fc-event-not-connected');
         },
         dayMaxEvents: 3,
-        moreLinkContent: (arg) => `+${arg.num} jadwal lainnya`,
+        moreLinkContent: (arg) => `+${arg.num} more`,
     });
 
     calendar.render();
