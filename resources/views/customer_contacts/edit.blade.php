@@ -60,6 +60,20 @@
                         @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
+                    {{-- WhatsApp --}}
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">
+                            No WA
+                        </label>
+                        <input type="text" 
+                               name="whatsapp" 
+                               value="{{ old('whatsapp', $customerContact->whatsapp) }}"
+                               placeholder="Nomor WhatsApp PIC"
+                               inputmode="tel"
+                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    </div>
+
                     {{-- Email --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">

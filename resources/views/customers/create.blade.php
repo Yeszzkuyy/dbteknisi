@@ -40,16 +40,6 @@
         </div>
 
         <div>
-            <label for="contact_person" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
-                PIC
-            </label>
-            <input type="text" id="contact_person" name="contact_person" value="{{ old('contact_person') }}"
-                   placeholder="cth: Ibu Vita"
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-            @error('contact_person') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
             <label for="phone" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                 No Telp
             </label>
