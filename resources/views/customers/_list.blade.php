@@ -24,7 +24,7 @@
                             {{ $customer->address ?: 'Alamat belum diisi' }}
                         </p>
                         @if($customer->whatsapp)
-                            <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">WA perusahaan: {{ $customer->whatsapp }}</p>
+                            <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">WA perusahaan: {{ \App\Support\PhoneFormatter::format($customer->whatsapp) }}</p>
                         @endif
                     </td>
 
@@ -32,7 +32,7 @@
                         @if($picName)
                             <p class="font-semibold text-slate-700 dark:text-slate-200">{{ $picName }}</p>
                             @if($picWhatsapp)
-                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">WA PIC: {{ $picWhatsapp }}</p>
+                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">WA PIC: {{ \App\Support\PhoneFormatter::format($picWhatsapp) }}</p>
                             @endif
                             @if($picEmail)
                                 <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{{ $picEmail }}</p>

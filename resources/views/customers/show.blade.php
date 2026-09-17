@@ -131,8 +131,8 @@
                             ['icon' => 'building', 'label' => 'Nama', 'value' => $customer->name],
                             ['icon' => 'user', 'label' => 'PIC', 'value' => $customer->contacts->first()?->name ?: $customer->contact_person],
                             ['icon' => 'map-pin', 'label' => 'Alamat', 'value' => $customer->address],
-                            ['icon' => 'phone', 'label' => 'Telepon', 'value' => $customer->phone],
-                            ['icon' => 'chat', 'label' => 'No WA', 'value' => $customer->whatsapp],
+                            ['icon' => 'phone', 'label' => 'Telepon', 'value' => \App\Support\PhoneFormatter::format($customer->phone)],
+                            ['icon' => 'chat', 'label' => 'No WA', 'value' => \App\Support\PhoneFormatter::format($customer->whatsapp)],
                             ['icon' => 'mail', 'label' => 'Email', 'value' => $customer->email],
                         ];
                         $stats = [
@@ -308,7 +308,7 @@
                                         <td class="px-6 py-3 font-medium text-slate-800 dark:text-slate-100 align-middle">{{ $contact->name }}</td>
                                         <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300 align-middle">{{ $contact->position ?? '-' }}</td>
                                         <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300 align-middle">
-                                            @if($contact->whatsapp)<span>WA: {{ $contact->whatsapp }}</span><br>@endif
+                                            @if($contact->whatsapp)<span>WA: {{ \App\Support\PhoneFormatter::format($contact->whatsapp) }}</span><br>@endif
                                             <span class="text-xs text-slate-400">{{ $contact->email ?? '-' }}</span>
                                         </td>
                                         <td class="px-6 py-3 align-middle">
