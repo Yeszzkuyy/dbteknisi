@@ -71,6 +71,35 @@ class LeadFormTest extends TestCase
         $this->assertSame('Jl. Testing No. 1, Jakarta', $lead->customer->address);
     }
 
+    public function test_update_persists_customer_whatsapp_even_when_customer_soft_deleted(): void
+    {
+        $user = $this->marketingUser();
+        $customer = Customer::create(['name' => 'PT Soft Deleted', 'whatsapp' => '0812-1111-2222']);
+        $lead = Lead::create([
+            'customer_id' => $customer->id,
+            'pt_group' => 'NTI',
+            'segment' => 'vendor',
+            'incoming_date' => now()->toDateString(),
+            'status' => 'new',
+        ]);
+        $customer->delete();
+
+        $response = $this->actingAs($user)->put(route('leads.update', $lead), [
+            'customer_mode' => 'existing',
+            'customer_id' => $customer->id,
+            'customer_name' => 'PT Soft Deleted',
+            'customer_whatsapp' => '0813-3333-4444',
+            'pt_group' => 'NTI',
+            'segment' => 'vendor',
+            'kebutuhan' => 'x',
+            'incoming_date' => now()->toDateString(),
+            'assigned_to' => $user->id,
+        ]);
+        $response->assertRedirect(route('leads.index'));
+
+        $this->assertSame('0813-3333-4444', Customer::withTrashed()->find($customer->id)->whatsapp);
+    }
+
     public function test_activities_are_logged_with_user(): void
     {
         $user = $this->marketingUser();
