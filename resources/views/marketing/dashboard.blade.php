@@ -2,11 +2,11 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Dashboard Marketing</h1>
-            <p class="text-slate-500 mt-1">Ringkasan performa lead dan pipeline</p>
+            <p class="text-slate-500 mt-1">{{ __('Ringkasan performa lead dan pipeline') }}</p>
         </div>
         <a href="{{ route('leads.index') }}"
            class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium transition">
-            Lihat Lead
+            {{ __('Lihat Lead') }}
         </a>
     </div>
 
@@ -14,11 +14,11 @@
         <form method="GET" action="{{ route('marketing.dashboard') }}" class="flex flex-wrap items-end gap-x-6 gap-y-4">
             <div class="flex flex-wrap sm:flex-nowrap items-end gap-4">
                 <div>
-                    <label class="text-sm font-medium text-slate-500">Dari Tanggal</label>
+                    <label class="text-sm font-medium text-slate-500">{{ __('Dari Tanggal') }}</label>
                     <x-datepicker name="date_from" value="{{ $dateFrom }}" class="mt-1"></x-datepicker>
                 </div>
                 <div>
-                    <label class="text-sm font-medium text-slate-500">Sampai Tanggal</label>
+                    <label class="text-sm font-medium text-slate-500">{{ __('Sampai Tanggal') }}</label>
                     <x-datepicker name="date_to" value="{{ $dateTo }}" class="mt-1"></x-datepicker>
                 </div>
             </div>
@@ -36,9 +36,9 @@
             <div class="flex items-end">
                 @php
                     $presets = [
-                        'Bulan Ini' => [now()->startOfMonth()->toDateString(), now()->toDateString()],
-                        '3 Bulan' => [now()->subMonths(2)->startOfMonth()->toDateString(), now()->toDateString()],
-                        '6 Bulan' => [now()->subMonths(5)->startOfMonth()->toDateString(), now()->toDateString()],
+                        __('Bulan Ini') => [now()->startOfMonth()->toDateString(), now()->toDateString()],
+                        __('3 Bulan') => [now()->subMonths(2)->startOfMonth()->toDateString(), now()->toDateString()],
+                        __('6 Bulan') => [now()->subMonths(5)->startOfMonth()->toDateString(), now()->toDateString()],
                     ];
                     $activeRange = $dateFrom . '|' . $dateTo;
                 @endphp
@@ -60,10 +60,10 @@
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-blue-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Lead Bulan Ini</p>
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('Lead Bulan Ini') }}</p>
                     <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['this_month'] }}</p>
                     <p class="text-xs mt-1 {{ $stats['this_month'] >= $stats['last_month'] ? 'text-green-600' : 'text-red-500' }}">
-                        {{ $stats['this_month'] >= $stats['last_month'] ? '▲' : '▼' }} bulan lalu: {{ $stats['last_month'] }}
+                        {{ $stats['this_month'] >= $stats['last_month'] ? '▲' : '▼' }} {{ __('bulan lalu:') }} {{ $stats['last_month'] }}
                     </p>
                 </div>
                 <div class="shrink-0 p-2.5 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
@@ -89,7 +89,7 @@
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-amber-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Lead Aktif</p>
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('Lead Aktif') }}</p>
                     <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['active'] }}</p>
                 </div>
                 <div class="shrink-0 p-2.5 rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">
@@ -130,7 +130,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {{-- Tren lead masuk --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Lead Masuk — {{ $dateFrom }} s/d {{ $dateTo }}</h2>
+            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Lead Masuk') }} — {{ $dateFrom }} {{ __('s/d') }} {{ $dateTo }}</h2>
             @php($maxTrend = max($trend->max('total'), 1))
             <div class="flex items-end justify-between gap-3 h-44">
                 @foreach($trend as $month)
@@ -146,9 +146,9 @@
 
         {{-- Lead per sumber --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Lead per Sumber</h2>
+            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Lead per Sumber') }}</h2>
             @if($perSource->isEmpty())
-                <p class="text-sm text-slate-500 py-8 text-center">Belum ada data lead.</p>
+                <p class="text-sm text-slate-500 py-8 text-center">{{ __('Belum ada data lead.') }}</p>
             @else
                 @php($maxSource = max($perSource->max('total'), 1))
                 <div class="space-y-3">
@@ -189,8 +189,8 @@
             });
         }
     }">
-        <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Pipeline Lead per Status</h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400 -mt-2 mb-4">Klik segmen untuk melihat detail lead pada status tersebut.</p>
+        <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Pipeline Lead per Status') }}</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 -mt-2 mb-4">{{ __('Klik segmen untuk melihat detail lead pada status tersebut.') }}</p>
         <div class="relative w-full max-w-[420px] mx-auto">
             <div id="status-donut-chart" class="w-full"></div>
             <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
@@ -205,7 +205,7 @@
              class="mt-6 border-t border-slate-100 dark:border-slate-700 pt-5">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-semibold text-slate-700 dark:text-slate-200">
-                    Detail Lead <span class="text-blue-600 dark:text-blue-400 uppercase" x-text="selectedStatus"></span>
+                    {{ __('Detail Lead') }} <span class="text-blue-600 dark:text-blue-400 uppercase" x-text="selectedStatus"></span>
                     <span class="text-sm font-medium text-slate-400">(<span x-text="(leads[selectedStatus] || []).length"></span> lead)</span>
                 </h3>
                 <button type="button" @click="select(selectedStatus)"
@@ -220,9 +220,9 @@
                         <thead class="bg-slate-50 dark:bg-slate-900/40">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Lead / Customer</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Sumber</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">{{ __('Sumber') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Partner</th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Tanggal Masuk</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">{{ __('Tanggal Masuk') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
@@ -244,7 +244,7 @@
 
             <template x-if="(leads[selectedStatus] || []).length === 0">
                 <div class="rounded-xl bg-slate-50 dark:bg-slate-900/40 px-5 py-8 text-center">
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Tidak ada lead berstatus <span class="uppercase" x-text="selectedStatus"></span> pada rentang tanggal ini.</p>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ __('Tidak ada lead berstatus') }} <span class="uppercase" x-text="selectedStatus"></span> {{ __('pada rentang tanggal ini.') }}</p>
                 </div>
             </template>
         </div>

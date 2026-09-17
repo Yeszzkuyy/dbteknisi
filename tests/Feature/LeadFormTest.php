@@ -30,9 +30,9 @@ class LeadFormTest extends TestCase
             ->assertOk()
             ->assertSee('Segment')
             ->assertSee('System Integrator')
-            ->assertSee('Canvasing')
-            ->assertSee('Kebutuhan')
-            ->assertSee('Tanggal Masuk')
+            ->assertSee(__('Canvasing'))
+            ->assertSee(__('Kebutuhan'))
+            ->assertSee(__('Tanggal Masuk'))
             ->assertDontSee('Nilai Opportunity');
     }
 
@@ -115,7 +115,7 @@ class LeadFormTest extends TestCase
         $this->actingAs($this->marketingUser())
             ->get(route('leads.activities'))
             ->assertOk()
-            ->assertSee('Log Aktivitas Lead');
+            ->assertSee(__('Log Aktivitas Lead'));
     }
 
     public function test_segment_is_required_and_validated(): void

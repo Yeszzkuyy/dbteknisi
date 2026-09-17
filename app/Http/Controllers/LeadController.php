@@ -32,7 +32,10 @@ class LeadController extends Controller
             'gov' => 'Gov',
             'principle' => 'Principle',
             'distributor' => 'Distributor',
-            default => ucfirst(str_replace('_', ' ', $value)),
+            'kontraktor' => __('Kontraktor'),
+            'canvasing' => __('Canvasing'),
+            'telpon' => __('Telpon'),
+            default => __(ucfirst(str_replace('_', ' ', $value))),
         };
     }
 
@@ -285,7 +288,7 @@ class LeadController extends Controller
 
         return redirect()
             ->route('leads.index')
-            ->with('success', 'Lead berhasil ditambahkan');
+            ->with('success', __('Lead berhasil ditambahkan'));
     }
 
     public function show(Lead $lead)
@@ -395,7 +398,7 @@ class LeadController extends Controller
 
         return redirect()
             ->route('leads.index')
-            ->with('success', 'Lead berhasil diupdate');
+            ->with('success', __('Lead berhasil diupdate'));
     }
 
     public function destroy(Lead $lead)
@@ -407,7 +410,7 @@ class LeadController extends Controller
 
         return redirect()
             ->route('leads.index')
-            ->with('success', 'Lead berhasil dihapus');
+            ->with('success', __('Lead berhasil dihapus'));
     }
 
     public function convert(Lead $lead)
@@ -433,7 +436,7 @@ class LeadController extends Controller
 
         return redirect()
             ->route('projects.show', $project)
-            ->with('success', 'Lead berhasil dikonversi ke Project');
+            ->with('success', __('Lead berhasil dikonversi ke Project'));
     }
 
     public function activities(Request $request)
@@ -530,7 +533,7 @@ class LeadController extends Controller
             'file' => ['old' => $document->file_name, 'new' => null],
         ]);
 
-        return back()->with('success', 'Lampiran berhasil dihapus');
+        return back()->with('success', __('Lampiran berhasil dihapus'));
     }
 
     private function saveAttachments(Request $request, Lead $lead): void

@@ -43,13 +43,13 @@ class LeadActivity extends Model
     public function actionLabel(): string
     {
         return match ($this->action) {
-            'created' => 'Menambahkan lead',
-            'updated' => 'Mengubah lead',
-            'deleted' => 'Menghapus lead',
-            'attachment_deleted' => 'Menghapus lampiran lead',
-            'converted' => 'Mengonversi lead menjadi Project',
-            'status_changed' => 'Memindahkan posisi lead di pipeline',
-            'assigned' => 'Meng-assign lead ke sales',
+            'created' => __('Menambahkan lead'),
+            'updated' => __('Mengubah lead'),
+            'deleted' => __('Menghapus lead'),
+            'attachment_deleted' => __('Menghapus lampiran lead'),
+            'converted' => __('Mengonversi lead menjadi Project'),
+            'status_changed' => __('Memindahkan posisi lead di pipeline'),
+            'assigned' => __('Meng-assign lead ke sales'),
             default => $this->action,
         };
     }

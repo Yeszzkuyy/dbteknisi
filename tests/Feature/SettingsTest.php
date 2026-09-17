@@ -72,8 +72,8 @@ class SettingsTest extends TestCase
             ->withSession(['auth.password_confirmed_at' => now()->getTimestamp()])
             ->get(route('settings.advanced'))
             ->assertOk()
-            ->assertSee('Pengaturan Lanjutan')
-            ->assertSee('Informasi Akun');
+            ->assertSee(__('Pengaturan Lanjutan'))
+            ->assertSee(__('Informasi Akun'));
     }
 
     public function test_account_info_can_be_updated_from_advanced(): void

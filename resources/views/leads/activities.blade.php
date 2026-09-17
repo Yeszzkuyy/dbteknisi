@@ -1,18 +1,18 @@
 <x-app-layout>
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Log Aktivitas Lead</h1>
+            <h1 class="text-3xl font-bold text-slate-800">{{ __('Log Aktivitas Lead') }}</h1>
             <p class="text-slate-500 mt-1">
-                Riwayat semua perubahan lead beserta user yang melakukannya
+                {{ __('Riwayat semua perubahan lead beserta user yang melakukannya') }}
                 @if($filterUser)
-                    — filter: <span class="font-semibold text-blue-600">{{ $filterUser->name }}</span>
-                    <a href="{{ route('leads.activities') }}" class="text-slate-400 hover:text-red-500 ml-1" title="Hapus filter">&times;</a>
+                    {{ __('— filter:') }} <span class="font-semibold text-blue-600">{{ $filterUser->name }}</span>
+                    <a href="{{ route('leads.activities') }}" class="text-slate-400 hover:text-red-500 ml-1" title="{{ __('Hapus filter') }}">&times;</a>
                 @endif
             </p>
         </div>
         <a href="{{ route('leads.index') }}"
            class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
-            Kembali
+            {{ __('Kembali') }}
         </a>
     </div>
 
@@ -50,7 +50,7 @@
 
         @if($activities->isEmpty())
             <div class="text-center py-12 px-4">
-                <p class="text-sm font-medium text-slate-500">Belum ada aktivitas lead.</p>
+                <p class="text-sm font-medium text-slate-500">{{ __('Belum ada aktivitas lead.') }}</p>
             </div>
         @else
             <ol class="relative border-l-2 border-slate-200 ml-3 space-y-6">
@@ -61,7 +61,7 @@
 
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
                             <x-user-avatar :user="$activity->user" size="w-7 h-7" text="text-xs" />
-                            <span class="font-semibold text-slate-800">{{ $activity->user ? ($userNames[$activity->user_id] ?? $activity->user->name) : 'Sistem' }}</span>
+                            <span class="font-semibold text-slate-800">{{ $activity->user ? ($userNames[$activity->user_id] ?? $activity->user->name) : __('Sistem') }}</span>
                             <span class="text-slate-600">{{ $activity->actionLabel() }}</span>
                             @if($activity->lead && $activity->lead->customer)
                                 @php [$badgeBg, $badgeText] = ($logColor)($activity->lead->customer_id); @endphp
@@ -71,7 +71,7 @@
                                     {{ $activity->lead->customer->name }}
                                 </a>
                             @else
-                                — <span class="text-slate-400 italic">lead sudah dihapus permanen</span>
+                                — <span class="text-slate-400 italic">{{ __('lead sudah dihapus permanen') }}</span>
                             @endif
                         </div>
 
@@ -85,7 +85,7 @@
                                     @endphp
                                     <div class="text-xs bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2 inline-block mr-2">
                                         <span class="font-semibold text-slate-700 dark:text-slate-200">
-                                            {{ \App\Models\LeadActivity::FIELD_LABELS[$field] ?? $field }}:
+                                            {{ __(\App\Models\LeadActivity::FIELD_LABELS[$field] ?? $field) }}:
                                         </span>
                                         @if($hasOld)
                                             <span class="text-red-500 line-through mr-1">{{ $old }}</span>

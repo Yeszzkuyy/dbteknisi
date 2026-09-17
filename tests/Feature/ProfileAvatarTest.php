@@ -57,7 +57,7 @@ class ProfileAvatarTest extends TestCase
         $this->actingAs($user)
             ->get(route('profile.edit'))
             ->assertOk()
-            ->assertSee('Ubah foto profil');
+            ->assertSee(__('Ubah foto profil'));
     }
 
     public function test_avatar_must_be_valid_image(): void

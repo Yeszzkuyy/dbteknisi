@@ -65,17 +65,17 @@ class TechnicianDashboardTest extends TestCase
         $this->actingAs($user)
             ->get(route('teknisi.dashboard'))
             ->assertOk()
-            ->assertSee('Dashboard Teknisi')
-            ->assertSee('Total Teknisi')
-            ->assertSee('Teknisi Aktif')
-            ->assertSee('Project Berjalan')
-            ->assertSee('Project Selesai')
-            ->assertSee('Progress Pekerjaan')
+            ->assertSee(__('Dashboard Teknisi'))
+            ->assertSee(__('Total Teknisi'))
+            ->assertSee(__('Teknisi Aktif'))
+            ->assertSee(__('Project Berjalan'))
+            ->assertSee(__('Project Selesai'))
+            ->assertSee(__('Progress Pekerjaan'))
             ->assertSee('Instalasi CCTV')
             ->assertSee('PT ABC Indonesia')
             ->assertSee('Maintenance Server')
             ->assertSee('menambahkan catatan')
-            ->assertSee('Buka Jadwal')
+            ->assertSee(__('Buka Jadwal'))
             ->assertDontSee('Jadwal Hari Ini');
     }
 
@@ -119,7 +119,7 @@ class TechnicianDashboardTest extends TestCase
         $this->actingAs($user)
             ->get(route('teknisi.dashboard'))
             ->assertOk()
-            ->assertSee('Teknisi Aktif')
-            ->assertSee('Belum ada teknisi aktif');
+            ->assertSee(__('Teknisi Aktif'))
+            ->assertSee(__('Belum ada') . ' ' . __('teknisi aktif'));
     }
 }
