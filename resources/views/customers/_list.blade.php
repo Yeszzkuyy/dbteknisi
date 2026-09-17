@@ -15,6 +15,7 @@
                     $primaryContact = $customer->contacts->first();
                     $picName = $primaryContact?->name ?: $customer->contact_person;
                     $picPhone = $primaryContact?->phone ?: $customer->phone;
+                    $picEmail = $primaryContact?->email ?: $customer->email;
                 @endphp
                 <tr class="group transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-white/5">
                     <td class="px-5 py-4 sm:px-6">
@@ -30,11 +31,11 @@
                             @if($picPhone)
                                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $picPhone }}</p>
                             @endif
-                            @if($customer->whatsapp || $customer->email)
+                            @if($customer->whatsapp || $picEmail)
                                 <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                                     @if($customer->whatsapp)WA: {{ $customer->whatsapp }}@endif
-                                    @if($customer->whatsapp && $customer->email) · @endif
-                                    @if($customer->email){{ $customer->email }}@endif
+                                    @if($customer->whatsapp && $picEmail) · @endif
+                                    @if($picEmail){{ $picEmail }}@endif
                                 </p>
                             @endif
                         @else
