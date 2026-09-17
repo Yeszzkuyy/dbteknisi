@@ -297,7 +297,7 @@
                                 <tr>
                                     <x-th>Nama</x-th>
                                     <x-th>Jabatan</x-th>
-                                    <x-th>Phone & Email</x-th>
+                                    <x-th>WA & Email</x-th>
                                     <x-th>Status</x-th>
                                     <x-th class="text-right">Aksi</x-th>
                                 </tr>
@@ -308,9 +308,8 @@
                                         <td class="px-6 py-3 font-medium text-slate-800 dark:text-slate-100 align-middle">{{ $contact->name }}</td>
                                         <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300 align-middle">{{ $contact->position ?? '-' }}</td>
                                         <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300 align-middle">
-                                            {{ $contact->phone ?? '-' }} <br>
-                                            <span class="text-xs text-slate-400">@if($contact->whatsapp)WA: {{ $contact->whatsapp }} @endif</span>
-                                            <span class="text-xs text-slate-400">{{ $contact->email ?? '' }}</span>
+                                            @if($contact->whatsapp)<span>WA: {{ $contact->whatsapp }}</span><br>@endif
+                                            <span class="text-xs text-slate-400">{{ $contact->email ?? '-' }}</span>
                                         </td>
                                         <td class="px-6 py-3 align-middle">
                                             <form action="{{ route('customer-contacts.primary', $contact) }}" method="POST">
