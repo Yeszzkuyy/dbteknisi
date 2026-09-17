@@ -256,7 +256,7 @@ class LeadController extends Controller
                 'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
         } elseif (!empty($validated['customer_contact_person'])) {
-            Customer::whereKey($validated['customer_id'])->update([
+            Customer::withTrashed()->whereKey($validated['customer_id'])->update([
                 'contact_person' => $validated['customer_contact_person'],
             ]);
         }
@@ -364,7 +364,7 @@ class LeadController extends Controller
             ], fn ($value) => $value !== null);
 
             if ($customerData) {
-                Customer::whereKey($validated['customer_id'])->update($customerData);
+                Customer::withTrashed()->whereKey($validated['customer_id'])->update($customerData);
             }
         }
 
