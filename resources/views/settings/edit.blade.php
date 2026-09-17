@@ -1,7 +1,7 @@
 <x-app-layout>
     @php
         $currentTheme = $user->preference('theme', 'system');
-        $currentLocale = $user->preference('locale', 'id');
+        $currentLocale = $user->preference('locale', 'en');
         $notifyEmail = (bool) $user->preference('notify_email', false);
         $notifySystem = (bool) $user->preference('notify_system', true);
 

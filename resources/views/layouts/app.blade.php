@@ -147,7 +147,7 @@
                 @endif
                 @if($errors->any())
                     <div class="rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-5 py-3 mb-4">
-                        <p class="font-semibold mb-1">Terdapat kesalahan pada form:</p>
+                        <p class="font-semibold mb-1">{{ __('Terdapat kesalahan pada form:') }}</p>
                         <ul class="list-disc list-inside text-sm">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -184,7 +184,7 @@
             function setCollapsed(v){
                 root.classList.toggle('sidebar-collapsed',v);
                 try{localStorage.setItem('sidebar-collapsed',v?'1':'0')}catch(e){}
-                if(cb){cb.setAttribute('aria-expanded',String(!v));cb.setAttribute('aria-label',v?'Perluas sidebar':'Perkecil sidebar')}
+                if(cb){cb.setAttribute('aria-expanded',String(!v));cb.setAttribute('aria-label',v?@json(__('Perluas sidebar')):@json(__('Perkecil sidebar')))}
                 syncTitles();
             }
             syncTitles();

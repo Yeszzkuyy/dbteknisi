@@ -39,7 +39,7 @@
     </div>
 
     {{-- Menu --}}
-    <nav id="sidebar-navigation" aria-label="Navigasi utama" class="sidebar-nav relative z-10 flex-1 overflow-y-auto px-3 py-4">
+    <nav id="sidebar-navigation" aria-label="{{ __('Navigasi utama') }}" class="sidebar-nav relative z-10 flex-1 overflow-y-auto px-3 py-4">
         <div class="space-y-6">
             <section aria-labelledby="sidebar-main-label">
                 <p id="sidebar-main-label" class="sidebar-hide px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Main</p>
@@ -81,7 +81,7 @@
                                     <span>Management</span>
                                     <span class="ml-auto flex items-center gap-1.5">
                                         <template x-if="$store.notif.unassigned > 0">
-                                            <span class="h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
+                                            <span class="h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="{{ __('Ada lead belum di-assign') }}"></span>
                                         </template>
                                         <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -102,7 +102,7 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
                                         <span>Manage Sales</span>
                                         <template x-if="$store.notif.unassigned > 0">
-                                            <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="Ada lead belum di-assign"></span>
+                                            <span class="ml-auto h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="{{ __('Ada lead belum di-assign') }}"></span>
                                         </template>
                                     </a>
                                     <a href="{{ route('manage.marketing.index') }}"
@@ -142,7 +142,7 @@
                                         data-sidebar-active="{{ $technicianActive ? 'true' : 'false' }}"
                                         class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive : $navInactive }}">
                                     <x-icon name="tools" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                                    <span>Teknisi</span>
+                                    <span>{{ __('Teknisi') }}</span>
                                     <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
@@ -159,7 +159,7 @@
                                        aria-current="{{ request()->routeIs('teknisi.dashboard*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('teknisi.dashboard*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
-                                        <span>Dashboard Teknisi</span>
+                                        <span>{{ __('Dashboard Teknisi') }}</span>
                                     </a>
                                     <a href="{{ route('projects.index') }}"
                                        aria-current="{{ request()->routeIs('projects*') ? 'page' : 'false' }}"
@@ -171,7 +171,7 @@
                                        aria-current="{{ request()->routeIs('teknisi.jadwal*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('teknisi.jadwal*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
-                                        <span>Jadwal</span>
+                                        <span>{{ __('Jadwal') }}</span>
                                     </a>
                                     <a href="{{ route('teknisi.surveys.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.surveys*') ? 'page' : 'false' }}"
@@ -189,13 +189,13 @@
                                        aria-current="{{ request()->routeIs('teknisi.request-hargas*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('teknisi.request-hargas*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" aria-hidden="true"></span>
-                                        <span>Request Harga</span>
+                                        <span>{{ __('Request Harga') }}</span>
                                     </a>
                                     <a href="{{ route('teknisi.instalasis.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.instalasis*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('teknisi.instalasis*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
-                                        <span>Instalasi</span>
+                                        <span>{{ __('Instalasi') }}</span>
                                     </a>
                                     <a href="{{ route('teknisi.documents.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.documents*') ? 'page' : 'false' }}"
@@ -257,13 +257,13 @@
                                        aria-current="{{ request()->routeIs('partners*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('partners*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" aria-hidden="true"></span>
-                                        <span>Data Partner</span>
+                                        <span>{{ __('Data Partner') }}</span>
                                     </a>
                                     <a href="{{ route('leads.activities') }}"
                                        aria-current="{{ request()->routeIs('leads.activities') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('leads.activities') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400" aria-hidden="true"></span>
-                                        <span>Log Aktivitas</span>
+                                        <span>{{ __('Log Aktivitas') }}</span>
                                     </a>
                                     @can('monitor-marketing')
                                         <a href="{{ route('leads.monitoring') }}"
@@ -484,14 +484,14 @@
     <div class="relative z-10 flex-shrink-0 px-3 pb-3">
         <button id="sidebarCollapseBtn" type="button"
                 class="sidebar-collapse group flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50"
-                aria-label="Perkecil sidebar" aria-controls="sidebar" aria-expanded="true">
+                aria-label="{{ __('Perkecil sidebar') }}" aria-controls="sidebar" aria-expanded="true">
             <svg class="icon-collapse h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
             </svg>
             <svg class="icon-expand h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h10M4 12h10M4 17h10M13 12h7M17 9l3 3-3 3"/>
             </svg>
-            <span class="sidebar-hide">Perkecil</span>
+            <span class="sidebar-hide">{{ __('Perkecil') }}</span>
         </button>
     </div>
 </aside>

@@ -37,7 +37,7 @@
                 <button @click="open = !open; $store.notif.refresh()"
                         class="beam-notif relative p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition"
                         :class="{ 'beam-on': $store.notif.unread > 0 }"
-                        aria-label="Notifikasi">
+                        aria-label="{{ __('Notifikasi') }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 00-4-5.66V5a2 2 0 10-4 0v.34A6 6 0 006 11v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
@@ -48,11 +48,11 @@
                 <div x-show="open" @click.away="open = false"
                      class="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 origin-top-right">
                     <div class="flex items-center justify-between px-4 py-1.5 border-b border-slate-100">
-                        <span class="text-sm font-semibold text-slate-700">Notifikasi</span>
+                        <span class="text-sm font-semibold text-slate-700">{{ __('Notifikasi') }}</span>
                         <template x-if="$store.notif.unread > 0">
                             <form method="POST" action="{{ route('notifications.read-all') }}">
                                 @csrf
-                                <button class="text-xs text-blue-600 hover:text-blue-700">Tandai semua dibaca</button>
+                                <button class="text-xs text-blue-600 hover:text-blue-700">{{ __('Tandai semua dibaca') }}</button>
                             </form>
                         </template>
                     </div>
@@ -62,13 +62,13 @@
                            :class="n.read ? 'opacity-60' : ''">
                             <span class="mt-1.5 h-2 w-2 rounded-full shrink-0" :class="n.read ? 'bg-slate-300' : 'bg-red-500'"></span>
                             <span class="min-w-0">
-                                <span class="block text-sm text-slate-700">Lead baru: <strong x-text="n.customer"></strong></span>
+                                <span class="block text-sm text-slate-700">{{ __('Lead baru') }}: <strong x-text="n.customer"></strong></span>
                                 <span class="block text-xs text-slate-400" x-text="n.ago"></span>
                             </span>
                         </a>
                     </template>
                     <template x-if="$store.notif.items.length === 0">
-                        <p class="px-4 py-6 text-center text-sm text-slate-400">Tidak ada notifikasi</p>
+                        <p class="px-4 py-6 text-center text-sm text-slate-400">{{ __('Tidak ada notifikasi') }}</p>
                     </template>
                 </div>
 
@@ -80,10 +80,10 @@
                         <div class="flex items-center gap-2.5 rounded-lg bg-white shadow-lg border border-slate-200 py-2.5 px-3.5">
                             <span class="h-2 w-2 shrink-0 rounded-full bg-red-500 animate-ping"></span>
                             <p class="text-sm text-slate-700">
-                                Lead baru belum di-assign &mdash;
-                                <a href="{{ route('manage-sales.index') }}" class="font-semibold text-blue-600 hover:text-blue-700">kelola</a>
+                                {{ __('Lead baru belum di-assign') }} &mdash;
+                                <a href="{{ route('manage-sales.index') }}" class="font-semibold text-blue-600 hover:text-blue-700">{{ __('kelola') }}</a>
                             </p>
-                            <button @click="$store.notif.toast = false" class="text-slate-400 hover:text-slate-600" aria-label="Tutup">&#10005;</button>
+                            <button @click="$store.notif.toast = false" class="text-slate-400 hover:text-slate-600" aria-label="{{ __('Tutup') }}">&#10005;</button>
                         </div>
                     </div>
                 </template>
@@ -119,7 +119,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
-                    Profil
+                    {{ __('Profil') }}
                 </a>
 
                 {{-- Setting --}}
@@ -129,7 +129,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
-                    Setting
+                    {{ __('Setting') }}
                 </a>
 
                 <hr class="my-1 border-slate-200">
