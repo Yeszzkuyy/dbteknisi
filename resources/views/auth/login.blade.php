@@ -40,28 +40,19 @@
            Halaman: gradient pastel + shell putih rounded
            ============================================================ */
         .login-page {
-            display: flex;
             min-height: 100vh;
             min-height: 100dvh;
-            align-items: center;
-            justify-content: center;
-            padding: 1.75rem;
-            background:
-                radial-gradient(circle at 8% 18%, rgba(129, 140, 248, 0.3), transparent 32%),
-                radial-gradient(circle at 92% 86%, rgba(251, 146, 60, 0.18), transparent 34%),
-                linear-gradient(135deg, #ddd9ff 0%, #f2d9f1 50%, #ffddd3 100%);
+            background: #ffffff;
         }
 
         .login-shell {
             display: grid;
-            width: min(1120px, 100%);
-            min-height: 660px;
-            grid-template-columns: minmax(20rem, 44%) 1fr;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            grid-template-columns: clamp(24rem, 46vw, 40rem) 1fr;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            border-radius: 2rem;
             background: #ffffff;
-            box-shadow: 0 40px 80px -32px rgba(76, 29, 149, 0.35), 0 12px 28px -18px rgba(76, 29, 149, 0.25);
         }
 
         /* ============================================================
@@ -77,7 +68,7 @@
         }
 
         .login-form-inner {
-            width: min(100%, 22.5rem);
+            width: min(100%, 24rem);
             margin: 0 auto;
         }
 
@@ -298,7 +289,7 @@
             justify-content: center;
             overflow: hidden;
             background: linear-gradient(150deg, #221a8f 0%, #2f2ac4 46%, #4f46e5 100%);
-            border-radius: 22% 0 0 22% / 50% 0 0 50%;
+            border-radius: 18% 0 0 18% / 42% 0 0 42%;
         }
 
         .login-brand-kinetic {
@@ -350,10 +341,11 @@
         .login-visual {
             position: absolute;
             z-index: 2;
-            top: 28%;
-            right: 6%;
+            top: 22%;
             bottom: 3%;
-            left: 6%;
+            left: 50%;
+            width: min(86%, 46rem);
+            transform: translateX(-50%);
         }
 
         .login-visual-halo {
@@ -503,15 +495,14 @@
            ============================================================ */
         @media (max-width: 1023px) {
             .login-page {
-                padding: 1rem;
-                align-items: flex-start;
+                padding: 0;
             }
 
             .login-shell {
                 display: flex;
-                min-height: 0;
+                min-height: 100dvh;
                 flex-direction: column;
-                border-radius: 1.5rem;
+                border-radius: 0;
             }
 
             .login-form-panel {
@@ -522,7 +513,7 @@
             .login-brand-panel {
                 order: 1;
                 height: clamp(13rem, 46vw, 17rem);
-                border-radius: 1.25rem 1.25rem 2.5rem 2.5rem;
+                border-radius: 0 0 2.5rem 2.5rem;
             }
 
             .login-brand-content {
@@ -531,9 +522,10 @@
 
             .login-visual {
                 top: 8%;
-                right: 14%;
                 bottom: 8%;
-                left: 14%;
+                left: 50%;
+                width: min(88%, 22rem);
+                transform: translateX(-50%);
             }
 
             .login-character {
