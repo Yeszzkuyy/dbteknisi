@@ -4,12 +4,6 @@
             <h1 class="text-3xl font-bold text-slate-800">Follow Up Customer</h1>
             <p class="text-slate-500 mt-1">Pantau tindak lanjut dengan customer.</p>
         </div>
-        @can('manage-sales')
-            <a href="{{ route('sales.follow-ups.create') }}"
-               class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
-                + Tambah Follow Up
-            </a>
-        @endcan
     </div>
 
     {{-- Search --}}
