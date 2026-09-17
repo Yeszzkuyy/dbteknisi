@@ -366,16 +366,26 @@
             transform: translateX(-50%);
         }
 
+        .login-visual::after {
+            position: absolute;
+            z-index: 0;
+            inset: -16%;
+            background: radial-gradient(circle, rgba(129, 140, 248, 0.6) 0%, rgba(99, 102, 241, 0.26) 40%, transparent 72%);
+            filter: blur(38px);
+            content: '';
+            pointer-events: none;
+        }
+
         .login-visual-halo {
             position: absolute;
             z-index: 0;
             top: 46%;
             left: 50%;
-            width: 78%;
+            width: 88%;
             aspect-ratio: 1;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(199, 210, 254, 0.42), rgba(129, 140, 248, 0.16) 45%, transparent 70%);
-            filter: blur(10px);
+            background: radial-gradient(circle, rgba(199, 210, 254, 0.52), rgba(129, 140, 248, 0.2) 45%, transparent 70%);
+            filter: blur(18px);
             transform: translate(-50%, -50%);
             animation: halo-breathe 9s ease-in-out infinite;
         }
@@ -397,11 +407,12 @@
 
         .connector-line {
             fill: none;
-            stroke: #e0e7ff;
-            stroke-width: 0.8;
+            stroke: #e6ecff;
+            stroke-width: 0.35;
+            stroke-dasharray: 0.55 4.2;
             stroke-linecap: round;
             filter: url(#login-connector-glow);
-            opacity: 0.75;
+            opacity: 0.9;
         }
 
         .login-character {
@@ -424,11 +435,11 @@
         .login-hand-icon {
             position: absolute;
             z-index: 3;
-            top: 40%;
-            left: 55%;
-            width: 24%;
+            top: 10%;
+            left: 27%;
+            width: 30%;
             transform: translate(-50%, -50%);
-            filter: drop-shadow(0 0 6px rgba(186, 230, 253, 0.85)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.3));
+            filter: drop-shadow(0 0 8px rgba(186, 230, 253, 0.9)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.3));
             animation: hand-icon-float 6s ease-in-out infinite;
         }
 
@@ -436,20 +447,21 @@
             position: absolute;
             z-index: 3;
             display: grid;
-            width: clamp(2.6rem, 13%, 6rem);
+            width: clamp(2.4rem, 11%, 5rem);
             aspect-ratio: 1;
             place-items: center;
+            transform: translate(-50%, -50%);
             animation: icon-float var(--float-duration, 6s) ease-in-out var(--float-delay, 0s) infinite;
         }
 
         .login-icon::before {
             position: absolute;
             z-index: -1;
-            inset: 6%;
+            inset: 4%;
             border-radius: 50%;
             background: radial-gradient(circle, var(--icon-glow, rgba(165, 180, 252, 0.85)), transparent 70%);
-            filter: blur(10px);
-            opacity: 0.9;
+            filter: blur(14px);
+            opacity: 1;
             content: '';
             animation: icon-pulse 4s ease-in-out var(--float-delay, 0s) infinite;
         }
@@ -461,11 +473,11 @@
             filter: drop-shadow(0 0 5px rgba(224, 231, 255, 0.72)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.32));
         }
 
-        .login-icon-2 { top: 37%; left: 1%; --icon-glow: rgba(196, 181, 253, 0.95); --float-duration: 7.2s; --float-delay: -3.4s; }
-        .login-icon-3 { top: 73%; left: 17%; --icon-glow: rgba(249, 168, 212, 0.92); --float-duration: 5.8s; --float-delay: -2.3s; }
-        .login-icon-4 { top: 1%; left: 72%; --icon-glow: rgba(253, 230, 138, 0.95); --float-duration: 6.8s; --float-delay: -4.1s; }
-        .login-icon-5 { top: 38%; left: 85%; --icon-glow: rgba(253, 186, 116, 0.92); --float-duration: 7.6s; --float-delay: -1.8s; }
-        .login-icon-6 { top: 78%; left: 50%; --icon-glow: rgba(252, 165, 165, 0.95); --float-duration: 6.1s; --float-delay: -4.8s; }
+        .login-icon-2 { top: 42%; left: 25%; --icon-glow: rgba(196, 181, 253, 0.95); --float-duration: 7.2s; --float-delay: -3.4s; }
+        .login-icon-3 { top: 72%; left: 27%; --icon-glow: rgba(249, 168, 212, 0.92); --float-duration: 5.8s; --float-delay: -2.3s; }
+        .login-icon-4 { top: 30%; left: 71%; --icon-glow: rgba(253, 230, 138, 0.95); --float-duration: 6.8s; --float-delay: -4.1s; }
+        .login-icon-5 { top: 45%; left: 78%; --icon-glow: rgba(253, 186, 116, 0.92); --float-duration: 7.6s; --float-delay: -1.8s; }
+        .login-icon-6 { top: 74%; left: 36%; --icon-glow: rgba(252, 165, 165, 0.95); --float-duration: 6.1s; --float-delay: -4.8s; }
 
         @keyframes character-float {
             0%, 100% { transform: translate(-50%, -50%) rotate(-1deg); }
@@ -473,8 +485,8 @@
         }
 
         @keyframes icon-float {
-            0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
-            50% { transform: translate3d(0, -0.6rem, 0) rotate(3deg); }
+            0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); }
+            50% { transform: translate(-50%, calc(-50% - 0.55rem)) rotate(3deg); }
         }
 
         @keyframes icon-pulse {
@@ -754,10 +766,10 @@
                     <div class="login-visual-halo"></div>
 
                     <div x-ref="connectors" class="login-parallax">
-                        <svg class="login-connectors" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="login-connectors" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <defs>
-                                <filter id="login-connector-glow" x="-50%" y="-50%" width="200%" height="200%">
-                                    <feGaussianBlur stdDeviation="1.1" result="blur" />
+                                <filter id="login-connector-glow" x="-80%" y="-80%" width="260%" height="260%">
+                                    <feGaussianBlur stdDeviation="2" result="blur" />
                                     <feMerge>
                                         <feMergeNode in="blur" />
                                         <feMergeNode in="SourceGraphic" />
@@ -765,19 +777,19 @@
                                 </filter>
                             </defs>
 
-                            <path class="connector-line" d="M52 52C44 42 35 18 27.5 7.5" />
-                            <path class="connector-line" d="M52 52C38 49 20 44 7.5 43.5" />
-                            <path class="connector-line" d="M52 54C43 64 32 76 23.5 79.5" />
-                            <path class="connector-line" d="M54 50C62 39 72 17 78.5 7.5" />
-                            <path class="connector-line" d="M56 52C68 50 82 46 91.5 44.5" />
-                            <path class="connector-line" d="M54 56C55 66 56 77 56.5 84.5" />
+                            <path class="connector-line" d="M52 52C50 46 47 39 45 32" />
+                            <path class="connector-line" d="M52 52C44 46 34 45 25 42" />
+                            <path class="connector-line" d="M52 52C40 62 33 66 27 72" />
+                            <path class="connector-line" d="M52 52C60 42 66 36 71 30" />
+                            <path class="connector-line" d="M52 52C63 48 71 46 78 45" />
+                            <path class="connector-line" d="M52 52C45 62 40 68 36 74" />
 
-                            <circle cx="27.5" cy="7.5" r="1.1" fill="#BAE6FD" />
-                            <circle cx="7.5" cy="43.5" r="1.1" fill="#C4B5FD" />
-                            <circle cx="23.5" cy="79.5" r="1.1" fill="#F9A8D4" />
-                            <circle cx="78.5" cy="7.5" r="1.1" fill="#FDE68A" />
-                            <circle cx="91.5" cy="44.5" r="1.1" fill="#FDBA74" />
-                            <circle cx="56.5" cy="84.5" r="1.1" fill="#FCA5A5" />
+                            <circle cx="45" cy="32" r="1.3" fill="#EAF6FF" />
+                            <circle cx="25" cy="42" r="1.1" fill="#C4B5FD" />
+                            <circle cx="27" cy="72" r="1.1" fill="#F9A8D4" />
+                            <circle cx="71" cy="30" r="1.1" fill="#FDE68A" />
+                            <circle cx="78" cy="45" r="1.1" fill="#FDBA74" />
+                            <circle cx="36" cy="74" r="1.1" fill="#FCA5A5" />
                         </svg>
                     </div>
 
