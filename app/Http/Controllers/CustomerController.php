@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Rules\WhatsappNumber;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -54,7 +53,7 @@ class CustomerController extends Controller
             'company' => 'nullable',
             'address' => 'nullable',
             'phone' => 'nullable',
-            'whatsapp' => ['nullable', new WhatsappNumber],
+            'whatsapp' => 'nullable',
             'email' => 'nullable|email',
             'notes' => 'nullable',
             'status' => 'nullable|in:lead,deal,instalasi,selesai',
@@ -112,7 +111,7 @@ class CustomerController extends Controller
             'company' => 'nullable',
             'address' => 'nullable',
             'phone' => 'nullable',
-            'whatsapp' => ['nullable', new WhatsappNumber],
+            'whatsapp' => 'nullable',
             'email' => 'nullable|email',
             'notes' => 'nullable',
             'status' => 'nullable|in:lead,deal,instalasi,selesai',

@@ -10,7 +10,6 @@ use App\Models\WhatsappAccount;
 use App\Models\WhatsappConversationPreference;
 use App\Models\WhatsappMessage;
 use App\Notifications\NewLeadNotification;
-use App\Rules\WhatsappNumber;
 use App\Services\WhatsappGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -173,7 +172,7 @@ class WhatsAppCenterController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'whatsapp' => ['required', 'string', 'max:50', new WhatsappNumber],
+            'whatsapp' => 'required|string|max:50',
             'notes' => 'nullable|string|max:2000',
         ]);
 
