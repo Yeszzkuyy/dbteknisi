@@ -3,15 +3,15 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h1 class="text-3xl font-bold text-slate-800">
-                    Edit PIC
+                    {{ __('Edit PIC') }}
                 </h1>
                 <p class="text-slate-500 mt-1">
-                    Edit PIC untuk customer: <span class="font-semibold text-slate-700">{{ $customer->name }}</span>
+                    {{ __('Edit PIC untuk customer:') }} <span class="font-semibold text-slate-700">{{ $customer->name }}</span>
                 </p>
             </div>
             <a href="{{ route('customers.show', $customer) }}" 
                class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition">
-                ← Kembali ke Customer
+                {{ __('← Kembali ke Customer') }}
             </a>
         </div>
 
@@ -24,7 +24,7 @@
                     {{-- Nama --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            Nama <span class="text-red-500">*</span>
+                            {{ __('Nama') }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text" 
                                name="name" 
@@ -37,12 +37,12 @@
                     {{-- Jabatan --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            Jabatan
+                            {{ __('Jabatan') }}
                         </label>
                         <input type="text" 
                                name="position" 
                                value="{{ old('position', $customerContact->position) }}"
-                               placeholder="Contoh: Manager, Teknisi, dll"
+                               placeholder="{{ __('Contoh: Manager, Teknisi, dll') }}"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('position') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -50,12 +50,12 @@
                     {{-- WhatsApp --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            No WA
+                            {{ __('No WA') }}
                         </label>
                         <input type="text" 
                                name="whatsapp" 
                                value="{{ old('whatsapp', $customerContact->whatsapp) }}"
-                               placeholder="Nomor WhatsApp PIC"
+                               placeholder="{{ __('Nomor WhatsApp PIC') }}"
                                inputmode="tel"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -69,7 +69,7 @@
                         <input type="email" 
                                name="email" 
                                value="{{ old('email', $customerContact->email) }}"
-                               placeholder="Email PIC"
+                               placeholder="{{ __('Email PIC') }}"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -83,7 +83,7 @@
                                {{ old('is_primary', $customerContact->is_primary) ? 'checked' : '' }}
                                class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
                         <label for="is_primary" class="text-sm font-medium text-slate-700">
-                            Jadikan PIC Utama (Primary)
+                            {{ __('Jadikan PIC Utama (Primary)') }}
                         </label>
                     </div>
                     @error('is_primary') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -91,11 +91,11 @@
 
                 <div class="mt-6 flex gap-3">
                     <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
-                        Update PIC
+                        {{ __('Update PIC') }}
                     </button>
                     <a href="{{ route('customers.show', $customer) }}" 
                        class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
-                        Batal
+                        {{ __('Batal') }}
                     </a>
                 </div>
             </form>

@@ -5,7 +5,7 @@
                 <th scope="col" class="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-300 sm:px-6">Customer</th>
                 <th scope="col" class="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-300 sm:px-6">PIC</th>
                 <th scope="col" class="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-300 sm:px-6">Project</th>
-                <th scope="col" class="px-5 py-4 text-right text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-300 sm:px-6">Aksi</th>
+                <th scope="col" class="px-5 py-4 text-right text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-300 sm:px-6">{{ __('Aksi') }}</th>
             </tr>
         </thead>
 
@@ -21,10 +21,10 @@
                     <td class="px-5 py-4 sm:px-6">
                         <p class="font-semibold text-slate-800 dark:text-slate-100">{{ $customer->name }}</p>
                         <p class="mt-1 max-w-sm truncate text-sm text-slate-500 dark:text-slate-400">
-                            {{ $customer->address ?: 'Alamat belum diisi' }}
+                            {{ $customer->address ?: __('Alamat belum diisi') }}
                         </p>
                         @if($customer->whatsapp)
-                            <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">WA perusahaan: {{ \App\Support\PhoneFormatter::format($customer->whatsapp) }}</p>
+                            <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">{{ __('WA perusahaan:') }} {{ \App\Support\PhoneFormatter::format($customer->whatsapp) }}</p>
                         @endif
                     </td>
 
@@ -32,13 +32,13 @@
                         @if($picName)
                             <p class="font-semibold text-slate-700 dark:text-slate-200">{{ $picName }}</p>
                             @if($picWhatsapp)
-                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">WA PIC: {{ \App\Support\PhoneFormatter::format($picWhatsapp) }}</p>
+                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('WA PIC:') }} {{ \App\Support\PhoneFormatter::format($picWhatsapp) }}</p>
                             @endif
                             @if($picEmail)
                                 <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{{ $picEmail }}</p>
                             @endif
                         @else
-                            <x-status-badge color="yellow">Belum ada PIC</x-status-badge>
+                            <x-status-badge color="yellow">{{ __('Belum ada PIC') }}</x-status-badge>
                         @endif
                     </td>
 
@@ -55,28 +55,28 @@
                     <td class="px-5 py-4 sm:px-6">
                         <div class="flex justify-end gap-2">
                             <a href="{{ route('customers.show', $customer) }}"
-                               title="Lihat customer"
-                               aria-label="Lihat customer {{ $customer->name }}"
+                               title="{{ __('Lihat customer') }}"
+                               aria-label="{{ __('Lihat customer') }} {{ $customer->name }}"
                                class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700 transition hover:bg-indigo-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
                                 <x-icon name="eye" class="h-4 w-4" />
                             </a>
 
                             @can('manage-sales')
                                 <a href="{{ route('customers.edit', $customer) }}"
-                                   title="Edit customer"
-                                   aria-label="Edit customer {{ $customer->name }}"
+                                   title="{{ __('Edit customer') }}"
+                                   aria-label="{{ __('Edit customer') }} {{ $customer->name }}"
                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700 transition hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">
                                     <x-icon name="edit" class="h-4 w-4" />
                                 </a>
                             @endcan
 
                             @can('manage-sales')
-                                <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline-flex" onsubmit="return confirm('Hapus customer ini?')">
+                                <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline-flex" onsubmit="return confirm('{{ __('Hapus customer ini?') }}')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
-                                            title="Hapus customer"
-                                            aria-label="Hapus customer {{ $customer->name }}"
+                                            title="{{ __('Hapus customer') }}"
+                                            aria-label="{{ __('Hapus customer') }} {{ $customer->name }}"
                                             class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 text-red-700 transition hover:bg-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20">
                                         <x-icon name="trash" class="h-4 w-4" />
                                     </button>
@@ -93,11 +93,11 @@
                                 <x-icon name="users" class="h-6 w-6" />
                             </span>
                             @if(request()->filled('search'))
-                                <p class="mt-4 text-sm font-semibold text-slate-700 dark:text-slate-200">Customer tidak ditemukan</p>
-                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Coba gunakan nama, perusahaan, atau email lain.</p>
+                                <p class="mt-4 text-sm font-semibold text-slate-700 dark:text-slate-200">{{ __('Customer tidak ditemukan') }}</p>
+                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Coba gunakan nama, perusahaan, atau email lain.') }}</p>
                             @else
-                                <p class="mt-4 text-sm font-semibold text-slate-700 dark:text-slate-200">Belum ada customer</p>
-                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Data customer yang baru ditambahkan akan muncul di sini.</p>
+                                <p class="mt-4 text-sm font-semibold text-slate-700 dark:text-slate-200">{{ __('Belum ada customer') }}</p>
+                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Data customer yang baru ditambahkan akan muncul di sini.') }}</p>
                             @endif
                         </div>
                     </td>

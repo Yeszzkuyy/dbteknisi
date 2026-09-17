@@ -6,7 +6,7 @@
                     Edit Customer
                 </h1>
                 <p class="text-slate-500 mt-1">
-                    Edit data customer: <span class="font-semibold text-slate-700">{{ $customer->name }}</span>
+                    {{ __('Edit data customer:') }} <span class="font-semibold text-slate-700">{{ $customer->name }}</span>
                 </p>
             </div>
             <a href="{{ route('customers.show', $customer) }}" 
@@ -14,7 +14,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Kembali ke Customer
+                {{ __('Kembali ke Customer') }}
             </a>
         </div>
 
@@ -27,7 +27,7 @@
                     {{-- Nama Perusahaan --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            Nama Perusahaan <span class="text-red-500">*</span>
+                            {{ __('Nama Perusahaan') }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text"
                                name="name"
@@ -51,7 +51,7 @@
                     {{-- Phone --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            No Telp
+                            {{ __('No Telp') }}
                         </label>
                         <input type="text" 
                                name="phone" 
@@ -63,7 +63,7 @@
                     {{-- WhatsApp --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            No WA
+                            {{ __('No WA') }}
                         </label>
                         <input type="text"
                                name="whatsapp"
@@ -100,10 +100,10 @@
                 <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3">
                     <a href="{{ route('customers.show', $customer) }}" 
                        class="px-6 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium transition text-base text-center">
-                        Batal
+                        {{ __('Batal') }}
                     </a>
                     <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition text-base">
-                        Update Customer
+                        {{ __('Update Customer') }}
                     </button>
                 </div>
             </form>

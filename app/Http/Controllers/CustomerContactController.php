@@ -43,7 +43,7 @@ class CustomerContactController extends Controller
 
         return redirect()
             ->route('customers.show', $customer)
-            ->with('success', 'PIC berhasil ditambahkan.');
+            ->with('success', __('PIC berhasil ditambahkan.'));
     }
 
     /**
@@ -84,7 +84,7 @@ class CustomerContactController extends Controller
 
         return redirect()
             ->route('customers.show', $customer)
-            ->with('success', 'PIC berhasil diupdate.');
+            ->with('success', __('PIC berhasil diupdate.'));
     }
 
     /**
@@ -117,6 +117,6 @@ class CustomerContactController extends Controller
 
         return redirect()
             ->route('customers.show', $customer)
-            ->with('success', 'PIC berhasil dihapus.');
+            ->with('success', __('PIC berhasil dihapus.'));
     }
 }
