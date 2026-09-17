@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h1 class="text-3xl font-bold text-slate-800">Detail Follow Up</h1>
-                <p class="text-slate-500 mt-1">{{ $followUp->customer->name }}</p>
+                <p class="text-slate-500 mt-1">{{ $followUp->customer?->name ?? '-' }}</p>
             </div>
             <div class="flex gap-2">
                 @can('manage-sales')
@@ -23,7 +23,7 @@
             <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                     <dt class="text-xs text-slate-400">Customer</dt>
-                    <dd class="font-medium text-slate-800">{{ $followUp->customer->name }}</dd>
+                    <dd class="font-medium text-slate-800">{{ $followUp->customer?->name ?? '-' }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs text-slate-400">Tanggal Follow Up</dt>

@@ -53,7 +53,7 @@
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                     @forelse($followUps as $fu)
                         <tr class="hover:bg-slate-50 transition">
-                            <td class="px-6 py-4 font-semibold text-slate-800">{{ $fu->customer->name }}</td>
+                            <td class="px-6 py-4 font-semibold text-slate-800">{{ $fu->customer?->name ?? '-' }}</td>
                             <td class="px-6 py-4 text-slate-600 max-w-xs truncate">
                                 {{ Str::limit($fu->description, 100) }}
                             </td>
