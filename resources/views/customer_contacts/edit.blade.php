@@ -47,17 +47,18 @@
                         @error('position') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
-                    {{-- Phone --}}
+                    {{-- WhatsApp --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            Phone
+                            No WA
                         </label>
                         <input type="text" 
-                               name="phone" 
-                               value="{{ old('phone', $customerContact->phone) }}"
-                               placeholder="Nomor telepon PIC"
+                               name="whatsapp" 
+                               value="{{ old('whatsapp', $customerContact->whatsapp) }}"
+                               placeholder="Nomor WhatsApp PIC"
+                               inputmode="tel"
                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                        @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     {{-- Email --}}

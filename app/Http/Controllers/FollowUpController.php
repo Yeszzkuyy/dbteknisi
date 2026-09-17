@@ -27,12 +27,13 @@ class FollowUpController extends Controller
 
         $customerId = $request->get('customer_id');
         $meetingId = $request->get('meeting_id');
+        $customer = $customerId ? Customer::withTrashed()->find($customerId) : null;
 
         if ($customerId) {
             $meetings = Meeting::where('customer_id', $customerId)->orderBy('meeting_date', 'desc')->get(['id', 'meeting_date']);
         }
 
-        return view('sales.follow-ups.create', compact('customers', 'meetings', 'customerId', 'meetingId'));
+        return view('sales.follow-ups.create', compact('customers', 'meetings', 'customerId', 'meetingId', 'customer'));
     }
 
     public function store(Request $request)

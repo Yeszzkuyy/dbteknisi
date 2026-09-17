@@ -14,7 +14,8 @@
                 @php
                     $primaryContact = $customer->contacts->first();
                     $picName = $primaryContact?->name ?: $customer->contact_person;
-                    $picPhone = $primaryContact?->phone ?: $customer->phone;
+                    $picWhatsapp = $primaryContact?->whatsapp;
+                    $picEmail = $primaryContact?->email;
                 @endphp
                 <tr class="group transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-white/5">
                     <td class="px-5 py-4 sm:px-6">
@@ -22,20 +23,19 @@
                         <p class="mt-1 max-w-sm truncate text-sm text-slate-500 dark:text-slate-400">
                             {{ $customer->address ?: 'Alamat belum diisi' }}
                         </p>
+                        @if($customer->whatsapp)
+                            <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">WA perusahaan: {{ \App\Support\PhoneFormatter::format($customer->whatsapp) }}</p>
+                        @endif
                     </td>
 
                     <td class="px-5 py-4 sm:px-6">
                         @if($picName)
                             <p class="font-semibold text-slate-700 dark:text-slate-200">{{ $picName }}</p>
-                            @if($picPhone)
-                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $picPhone }}</p>
+                            @if($picWhatsapp)
+                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">WA PIC: {{ \App\Support\PhoneFormatter::format($picWhatsapp) }}</p>
                             @endif
-                            @if($customer->whatsapp || $customer->email)
-                                <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-                                    @if($customer->whatsapp)WA: {{ $customer->whatsapp }}@endif
-                                    @if($customer->whatsapp && $customer->email) · @endif
-                                    @if($customer->email){{ $customer->email }}@endif
-                                </p>
+                            @if($picEmail)
+                                <p class="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{{ $picEmail }}</p>
                             @endif
                         @else
                             <x-status-badge color="yellow">Belum ada PIC</x-status-badge>

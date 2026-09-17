@@ -79,6 +79,19 @@
         <section class="border-t border-slate-200">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
+                    <label for="pt_group" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
+                        Lead dari PT
+                        <x-info-tip tip="Jenama penyedia yang menangani lead ini. Bisa diubah jikalau management menggantinya." />
+                    </label>
+                    <select name="pt_group" id="pt_group"
+                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">— Pilih PT —</option>
+                        @foreach(\App\Models\Lead::PT_GROUPS as $pt)
+                            <option value="{{ $pt }}" {{ old('pt_group', $lead->pt_group) === $pt ? 'selected' : '' }}>{{ $pt }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                         Assign / Direct ke Sales
                         <x-info-tip tip="Sales yang bertanggung jawab follow-up lead ini." />

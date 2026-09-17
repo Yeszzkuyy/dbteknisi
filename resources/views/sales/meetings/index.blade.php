@@ -62,7 +62,7 @@
                     @forelse($meetings as $meeting)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-800">{{ $meeting->customer->name }}</div>
+                                <div class="font-semibold text-slate-800">{{ $meeting->customer?->name ?? '-' }}</div>
                                 <div class="text-xs text-slate-400">oleh {{ $meeting->creator?->name ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4 text-slate-700">

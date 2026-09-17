@@ -65,4 +65,22 @@ class Customer extends Model
     {
         return $this->hasMany(Lead::class);
     }
+
+    public function waLink(string $text = ''): ?string
+    {
+        $number = $this->whatsapp ?: $this->phone;
+        $digits = preg_replace('/\D/', '', $number ?? '');
+
+        if (!$digits) {
+            return null;
+        }
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '62' . substr($digits, 1);
+        } elseif (str_starts_with($digits, '8')) {
+            $digits = '62' . $digits;
+        }
+
+        return 'https://wa.me/' . $digits . ($text ? '?text=' . rawurlencode($text) : '');
+    }
 }

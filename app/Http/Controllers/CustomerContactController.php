@@ -29,6 +29,7 @@ class CustomerContactController extends Controller
             'name' => 'required|string|max:255',
             'position' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:255',
+            'whatsapp' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'is_primary' => 'nullable|boolean',
         ]);
@@ -67,6 +68,7 @@ class CustomerContactController extends Controller
             'name' => 'required|string|max:255',
             'position' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:255',
+            'whatsapp' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'is_primary' => 'nullable|boolean',
         ]);
@@ -83,6 +85,24 @@ class CustomerContactController extends Controller
         return redirect()
             ->route('customers.show', $customer)
             ->with('success', 'PIC berhasil diupdate.');
+    }
+
+    /**
+     * Toggle primary PIC dari daftar contacts.
+     */
+    public function togglePrimary(CustomerContact $customerContact)
+    {
+        $this->authorize('update', $customerContact->customer);
+        $customer = $customerContact->customer;
+
+        if (! $customerContact->is_primary) {
+            $customer->contacts()->update(['is_primary' => false]);
+            $customerContact->update(['is_primary' => true]);
+        } else {
+            $customerContact->update(['is_primary' => false]);
+        }
+
+        return redirect()->route('customers.show', $customer);
     }
 
     /**

@@ -17,16 +17,21 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Customer <span class="text-red-500">*</span></label>
-                    <select name="customer_id" id="customer_id" required
-                            onchange="window.location.href='{{ route('sales.follow-ups.create') }}?customer_id='+this.value"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">-- Pilih Customer --</option>
-                        @foreach($customers as $customer)
-                            <option value="{{ $customer->id }}" {{ old('customer_id', $customerId) == $customer->id ? 'selected' : '' }}>
-                                {{ $customer->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    @if($customer)
+                        <input type="hidden" name="customer_id" value="{{ $customer->id }}">
+                        <div class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-slate-700">{{ $customer->name }}</div>
+                    @else
+                        <select name="customer_id" id="customer_id" required
+                                onchange="window.location.href='{{ route('sales.follow-ups.create') }}?customer_id='+this.value"
+                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">-- Pilih Customer --</option>
+                            @foreach($customers as $customer)
+                                <option value="{{ $customer->id }}" {{ old('customer_id', $customerId) == $customer->id ? 'selected' : '' }}>
+                                    {{ $customer->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
                     @error('customer_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 

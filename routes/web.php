@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/customer-contacts/{customerContact}/edit', [CustomerContactController::class, 'edit'])->name('customer-contacts.edit');
         Route::put('/customer-contacts/{customerContact}', [CustomerContactController::class, 'update'])->name('customer-contacts.update');
         Route::delete('/customer-contacts/{customerContact}', [CustomerContactController::class, 'destroy'])->name('customer-contacts.destroy');
+        Route::patch('/customer-contacts/{customerContact}/primary', [CustomerContactController::class, 'togglePrimary'])->name('customer-contacts.primary');
     });
 
     Route::middleware('permission:view-sales|manage-sales|view-customer')->group(function () {

@@ -14,6 +14,7 @@ class CustomerContact extends Model
         'name',
         'position',
         'phone',
+        'whatsapp',
         'email',
         'is_primary',
     ];
