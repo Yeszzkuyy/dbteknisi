@@ -2,12 +2,12 @@
 <div class="px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Tambah Survey</h1>
-            <p class="text-slate-500 mt-1">Isi data survey untuk project</p>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">{{ __('Tambah Survey') }}</h1>
+            <p class="text-slate-500 mt-1">{{ __('Isi data survey untuk project') }}</p>
         </div>
         <a href="{{ route('teknisi.surveys.index') }}"
            class="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 font-medium transition">
-            Kembali
+            {{ __('Kembali') }}
         </a>
     </div>
 
@@ -35,7 +35,7 @@
                                @input="if (query !== '') selectedId = null; open = true"
                                @keydown.escape="open = false"
                                @blur="setTimeout(() => open = false, 150)"
-                               placeholder="Cari project..."
+                               placeholder="{{ __('Cari project...') }}"
                                autocomplete="off"
                                class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
                         <div x-show="open" x-cloak x-transition
@@ -47,7 +47,7 @@
                                         :class="String(p.id) === String(selectedId) ? 'bg-blue-50 dark:bg-slate-700' : ''"
                                         x-text="p.name"></button>
                             </template>
-                            <p x-show="filtered.length === 0" class="px-4 py-3 text-sm text-slate-400">Tidak ada hasil.</p>
+                            <p x-show="filtered.length === 0" class="px-4 py-3 text-sm text-slate-400">{{ __('Tidak ada hasil.') }}</p>
                         </div>
                     </div>
                     @error('project_id') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -64,7 +64,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {{-- Survey Date --}}
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Tanggal Survey <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">{{ __('Tanggal Survey') }} <span class="text-red-500">*</span></label>
                         <input type="date" name="survey_date" value="{{ old('survey_date') }}" required
                                class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
                         @error('survey_date') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -87,7 +87,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {{-- Location --}}
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Lokasi</label>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">{{ __('Lokasi') }}</label>
                         <input type="text" name="location" value="{{ old('location') }}"
                                class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
                         @error('location') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -95,7 +95,7 @@
 
                     {{-- PIC --}}
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">PIC</label>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">{{ __('PIC') }}</label>
                         <input type="text" name="pic" value="{{ old('pic') }}"
                                class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
                         @error('pic') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -104,7 +104,7 @@
 
                 {{-- Survey Data --}}
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Data Survey</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">{{ __('Data Survey') }}</label>
                     <textarea name="survey_data" rows="4"
                               class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">{{ old('survey_data') }}</textarea>
                     @error('survey_data') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -112,7 +112,7 @@
 
                 {{-- Survey Report --}}
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Laporan Survey</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">{{ __('Laporan Survey') }}</label>
                     <textarea name="survey_report" rows="4"
                               class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">{{ old('survey_report') }}</textarea>
                     @error('survey_report') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -120,7 +120,7 @@
 
                 {{-- Notes --}}
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Catatan</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">{{ __('Catatan') }}</label>
                     <textarea name="notes" rows="3"
                               class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">{{ old('notes') }}</textarea>
                     @error('notes') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -128,8 +128,8 @@
             </div>
 
             <div class="mt-6 flex gap-3">
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">Simpan Survey</button>
-                <a href="{{ route('teknisi.surveys.index') }}" class="px-6 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 font-medium transition">Batal</a>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">{{ __('Simpan Survey') }}</button>
+                <a href="{{ route('teknisi.surveys.index') }}" class="px-6 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 font-medium transition">{{ __('Batal') }}</a>
             </div>
         </form>
     </div>

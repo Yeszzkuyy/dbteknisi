@@ -15,12 +15,12 @@
         {{-- Header --}}
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Edit Request Harga</h1>
-                <p class="text-slate-500 dark:text-slate-400 mt-1">Perbarui daftar perangkat dan status</p>
+                <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">{{ __('Edit Request Harga') }}</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-1">{{ __('Perbarui daftar perangkat dan status') }}</p>
             </div>
             <a href="{{ route('teknisi.request-hargas.show', $requestHarga) }}"
                class="rounded-xl border border-slate-300 text-slate-700 hover:bg-white px-5 py-2.5 text-sm font-medium transition dark:border-slate-600 dark:text-slate-200">
-                Kembali
+                {{ __('Kembali') }}
             </a>
         </div>
 
@@ -43,11 +43,11 @@
                 <label for="project_id" class="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">Project</label>
                 <select id="project_id" name="project_id" required
                         class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
-                    <option value="">Pilih Project</option>
+                    <option value="">{{ __('Pilih Project') }}</option>
                     @foreach($projects as $project)
                         <option value="{{ $project->id }}"
                                 {{ (string) old('project_id', $requestHarga->project_id) === (string) $project->id ? 'selected' : '' }}>
-                            {{ $project->project_name }} — {{ $project->customer?->name ?? 'Tanpa customer' }}
+                            {{ $project->project_name }} — {{ $project->customer?->name ?? __('Tanpa customer') }}
                         </option>
                     @endforeach
                 </select>
@@ -62,7 +62,7 @@
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Items</label>
                     <button type="button" @click="addItem()"
                             class="rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 text-xs font-semibold transition">
-                        + Tambah Item
+                        {{ __('+ Tambah Item') }}
                     </button>
                 </div>
 
@@ -72,7 +72,7 @@
                             <div class="sm:col-span-5">
                                 <label class="block text-xs font-medium text-slate-500 mb-1" x-text="'Device #' + (index + 1)"></label>
                                 <input type="text" x-model="item.device" name="items[][device]"
-                                       placeholder="Nama perangkat"
+                                       placeholder="{{ __('Nama perangkat') }}"
                                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                             </div>
                             <div class="sm:col-span-2">
@@ -81,9 +81,9 @@
                                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                             </div>
                             <div class="sm:col-span-4">
-                                <label class="block text-xs font-medium text-slate-500 mb-1">Spesifikasi</label>
+                                <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Spesifikasi') }}</label>
                                 <input type="text" x-model="item.specification" name="items[][specification]"
-                                       placeholder="Opsional"
+                                       placeholder="{{ __('Opsional') }}"
                                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                             </div>
                             <div class="sm:col-span-1 flex items-end justify-end">
@@ -104,9 +104,9 @@
 
             {{-- Notes --}}
             <div>
-                <label for="notes" class="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">Catatan</label>
+                <label for="notes" class="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">{{ __('Catatan') }}</label>
                 <textarea id="notes" name="notes" rows="3"
-                          placeholder="Catatan tambahan (opsional)"
+                          placeholder="{{ __('Catatan tambahan (opsional)') }}"
                           class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">{{ old('notes', $requestHarga->notes) }}</textarea>
                 @error('notes')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -132,11 +132,11 @@
             <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
                 <a href="{{ route('teknisi.request-hargas.show', $requestHarga) }}"
                    class="rounded-xl border border-slate-300 text-slate-700 hover:bg-white px-5 py-2.5 text-sm font-medium transition dark:border-slate-600 dark:text-slate-200">
-                    Batal
+                    {{ __('Batal') }}
                 </a>
                 <button type="submit"
                         class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 text-sm font-semibold transition">
-                    Simpan Perubahan
+                    {{ __('Simpan Perubahan') }}
                 </button>
             </div>
         </form>

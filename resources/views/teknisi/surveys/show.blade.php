@@ -2,7 +2,7 @@
 <div class="px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Detail Survey</h1>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">{{ __('Detail Survey') }}</h1>
             <p class="text-slate-500 mt-1">{{ $survey->project?->project_name ?? '-' }}</p>
         </div>
         <div class="flex gap-2">
@@ -12,7 +12,7 @@
             </a>
             <a href="{{ route('teknisi.surveys.index') }}"
                class="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 font-medium transition">
-                Kembali
+                {{ __('Kembali') }}
             </a>
         </div>
     </div>
@@ -49,19 +49,19 @@
 
                 {{-- Tanggal Survey --}}
                 <div>
-                    <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Tanggal Survey</p>
+                    <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">{{ __('Tanggal Survey') }}</p>
                     <p class="text-slate-800 dark:text-slate-100">{{ $survey->survey_date ? \Carbon\Carbon::parse($survey->survey_date)->format('d M Y') : '-' }}</p>
                 </div>
 
                 {{-- Lokasi --}}
                 <div>
-                    <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Lokasi</p>
+                    <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">{{ __('Lokasi') }}</p>
                     <p class="text-slate-800 dark:text-slate-100">{{ $survey->location ?? '-' }}</p>
                 </div>
 
                 {{-- PIC --}}
                 <div>
-                    <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">PIC</p>
+                    <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">{{ __('PIC') }}</p>
                     <p class="text-slate-800 dark:text-slate-100">{{ $survey->pic ?? '-' }}</p>
                 </div>
             </div>
@@ -76,19 +76,19 @@
 
             {{-- Survey Data --}}
             <div>
-                <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Data Survey</p>
+                <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">{{ __('Data Survey') }}</p>
                 <p class="text-slate-800 dark:text-slate-100 whitespace-pre-wrap">{{ $survey->survey_data ?: '-' }}</p>
             </div>
 
             {{-- Survey Report --}}
             <div>
-                <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Laporan Survey</p>
+                <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">{{ __('Laporan Survey') }}</p>
                 <p class="text-slate-800 dark:text-slate-100 whitespace-pre-wrap">{{ $survey->survey_report ?: '-' }}</p>
             </div>
 
             {{-- Notes --}}
             <div>
-                <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Catatan</p>
+                <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">{{ __('Catatan') }}</p>
                 <p class="text-slate-800 dark:text-slate-100 whitespace-pre-wrap">{{ $survey->notes ?: '-' }}</p>
             </div>
         </div>

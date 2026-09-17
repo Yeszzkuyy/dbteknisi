@@ -11,12 +11,12 @@
 <div class="px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Edit Sizing Project</h1>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">{{ __('Edit Sizing Project') }}</h1>
             <p class="text-slate-500 dark:text-slate-400 mt-1">{{ $sizingProject->project->project_name ?? 'Sizing Project' }}</p>
         </div>
         <a href="{{ route('teknisi.sizing-projects.show', $sizingProject) }}"
            class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 rounded-xl text-sm">
-            Kembali
+            {{ __('Kembali') }}
         </a>
     </div>
 
@@ -40,7 +40,7 @@
                     <label for="project_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Project <span class="text-red-500">*</span></label>
                     <select name="project_id" id="project_id" required
                             class="mt-1 block w-full rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">— Pilih Project —</option>
+                        <option value="">{{ __('— Pilih Project —') }}</option>
                         @foreach ($projects as $project)
                             <option value="{{ $project->id }}"
                                 @selected(old('project_id', $sizingProject->project_id) == $project->id)>
@@ -65,13 +65,13 @@
             </div>
 
             <div>
-                <label for="recommendation" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Rekomendasi</label>
+                <label for="recommendation" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('Rekomendasi') }}</label>
                 <textarea name="recommendation" id="recommendation" rows="3"
                           class="mt-1 block w-full rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('recommendation', $sizingProject->recommendation) }}</textarea>
             </div>
 
             <div>
-                <label for="specifications" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Spesifikasi</label>
+                <label for="specifications" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('Spesifikasi') }}</label>
                 <textarea name="specifications" id="specifications" rows="3"
                           class="mt-1 block w-full rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('specifications', $sizingProject->specifications) }}</textarea>
             </div>
@@ -95,13 +95,13 @@
             </div>
 
             <div>
-                <label for="topology" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Topologi</label>
+                <label for="topology" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('Topologi') }}</label>
                 <textarea name="topology" id="topology" rows="3"
                           class="mt-1 block w-full rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('topology', $sizingProject->topology) }}</textarea>
             </div>
 
             <div>
-                <label for="technical_notes" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Catatan Teknis</label>
+                <label for="technical_notes" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('Catatan Teknis') }}</label>
                 <textarea name="technical_notes" id="technical_notes" rows="3"
                           class="mt-1 block w-full rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">{{ old('technical_notes', $sizingProject->technical_notes) }}</textarea>
             </div>
@@ -115,11 +115,11 @@
             <div class="flex items-center justify-end gap-3 pt-2">
                 <a href="{{ route('teknisi.sizing-projects.show', $sizingProject) }}"
                    class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 rounded-xl text-sm">
-                    Batal
+                    {{ __('Batal') }}
                 </a>
                 <button type="submit"
                         class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium">
-                    Simpan Perubahan
+                    {{ __('Simpan Perubahan') }}
                 </button>
             </div>
         </form>

@@ -3,20 +3,20 @@
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Document Repository</h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-1">Semua dokumen technical project</p>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">{{ __('Semua dokumen technical project') }}</p>
         </div>
     </div>
 
     {{-- Filter --}}
     <form method="GET" class="flex flex-wrap gap-3">
         <select name="project_id" class="rounded-xl border-slate-300 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
-            <option value="">Semua Project</option>
+            <option value="">{{ __('Semua Project') }}</option>
             @foreach($documents->pluck('project')->unique('id') as $p)
                 <option value="{{ $p->id }}" {{ request('project_id') == $p->id ? 'selected' : '' }}>{{ $p->project_name }}</option>
             @endforeach
         </select>
         <select name="document_category_id" class="rounded-xl border-slate-300 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
-            <option value="">Semua Kategori</option>
+            <option value="">{{ __('Semua Kategori') }}</option>
             @foreach($categories as $cat)
                 <option value="{{ $cat->id }}" {{ request('document_category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
             @endforeach
@@ -32,10 +32,10 @@
                     <tr>
                         <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Project</th>
                         <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Customer</th>
-                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Kategori</th>
+                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Kategori') }}</th>
                         <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">File</th>
                         <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Uploaded By</th>
-                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Tanggal</th>
+                        <th class="px-6 py-3.5 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Tanggal') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
@@ -52,7 +52,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-16 text-center text-sm text-slate-400 dark:text-slate-500">Belum ada dokumen.</td>
+                            <td colspan="6" class="px-6 py-16 text-center text-sm text-slate-400 dark:text-slate-500">{{ __('Belum ada dokumen.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

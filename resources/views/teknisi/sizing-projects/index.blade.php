@@ -19,11 +19,11 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Sizing Projects</h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-1">Kelola hasil sizing / usulan solusi per project</p>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">{{ __('Kelola hasil sizing / usulan solusi per project') }}</p>
         </div>
         <a href="{{ route('teknisi.sizing-projects.create') }}"
            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium">
-            + Tambah Sizing
+            {{ __('+ Tambah Sizing') }}
         </a>
     </div>
 
@@ -40,7 +40,7 @@
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
             <select name="status"
                     class="rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Semua Status</option>
+                <option value="">{{ __('Semua Status') }}</option>
                 @foreach ($statuses as $value => $label)
                     <option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>
                 @endforeach
@@ -51,7 +51,7 @@
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Project</label>
             <select name="project_id"
                     class="rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Semua Project</option>
+                <option value="">{{ __('Semua Project') }}</option>
                 @foreach ($projects as $project)
                     <option value="{{ $project->id }}" @selected(request('project_id') == $project->id)>
                         {{ $project->project_name }}
@@ -81,7 +81,7 @@
                 <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
                         @php
-                            $headers = ['Project', 'Customer', 'Sales PIC', 'Quantity', 'Status', 'Aksi'];
+                            $headers = ['Project', 'Customer', 'Sales PIC', 'Quantity', 'Status', __('Aksi')];
                         @endphp
                         @foreach ($headers as $header)
                             <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">{{ $header }}</th>
@@ -112,19 +112,19 @@
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('teknisi.sizing-projects.show', $sizing) }}"
                                        class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700">
-                                        Lihat
+                                        {{ __('Lihat') }}
                                     </a>
                                     <a href="{{ route('teknisi.sizing-projects.edit', $sizing) }}"
                                        class="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-100 hover:bg-blue-200 text-blue-700">
                                         Edit
                                     </a>
                                     <form action="{{ route('teknisi.sizing-projects.destroy', $sizing) }}" method="POST"
-                                          onsubmit="return confirm('Hapus sizing project ini?');">
+                                          onsubmit="return confirm('{{ __('Hapus sizing project ini?') }}');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
                                                 class="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-600 hover:bg-red-700 text-white">
-                                            Hapus
+                                            {{ __('Hapus') }}
                                         </button>
                                     </form>
                                 </div>
@@ -133,7 +133,7 @@
                     @empty
                         <tr>
                             <td colspan="6">
-                                <x-empty-state label="sizing project" description="Belum ada data sizing." />
+                                <x-empty-state label="sizing project" description="{{ __('Belum ada data sizing.') }}" />
                             </td>
                         </tr>
                     @endforelse
