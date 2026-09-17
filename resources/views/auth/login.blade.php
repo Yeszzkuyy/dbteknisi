@@ -390,6 +390,21 @@
             animation: halo-breathe 9s ease-in-out infinite;
         }
 
+        .login-circle {
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            left: 50%;
+            width: 92%;
+            aspect-ratio: 1;
+            border: 1px solid rgba(165, 180, 252, 0.4);
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 30%, rgba(99, 102, 241, 0.85) 0%, #3730a3 48%, #1e1b4b 100%);
+            box-shadow: 0 0 70px rgba(79, 70, 229, 0.4), inset 0 0 90px rgba(30, 27, 75, 0.55);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
         .login-parallax {
             position: absolute;
             inset: 0;
@@ -409,7 +424,6 @@
             fill: none;
             stroke: #e6ecff;
             stroke-width: 0.35;
-            stroke-dasharray: 0.55 4.2;
             stroke-linecap: round;
             filter: url(#login-connector-glow);
             opacity: 0.9;
@@ -437,7 +451,7 @@
             z-index: 3;
             top: 10%;
             left: 27%;
-            width: 30%;
+            width: 22%;
             transform: translate(-50%, -50%);
             filter: drop-shadow(0 0 8px rgba(186, 230, 253, 0.9)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.3));
             animation: hand-icon-float 6s ease-in-out infinite;
@@ -473,11 +487,11 @@
             filter: drop-shadow(0 0 5px rgba(224, 231, 255, 0.72)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.32));
         }
 
-        .login-icon-2 { top: 42%; left: 25%; --icon-glow: rgba(196, 181, 253, 0.95); --float-duration: 7.2s; --float-delay: -3.4s; }
-        .login-icon-3 { top: 72%; left: 27%; --icon-glow: rgba(249, 168, 212, 0.92); --float-duration: 5.8s; --float-delay: -2.3s; }
-        .login-icon-4 { top: 30%; left: 71%; --icon-glow: rgba(253, 230, 138, 0.95); --float-duration: 6.8s; --float-delay: -4.1s; }
-        .login-icon-5 { top: 45%; left: 78%; --icon-glow: rgba(253, 186, 116, 0.92); --float-duration: 7.6s; --float-delay: -1.8s; }
-        .login-icon-6 { top: 74%; left: 36%; --icon-glow: rgba(252, 165, 165, 0.95); --float-duration: 6.1s; --float-delay: -4.8s; }
+        .login-icon-2 { top: 42%; left: 25%; --icon-glow: rgba(96, 165, 250, 0.95); --float-duration: 7.2s; --float-delay: -3.4s; }
+        .login-icon-3 { top: 76%; left: 24%; --icon-glow: rgba(249, 115, 22, 0.92); --float-duration: 5.8s; --float-delay: -2.3s; }
+        .login-icon-4 { top: 28%; left: 69%; --icon-glow: rgba(239, 68, 68, 0.92); --float-duration: 6.8s; --float-delay: -4.1s; }
+        .login-icon-5 { top: 44%; left: 80%; --icon-glow: rgba(250, 204, 21, 0.95); --float-duration: 7.6s; --float-delay: -1.8s; }
+        .login-icon-6 { top: 72%; left: 46%; --icon-glow: rgba(251, 146, 60, 0.95); --float-duration: 6.1s; --float-delay: -4.8s; }
 
         @keyframes character-float {
             0%, 100% { transform: translate(-50%, -50%) rotate(-1deg); }
@@ -764,6 +778,7 @@
 
                 <div class="login-visual" aria-hidden="true">
                     <div class="login-visual-halo"></div>
+                    <div class="login-circle"></div>
 
                     <div x-ref="connectors" class="login-parallax">
                         <svg class="login-connectors" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -779,17 +794,17 @@
 
                             <path class="connector-line" d="M52 52C50 46 47 39 45 32" />
                             <path class="connector-line" d="M52 52C44 46 34 45 25 42" />
-                            <path class="connector-line" d="M52 52C40 62 33 66 27 72" />
-                            <path class="connector-line" d="M52 52C60 42 66 36 71 30" />
-                            <path class="connector-line" d="M52 52C63 48 71 46 78 45" />
-                            <path class="connector-line" d="M52 52C45 62 40 68 36 74" />
+                            <path class="connector-line" d="M52 52C40 64 32 70 24 76" />
+                            <path class="connector-line" d="M52 52C60 40 65 34 69 28" />
+                            <path class="connector-line" d="M52 52C63 47 70 45 80 44" />
+                            <path class="connector-line" d="M52 52C47 61 47 66 46 72" />
 
-                            <circle cx="45" cy="32" r="1.3" fill="#EAF6FF" />
-                            <circle cx="25" cy="42" r="1.1" fill="#C4B5FD" />
-                            <circle cx="27" cy="72" r="1.1" fill="#F9A8D4" />
-                            <circle cx="71" cy="30" r="1.1" fill="#FDE68A" />
-                            <circle cx="78" cy="45" r="1.1" fill="#FDBA74" />
-                            <circle cx="36" cy="74" r="1.1" fill="#FCA5A5" />
+                            <circle cx="45" cy="32" r="1.3" fill="#BAE6FD" />
+                            <circle cx="25" cy="42" r="1.1" fill="#93C5FD" />
+                            <circle cx="24" cy="76" r="1.1" fill="#FB923C" />
+                            <circle cx="69" cy="28" r="1.1" fill="#F87171" />
+                            <circle cx="80" cy="44" r="1.1" fill="#FDE047" />
+                            <circle cx="46" cy="72" r="1.1" fill="#FDBA74" />
                         </svg>
                     </div>
 
