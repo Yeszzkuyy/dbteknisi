@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-30 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl border-b border-slate-200/70 h-16 sm:h-20 flex items-center justify-between px-4 sm:px-8 lg:px-8">
+<header class="sticky top-0 z-30 bg-white/85 dark:bg-zinc-900 backdrop-blur-xl border-b border-slate-200/70 dark:border-zinc-800 h-16 sm:h-20 flex items-center justify-between px-4 sm:px-8 lg:px-8">
     <div class="flex items-center gap-3">
         {{-- Hamburger, hanya tampil di mobile --}}
         <button id="hamburgerBtn" type="button"
