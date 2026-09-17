@@ -395,38 +395,14 @@
             overflow: visible;
         }
 
-        .connector-base,
-        .connector-flow,
-        .connector-glow {
+        .connector-line {
             fill: none;
+            stroke: #e0e7ff;
+            stroke-width: 0.8;
             stroke-linecap: round;
-        }
-
-        .connector-glow {
-            stroke: rgba(165, 180, 252, 0.8);
-            stroke-width: 2.8;
             filter: url(#login-connector-glow);
-            opacity: 0.42;
+            opacity: 0.75;
         }
-
-        .connector-base {
-            stroke: rgba(224, 231, 255, 0.22);
-            stroke-width: 0.5;
-        }
-
-        .connector-flow {
-            stroke: #f5f3ff;
-            stroke-width: 0.85;
-            stroke-dasharray: 0.8 8;
-            filter: url(#login-connector-glow);
-            animation: connector-flow 9s linear infinite;
-        }
-
-        .connector-flow.flow-2 { animation-delay: -1.8s; }
-        .connector-flow.flow-3 { animation-delay: -3.4s; }
-        .connector-flow.flow-4 { animation-delay: -5.1s; }
-        .connector-flow.flow-5 { animation-delay: -6.6s; }
-        .connector-flow.flow-6 { animation-delay: -8.1s; }
 
         .login-character {
             position: absolute;
@@ -443,6 +419,17 @@
             width: 100%;
             height: auto;
             filter: drop-shadow(0 16px 18px rgba(15, 23, 42, 0.34));
+        }
+
+        .login-hand-icon {
+            position: absolute;
+            z-index: 3;
+            top: 40%;
+            left: 55%;
+            width: 24%;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 6px rgba(186, 230, 253, 0.85)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.3));
+            animation: hand-icon-float 6s ease-in-out infinite;
         }
 
         .login-icon {
@@ -474,7 +461,6 @@
             filter: drop-shadow(0 0 5px rgba(224, 231, 255, 0.72)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.32));
         }
 
-        .login-icon-1 { top: 1%; left: 21%; --icon-glow: rgba(186, 230, 253, 0.95); --float-duration: 6.4s; --float-delay: -1.2s; }
         .login-icon-2 { top: 37%; left: 1%; --icon-glow: rgba(196, 181, 253, 0.95); --float-duration: 7.2s; --float-delay: -3.4s; }
         .login-icon-3 { top: 73%; left: 17%; --icon-glow: rgba(249, 168, 212, 0.92); --float-duration: 5.8s; --float-delay: -2.3s; }
         .login-icon-4 { top: 1%; left: 72%; --icon-glow: rgba(253, 230, 138, 0.95); --float-duration: 6.8s; --float-delay: -4.1s; }
@@ -496,13 +482,14 @@
             50% { opacity: 1; }
         }
 
-        @keyframes connector-flow {
-            to { stroke-dashoffset: -100; }
-        }
-
         @keyframes halo-breathe {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
+        }
+
+        @keyframes hand-icon-float {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-3deg); }
+            50% { transform: translate(-50%, calc(-50% - 0.5rem)) rotate(4deg); }
         }
 
         @media (prefers-reduced-motion: no-preference) {
@@ -573,8 +560,8 @@
             .login-character,
             .login-icon,
             .login-icon::before,
+            .login-hand-icon,
             .login-visual-halo,
-            .connector-flow,
             .login-form-inner {
                 animation: none !important;
             }
@@ -778,24 +765,12 @@
                                 </filter>
                             </defs>
 
-                            <path class="connector-glow" d="M52 52C44 42 35 18 27.5 7.5" />
-                            <path class="connector-base" d="M52 52C44 42 35 18 27.5 7.5" />
-                            <path class="connector-flow flow-1" d="M52 52C44 42 35 18 27.5 7.5" />
-                            <path class="connector-glow" d="M52 52C38 49 20 44 7.5 43.5" />
-                            <path class="connector-base" d="M52 52C38 49 20 44 7.5 43.5" />
-                            <path class="connector-flow flow-2" d="M52 52C38 49 20 44 7.5 43.5" />
-                            <path class="connector-glow" d="M52 54C43 64 32 76 23.5 79.5" />
-                            <path class="connector-base" d="M52 54C43 64 32 76 23.5 79.5" />
-                            <path class="connector-flow flow-3" d="M52 54C43 64 32 76 23.5 79.5" />
-                            <path class="connector-glow" d="M54 50C62 39 72 17 78.5 7.5" />
-                            <path class="connector-base" d="M54 50C62 39 72 17 78.5 7.5" />
-                            <path class="connector-flow flow-4" d="M54 50C62 39 72 17 78.5 7.5" />
-                            <path class="connector-glow" d="M56 52C68 50 82 46 91.5 44.5" />
-                            <path class="connector-base" d="M56 52C68 50 82 46 91.5 44.5" />
-                            <path class="connector-flow flow-5" d="M56 52C68 50 82 46 91.5 44.5" />
-                            <path class="connector-glow" d="M54 56C55 66 56 77 56.5 84.5" />
-                            <path class="connector-base" d="M54 56C55 66 56 77 56.5 84.5" />
-                            <path class="connector-flow flow-6" d="M54 56C55 66 56 77 56.5 84.5" />
+                            <path class="connector-line" d="M52 52C44 42 35 18 27.5 7.5" />
+                            <path class="connector-line" d="M52 52C38 49 20 44 7.5 43.5" />
+                            <path class="connector-line" d="M52 54C43 64 32 76 23.5 79.5" />
+                            <path class="connector-line" d="M54 50C62 39 72 17 78.5 7.5" />
+                            <path class="connector-line" d="M56 52C68 50 82 46 91.5 44.5" />
+                            <path class="connector-line" d="M54 56C55 66 56 77 56.5 84.5" />
 
                             <circle cx="27.5" cy="7.5" r="1.1" fill="#BAE6FD" />
                             <circle cx="7.5" cy="43.5" r="1.1" fill="#C4B5FD" />
@@ -809,11 +784,11 @@
                     <div x-ref="character" class="login-parallax">
                         <div class="login-character">
                             <img src="{{ asset('images/Asset_LoginPage/character2.svg') }}" alt="" fetchpriority="high" decoding="async">
+                            <img class="login-hand-icon" src="{{ asset('images/Asset_LoginPage/icon1.svg') }}" alt="" decoding="async">
                         </div>
                     </div>
 
                     <div x-ref="icons" class="login-parallax">
-                        <div class="login-icon login-icon-1"><img src="{{ asset('images/Asset_LoginPage/icon1.svg') }}" alt="" decoding="async"></div>
                         <div class="login-icon login-icon-2"><img src="{{ asset('images/Asset_LoginPage/icon2.svg') }}" alt="" decoding="async"></div>
                         <div class="login-icon login-icon-3"><img src="{{ asset('images/Asset_LoginPage/icon3.svg') }}" alt="" decoding="async"></div>
                         <div class="login-icon login-icon-4"><img src="{{ asset('images/Asset_LoginPage/icon4.svg') }}" alt="" decoding="async"></div>
