@@ -124,6 +124,22 @@ class ManageSalesTest extends TestCase
         $this->assertNotNull(LeadActivity::where('lead_id', $lead->id)->where('action', 'updated')->first());
     }
 
+    public function test_management_changing_pt_keeps_assignment(): void
+    {
+        $this->actingAs($this->loginAs('management'));
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+        $lead = $this->makeLead($sales);
+
+        $this->actingAs($this->loginAs('management'))
+            ->put(route('manage-sales.update', $lead), ['pt_group' => 'WANI'])
+            ->assertRedirect(route('manage-sales.index'));
+
+        $lead->refresh();
+        $this->assertSame('WANI', $lead->pt_group);
+        $this->assertSame($sales->id, $lead->assigned_to);
+    }
+
     public function test_sales_sees_only_own_assigned_leads(): void
     {
         $sales = $this->loginAs('sales');

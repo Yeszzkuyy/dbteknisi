@@ -56,7 +56,10 @@ class ManageSalesController extends Controller
         }
 
         $lead->fill($validated);
-        $this->trackAssignment($lead, $validated['assigned_to'] ?? null);
+
+        if ($request->has('assigned_to')) {
+            $this->trackAssignment($lead, $validated['assigned_to']);
+        }
 
         $changes = [];
         foreach ($validated as $field => $value) {

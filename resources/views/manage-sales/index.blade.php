@@ -42,6 +42,7 @@
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Kebutuhan</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Tanggal Masuk</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Lead dari PT</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Assign / Direct ke Sales</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -87,6 +88,19 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-left">
+                                <form action="{{ route('manage-sales.update', $lead) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <select name="pt_group" onchange="this.form.submit()" title="Ubah lead dari PT"
+                                            class="w-24 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        <option value="">—</option>
+                                        @foreach(\App\Models\Lead::PT_GROUPS as $pt)
+                                            <option value="{{ $pt }}" {{ $lead->pt_group === $pt ? 'selected' : '' }}>{{ $pt }}</option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            </td>
+                            <td class="px-6 py-4 text-left">
                                 <form action="{{ route('manage-sales.assign', $lead) }}" method="POST" class="flex items-center gap-2">
                                     @csrf
                                     <select name="assigned_to" class="w-40 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
@@ -116,7 +130,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-500">
                                 Belum ada lead dari marketing.
                             </td>
                         </tr>
