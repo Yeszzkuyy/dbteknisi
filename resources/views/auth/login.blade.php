@@ -37,7 +37,7 @@
         }
 
         /* ============================================================
-           Halaman: gradient pastel + shell putih rounded
+           Halaman: full-bleed form + panel ilustrasi
            ============================================================ */
         .login-page {
             min-height: 100vh;
@@ -50,7 +50,7 @@
             width: 100%;
             min-height: 100vh;
             min-height: 100dvh;
-            grid-template-columns: clamp(24rem, 46vw, 40rem) 1fr;
+            grid-template-columns: 45% 55%;
             overflow: hidden;
             background: #ffffff;
         }
@@ -59,15 +59,33 @@
            Panel kiri: form
            ============================================================ */
         .login-form-panel {
+            position: relative;
             display: flex;
             min-width: 0;
             flex-direction: column;
             justify-content: center;
+            overflow: hidden;
             background: #ffffff;
             padding: clamp(2rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 4rem);
         }
 
+        .login-form-panel::before {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 12% 18%, rgba(99, 102, 241, 0.12) 0 1px, transparent 1.5px),
+                radial-gradient(circle at 82% 76%, rgba(236, 72, 153, 0.09) 0 1px, transparent 1.5px),
+                linear-gradient(135deg, rgba(224, 231, 255, 0.24), transparent 34%, rgba(251, 207, 232, 0.14));
+            background-size: 32px 32px, 46px 46px, auto;
+            content: '';
+            opacity: 0.48;
+            pointer-events: none;
+        }
+
         .login-form-inner {
+            position: relative;
+            z-index: 1;
             width: min(100%, 24rem);
             margin: 0 auto;
         }
@@ -289,7 +307,7 @@
             justify-content: center;
             overflow: hidden;
             background: linear-gradient(150deg, #221a8f 0%, #2f2ac4 46%, #4f46e5 100%);
-            border-radius: 18% 0 0 18% / 42% 0 0 42%;
+            border-radius: 28% 0 0 28% / 50% 0 0 50%;
         }
 
         .login-brand-kinetic {
@@ -378,9 +396,17 @@
         }
 
         .connector-base,
-        .connector-flow {
+        .connector-flow,
+        .connector-glow {
             fill: none;
             stroke-linecap: round;
+        }
+
+        .connector-glow {
+            stroke: rgba(165, 180, 252, 0.8);
+            stroke-width: 2.8;
+            filter: url(#login-connector-glow);
+            opacity: 0.42;
         }
 
         .connector-base {
@@ -389,9 +415,9 @@
         }
 
         .connector-flow {
-            stroke: #e0e7ff;
-            stroke-width: 1.1;
-            stroke-dasharray: 1 9;
+            stroke: #f5f3ff;
+            stroke-width: 0.85;
+            stroke-dasharray: 0.8 8;
             filter: url(#login-connector-glow);
             animation: connector-flow 9s linear infinite;
         }
@@ -423,7 +449,7 @@
             position: absolute;
             z-index: 3;
             display: grid;
-            width: clamp(2.6rem, 13%, 4rem);
+            width: clamp(2.6rem, 13%, 6rem);
             aspect-ratio: 1;
             place-items: center;
             animation: icon-float var(--float-duration, 6s) ease-in-out var(--float-delay, 0s) infinite;
@@ -445,7 +471,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.3));
+            filter: drop-shadow(0 0 5px rgba(224, 231, 255, 0.72)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.32));
         }
 
         .login-icon-1 { top: 1%; left: 21%; --icon-glow: rgba(186, 230, 253, 0.95); --float-duration: 6.4s; --float-delay: -1.2s; }
@@ -752,25 +778,31 @@
                                 </filter>
                             </defs>
 
-                            <path class="connector-base" d="M52 52C46 40 38 28 30 16" />
-                            <path class="connector-flow flow-1" d="M52 52C46 40 38 28 30 16" />
-                            <path class="connector-base" d="M51 52C38 50 24 48 9 44" />
-                            <path class="connector-flow flow-2" d="M51 52C38 50 24 48 9 44" />
-                            <path class="connector-base" d="M52 56C44 66 36 76 26 86" />
-                            <path class="connector-flow flow-3" d="M52 56C44 66 36 76 26 86" />
-                            <path class="connector-base" d="M55 50C63 38 70 27 80 15" />
-                            <path class="connector-flow flow-4" d="M55 50C63 38 70 27 80 15" />
-                            <path class="connector-base" d="M56 52C68 52 80 51 93 49" />
-                            <path class="connector-flow flow-5" d="M56 52C68 52 80 51 93 49" />
-                            <path class="connector-base" d="M54 58C54 70 54 80 54 90" />
-                            <path class="connector-flow flow-6" d="M54 58C54 70 54 80 54 90" />
+                            <path class="connector-glow" d="M52 52C44 42 35 18 27.5 7.5" />
+                            <path class="connector-base" d="M52 52C44 42 35 18 27.5 7.5" />
+                            <path class="connector-flow flow-1" d="M52 52C44 42 35 18 27.5 7.5" />
+                            <path class="connector-glow" d="M52 52C38 49 20 44 7.5 43.5" />
+                            <path class="connector-base" d="M52 52C38 49 20 44 7.5 43.5" />
+                            <path class="connector-flow flow-2" d="M52 52C38 49 20 44 7.5 43.5" />
+                            <path class="connector-glow" d="M52 54C43 64 32 76 23.5 79.5" />
+                            <path class="connector-base" d="M52 54C43 64 32 76 23.5 79.5" />
+                            <path class="connector-flow flow-3" d="M52 54C43 64 32 76 23.5 79.5" />
+                            <path class="connector-glow" d="M54 50C62 39 72 17 78.5 7.5" />
+                            <path class="connector-base" d="M54 50C62 39 72 17 78.5 7.5" />
+                            <path class="connector-flow flow-4" d="M54 50C62 39 72 17 78.5 7.5" />
+                            <path class="connector-glow" d="M56 52C68 50 82 46 91.5 44.5" />
+                            <path class="connector-base" d="M56 52C68 50 82 46 91.5 44.5" />
+                            <path class="connector-flow flow-5" d="M56 52C68 50 82 46 91.5 44.5" />
+                            <path class="connector-glow" d="M54 56C55 66 56 77 56.5 84.5" />
+                            <path class="connector-base" d="M54 56C55 66 56 77 56.5 84.5" />
+                            <path class="connector-flow flow-6" d="M54 56C55 66 56 77 56.5 84.5" />
 
-                            <circle cx="30" cy="16" r="1.1" fill="#BAE6FD" />
-                            <circle cx="9" cy="44" r="1.1" fill="#C4B5FD" />
-                            <circle cx="26" cy="86" r="1.1" fill="#F9A8D4" />
-                            <circle cx="80" cy="15" r="1.1" fill="#FDE68A" />
-                            <circle cx="93" cy="49" r="1.1" fill="#FDBA74" />
-                            <circle cx="54" cy="90" r="1.1" fill="#FCA5A5" />
+                            <circle cx="27.5" cy="7.5" r="1.1" fill="#BAE6FD" />
+                            <circle cx="7.5" cy="43.5" r="1.1" fill="#C4B5FD" />
+                            <circle cx="23.5" cy="79.5" r="1.1" fill="#F9A8D4" />
+                            <circle cx="78.5" cy="7.5" r="1.1" fill="#FDE68A" />
+                            <circle cx="91.5" cy="44.5" r="1.1" fill="#FDBA74" />
+                            <circle cx="56.5" cy="84.5" r="1.1" fill="#FCA5A5" />
                         </svg>
                     </div>
 
