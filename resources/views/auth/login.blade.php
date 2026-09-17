@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Masuk - {{ config('app.name', 'Tridaya App') }}</title>
+    <title>Sign in - {{ config('app.name', 'Tridaya App') }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet">
@@ -15,7 +15,6 @@
         [x-cloak] { display: none !important; }
 
         :root {
-            --login-navy: #1e40af;
             --login-blue: #2563eb;
             --login-ink: #111827;
             --login-muted: #6b7280;
@@ -37,25 +36,48 @@
             text-rendering: optimizeLegibility;
         }
 
+        /* ============================================================
+           Halaman: gradient pastel + shell putih rounded
+           ============================================================ */
         .login-page {
-            display: grid;
+            display: flex;
             min-height: 100vh;
             min-height: 100dvh;
-            grid-template-columns: minmax(22rem, 40%) 1fr;
-            background: var(--login-paper);
+            align-items: center;
+            justify-content: center;
+            padding: 1.75rem;
+            background:
+                radial-gradient(circle at 8% 18%, rgba(129, 140, 248, 0.3), transparent 32%),
+                radial-gradient(circle at 92% 86%, rgba(251, 146, 60, 0.18), transparent 34%),
+                linear-gradient(135deg, #ddd9ff 0%, #f2d9f1 50%, #ffddd3 100%);
         }
 
+        .login-shell {
+            display: grid;
+            width: min(1120px, 100%);
+            min-height: 660px;
+            grid-template-columns: minmax(20rem, 44%) 1fr;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 2rem;
+            background: #ffffff;
+            box-shadow: 0 40px 80px -32px rgba(76, 29, 149, 0.35), 0 12px 28px -18px rgba(76, 29, 149, 0.25);
+        }
+
+        /* ============================================================
+           Panel kiri: form
+           ============================================================ */
         .login-form-panel {
             display: flex;
             min-width: 0;
             flex-direction: column;
             justify-content: center;
             background: #ffffff;
-            padding: clamp(2rem, 6vw, 6rem) clamp(1.5rem, 6vw, 6.5rem);
+            padding: clamp(2rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 4rem);
         }
 
         .login-form-inner {
-            width: min(100%, 23.75rem);
+            width: min(100%, 22.5rem);
             margin: 0 auto;
         }
 
@@ -90,13 +112,13 @@
         }
 
         .login-header {
-            margin-top: clamp(3rem, 8vh, 5.5rem);
+            margin-top: clamp(2.5rem, 7vh, 4.5rem);
         }
 
         .login-header h1 {
             margin: 0;
             color: var(--login-ink);
-            font-size: clamp(1.5rem, 2.5vw, 1.75rem);
+            font-size: clamp(1.5rem, 2.4vw, 1.75rem);
             font-weight: 600;
             letter-spacing: -0.035em;
             line-height: 1.25;
@@ -265,6 +287,9 @@
             margin-top: 1.25rem;
         }
 
+        /* ============================================================
+           Panel kanan: navy + kinetic grid + ilustrasi
+           ============================================================ */
         .login-brand-panel {
             position: relative;
             display: flex;
@@ -272,72 +297,194 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            padding: 3rem;
-        }
-
-        .login-brand-panel::before {
-            position: absolute;
-            top: -12rem;
-            right: -8rem;
-            width: 32rem;
-            height: 32rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-            box-shadow: 0 0 0 2rem rgba(255, 255, 255, 0.025), 0 0 0 5rem rgba(255, 255, 255, 0.02);
-            content: '';
-            pointer-events: none;
-        }
-
-        .login-brand-panel::after {
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.38) 1px, transparent 1.2px);
-            background-size: 2rem 2rem;
-            content: '';
-            opacity: 0.1;
-            pointer-events: none;
+            background: linear-gradient(150deg, #221a8f 0%, #2f2ac4 46%, #4f46e5 100%);
+            border-radius: 22% 0 0 22% / 50% 0 0 50%;
         }
 
         .login-brand-kinetic {
             position: absolute;
+            z-index: 0;
             inset: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
         }
 
-        .login-brand-content {
-            position: relative;
+        .login-brand-panel::after {
+            position: absolute;
             z-index: 1;
-            width: min(100%, 28rem);
+            inset: 0;
+            background: linear-gradient(120deg, rgba(15, 23, 42, 0.3) 0%, transparent 38%, rgba(15, 23, 42, 0.14) 100%);
+            content: '';
+            pointer-events: none;
+        }
+
+        .login-brand-content {
+            position: absolute;
+            z-index: 3;
+            top: clamp(1.75rem, 5.5%, 3rem);
+            left: 50%;
+            width: min(70%, 21rem);
+            transform: translateX(-50%);
             color: #ffffff;
             text-align: center;
         }
 
-        .login-brand-content img {
-            width: 4.5rem;
-            height: 4.5rem;
-            object-fit: contain;
-            filter: brightness(0) invert(1);
-            opacity: 0.94;
-        }
-
         .login-brand-content h2 {
-            margin: 2rem 0 0;
+            margin: 0;
             color: #ffffff;
-            font-size: clamp(1.65rem, 3vw, 2.25rem);
+            font-size: clamp(1.15rem, 1.8vw, 1.5rem);
             font-weight: 600;
-            letter-spacing: -0.045em;
-            line-height: 1.25;
+            letter-spacing: -0.035em;
+            line-height: 1.3;
         }
 
         .login-brand-content p {
-            max-width: 23rem;
-            margin: 1.1rem auto 0;
-            color: #bfdbfe;
-            font-size: 0.9rem;
-            line-height: 1.7;
+            margin: 0.5rem 0 0;
+            color: #c7d2fe;
+            font-size: 0.78rem;
+            line-height: 1.6;
+        }
+
+        /* ---- Composition ---- */
+        .login-visual {
+            position: absolute;
+            z-index: 2;
+            top: 28%;
+            right: 6%;
+            bottom: 3%;
+            left: 6%;
+        }
+
+        .login-visual-halo {
+            position: absolute;
+            z-index: 0;
+            top: 46%;
+            left: 50%;
+            width: 78%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(199, 210, 254, 0.42), rgba(129, 140, 248, 0.16) 45%, transparent 70%);
+            filter: blur(10px);
+            transform: translate(-50%, -50%);
+            animation: halo-breathe 9s ease-in-out infinite;
+        }
+
+        .login-parallax {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0);
+            transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        .login-connectors {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .connector-base,
+        .connector-flow {
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .connector-base {
+            stroke: rgba(224, 231, 255, 0.22);
+            stroke-width: 0.5;
+        }
+
+        .connector-flow {
+            stroke: #e0e7ff;
+            stroke-width: 1.1;
+            stroke-dasharray: 1 9;
+            filter: url(#login-connector-glow);
+            animation: connector-flow 9s linear infinite;
+        }
+
+        .connector-flow.flow-2 { animation-delay: -1.8s; }
+        .connector-flow.flow-3 { animation-delay: -3.4s; }
+        .connector-flow.flow-4 { animation-delay: -5.1s; }
+        .connector-flow.flow-5 { animation-delay: -6.6s; }
+        .connector-flow.flow-6 { animation-delay: -8.1s; }
+
+        .login-character {
+            position: absolute;
+            z-index: 2;
+            top: 52%;
+            left: 52%;
+            width: 31%;
+            transform: translate(-50%, -50%);
+            animation: character-float 7.5s ease-in-out infinite;
+        }
+
+        .login-character img {
+            display: block;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 16px 18px rgba(15, 23, 42, 0.34));
+        }
+
+        .login-icon {
+            position: absolute;
+            z-index: 3;
+            display: grid;
+            width: clamp(2.6rem, 13%, 4rem);
+            aspect-ratio: 1;
+            place-items: center;
+            animation: icon-float var(--float-duration, 6s) ease-in-out var(--float-delay, 0s) infinite;
+        }
+
+        .login-icon::before {
+            position: absolute;
+            z-index: -1;
+            inset: 6%;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--icon-glow, rgba(165, 180, 252, 0.85)), transparent 70%);
+            filter: blur(10px);
+            opacity: 0.9;
+            content: '';
+            animation: icon-pulse 4s ease-in-out var(--float-delay, 0s) infinite;
+        }
+
+        .login-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.3));
+        }
+
+        .login-icon-1 { top: 1%; left: 21%; --icon-glow: rgba(186, 230, 253, 0.95); --float-duration: 6.4s; --float-delay: -1.2s; }
+        .login-icon-2 { top: 37%; left: 1%; --icon-glow: rgba(196, 181, 253, 0.95); --float-duration: 7.2s; --float-delay: -3.4s; }
+        .login-icon-3 { top: 73%; left: 17%; --icon-glow: rgba(249, 168, 212, 0.92); --float-duration: 5.8s; --float-delay: -2.3s; }
+        .login-icon-4 { top: 1%; left: 72%; --icon-glow: rgba(253, 230, 138, 0.95); --float-duration: 6.8s; --float-delay: -4.1s; }
+        .login-icon-5 { top: 38%; left: 85%; --icon-glow: rgba(253, 186, 116, 0.92); --float-duration: 7.6s; --float-delay: -1.8s; }
+        .login-icon-6 { top: 78%; left: 50%; --icon-glow: rgba(252, 165, 165, 0.95); --float-duration: 6.1s; --float-delay: -4.8s; }
+
+        @keyframes character-float {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-1deg); }
+            50% { transform: translate(-50%, calc(-50% - 0.85rem)) rotate(1deg); }
+        }
+
+        @keyframes icon-float {
+            0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); }
+            50% { transform: translate3d(0, -0.6rem, 0) rotate(3deg); }
+        }
+
+        @keyframes icon-pulse {
+            0%, 100% { opacity: 0.55; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes connector-flow {
+            to { stroke-dashoffset: -100; }
+        }
+
+        @keyframes halo-breathe {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
 
         @media (prefers-reduced-motion: no-preference) {
@@ -347,181 +494,311 @@
         }
 
         @keyframes login-fade-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ============================================================
+           Responsive
+           ============================================================ */
         @media (max-width: 1023px) {
             .login-page {
-                display: block;
+                padding: 1rem;
+                align-items: flex-start;
+            }
+
+            .login-shell {
+                display: flex;
+                min-height: 0;
+                flex-direction: column;
+                border-radius: 1.5rem;
             }
 
             .login-form-panel {
-                min-height: 100vh;
-                min-height: 100dvh;
-                padding: 2.5rem clamp(1.25rem, 8vw, 4rem);
+                order: 2;
+                padding: 2rem clamp(1.25rem, 7vw, 3rem) 2.25rem;
+            }
+
+            .login-brand-panel {
+                order: 1;
+                height: clamp(13rem, 46vw, 17rem);
+                border-radius: 1.25rem 1.25rem 2.5rem 2.5rem;
+            }
+
+            .login-brand-content {
+                display: none;
+            }
+
+            .login-visual {
+                top: 8%;
+                right: 14%;
+                bottom: 8%;
+                left: 14%;
+            }
+
+            .login-character {
+                width: 34%;
             }
         }
 
         @media (max-width: 420px) {
-            .login-form-panel {
-                padding: 2rem 1.25rem;
+            .login-brand-panel {
+                height: 12.5rem;
             }
 
             .login-header {
-                margin-top: 3.25rem;
+                margin-top: 2.75rem;
             }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+            .login-character,
+            .login-icon,
+            .login-icon::before,
+            .login-visual-halo,
+            .connector-flow,
+            .login-form-inner {
+                animation: none !important;
+            }
+
+            .login-parallax {
+                transition: none;
             }
         }
     </style>
 </head>
 <body>
-    <main class="login-page">
-        <section class="login-form-panel" aria-labelledby="login-title">
-            <div class="login-form-inner">
-                <div class="login-brand">
-                    <div x-data="{ logoFailed: false }" class="login-brand-mark">
-                        <img
-                            x-show="!logoFailed"
-                            x-on:error="logoFailed = true"
-                            src="{{ asset('images/logo/logo-lightmode.png') }}"
-                            alt="Tridaya App"
-                        >
-                        <span x-show="logoFailed" x-cloak class="login-brand-mark login-brand-fallback">T</span>
-                    </div>
-                    <span class="text-xl font-semibold tracking-tight text-gray-900">Tridaya App</span>
-                </div>
-
-                <div class="login-header">
-                    <h1 id="login-title">Selamat datang kembali</h1>
-                    <p>Masuk ke akun Anda untuk melanjutkan</p>
-                </div>
-
-                <x-auth-session-status
-                    class="login-status rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
-                    :status="session('status')"
-                />
-
-                <form
-                    method="POST"
-                    action="{{ route('login') }}"
-                    x-data="{ isSubmitting: false }"
-                    x-on:submit="isSubmitting = true"
-                    class="login-form"
-                >
-                    @csrf
-
-                    <div class="login-field">
-                        <label for="email" class="login-label-row">
-                            <span class="login-label">Alamat Email</span>
-                        </label>
-                        <input
-                            id="email"
-                            type="email"
-                            name="email"
-                            value="{{ old('email') }}"
-                            placeholder="kamu@perusahaan.com"
-                            required
-                            autofocus
-                            autocomplete="username"
-                            aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
-                            class="login-input"
-                        >
-                        <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
-                    </div>
-
-                    <div x-data="{ showPassword: false, capsLock: false }" class="login-field">
-                        <div class="login-label-row">
-                            <label for="password" class="login-label">Password</label>
-                            @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}" class="login-link">Lupa password?</a>
-                            @endif
-                        </div>
-                        <div class="login-input-wrap">
-                            <input
-                                id="password"
-                                :type="showPassword ? 'text' : 'password'"
-                                name="password"
-                                placeholder="Masukkan password"
-                                required
-                                autocomplete="current-password"
-                                aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
-                                x-on:keyup="capsLock = $event.getModifierState('CapsLock')"
-                                x-on:keydown="capsLock = $event.getModifierState('CapsLock')"
-                                class="login-input login-input-password"
+    <main
+        class="login-page"
+        x-data="{
+            raf: null,
+            reducedMotion: false,
+            compact: false,
+            init() {
+                this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                this.compact = window.matchMedia('(pointer: coarse), (max-width: 1023px)').matches;
+            },
+            move(event) {
+                if (this.reducedMotion || this.compact) return;
+                const x = (event.clientX / window.innerWidth - 0.5) * 2;
+                const y = (event.clientY / window.innerHeight - 0.5) * 2;
+                cancelAnimationFrame(this.raf);
+                this.raf = requestAnimationFrame(() => {
+                    [[this.$refs.connectors, -4, -3], [this.$refs.character, -8, -6], [this.$refs.icons, 12, 9]]
+                        .forEach(([element, fx, fy]) => {
+                            if (!element) return;
+                            element.style.setProperty('--parallax-x', (x * fx) + 'px');
+                            element.style.setProperty('--parallax-y', (y * fy) + 'px');
+                        });
+                });
+            },
+            reset() {
+                if (this.reducedMotion || this.compact) return;
+                cancelAnimationFrame(this.raf);
+                [this.$refs.connectors, this.$refs.character, this.$refs.icons].forEach((element) => {
+                    if (!element) return;
+                    element.style.setProperty('--parallax-x', '0px');
+                    element.style.setProperty('--parallax-y', '0px');
+                });
+            }
+        }"
+    >
+        <div class="login-shell">
+            <section class="login-form-panel" aria-labelledby="login-title">
+                <div class="login-form-inner">
+                    <div class="login-brand">
+                        <div x-data="{ logoFailed: false }" class="login-brand-mark">
+                            <img
+                                x-show="!logoFailed"
+                                x-on:error="logoFailed = true"
+                                src="{{ asset('images/logo/logo-lightmode.png') }}"
+                                alt="Tridaya App"
                             >
-                            <button
-                                type="button"
-                                x-on:click="showPassword = !showPassword"
-                                :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
-                                :aria-pressed="showPassword"
-                                aria-controls="password"
-                                class="login-password-toggle"
-                            >
-                                <svg x-show="!showPassword" class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                <svg x-show="showPassword" x-cloak class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                                </svg>
-                            </button>
+                            <span x-show="logoFailed" x-cloak class="login-brand-mark login-brand-fallback">T</span>
                         </div>
-                        <p x-show="capsLock" x-cloak role="alert" class="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">Caps Lock aktif</p>
-                        <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
+                        <span class="text-xl font-semibold tracking-tight text-gray-900">Tridaya App</span>
                     </div>
 
-                    <label for="remember" class="login-remember">
-                        <input id="remember" type="checkbox" name="remember">
-                        Ingat saya
-                    </label>
+                    <div class="login-header">
+                        <h1 id="login-title">Sign in to your account</h1>
+                        <p>Access your workspace and keep your work connected.</p>
+                    </div>
 
-                    <button
-                        type="submit"
-                        x-bind:disabled="isSubmitting"
-                        x-bind:aria-busy="isSubmitting"
-                        class="login-submit"
+                    <x-auth-session-status
+                        class="login-status rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+                        :status="session('status')"
+                    />
+
+                    <form
+                        method="POST"
+                        action="{{ route('login') }}"
+                        x-data="{ isSubmitting: false }"
+                        x-on:submit="isSubmitting = true"
+                        class="login-form"
                     >
-                        <span x-show="!isSubmitting">Masuk</span>
-                        <span x-show="isSubmitting" x-cloak class="inline-flex items-center gap-2">
-                            <svg class="h-4 w-4 animate-spin" aria-hidden="true" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        @csrf
+
+                        <div class="login-field">
+                            <label for="email" class="login-label-row">
+                                <span class="login-label">Email address</span>
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                name="email"
+                                value="{{ old('email') }}"
+                                placeholder="you@company.com"
+                                required
+                                autofocus
+                                autocomplete="username"
+                                aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
+                                class="login-input"
+                            >
+                            <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
+                        </div>
+
+                        <div x-data="{ showPassword: false, capsLock: false }" class="login-field">
+                            <div class="login-label-row">
+                                <label for="password" class="login-label">Password</label>
+                                @if (Route::has('password.request'))
+                                    <a href="{{ route('password.request') }}" class="login-link">Forgot password?</a>
+                                @endif
+                            </div>
+                            <div class="login-input-wrap">
+                                <input
+                                    id="password"
+                                    :type="showPassword ? 'text' : 'password'"
+                                    name="password"
+                                    placeholder="Enter your password"
+                                    required
+                                    autocomplete="current-password"
+                                    aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
+                                    x-on:keyup="capsLock = $event.getModifierState('CapsLock')"
+                                    x-on:keydown="capsLock = $event.getModifierState('CapsLock')"
+                                    class="login-input login-input-password"
+                                >
+                                <button
+                                    type="button"
+                                    x-on:click="showPassword = !showPassword"
+                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                    :aria-pressed="showPassword"
+                                    aria-controls="password"
+                                    class="login-password-toggle"
+                                >
+                                    <svg x-show="!showPassword" class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <svg x-show="showPassword" x-cloak class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p x-show="capsLock" x-cloak role="alert" class="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">Caps Lock is on</p>
+                            <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
+                        </div>
+
+                        <label for="remember" class="login-remember">
+                            <input id="remember" type="checkbox" name="remember">
+                            Remember me
+                        </label>
+
+                        <button
+                            type="submit"
+                            x-bind:disabled="isSubmitting"
+                            x-bind:aria-busy="isSubmitting"
+                            class="login-submit"
+                        >
+                            <span x-show="!isSubmitting">Sign In</span>
+                            <span x-show="isSubmitting" x-cloak class="inline-flex items-center gap-2">
+                                <svg class="h-4 w-4 animate-spin" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                </svg>
+                                Signing in...
+                            </span>
+                            <svg x-show="!isSubmitting" class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
-                            Memuat...
-                        </span>
-                        <svg x-show="!isSubmitting" class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </button>
+                    </form>
+
+                    @if (Route::has('register'))
+                        <p class="login-register">
+                            Not registered yet?
+                            <a href="{{ route('register') }}" class="login-link">Create an account</a>
+                        </p>
+                    @endif
+                </div>
+            </section>
+
+            <aside
+                class="login-brand-panel"
+                aria-label="Tridaya App"
+                x-on:pointermove="move($event)"
+                x-on:pointerleave="reset()"
+            >
+                <canvas id="login-kinetic" class="login-brand-kinetic" aria-hidden="true"></canvas>
+
+                <div class="login-brand-content">
+                    <h2>Connecting People, Empowering Business</h2>
+                    <p>Technology and communication that keeps your team connected.</p>
+                </div>
+
+                <div class="login-visual" aria-hidden="true">
+                    <div class="login-visual-halo"></div>
+
+                    <div x-ref="connectors" class="login-parallax">
+                        <svg class="login-connectors" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <filter id="login-connector-glow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="1.1" result="blur" />
+                                    <feMerge>
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <path class="connector-base" d="M52 52C46 40 38 28 30 16" />
+                            <path class="connector-flow flow-1" d="M52 52C46 40 38 28 30 16" />
+                            <path class="connector-base" d="M51 52C38 50 24 48 9 44" />
+                            <path class="connector-flow flow-2" d="M51 52C38 50 24 48 9 44" />
+                            <path class="connector-base" d="M52 56C44 66 36 76 26 86" />
+                            <path class="connector-flow flow-3" d="M52 56C44 66 36 76 26 86" />
+                            <path class="connector-base" d="M55 50C63 38 70 27 80 15" />
+                            <path class="connector-flow flow-4" d="M55 50C63 38 70 27 80 15" />
+                            <path class="connector-base" d="M56 52C68 52 80 51 93 49" />
+                            <path class="connector-flow flow-5" d="M56 52C68 52 80 51 93 49" />
+                            <path class="connector-base" d="M54 58C54 70 54 80 54 90" />
+                            <path class="connector-flow flow-6" d="M54 58C54 70 54 80 54 90" />
+
+                            <circle cx="30" cy="16" r="1.1" fill="#BAE6FD" />
+                            <circle cx="9" cy="44" r="1.1" fill="#C4B5FD" />
+                            <circle cx="26" cy="86" r="1.1" fill="#F9A8D4" />
+                            <circle cx="80" cy="15" r="1.1" fill="#FDE68A" />
+                            <circle cx="93" cy="49" r="1.1" fill="#FDBA74" />
+                            <circle cx="54" cy="90" r="1.1" fill="#FCA5A5" />
                         </svg>
-                    </button>
-                </form>
+                    </div>
 
-                @if (Route::has('register'))
-                    <p class="login-register">
-                        Belum punya akun?
-                        <a href="{{ route('register') }}" class="login-link">Daftar sekarang</a>
-                    </p>
-                @endif
-            </div>
-        </section>
+                    <div x-ref="character" class="login-parallax">
+                        <div class="login-character">
+                            <img src="{{ asset('images/Asset_LoginPage/character2.svg') }}" alt="" fetchpriority="high" decoding="async">
+                        </div>
+                    </div>
 
-        <aside class="login-brand-panel" aria-label="Tridaya App">
-            <canvas id="login-kinetic" class="login-brand-kinetic" aria-hidden="true"></canvas>
-            <div class="login-brand-content">
-                <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App">
-                <h2>Connecting People,<br>Empowering Business</h2>
-                <p>Technology and communication that keeps your team connected.</p>
-            </div>
-        </aside>
+                    <div x-ref="icons" class="login-parallax">
+                        <div class="login-icon login-icon-1"><img src="{{ asset('images/Asset_LoginPage/icon1.svg') }}" alt="" decoding="async"></div>
+                        <div class="login-icon login-icon-2"><img src="{{ asset('images/Asset_LoginPage/icon2.svg') }}" alt="" decoding="async"></div>
+                        <div class="login-icon login-icon-3"><img src="{{ asset('images/Asset_LoginPage/icon3.svg') }}" alt="" decoding="async"></div>
+                        <div class="login-icon login-icon-4"><img src="{{ asset('images/Asset_LoginPage/icon4.svg') }}" alt="" decoding="async"></div>
+                        <div class="login-icon login-icon-5"><img src="{{ asset('images/Asset_LoginPage/icon5.svg') }}" alt="" decoding="async"></div>
+                        <div class="login-icon login-icon-6"><img src="{{ asset('images/Asset_LoginPage/icon6.svg') }}" alt="" decoding="async"></div>
+                    </div>
+                </div>
+            </aside>
+        </div>
     </main>
 </body>
 </html>
