@@ -14,382 +14,441 @@
     <style>
         [x-cloak] { display: none !important; }
 
+        /* ============================================================
+           TOKEN & RESET
+           ============================================================ */
         :root {
-            --login-blue: #2563eb;
-            --login-ink: #111827;
-            --login-muted: #6b7280;
-            --login-border: #d1d5db;
-            --login-paper: #f8fafc;
+            --login-blue:     #2563eb;
+            --login-blue-mid: #3b52d9;
+            --login-ink:      #111827;
+            --login-muted:    #6b7280;
+            --login-border:   #d1d5db;
+            --login-paper:    #f8fafc;
+            /* Panel ilustrasi — sesuai referensi: biru tua ke ungu medium */
+            --panel-from:     #1a1464;
+            --panel-mid:      #2d27b8;
+            --panel-to:       #4338ca;
         }
 
-        html,
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            min-height: 100%;
-            margin: 0;
-            background: var(--login-paper);
             font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            color: var(--login-ink);
             -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
         }
 
         /* ============================================================
-           Halaman: full-bleed form + panel ilustrasi
+           LAYOUT UTAMA
            ============================================================ */
         .login-page {
-            min-height: 100vh;
             min-height: 100dvh;
-            background: #ffffff;
+            display: flex;
         }
 
         .login-shell {
             display: grid;
             width: 100%;
-            min-height: 100vh;
             min-height: 100dvh;
-            grid-template-columns: 45% 55%;
+            /* ~40% form | ~60% ilustrasi, cocok dengan referensi */
+            grid-template-columns: 40% 60%;
             overflow: hidden;
             background: #ffffff;
         }
 
         /* ============================================================
-           Panel kiri: form
+           PANEL KIRI — FORM
            ============================================================ */
         .login-form-panel {
             position: relative;
             display: flex;
-            min-width: 0;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            overflow: hidden;
+            padding: 2.5rem clamp(1.5rem, 6vw, 3.5rem);
             background: #ffffff;
-            padding: clamp(2rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 4rem);
+            isolation: isolate;
         }
 
         .login-form-panel::before {
             position: absolute;
-            z-index: 0;
             inset: 0;
-            background-image:
-                radial-gradient(circle at 12% 18%, rgba(99, 102, 241, 0.12) 0 1px, transparent 1.5px),
-                radial-gradient(circle at 82% 76%, rgba(236, 72, 153, 0.09) 0 1px, transparent 1.5px),
-                linear-gradient(135deg, rgba(224, 231, 255, 0.24), transparent 34%, rgba(251, 207, 232, 0.14));
-            background-size: 32px 32px, 46px 46px, auto;
+            z-index: 0;
             content: '';
-            opacity: 0.48;
+            background-image:
+                radial-gradient(circle at 10% 15%, rgba(99,102,241,.09) 0 1px, transparent 1.5px),
+                radial-gradient(circle at 85% 80%, rgba(236,72,153,.07) 0 1px, transparent 1.5px);
+            background-size: 32px 32px, 44px 44px;
+            opacity: .5;
             pointer-events: none;
         }
 
         .login-form-inner {
             position: relative;
             z-index: 1;
-            width: min(100%, 24rem);
-            margin: 0 auto;
+            width: min(100%, 22rem);
         }
 
+        /* Brand / logo */
         .login-brand {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 0.7rem;
+            gap: .6rem;
+            margin-bottom: 2rem;
         }
 
         .login-brand-mark {
-            display: inline-flex;
-            width: 2.25rem;
-            height: 2.25rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: .45rem;
+            overflow: hidden;
+            display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            border-radius: 0.65rem;
-            background: #eff6ff;
+            background: var(--login-blue);
+            flex-shrink: 0;
         }
 
-        .login-brand-mark img {
-            width: 1.65rem;
-            height: 1.65rem;
-            object-fit: contain;
-        }
+        .login-brand-mark img { width: 100%; height: 100%; object-fit: contain; }
 
         .login-brand-fallback {
-            color: #ffffff;
-            font-size: 0.85rem;
-            font-weight: 800;
-            background: var(--login-blue);
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
         }
 
         .login-header {
-            margin-top: clamp(2.5rem, 7vh, 4.5rem);
+            margin-bottom: 1.75rem;
         }
 
         .login-header h1 {
-            margin: 0;
+            font-size: clamp(1.25rem, 2.5vw, 1.55rem);
+            font-weight: 700;
             color: var(--login-ink);
-            font-size: clamp(1.5rem, 2.4vw, 1.75rem);
-            font-weight: 600;
-            letter-spacing: -0.035em;
             line-height: 1.25;
+            margin-bottom: .35rem;
         }
 
         .login-header p {
-            margin: 0.55rem 0 0;
+            font-size: .875rem;
             color: var(--login-muted);
-            font-size: 0.84rem;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
+        /* Form */
         .login-form {
-            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
         }
 
-        .login-field + .login-field {
-            margin-top: 1.2rem;
+        .login-field {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
         }
 
         .login-label-row {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 0.45rem;
+            align-items: center;
         }
 
         .login-label {
-            color: #374151;
-            font-size: 0.78rem;
+            font-size: .8125rem;
             font-weight: 600;
-        }
-
-        .login-input-wrap {
-            position: relative;
-        }
-
-        .login-input {
-            display: block;
-            width: 100%;
-            min-height: 3rem;
-            border: 1px solid var(--login-border);
-            border-radius: 0.55rem;
-            background: #ffffff;
             color: var(--login-ink);
-            font-size: 0.82rem;
-            outline: 0;
-            padding: 0.7rem 0.85rem;
-            transition: border-color 200ms ease, box-shadow 200ms ease;
-        }
-
-        .login-input::placeholder {
-            color: #9ca3af;
-        }
-
-        .login-input:focus {
-            border-color: var(--login-blue);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.16);
-        }
-
-        .login-input-password {
-            padding-right: 3.25rem;
-        }
-
-        .login-password-toggle {
-            position: absolute;
-            top: 50%;
-            right: 0.25rem;
-            display: inline-flex;
-            width: 2.65rem;
-            height: 2.65rem;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.45rem;
-            color: #9ca3af;
-            transform: translateY(-50%);
-            transition: color 200ms ease, background-color 200ms ease;
-        }
-
-        .login-password-toggle:hover {
-            color: #4b5563;
-            background: #f3f4f6;
-        }
-
-        .login-password-toggle:focus-visible,
-        .login-link:focus-visible,
-        .login-submit:focus-visible {
-            outline: 2px solid var(--login-blue);
-            outline-offset: 2px;
         }
 
         .login-link {
-            color: #2563eb;
-            font-size: 0.72rem;
-            font-weight: 600;
+            font-size: .8rem;
+            font-weight: 500;
+            color: var(--login-blue);
             text-decoration: none;
-            transition: color 200ms ease;
         }
 
-        .login-link:hover {
-            color: #1d4ed8;
+        .login-link:hover { text-decoration: underline; }
+
+        .login-input {
+            width: 100%;
+            min-height: 2.75rem;
+            padding: .625rem .875rem;
+            font-size: .875rem;
+            font-family: inherit;
+            color: var(--login-ink);
+            background: #fff;
+            border: 1px solid var(--login-border);
+            border-radius: .5rem;
+            outline: none;
+            transition: border-color 200ms, box-shadow 200ms;
         }
+
+        .login-input::placeholder { color: #9ca3af; }
+
+        .login-input:focus {
+            border-color: var(--login-blue);
+            box-shadow: 0 0 0 3px rgba(37,99,235,.14);
+        }
+
+        .login-input-wrap { position: relative; }
+
+        .login-input-password { padding-right: 2.75rem; }
+
+        .login-password-toggle {
+            position: absolute;
+            right: .75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--login-muted);
+            padding: .15rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-password-toggle:hover { color: var(--login-ink); }
 
         .login-remember {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-top: 1.25rem;
-            color: #4b5563;
+            gap: .5rem;
+            font-size: .8125rem;
+            color: var(--login-ink);
             cursor: pointer;
-            font-size: 0.78rem;
             user-select: none;
         }
 
-        .login-remember input {
+        .login-remember input[type="checkbox"] {
             width: 1rem;
             height: 1rem;
             accent-color: var(--login-blue);
+            border-radius: .2rem;
+            cursor: pointer;
+            flex-shrink: 0;
         }
 
         .login-submit {
-            display: inline-flex;
-            width: 100%;
-            min-height: 3rem;
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-            border: 0;
-            border-radius: 0.55rem;
-            background: #2563eb;
-            box-shadow: 0 5px 12px -8px rgba(37, 99, 235, 0.75);
-            color: #ffffff;
-            cursor: pointer;
-            font-size: 0.82rem;
+            gap: .5rem;
+            width: 100%;
+            min-height: 2.85rem;
+            padding: .65rem 1.25rem;
+            font-size: .9rem;
             font-weight: 600;
-            transition: background-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+            font-family: inherit;
+            color: #fff;
+            background: var(--login-blue);
+            border: none;
+            border-radius: .55rem;
+            cursor: pointer;
+            letter-spacing: .015em;
+            transition: background 180ms, box-shadow 180ms, transform 100ms;
         }
 
         .login-submit:hover:not(:disabled) {
-            background: #1d4ed8;
-            box-shadow: 0 8px 16px -9px rgba(37, 99, 235, 0.85);
-            transform: translateY(-1px);
+            background: var(--login-blue-mid);
+            box-shadow: 0 4px 14px rgba(37,99,235,.35);
         }
 
-        .login-submit:active:not(:disabled) {
-            background: #1e40af;
-            transform: translateY(0);
-        }
+        .login-submit:active:not(:disabled) { transform: translateY(1px); }
 
-        .login-submit:disabled {
-            cursor: wait;
-            opacity: 0.75;
-        }
+        .login-submit:disabled { opacity: .7; cursor: not-allowed; }
 
         .login-register {
-            margin: 2rem 0 0;
+            margin-top: 1.1rem;
+            font-size: .8125rem;
             color: var(--login-muted);
-            font-size: 0.78rem;
-            line-height: 1.5;
             text-align: center;
         }
 
         .login-status {
-            margin-top: 1.25rem;
+            margin-bottom: .75rem;
         }
 
         /* ============================================================
-           Panel kanan: navy + kinetic grid + ilustrasi
+           PANEL KANAN — ILUSTRASI
            ============================================================ */
         .login-brand-panel {
             position: relative;
             display: flex;
-            min-width: 0;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background: linear-gradient(150deg, #221a8f 0%, #2f2ac4 46%, #4f46e5 100%);
-            border-radius: 28% 0 0 28% / 50% 0 0 50%;
+            background: linear-gradient(145deg, var(--panel-from) 0%, var(--panel-mid) 50%, var(--panel-to) 100%);
+            border-radius: 2.5rem 0 0 2.5rem;
+        }
+
+        .login-brand-panel::after {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            content: '';
+            background: linear-gradient(120deg, rgba(15,23,42,.22) 0%, transparent 40%, rgba(15,23,42,.1) 100%);
+            pointer-events: none;
         }
 
         .login-brand-kinetic {
             position: absolute;
-            z-index: 0;
             inset: 0;
+            z-index: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
         }
 
-        .login-brand-panel::after {
+        /* ---- DAUN DEKORATIF ---- */
+        .login-leaves {
             position: absolute;
-            z-index: 1;
             inset: 0;
-            background: linear-gradient(120deg, rgba(15, 23, 42, 0.3) 0%, transparent 38%, rgba(15, 23, 42, 0.14) 100%);
-            content: '';
+            z-index: 2;
             pointer-events: none;
         }
 
-        .login-brand-content {
+        .login-leaf-tr {
             position: absolute;
-            z-index: 3;
-            top: clamp(1.75rem, 5.5%, 3rem);
-            left: 50%;
-            width: min(70%, 21rem);
-            transform: translateX(-50%);
-            color: #ffffff;
-            text-align: center;
+            top: -2%;
+            right: -3%;
+            width: clamp(6rem, 20%, 12rem);
+            opacity: .7;
         }
 
-        .login-brand-content h2 {
-            margin: 0;
-            color: #ffffff;
-            font-size: clamp(1.15rem, 1.8vw, 1.5rem);
-            font-weight: 600;
-            letter-spacing: -0.035em;
-            line-height: 1.3;
+        .login-leaf-br {
+            position: absolute;
+            bottom: -2%;
+            right: -3%;
+            width: clamp(5rem, 17%, 10rem);
+            opacity: .6;
+            transform: rotate(180deg);
         }
 
-        .login-brand-content p {
-            margin: 0.5rem 0 0;
-            color: #c7d2fe;
-            font-size: 0.78rem;
-            line-height: 1.6;
+        .login-leaf-tl {
+            position: absolute;
+            top: -3%;
+            left: -2%;
+            width: clamp(4rem, 12%, 7rem);
+            opacity: .45;
+            transform: rotate(140deg) scaleX(-1);
         }
 
-        /* ---- Composition ---- */
+        /* ---- KOTAK KOMPOSISI ILUSTRASI ---- */
         .login-visual {
             position: absolute;
-            z-index: 2;
-            top: 22%;
-            bottom: 3%;
+            z-index: 3;
+            top: 10%;
+            bottom: 5%;
             left: 50%;
-            width: min(86%, 46rem);
+            width: min(90%, 48rem);
             transform: translateX(-50%);
         }
 
         .login-visual::after {
             position: absolute;
             z-index: 0;
-            inset: -16%;
-            background: radial-gradient(circle, rgba(129, 140, 248, 0.6) 0%, rgba(99, 102, 241, 0.26) 40%, transparent 72%);
-            filter: blur(38px);
+            inset: -10%;
             content: '';
+            background: radial-gradient(circle, rgba(129,140,248,.55) 0%, rgba(99,102,241,.2) 40%, transparent 72%);
+            filter: blur(40px);
             pointer-events: none;
+        }
+
+        /* ---- LINGKARAN BOLA BESAR ---- */
+        .login-sphere {
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            left: 50%;
+            width: min(80%, 420px);
+            aspect-ratio: 1;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 35% 32%,
+                    rgba(255,255,255,.18) 0%,
+                    rgba(99,130,255,.0)  28%,
+                    transparent         45%
+                ),
+                radial-gradient(circle at 55% 50%,
+                    #3b52e8  0%,
+                    #2a3fc4 35%,
+                    #1e2e9a 65%,
+                    #111b6a 100%
+                );
+            box-shadow:
+                0 0 60px 20px rgba(80,102,255,.35),
+                0 0 120px 40px rgba(60,80,220,.18);
+            overflow: hidden;
+            animation: sphere-breathe 8s ease-in-out infinite;
+        }
+
+        .login-sphere::before {
+            position: absolute;
+            content: '';
+            top: 8%;
+            left: 12%;
+            width: 38%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,.22) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .login-sphere::after {
+            position: absolute;
+            content: '';
+            bottom: 6%;
+            right: 8%;
+            width: 28%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(160,180,255,.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        @keyframes sphere-breathe {
+            0%, 100% { box-shadow: 0 0 60px 20px rgba(80,102,255,.35), 0 0 120px 40px rgba(60,80,220,.18); }
+            50%       { box-shadow: 0 0 80px 30px rgba(80,102,255,.45), 0 0 150px 55px rgba(60,80,220,.22); }
         }
 
         .login-visual-halo {
             position: absolute;
             z-index: 0;
-            top: 46%;
+            top: 50%;
             left: 50%;
-            width: 88%;
+            width: 92%;
             aspect-ratio: 1;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(199, 210, 254, 0.52), rgba(129, 140, 248, 0.2) 45%, transparent 70%);
-            filter: blur(18px);
+            background: radial-gradient(circle, rgba(199,210,254,.4), rgba(129,140,248,.15) 48%, transparent 70%);
+            filter: blur(22px);
             transform: translate(-50%, -50%);
             animation: halo-breathe 9s ease-in-out infinite;
         }
 
+        @keyframes halo-breathe {
+            0%, 100% { opacity: .65; }
+            50%       { opacity: 1; }
+        }
+
+        /* ---- GARIS KONEKTOR ---- */
+        .login-connectors {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .connector-line {
+            fill: none;
+            stroke: rgba(255,255,255,.55);
+            stroke-width: 0.4;
+            stroke-linecap: round;
+            filter: url(#login-connector-glow);
+            opacity: .85;
+        }
+
+        /* ---- PARALLAX WRAPPER ---- */
         .login-parallax {
             position: absolute;
             inset: 0;
@@ -399,54 +458,40 @@
             will-change: transform;
         }
 
-        .login-connectors {
-            width: 100%;
-            height: 100%;
-            overflow: visible;
-        }
-
-        .connector-line {
-            fill: none;
-            stroke: #e6ecff;
-            stroke-width: 0.35;
-            stroke-linecap: round;
-            filter: url(#login-connector-glow);
-            opacity: 0.9;
-        }
-
+        /* ---- KARAKTER ---- */
         .login-character {
             position: absolute;
-            z-index: 2;
-            top: 52%;
-            left: 52%;
-            width: 31%;
+            z-index: 4;
+            top: 46%;
+            left: 50%;
+            width: 34%;
             transform: translate(-50%, -50%);
             animation: character-float 7.5s ease-in-out infinite;
         }
 
-        .login-character img {
-            display: block;
+        .login-character img:first-child {
             width: 100%;
             height: auto;
-            filter: drop-shadow(0 16px 18px rgba(15, 23, 42, 0.34));
+            filter: drop-shadow(0 12px 24px rgba(10,20,80,.45));
         }
 
         .login-hand-icon {
             position: absolute;
-            z-index: 3;
-            top: 10%;
-            left: 27%;
-            width: 22%;
+            z-index: 5;
+            top: 8%;
+            left: 22%;
+            width: 24%;
             transform: translate(-50%, -50%);
-            filter: drop-shadow(0 0 8px rgba(186, 230, 253, 0.9)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.3));
+            filter: drop-shadow(0 0 10px rgba(186,230,253,.95)) drop-shadow(0 8px 14px rgba(15,23,42,.3));
             animation: hand-icon-float 6s ease-in-out infinite;
         }
 
+        /* ---- IKON ORBIT ---- */
         .login-icon {
             position: absolute;
-            z-index: 3;
+            z-index: 4;
             display: grid;
-            width: clamp(2.4rem, 11%, 5rem);
+            width: clamp(2.6rem, 12%, 5.5rem);
             aspect-ratio: 1;
             place-items: center;
             transform: translate(-50%, -50%);
@@ -455,13 +500,13 @@
 
         .login-icon::before {
             position: absolute;
+            inset: 0;
             z-index: -1;
-            inset: 4%;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--icon-glow, rgba(165, 180, 252, 0.85)), transparent 70%);
-            filter: blur(14px);
-            opacity: 1;
             content: '';
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--icon-glow, rgba(165,180,252,.85)), transparent 72%);
+            filter: blur(12px);
+            opacity: .9;
             animation: icon-pulse 4s ease-in-out var(--float-delay, 0s) infinite;
         }
 
@@ -469,64 +514,73 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 0 5px rgba(224, 231, 255, 0.72)) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.32));
+            filter: drop-shadow(0 0 6px rgba(224,231,255,.8)) drop-shadow(0 8px 14px rgba(15,23,42,.3));
         }
 
-        .login-icon-2 { top: 42%; left: 25%; --icon-glow: rgba(96, 165, 250, 0.95); --float-duration: 7.2s; --float-delay: -3.4s; }
-        .login-icon-3 { top: 76%; left: 24%; --icon-glow: rgba(249, 115, 22, 0.92); --float-duration: 5.8s; --float-delay: -2.3s; }
-        .login-icon-4 { top: 28%; left: 69%; --icon-glow: rgba(239, 68, 68, 0.92); --float-duration: 6.8s; --float-delay: -4.1s; }
-        .login-icon-5 { top: 44%; left: 80%; --icon-glow: rgba(250, 204, 21, 0.95); --float-duration: 7.6s; --float-delay: -1.8s; }
-        .login-icon-6 { top: 72%; left: 46%; --icon-glow: rgba(251, 146, 60, 0.95); --float-duration: 6.1s; --float-delay: -4.8s; }
+        .login-icon-2 { top: 40%; left: 22%; --icon-glow: rgba(96,165,250,.95);  --float-duration: 7.2s; --float-delay: -3.4s; }
+        .login-icon-3 { top: 78%; left: 22%; --icon-glow: rgba(249,115,22,.92);  --float-duration: 5.8s; --float-delay: -2.3s; }
+        .login-icon-4 { top: 26%; left: 70%; --icon-glow: rgba(239,68,68,.92);   --float-duration: 6.8s; --float-delay: -4.1s; }
+        .login-icon-5 { top: 42%; left: 81%; --icon-glow: rgba(250,204,21,.95);  --float-duration: 7.6s; --float-delay: -1.8s; }
+        .login-icon-6 { top: 74%; left: 48%; --icon-glow: rgba(251,146,60,.95);  --float-duration: 6.1s; --float-delay: -4.8s; }
 
+        /* ---- ANIMASI ---- */
         @keyframes character-float {
             0%, 100% { transform: translate(-50%, -50%) rotate(-1deg); }
-            50% { transform: translate(-50%, calc(-50% - 0.85rem)) rotate(1deg); }
-        }
-
-        @keyframes icon-float {
-            0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); }
-            50% { transform: translate(-50%, calc(-50% - 0.55rem)) rotate(3deg); }
-        }
-
-        @keyframes icon-pulse {
-            0%, 100% { opacity: 0.55; }
-            50% { opacity: 1; }
-        }
-
-        @keyframes halo-breathe {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
+            50%       { transform: translate(-50%, calc(-50% - 0.9rem)) rotate(1deg); }
         }
 
         @keyframes hand-icon-float {
             0%, 100% { transform: translate(-50%, -50%) rotate(-3deg); }
-            50% { transform: translate(-50%, calc(-50% - 0.5rem)) rotate(4deg); }
+            50%       { transform: translate(-50%, calc(-50% - 0.5rem)) rotate(4deg); }
         }
 
-        @media (prefers-reduced-motion: no-preference) {
-            .login-form-inner {
-                animation: login-fade-in 500ms ease both;
-            }
+        @keyframes icon-float {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); }
+            50%       { transform: translate(-50%, calc(-50% - 0.6rem)) rotate(3deg); }
+        }
+
+        @keyframes icon-pulse {
+            0%, 100% { opacity: .55; }
+            50%       { opacity: 1; }
         }
 
         @keyframes login-fade-in {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ---- TAGLINE ---- */
+        .login-brand-content {
+            position: absolute;
+            z-index: 5;
+            top: clamp(1.5rem, 5%, 2.75rem);
+            left: 50%;
+            width: min(72%, 20rem);
+            transform: translateX(-50%);
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .login-brand-content h2 {
+            font-size: clamp(.9rem, 1.8vw, 1.1rem);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .login-brand-content p {
+            font-size: .78rem;
+            opacity: .75;
+            margin-top: .25rem;
         }
 
         /* ============================================================
-           Responsive
+           RESPONSIVE
            ============================================================ */
         @media (max-width: 1023px) {
-            .login-page {
-                padding: 0;
-            }
-
             .login-shell {
                 display: flex;
-                min-height: 100dvh;
                 flex-direction: column;
-                border-radius: 0;
+                min-height: 100dvh;
             }
 
             .login-form-panel {
@@ -536,35 +590,26 @@
 
             .login-brand-panel {
                 order: 1;
-                height: clamp(13rem, 46vw, 17rem);
+                min-height: clamp(13rem, 46vw, 17rem);
                 border-radius: 0 0 2.5rem 2.5rem;
             }
 
-            .login-brand-content {
-                display: none;
-            }
+            .login-brand-content { display: none; }
 
             .login-visual {
-                top: 8%;
-                bottom: 8%;
-                left: 50%;
-                width: min(88%, 22rem);
-                transform: translateX(-50%);
+                top: 5%;
+                bottom: 5%;
+                width: min(90%, 22rem);
             }
 
-            .login-character {
-                width: 34%;
-            }
+            .login-character { width: 36%; }
+
+            .login-sphere { width: min(82%, 280px); }
         }
 
         @media (max-width: 420px) {
-            .login-brand-panel {
-                height: 12.5rem;
-            }
-
-            .login-header {
-                margin-top: 2.75rem;
-            }
+            .login-brand-panel { min-height: 13rem; }
+            .login-header { margin-top: 2.5rem; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -573,13 +618,10 @@
             .login-icon::before,
             .login-hand-icon,
             .login-visual-halo,
-            .login-form-inner {
-                animation: none !important;
-            }
+            .login-sphere,
+            .login-form-inner { animation: none !important; }
 
-            .login-parallax {
-                transition: none;
-            }
+            .login-parallax { transition: none; }
         }
     </style>
 </head>
@@ -596,32 +638,41 @@
             },
             move(event) {
                 if (this.reducedMotion || this.compact) return;
-                const x = (event.clientX / window.innerWidth - 0.5) * 2;
+                const x = (event.clientX / window.innerWidth  - 0.5) * 2;
                 const y = (event.clientY / window.innerHeight - 0.5) * 2;
                 cancelAnimationFrame(this.raf);
                 this.raf = requestAnimationFrame(() => {
-                    [[this.$refs.connectors, -4, -3], [this.$refs.character, -8, -6], [this.$refs.icons, 12, 9]]
-                        .forEach(([element, fx, fy]) => {
-                            if (!element) return;
-                            element.style.setProperty('--parallax-x', (x * fx) + 'px');
-                            element.style.setProperty('--parallax-y', (y * fy) + 'px');
-                        });
+                    [
+                        [this.$refs.connectors,  -4,  -3],
+                        [this.$refs.character,   -8,  -6],
+                        [this.$refs.icons,       12,   9],
+                    ].forEach(([el, fx, fy]) => {
+                        if (!el) return;
+                        el.style.setProperty('--parallax-x', (x * fx) + 'px');
+                        el.style.setProperty('--parallax-y', (y * fy) + 'px');
+                    });
                 });
             },
             reset() {
                 if (this.reducedMotion || this.compact) return;
                 cancelAnimationFrame(this.raf);
-                [this.$refs.connectors, this.$refs.character, this.$refs.icons].forEach((element) => {
-                    if (!element) return;
-                    element.style.setProperty('--parallax-x', '0px');
-                    element.style.setProperty('--parallax-y', '0px');
+                [this.$refs.connectors, this.$refs.character, this.$refs.icons].forEach(el => {
+                    if (!el) return;
+                    el.style.setProperty('--parallax-x', '0px');
+                    el.style.setProperty('--parallax-y', '0px');
                 });
             }
         }"
     >
         <div class="login-shell">
+
+            {{-- ================================================
+                 PANEL KIRI — FORM
+                 ================================================ --}}
             <section class="login-form-panel" aria-labelledby="login-title">
                 <div class="login-form-inner">
+
+                    {{-- Brand / Logo --}}
                     <div class="login-brand">
                         <div x-data="{ logoFailed: false }" class="login-brand-mark">
                             <img
@@ -630,13 +681,13 @@
                                 src="{{ asset('images/logo/logo-lightmode.png') }}"
                                 alt="Tridaya App"
                             >
-                            <span x-show="logoFailed" x-cloak class="login-brand-mark login-brand-fallback">T</span>
+                            <span x-show="logoFailed" x-cloak class="login-brand-fallback">T</span>
                         </div>
                         <span class="text-xl font-semibold tracking-tight text-gray-900">Tridaya App</span>
                     </div>
 
                     <div class="login-header">
-                        <h1 id="login-title">Sign in to your account</h1>
+                        <h1 id="login-title">Sign In to your Account</h1>
                         <p>Access your workspace and keep your work connected.</p>
                     </div>
 
@@ -656,14 +707,14 @@
 
                         <div class="login-field">
                             <label for="email" class="login-label-row">
-                                <span class="login-label">Email address</span>
+                                <span class="login-label">Email</span>
                             </label>
                             <input
                                 id="email"
                                 type="email"
                                 name="email"
                                 value="{{ old('email') }}"
-                                placeholder="you@company.com"
+                                placeholder="Enter Email"
                                 required
                                 autofocus
                                 autocomplete="username"
@@ -685,7 +736,7 @@
                                     id="password"
                                     :type="showPassword ? 'text' : 'password'"
                                     name="password"
-                                    placeholder="Enter your password"
+                                    placeholder="Enter Password"
                                     required
                                     autocomplete="current-password"
                                     aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
@@ -710,7 +761,9 @@
                                     </svg>
                                 </button>
                             </div>
-                            <p x-show="capsLock" x-cloak role="alert" class="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">Caps Lock is on</p>
+                            <p x-show="capsLock" x-cloak role="alert" class="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+                                Caps Lock is on
+                            </p>
                             <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
                         </div>
 
@@ -725,7 +778,7 @@
                             x-bind:aria-busy="isSubmitting"
                             class="login-submit"
                         >
-                            <span x-show="!isSubmitting">Sign In</span>
+                            <span x-show="!isSubmitting">SIGN IN</span>
                             <span x-show="isSubmitting" x-cloak class="inline-flex items-center gap-2">
                                 <svg class="h-4 w-4 animate-spin" aria-hidden="true" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -733,9 +786,6 @@
                                 </svg>
                                 Signing in...
                             </span>
-                            <svg x-show="!isSubmitting" class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
                         </button>
                     </form>
 
@@ -745,9 +795,13 @@
                             <a href="{{ route('register') }}" class="login-link">Create an account</a>
                         </p>
                     @endif
+
                 </div>
             </section>
 
+            {{-- ================================================
+                 PANEL KANAN — ILUSTRASI
+                 ================================================ --}}
             <aside
                 class="login-brand-panel"
                 aria-label="Tridaya App"
@@ -755,6 +809,30 @@
                 x-on:pointerleave="reset()"
             >
                 <canvas id="login-kinetic" class="login-brand-kinetic" aria-hidden="true"></canvas>
+
+                {{-- Daun dekoratif --}}
+                <div class="login-leaves" aria-hidden="true">
+                    <svg class="login-leaf-tr" viewBox="0 0 120 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M60 190 C20 160, 5 120, 10 70 C15 30, 50 10, 60 10 C70 10, 105 30, 110 70 C115 120, 100 160, 60 190Z" fill="rgba(67,90,200,0.45)" />
+                        <path d="M60 10 C60 10, 60 100, 60 190" stroke="rgba(130,150,255,0.35)" stroke-width="2"/>
+                        <path d="M60 50 C45 60, 30 80, 20 100" stroke="rgba(130,150,255,0.25)" stroke-width="1.5"/>
+                        <path d="M60 50 C75 60, 90 80, 100 100" stroke="rgba(130,150,255,0.25)" stroke-width="1.5"/>
+                        <path d="M60 90 C48 100, 35 115, 25 135" stroke="rgba(130,150,255,0.2)" stroke-width="1.5"/>
+                        <path d="M60 90 C72 100, 85 115, 95 135" stroke="rgba(130,150,255,0.2)" stroke-width="1.5"/>
+                    </svg>
+
+                    <svg class="login-leaf-br" viewBox="0 0 120 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M60 190 C20 160, 5 120, 10 70 C15 30, 50 10, 60 10 C70 10, 105 30, 110 70 C115 120, 100 160, 60 190Z" fill="rgba(67,90,200,0.4)" />
+                        <path d="M60 10 C60 10, 60 100, 60 190" stroke="rgba(130,150,255,0.3)" stroke-width="2"/>
+                        <path d="M60 50 C45 60, 30 80, 20 100" stroke="rgba(130,150,255,0.22)" stroke-width="1.5"/>
+                        <path d="M60 50 C75 60, 90 80, 100 100" stroke="rgba(130,150,255,0.22)" stroke-width="1.5"/>
+                    </svg>
+
+                    <svg class="login-leaf-tl" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M50 160 C18 135, 5 100, 8 60 C11 25, 38 8, 50 8 C62 8, 89 25, 92 60 C95 100, 82 135, 50 160Z" fill="rgba(55,80,190,0.35)" />
+                        <path d="M50 8 C50 8, 50 85, 50 160" stroke="rgba(120,140,240,0.3)" stroke-width="1.5"/>
+                    </svg>
+                </div>
 
                 <div class="login-brand-content">
                     <h2>Connecting People, Empowering Business</h2>
@@ -764,11 +842,20 @@
                 <div class="login-visual" aria-hidden="true">
                     <div class="login-visual-halo"></div>
 
+                    {{-- Lingkaran bola besar --}}
+                    <div class="login-sphere"></div>
+
                     <div x-ref="connectors" class="login-parallax">
-                        <svg class="login-connectors" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                            class="login-connectors"
+                            viewBox="0 0 100 100"
+                            preserveAspectRatio="none"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
                             <defs>
                                 <filter id="login-connector-glow" x="-80%" y="-80%" width="260%" height="260%">
-                                    <feGaussianBlur stdDeviation="2" result="blur" />
+                                    <feGaussianBlur stdDeviation="1.8" result="blur" />
                                     <feMerge>
                                         <feMergeNode in="blur" />
                                         <feMergeNode in="SourceGraphic" />
@@ -776,38 +863,60 @@
                                 </filter>
                             </defs>
 
-                            <path class="connector-line" d="M52 52C50 46 47 39 45 32" />
-                            <path class="connector-line" d="M52 52C44 46 34 45 25 42" />
-                            <path class="connector-line" d="M52 52C40 64 32 70 24 76" />
-                            <path class="connector-line" d="M52 52C60 40 65 34 69 28" />
-                            <path class="connector-line" d="M52 52C63 47 70 45 80 44" />
-                            <path class="connector-line" d="M52 52C47 61 47 66 46 72" />
+                            <path class="connector-line" d="M52 50C50 44 45 33 40.5 26" />
+                            <path class="connector-line" d="M52 50C44 46 33 43 22 40" />
+                            <path class="connector-line" d="M52 50C41 64 33 71 22 78" />
+                            <path class="connector-line" d="M52 50C61 40 66 33 70 26" />
+                            <path class="connector-line" d="M52 50C64 47 72 45 81 42" />
+                            <path class="connector-line" d="M52 50C48 61 48 67 48 74" />
 
-                            <circle cx="45" cy="32" r="1.3" fill="#BAE6FD" />
-                            <circle cx="25" cy="42" r="1.1" fill="#93C5FD" />
-                            <circle cx="24" cy="76" r="1.1" fill="#FB923C" />
-                            <circle cx="69" cy="28" r="1.1" fill="#F87171" />
-                            <circle cx="80" cy="44" r="1.1" fill="#FDE047" />
-                            <circle cx="46" cy="72" r="1.1" fill="#FDBA74" />
+                            <circle cx="40.5" cy="26" r="1.3" fill="#BAE6FD" />
+                            <circle cx="22" cy="40" r="1.2" fill="#93C5FD" />
+                            <circle cx="22" cy="78" r="1.2" fill="#FB923C" />
+                            <circle cx="70" cy="26" r="1.2" fill="#F87171" />
+                            <circle cx="81" cy="42" r="1.2" fill="#FDE047" />
+                            <circle cx="48" cy="74" r="1.2" fill="#FDBA74" />
                         </svg>
                     </div>
 
                     <div x-ref="character" class="login-parallax">
                         <div class="login-character">
-                            <img src="{{ asset('images/Asset_LoginPage/character2.svg') }}" alt="" fetchpriority="high" decoding="async">
-                            <img class="login-hand-icon" src="{{ asset('images/Asset_LoginPage/icon1.svg') }}" alt="" decoding="async">
+                            <img
+                                src="{{ asset('images/Asset_LoginPage/character2.svg') }}"
+                                alt=""
+                                fetchpriority="high"
+                                decoding="async"
+                            >
+                            <img
+                                class="login-hand-icon"
+                                src="{{ asset('images/Asset_LoginPage/icon1.svg') }}"
+                                alt=""
+                                decoding="async"
+                            >
                         </div>
                     </div>
 
                     <div x-ref="icons" class="login-parallax">
-                        <div class="login-icon login-icon-2"><img src="{{ asset('images/Asset_LoginPage/icon2.svg') }}" alt="" decoding="async"></div>
-                        <div class="login-icon login-icon-3"><img src="{{ asset('images/Asset_LoginPage/icon3.svg') }}" alt="" decoding="async"></div>
-                        <div class="login-icon login-icon-4"><img src="{{ asset('images/Asset_LoginPage/icon4.svg') }}" alt="" decoding="async"></div>
-                        <div class="login-icon login-icon-5"><img src="{{ asset('images/Asset_LoginPage/icon5.svg') }}" alt="" decoding="async"></div>
-                        <div class="login-icon login-icon-6"><img src="{{ asset('images/Asset_LoginPage/icon6.svg') }}" alt="" decoding="async"></div>
+                        <div class="login-icon login-icon-2">
+                            <img src="{{ asset('images/Asset_LoginPage/icon2.svg') }}" alt="" decoding="async">
+                        </div>
+                        <div class="login-icon login-icon-3">
+                            <img src="{{ asset('images/Asset_LoginPage/icon3.svg') }}" alt="" decoding="async">
+                        </div>
+                        <div class="login-icon login-icon-4">
+                            <img src="{{ asset('images/Asset_LoginPage/icon4.svg') }}" alt="" decoding="async">
+                        </div>
+                        <div class="login-icon login-icon-5">
+                            <img src="{{ asset('images/Asset_LoginPage/icon5.svg') }}" alt="" decoding="async">
+                        </div>
+                        <div class="login-icon login-icon-6">
+                            <img src="{{ asset('images/Asset_LoginPage/icon6.svg') }}" alt="" decoding="async">
+                        </div>
                     </div>
                 </div>
+
             </aside>
+
         </div>
     </main>
 </body>
