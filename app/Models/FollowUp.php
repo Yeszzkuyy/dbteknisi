@@ -35,4 +35,17 @@ class FollowUp extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function followUpWaLink(): ?string
+    {
+        if (!$this->customer) {
+            return null;
+        }
+
+        $greeting = $this->customer->contact_person ?: $this->customer->name;
+        $description = $this->description ? ' terkait "' . \Illuminate\Support\Str::limit($this->description, 80) . '"' : '';
+        $date = $this->follow_up_date ? ' (jadwal ' . $this->follow_up_date->format('d M') . ')' : '';
+
+        return $this->customer->waLink("Halo {$greeting}, izin follow up{$description}{$date}.");
+    }
 }

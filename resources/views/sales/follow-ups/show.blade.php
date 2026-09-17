@@ -6,6 +6,12 @@
                 <p class="text-slate-500 mt-1">{{ $followUp->customer->name }}</p>
             </div>
             <div class="flex gap-2">
+                @if(($waLink = $followUp->followUpWaLink()))
+                    <a href="{{ $waLink }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-green-100 hover:bg-green-200 text-green-700 text-sm font-medium transition">
+                        Follow up via WhatsApp
+                    </a>
+                @endif
                 @can('manage-sales')
                     <a href="{{ route('sales.follow-ups.edit', $followUp) }}"
                        class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium transition">
