@@ -363,21 +363,20 @@
             aspect-ratio: 1;
             transform: translate(-50%, -50%);
             border-radius: 50%;
+            /* Cahaya lembut: tepi menghilang, tidak ada garis lingkaran keras */
             background:
                 radial-gradient(circle at 35% 32%,
-                    rgba(255,255,255,.18) 0%,
-                    rgba(99,130,255,.0)  28%,
-                    transparent         45%
+                    rgba(255,255,255,.22) 0%,
+                    rgba(160,180,255,.10) 30%,
+                    transparent          52%
                 ),
                 radial-gradient(circle at 55% 50%,
-                    #3b52e8  0%,
-                    #2a3fc4 35%,
-                    #1e2e9a 65%,
-                    #111b6a 100%
+                    rgba(130,150,255,.55) 0%,
+                    rgba(90,110,250,.38) 40%,
+                    rgba(70,90,225,.18) 68%,
+                    transparent         100%
                 );
-            box-shadow:
-                0 0 60px 20px rgba(80,102,255,.35),
-                0 0 120px 40px rgba(60,80,220,.18);
+            box-shadow: 0 0 90px 30px rgba(80,102,255,.22);
             overflow: hidden;
             animation: sphere-breathe 8s ease-in-out infinite;
         }
@@ -407,8 +406,8 @@
         }
 
         @keyframes sphere-breathe {
-            0%, 100% { box-shadow: 0 0 60px 20px rgba(80,102,255,.35), 0 0 120px 40px rgba(60,80,220,.18); }
-            50%       { box-shadow: 0 0 80px 30px rgba(80,102,255,.45), 0 0 150px 55px rgba(60,80,220,.22); }
+            0%, 100% { opacity: .85; }
+            50%       { opacity: 1; }
         }
 
         .login-visual-halo {
@@ -448,9 +447,13 @@
             opacity: .85;
         }
 
-        /* ---- PARALLAX WRAPPER ---- */
+        /* ---- PARALLAX WRAPPER ----
+           transform membuat stacking context sendiri, jadi z-index wajib
+           eksplisit: tanpa ini lapisan ilustrasi dilukis di bawah
+           .login-sphere (z-index 1) dan ikut tertutup. */
         .login-parallax {
             position: absolute;
+            z-index: 2;
             inset: 0;
             pointer-events: none;
             transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0);
