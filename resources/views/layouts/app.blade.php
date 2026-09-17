@@ -57,7 +57,7 @@
         [x-cloak]{display:none!important}
         .icon-expand{display:none}
         :root{--sidebar-bg:#f8fafc;--sidebar-border:#e2e8f0;--card-bg:#fff;--card-border:#e2e8f0;--card-bg-hover:#f8fafc;--text-primary:#1e293b;--text-secondary:#64748b;--text-muted:#94a3b8;--input-bg:#f1f5f9;--input-border:#cbd5e1;--input-text:#1e293b;--nav-text:#334155;--nav-muted:#64748b;--nav-hover-bg:rgba(15,23,42,.05);--nav-hover-text:#0f172a;--nav-active-bg:rgba(59,130,246,.10);--nav-active-text:#1d4ed8;--sidebar-logo-text:#1d4ed8;--sidebar-border-soft:#e2e8f0;--sidebar-panel-bg:rgba(15,23,42,.04)}
-        .dark{--sidebar-bg:#1e293b;--sidebar-border:#334155;--card-bg:#1e293b;--card-border:#334155;--card-bg-hover:#2d3a4e;--text-primary:#f1f5f9;--text-secondary:#cbd5e1;--text-muted:#64748b;--input-bg:#243244;--input-border:#475569;--input-text:#f1f5f9;--nav-text:#cbd5e1;--nav-muted:#64748b;--nav-hover-bg:rgba(255,255,255,.06);--nav-hover-text:#fff;--nav-active-bg:rgba(59,130,246,.16);--nav-active-text:#93c5fd;--sidebar-logo-text:#93c5fd;--sidebar-border-soft:rgba(255,255,255,.1);--sidebar-panel-bg:rgba(255,255,255,.06)}
+        .dark{--sidebar-bg:#050505;--sidebar-border:#1a1a1d;--card-bg:#0d0d0f;--card-border:#1f1f24;--card-bg-hover:#161618;--text-primary:#f5f5f5;--text-secondary:#c9c9cf;--text-muted:#84848d;--input-bg:#161618;--input-border:#2a2a30;--input-text:#f5f5f5;--nav-text:#c9c9cf;--nav-muted:#84848d;--nav-hover-bg:rgba(255,255,255,.06);--nav-hover-text:#fff;--nav-active-bg:rgba(59,130,246,.16);--nav-active-text:#93c5fd;--sidebar-logo-text:#93c5fd;--sidebar-border-soft:rgba(255,255,255,.1);--sidebar-panel-bg:rgba(255,255,255,.06)}
         .sidebar{position:fixed;top:0;left:0;height:100vh;width:280px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out,width .3s cubic-bezier(.16,1,.3,1);overflow-y:auto}
         .sidebar.open{transform:translateX(0)}
         .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998}
@@ -97,18 +97,21 @@
         .dark .bg-white{background-color:var(--card-bg)!important}
         .dark #darkToggle .bg-white{background-color:#fff!important}
         .dark .bg-slate-50{background-color:var(--card-bg)!important}
-        .dark .bg-slate-100{background-color:#243244!important}
-        .dark .bg-slate-200{background-color:#334155!important}
-        .dark .bg-slate-300{background-color:#475569!important}
+        .dark .bg-slate-100{background-color:#161618!important}
+        .dark .bg-slate-200{background-color:#1f1f24!important}
+        .dark .bg-slate-300{background-color:#2a2a30!important}
         /* Toggle ON tetap biru walau dark-mode mengoverride bg-slate-300 (lebar selektor lebih spesifik) */
         .peer:checked ~ .peer-checked\:bg-blue-600{background-color:#2563eb!important}
-        .dark .bg-gray-300{background-color:#475569!important}
-        .dark .bg-gray-100{background-color:#243244!important}
-        .dark .hover\:bg-slate-100:hover{background-color:#243244!important}
-        .dark .hover\:bg-slate-200:hover{background-color:#334155!important}
-        .dark .hover\:bg-slate-300:hover{background-color:#475569!important}
+        .dark .bg-gray-300{background-color:#2a2a30!important}
+        .dark .bg-gray-100{background-color:#161618!important}
+        .dark .hover\:bg-slate-100:hover{background-color:#161618!important}
+        .dark .hover\:bg-slate-200:hover{background-color:#1f1f24!important}
+        .dark .hover\:bg-slate-300:hover{background-color:#2a2a30!important}
         .dark .hover\:bg-slate-50:hover{background-color:var(--card-bg-hover)!important}
         .dark .hover\:bg-gray-50:hover{background-color:var(--card-bg-hover)!important}
+        .dark .bg-slate-800{background-color:#0d0d0f!important}
+        .dark .bg-slate-900{background-color:#050505!important}
+        .dark .border-slate-700{border-color:#1a1a1d!important}
         .dark .border-slate-200{border-color:var(--card-border)!important}
         .dark .border-slate-300{border-color:var(--input-border)!important}
         .dark .text-slate-900,.dark .text-gray-800{color:var(--text-primary)!important}
@@ -124,7 +127,7 @@
         .dark input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]){color-scheme:dark}
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 font-sans antialiased">
+<body class="bg-slate-100 dark:bg-[#050505] font-sans antialiased">
 
     <div id="sidebarOverlay" class="sidebar-overlay dark:bg-black/60"></div>
 
