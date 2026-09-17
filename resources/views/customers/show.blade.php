@@ -312,9 +312,15 @@
                                             <span class="text-xs text-slate-400">{{ $contact->email ?? '' }}</span>
                                         </td>
                                         <td class="px-6 py-3 align-middle">
-                                            @if($contact->is_primary)
-                                                <x-status-badge color="green" icon="★">Primary PIC</x-status-badge>
-                                            @endif
+                                            <form action="{{ route('customer-contacts.primary', $contact) }}" method="POST">
+                                                @csrf @method('PATCH')
+                                                <label class="flex cursor-pointer items-center gap-1.5">
+                                                    <input type="checkbox" value="1" {{ $contact->is_primary ? 'checked' : '' }}
+                                                           onchange="this.form.submit()"
+                                                           class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                                    <span class="text-xs text-slate-500">Utama</span>
+                                                </label>
+                                            </form>
                                         </td>
                                         <td class="px-6 py-3 text-right align-middle">
                                             @can('manage-sales')

@@ -17,7 +17,7 @@ class CustomerController extends Controller
 
         $customers = Customer::withCount('projects')
             ->with(['contacts' => function ($query) {
-                $query->where('is_primary', true);
+                $query->orderByDesc('is_primary')->latest();
             }])
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->whereLike(['name', 'company', 'email'], $request->string('search'));

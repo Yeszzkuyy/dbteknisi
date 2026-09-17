@@ -86,6 +86,24 @@ class CustomerContactController extends Controller
     }
 
     /**
+     * Toggle primary PIC dari daftar contacts.
+     */
+    public function togglePrimary(CustomerContact $customerContact)
+    {
+        $this->authorize('update', $customerContact->customer);
+        $customer = $customerContact->customer;
+
+        if (! $customerContact->is_primary) {
+            $customer->contacts()->update(['is_primary' => false]);
+            $customerContact->update(['is_primary' => true]);
+        } else {
+            $customerContact->update(['is_primary' => false]);
+        }
+
+        return redirect()->route('customers.show', $customer);
+    }
+
+    /**
      * Remove the specified contact.
      */
     public function destroy(CustomerContact $customerContact)
