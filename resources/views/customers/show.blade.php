@@ -129,7 +129,7 @@
                             ->get();
                         $infoFields = [
                             ['icon' => 'building', 'label' => 'Nama', 'value' => $customer->name],
-                            ['icon' => 'user', 'label' => 'PIC', 'value' => $customer->contact_person],
+                            ['icon' => 'user', 'label' => 'PIC', 'value' => $customer->contacts->first()?->name ?: $customer->contact_person],
                             ['icon' => 'map-pin', 'label' => 'Alamat', 'value' => $customer->address],
                             ['icon' => 'phone', 'label' => 'Telepon', 'value' => $customer->phone],
                             ['icon' => 'chat', 'label' => 'No WA', 'value' => $customer->whatsapp],
