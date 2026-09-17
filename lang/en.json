@@ -470,5 +470,20 @@
     "PIC berhasil ditambahkan.": "PIC added successfully.",
     "PIC berhasil diupdate.": "PIC updated successfully.",
     "PIC berhasil dihapus.": "PIC deleted successfully.",
-    "Diproses": "In Process"
+    "Diproses": "In Process",
+    "Total Customer": "Total Customers",
+    "Customer terdaftar": "Registered customers",
+    "Seluruh project": "All projects",
+    "Total Dokumen": "Total Documents",
+    "Dokumen project": "Project documents",
+    "Ringkasan operasional": "Operational summary",
+    "Pantau kondisi customer, project, dan dokumentasi 3DY Group dari satu tempat.": "Monitor customer, project, and documentation conditions of 3DY Group in one place.",
+    "Dashboard umum": "General dashboard",
+    "Angka terbaru dari data operasional yang tersedia.": "Latest figures from available operational data.",
+    "Aktivitas terbaru": "Recent activity",
+    "Perubahan terakhir yang tercatat pada project.": "Latest changes recorded on projects.",
+    "Waktu tidak tersedia": "Time not available",
+    "Project tidak tersedia": "Project not available",
+    "Belum ada aktivitas yang tercatat.": "No activity recorded yet.",
+    "Aktivitas project akan muncul di sini.": "Project activity will appear here."
 }
