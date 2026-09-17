@@ -56,9 +56,9 @@
         *{margin:0;padding:0;box-sizing:border-box}
         [x-cloak]{display:none!important}
         .icon-expand{display:none}
-        :root{--sidebar-bg:#fff;--sidebar-border:#e2e8f0;--card-bg:#fff;--card-border:#e2e8f0;--card-bg-hover:#f8fafc;--text-primary:#1e293b;--text-secondary:#64748b;--text-muted:#94a3b8;--input-bg:#f1f5f9;--input-border:#cbd5e1;--input-text:#1e293b}
-        .dark{--sidebar-bg:#1e293b;--sidebar-border:#334155;--card-bg:#1e293b;--card-border:#334155;--card-bg-hover:#2d3a4e;--text-primary:#f1f5f9;--text-secondary:#cbd5e1;--text-muted:#64748b;--input-bg:#243244;--input-border:#475569;--input-text:#f1f5f9}
-        .sidebar{position:fixed;top:0;left:0;height:100vh;width:280px;background:#0a192f;border-right:1px solid rgba(255,255,255,.06);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out,width .3s cubic-bezier(.16,1,.3,1);overflow-y:auto}
+        :root{--sidebar-bg:#f8fafc;--sidebar-border:#e2e8f0;--card-bg:#fff;--card-border:#e2e8f0;--card-bg-hover:#f8fafc;--text-primary:#1e293b;--text-secondary:#64748b;--text-muted:#94a3b8;--input-bg:#f1f5f9;--input-border:#cbd5e1;--input-text:#1e293b;--nav-text:#334155;--nav-muted:#64748b;--nav-hover-bg:rgba(15,23,42,.05);--nav-hover-text:#0f172a;--nav-active-bg:rgba(59,130,246,.10);--nav-active-text:#1d4ed8;--sidebar-logo-text:#1d4ed8;--sidebar-border-soft:#e2e8f0;--sidebar-panel-bg:rgba(15,23,42,.04)}
+        .dark{--sidebar-bg:#1e293b;--sidebar-border:#334155;--card-bg:#1e293b;--card-border:#334155;--card-bg-hover:#2d3a4e;--text-primary:#f1f5f9;--text-secondary:#cbd5e1;--text-muted:#64748b;--input-bg:#243244;--input-border:#475569;--input-text:#f1f5f9;--nav-text:#cbd5e1;--nav-muted:#64748b;--nav-hover-bg:rgba(255,255,255,.06);--nav-hover-text:#fff;--nav-active-bg:rgba(59,130,246,.16);--nav-active-text:#93c5fd;--sidebar-logo-text:#93c5fd;--sidebar-border-soft:rgba(255,255,255,.1);--sidebar-panel-bg:rgba(255,255,255,.06)}
+        .sidebar{position:fixed;top:0;left:0;height:100vh;width:280px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out,width .3s cubic-bezier(.16,1,.3,1);overflow-y:auto}
         .sidebar.open{transform:translateX(0)}
         .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998}
         .sidebar-overlay.active{display:block}
