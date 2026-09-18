@@ -317,6 +317,8 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('permission:manage-marketing')->group(function () {
             Route::post('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'store'])->name('reply');
+            Route::post('/{account}/conversations/{sender}/takeover', [WhatsAppCenterController::class, 'takeover'])->name('takeover');
+            Route::post('/{account}/conversations/{sender}/release', [WhatsAppCenterController::class, 'release'])->name('release');
             Route::post('/{account}/convert/{sender}', [WhatsAppCenterController::class, 'convert'])->name('convert');
             Route::post('/{account}/contacts', [WhatsAppCenterController::class, 'saveContact'])->name('contact-save');
             Route::post('/{account}/simulate', [WhatsAppCenterController::class, 'simulate'])->name('simulate');

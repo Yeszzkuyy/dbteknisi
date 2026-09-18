@@ -890,5 +890,12 @@
     "Forward belum didukung gateway": "Forward not yet supported by the gateway",
     "Reaksi belum didukung gateway": "Reactions not yet supported by the gateway",
     "Penghapusan pesan belum didukung gateway": "Message deletion not yet supported by the gateway",
-    "Bot balas otomatis": "Auto-reply bot"
+    "Bot balas otomatis": "Auto-reply bot",
+    "Ditangani": "Handled",
+    "Bot": "Bot",
+    "Bot aktif": "Bot active",
+    "Ambil alih": "Take over",
+    "Kembalikan ke bot": "Return to bot",
+    "Gagal mengambil alih percakapan.": "Failed to take over the conversation.",
+    "Gagal mengembalikan ke bot.": "Failed to return to bot."
 }

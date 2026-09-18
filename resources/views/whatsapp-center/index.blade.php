@@ -386,6 +386,8 @@
                                     <span x-show="conv.unread > 0" class="wa-unread shrink-0" x-text="conv.unread > 99 ? '99+' : conv.unread"></span>
                                 </span>
                                 <span class="mt-1 flex items-center gap-1.5 text-[10px]" style="color:var(--wa-muted)">
+                                    <span x-show="conv.mode === 'human'" class="font-semibold" style="color:var(--wa-green)">{{ __('Ditangani') }}</span>
+                                    <span x-show="conv.mode !== 'human'" class="font-semibold" style="color:#0ea5e9">{{ __('Bot') }}</span>
                                     <span x-show="conv.is_pinned" title="{{ __('Disematkan') }}">📌</span>
                                     <span x-show="conv.is_muted" title="{{ __('Notifikasi dibisukan') }}">⌁</span>
                                     <span x-show="conv.lead_id" class="font-semibold" style="color:var(--wa-green)">Lead</span>
@@ -428,10 +430,14 @@
                                     <span class="wa-avatar wa-avatar-small" x-text="initials(conversationName(activeConv))"></span>
                                     <span class="wa-chat-head-copy">
                                         <span class="wa-chat-head-name block" x-text="conversationName(activeConv)"></span>
-                                        <span class="wa-chat-head-status block" x-text="activeConv.customer ? (activeConv.customer.whatsapp || activeConv.sender_number) : activeConv.sender_number"></span>
+                                        <span class="wa-chat-head-status block" x-text="(activeConv.customer ? (activeConv.customer.whatsapp || activeConv.sender_number) : activeConv.sender_number) + ' · ' + (activeConv.mode === 'human' ? '{{ __('Ditangani') }}' : '{{ __('Bot aktif') }}')"></span>
                                     </span>
                                 </button>
                                 <div class="flex items-center gap-0.5">
+                                    @can('manage-marketing')
+                                        <button type="button" x-show="activeConv.mode !== 'human'" class="wa-secondary hidden !min-h-[32px] !px-2 !text-xs sm:inline-flex" @click="takeoverChat()">{{ __('Ambil alih') }}</button>
+                                        <button type="button" x-show="activeConv.mode === 'human'" class="wa-secondary hidden !min-h-[32px] !px-2 !text-xs sm:inline-flex" @click="releaseChat()">{{ __('Kembalikan ke bot') }}</button>
+                                    @endcan
                                     <button type="button" class="wa-icon-button" @click="messageSearchOpen = !messageSearchOpen; $nextTick(() => messageSearchOpen && $refs.messageSearch?.focus())" aria-label="{{ __('Cari dalam chat') }}">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M16 16l5 5"/></svg>
                                     </button>
@@ -488,6 +494,7 @@
                                             <button type="button" class="wa-bubble text-left" :class="selectedMessages.includes(msg.id) ? 'is-selected' : ''" @click="selectedMessages.length ? toggleMessageSelection(msg) : null" @contextmenu.prevent="openMessageMenu($event, msg)">
                                                 <p class="wa-bubble-text" x-text="msg.message_body"></p>
                                                 <span class="wa-bubble-meta">
+                                                    <template x-if="msg.is_bot"><span class="font-semibold" style="color:var(--wa-green)">{{ __('Bot') }}</span></template>
                                                     <span x-text="messageTime(msg)"></span>
                                                     <template x-if="msg.direction === 'outbound'"><span :class="msg.status === 'read' ? 'wa-read' : ''" x-text="statusGlyph(msg.status)" :title="statusLabel(msg.status)"></span></template>
                                                 </span>
@@ -1015,6 +1022,28 @@
                     name: this.conversationName(this.activeConv),
                 });
                 window.location.href = '{{ route('leads.create') }}?' + params.toString();
+            },
+
+            async takeoverChat() {
+                if (!this.activeConv || !this.activeAccount) return;
+                try {
+                    const response = await fetch('{{ route('whatsapp-center.takeover', ['account' => ':id', 'sender' => ':sender']) }}'.replace(':id', this.activeAccount.id).replace(':sender', encodeURIComponent(this.activeConv.sender_number)), { method: 'POST', headers: { Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || '{{ __('Gagal mengambil alih percakapan.') }}');
+                    this.activeConv = { ...this.activeConv, mode: data.mode, handled_by: data.handled_by };
+                    this.loadConversations(true);
+                } catch (error) { this.showError(error.message); }
+            },
+
+            async releaseChat() {
+                if (!this.activeConv || !this.activeAccount) return;
+                try {
+                    const response = await fetch('{{ route('whatsapp-center.release', ['account' => ':id', 'sender' => ':sender']) }}'.replace(':id', this.activeAccount.id).replace(':sender', encodeURIComponent(this.activeConv.sender_number)), { method: 'POST', headers: { Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || '{{ __('Gagal mengembalikan ke bot.') }}');
+                    this.activeConv = { ...this.activeConv, mode: data.mode, handled_by: data.handled_by, bot_turns: data.bot_turns };
+                    this.loadConversations(true);
+                } catch (error) { this.showError(error.message); }
             },
 
             openFilePicker(accept) { this.attachmentPanel = false; this.$refs.fileInput.accept = accept; this.$refs.fileInput.click(); },

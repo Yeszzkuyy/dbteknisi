@@ -7,10 +7,12 @@ use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\User;
 use App\Models\WhatsappAccount;
+use App\Models\WhatsappConversation;
 use App\Models\WhatsappConversationPreference;
 use App\Models\WhatsappMessage;
 use App\Notifications\NewLeadNotification;
 use App\Notifications\WhatsappInboundNotification;
+use App\Services\WhatsappBot;
 use App\Services\WhatsappGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -19,6 +21,7 @@ class WhatsAppCenterController extends Controller
 {
     public function __construct(
         private readonly WhatsappGateway $gateway,
+        private readonly WhatsappBot $bot,
     ) {
     }
 
@@ -82,15 +85,21 @@ class WhatsAppCenterController extends Controller
             ->get()
             ->keyBy('sender_number');
 
+        $conversations = WhatsappConversation::where('whatsapp_account_id', $account->id)
+            ->with('handler:id,name')
+            ->get()
+            ->keyBy('sender_number');
+
         $rows = WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->orderBy('id')
             ->get()
             ->groupBy('sender_number')
-            ->map(function ($messages, $sender) use ($preferences) {
+            ->map(function ($messages, $sender) use ($preferences, $conversations) {
                 $last = $messages->last();
                 $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
                 $lead = $messages->whereNotNull('lead_id')->first()?->lead;
                 $preference = $preferences->get($sender);
+                $conversation = $conversations->get((string) $sender);
 
                 return [
                     'sender_number' => (string) $sender,
@@ -104,6 +113,9 @@ class WhatsAppCenterController extends Controller
                     'is_pinned' => (bool) $preference?->is_pinned,
                     'is_muted' => (bool) $preference?->is_muted,
                     'is_archived' => (bool) $preference?->is_archived,
+                    'mode' => $conversation?->mode ?? WhatsappConversation::MODE_BOT,
+                    'handled_by' => $conversation?->handler?->name,
+                    'bot_turns' => (int) ($conversation?->bot_turns ?? 0),
                 ];
             })
             ->values()
@@ -132,6 +144,7 @@ class WhatsAppCenterController extends Controller
                 'direction' => $m->direction,
                 'status' => $m->status,
                 'message_body' => $m->message_body,
+                'is_bot' => (bool) $m->is_bot,
                 'created_at' => $m->created_at->format('d M H:i'),
                 'created_iso' => $m->created_at->toIso8601String(),
             ]);
@@ -269,12 +282,43 @@ class WhatsAppCenterController extends Controller
             $status = 'failed';
         }
 
+        // Marketing ikut campur manual → ambil alih dari bot (sticky).
+        $this->bot->takeover($account, $sender, auth()->user());
+
         return response()->json([
             'id' => $message->id,
             'direction' => 'outbound',
             'status' => $status,
             'message_body' => $message->message_body,
             'created_at' => $message->created_at->format('d M H:i'),
+        ]);
+    }
+
+    public function takeover(WhatsappAccount $account, string $sender)
+    {
+        $this->authorizeAccount($account);
+        $this->authorize('manage-marketing');
+
+        $conversation = $this->bot->takeover($account, $this->normalizeNumber($sender), auth()->user());
+
+        return response()->json([
+            'mode' => $conversation->mode,
+            'handled_by' => auth()->user()->name,
+            'bot_turns' => $conversation->bot_turns,
+        ]);
+    }
+
+    public function release(WhatsappAccount $account, string $sender)
+    {
+        $this->authorizeAccount($account);
+        $this->authorize('manage-marketing');
+
+        $conversation = $this->bot->release($account, $this->normalizeNumber($sender));
+
+        return response()->json([
+            'mode' => $conversation->mode,
+            'handled_by' => null,
+            'bot_turns' => $conversation->bot_turns,
         ]);
     }
 

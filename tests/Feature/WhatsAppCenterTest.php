@@ -864,7 +864,32 @@ class WhatsAppCenterTest extends TestCase
         ]);
     }
 
-    public function test_bot_skips_conversation_recently_handled_by_human(): void
+    public function test_bot_skips_conversation_after_sticky_takeover(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123', 'bot_enabled' => true]);
+
+        \App\Models\WhatsappConversation::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'mode' => 'human',
+        ]);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'halo masih ada?',
+            'direction' => 'inbound',
+        ]);
+
+        Http::fake();
+        $bot = $this->fakeBot();
+
+        // Sticky: walau tidak ada balasan manusia baru-baru ini, bot tetap diam.
+        $this->assertSame(0, $bot->replyPending());
+    }
+
+    public function test_bot_replies_again_after_release(): void
     {
         $account = $this->makeAccount();
         $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123', 'bot_enabled' => true]);
@@ -872,26 +897,54 @@ class WhatsAppCenterTest extends TestCase
         WhatsappMessage::create([
             'whatsapp_account_id' => $account->id,
             'sender_number' => '6281234567890',
-            'message_body' => 'Halo',
-            'direction' => 'inbound',
-        ]);
-        WhatsappMessage::create([
-            'whatsapp_account_id' => $account->id,
-            'sender_number' => '6281234567890',
-            'message_body' => 'Baik, saya bantu',
-            'direction' => 'outbound',
-            'is_bot' => false,
-        ]);
-        WhatsappMessage::create([
-            'whatsapp_account_id' => $account->id,
-            'sender_number' => '6281234567890',
-            'message_body' => 'makasih',
+            'message_body' => 'halo',
             'direction' => 'inbound',
         ]);
 
-        Http::fake();
+        Http::fake(['api.green-api.com/*' => Http::response(['idMessage' => 'bot_msg_2'])]);
         $bot = $this->fakeBot();
 
+        $bot->takeover($account, '6281234567890');
+        $this->assertSame(0, $bot->replyPending());
+
+        $bot->release($account, '6281234567890');
+        $this->assertSame(1, $bot->replyPending());
+    }
+
+    public function test_bot_stops_after_max_turns_and_notifies_handoff(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123', 'bot_enabled' => true]);
+        $marketing = $this->marketingUser($account->id);
+
+        \App\Models\WhatsappConversation::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'mode' => 'bot',
+            'bot_turns' => 4,
+        ]);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'tolong info lebih lanjut',
+            'direction' => 'inbound',
+        ]);
+
+        Http::fake(['api.green-api.com/*' => Http::response(['idMessage' => 'bot_msg_5'])]);
+        $bot = $this->fakeBot();
+
+        $this->assertSame(1, $bot->replyPending());
+        $this->assertSame(5, \App\Models\WhatsappConversation::where('whatsapp_account_id', $account->id)->first()->bot_turns);
+        $this->assertSame(1, $marketing->notifications()->count());
+
+        // Balasan ke-6 tidak dikirim karena sudah mencapai batas.
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'halo?',
+            'direction' => 'inbound',
+        ]);
         $this->assertSame(0, $bot->replyPending());
     }
 
