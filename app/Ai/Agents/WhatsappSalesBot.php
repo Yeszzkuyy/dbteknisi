@@ -3,6 +3,7 @@
 namespace App\Ai\Agents;
 
 use Laravel\Ai\Attributes\MaxTokens;
+use Laravel\Ai\Attributes\Model;
 use Laravel\Ai\Attributes\Provider;
 use Laravel\Ai\Attributes\Temperature;
 use Laravel\Ai\Contracts\Agent;
@@ -11,6 +12,7 @@ use Laravel\Ai\Promptable;
 use Stringable;
 
 #[Provider(Lab::OpenRouter)]
+#[Model('google/gemini-2.5-flash')]
 #[Temperature(0.4)]
 #[MaxTokens(512)]
 class WhatsappSalesBot implements Agent

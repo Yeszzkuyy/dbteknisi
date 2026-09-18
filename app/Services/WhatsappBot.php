@@ -12,6 +12,11 @@ use Throwable;
 
 class WhatsappBot
 {
+    /**
+     * Balasan cadangan bila AI gagal, agar customer tidak dibiarkan tanpa respons.
+     */
+    private const FALLBACK_REPLY = 'Terima kasih sudah menghubungi 3DY Group. Pesan Anda sudah kami terima, tim sales akan segera membalas.';
+
     public function __construct(private WhatsappGateway $gateway)
     {
     }
@@ -143,10 +148,10 @@ class WhatsappBot
         } catch (Throwable $e) {
             Log::error('WhatsappBot generateReply gagal: '.$e->getMessage());
 
-            return null;
+            return self::FALLBACK_REPLY;
         }
 
-        return $text !== '' ? mb_substr($text, 0, 1000) : null;
+        return $text !== '' ? mb_substr($text, 0, 1000) : self::FALLBACK_REPLY;
     }
 
     private function transcript(WhatsappAccount $account, string $sender, int $limit): string
