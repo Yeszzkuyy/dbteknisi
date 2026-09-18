@@ -6,7 +6,6 @@ use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\User;
 use App\Notifications\NewLeadNotification;
-use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
@@ -21,6 +20,7 @@ class LeadNotificationTest extends TestCase
         Artisan::call('db:seed', ['--class' => 'RoleAndPermissionSeeder']);
         $user = User::factory()->create();
         $user->assignRole($role);
+
         return $user;
     }
 
@@ -90,6 +90,61 @@ class LeadNotificationTest extends TestCase
             ->assertRedirect();
 
         $this->assertSame(0, $management->fresh()->unreadNotifications()->count());
+    }
+
+    public function test_user_can_mark_one_notification_read_and_delete_it(): void
+    {
+        $management = $this->loginAs('management');
+        $lead = Lead::create([
+            'customer_id' => Customer::create(['name' => 'PT Baca Hapus'])->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'status' => 'new',
+            'incoming_date' => now()->toDateString(),
+        ]);
+        $management->notify(new NewLeadNotification($lead));
+        $notificationId = $management->notifications()->first()->id;
+
+        $this->actingAs($management)
+            ->post(route('notifications.read', $notificationId))
+            ->assertOk()
+            ->assertJson(['unread' => 0]);
+
+        $this->assertSame(1, $management->notifications()->count());
+        $this->assertNotNull($management->notifications()->first()->read_at);
+
+        $this->actingAs($management)
+            ->delete(route('notifications.destroy', $notificationId))
+            ->assertOk()
+            ->assertJson(['unread' => 0]);
+
+        $this->assertSame(0, $management->notifications()->count());
+    }
+
+    public function test_user_cannot_read_or_delete_another_users_notification(): void
+    {
+        $owner = $this->loginAs('management');
+        $other = $this->loginAs('management');
+
+        $lead = Lead::create([
+            'customer_id' => Customer::create(['name' => 'PT Milik Orang'])->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'status' => 'new',
+            'incoming_date' => now()->toDateString(),
+        ]);
+        $owner->notify(new NewLeadNotification($lead));
+        $notificationId = $owner->notifications()->first()->id;
+
+        $this->actingAs($other)
+            ->post(route('notifications.read', $notificationId))
+            ->assertNotFound();
+
+        $this->actingAs($other)
+            ->delete(route('notifications.destroy', $notificationId))
+            ->assertNotFound();
+
+        $this->assertSame(1, $owner->notifications()->count());
     }
 
     public function test_status_endpoint_returns_unread_and_unassigned(): void

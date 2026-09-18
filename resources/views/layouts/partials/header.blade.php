@@ -57,15 +57,22 @@
                         </template>
                     </div>
                     <template x-for="n in $store.notif.items" :key="n.id">
-                        <a :href="n.url"
-                           class="flex items-start gap-3 px-4 py-2.5 hover:bg-slate-50 transition"
-                           :class="n.read ? 'opacity-60' : ''">
-                            <span class="mt-1.5 h-2 w-2 rounded-full shrink-0" :class="n.read ? 'bg-slate-300' : 'bg-red-500'"></span>
-                            <span class="min-w-0">
-                                <span class="block text-sm text-slate-700">{{ __('Lead baru') }}: <strong x-text="n.customer"></strong></span>
-                                <span class="block text-xs text-slate-400" x-text="n.ago"></span>
-                            </span>
-                        </a>
+                        <div class="group flex items-start gap-1 pr-2 hover:bg-slate-50 transition"
+                             :class="n.read ? 'opacity-60' : ''">
+                            <a :href="n.url"
+                               @click="$store.notif.markRead(n.id)"
+                               class="flex items-start gap-3 min-w-0 flex-1 px-4 py-2.5">
+                                <span class="mt-1.5 h-2 w-2 rounded-full shrink-0" :class="n.read ? 'bg-slate-300' : 'bg-red-500'"></span>
+                                <span class="min-w-0">
+                                    <span class="block text-sm text-slate-700">{{ __('Lead baru') }}: <strong x-text="n.customer"></strong></span>
+                                    <span class="block text-xs text-slate-400" x-text="n.ago"></span>
+                                </span>
+                            </a>
+                            <button type="button"
+                                    @click.stop="$store.notif.remove(n.id)"
+                                    class="mt-2 shrink-0 h-5 w-5 flex items-center justify-center rounded text-xs text-slate-400 hover:text-red-500 transition"
+                                    aria-label="{{ __('Hapus notifikasi') }}">&#10005;</button>
+                        </div>
                     </template>
                     <template x-if="$store.notif.items.length === 0">
                         <p class="px-4 py-6 text-center text-sm text-slate-400">{{ __('Tidak ada notifikasi') }}</p>

@@ -105,6 +105,34 @@ document.addEventListener('alpine:init', () => {
                 this.items = data.items ?? [];
             } catch (e) {}
         },
+        async markRead(id) {
+            const token = document.querySelector('meta[name="csrf-token"]')?.content;
+            const item = this.items.find((n) => n.id === id);
+            if (item) item.read = true;
+            try {
+                const res = await fetch(`/notifications/${id}/read`, {
+                    method: 'POST',
+                    keepalive: true,
+                    headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+                });
+                const data = await res.json();
+                if (typeof data.unread === 'number') this.unread = data.unread;
+            } catch (e) {}
+        },
+        async remove(id) {
+            const token = document.querySelector('meta[name="csrf-token"]')?.content;
+            const item = this.items.find((n) => n.id === id);
+            this.items = this.items.filter((n) => n.id !== id);
+            if (item && !item.read) this.unread = Math.max(0, this.unread - 1);
+            try {
+                const res = await fetch(`/notifications/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+                });
+                const data = await res.json();
+                if (typeof data.unread === 'number') this.unread = data.unread;
+            } catch (e) {}
+        },
         showToast() {
             this.toast = true;
             clearTimeout(this.toastTimer);

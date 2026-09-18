@@ -4,8 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\Customer;
 use App\Models\Lead;
+use App\Models\User;
 use App\Models\WhatsappAccount;
+use App\Models\WhatsappConversationPreference;
 use App\Models\WhatsappMessage;
+use App\Services\WhatsappBot;
+use App\Services\WhatsappGateway;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -23,7 +27,7 @@ class WhatsAppCenterTest extends TestCase
 
     private function marketingUser(?int $accountId = null)
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $user->assignRole('marketing');
 
         if ($accountId) {
@@ -164,7 +168,7 @@ class WhatsAppCenterTest extends TestCase
             'direction' => 'inbound',
         ]);
 
-        \App\Models\WhatsappConversationPreference::create([
+        WhatsappConversationPreference::create([
             'user_id' => $user->id,
             'whatsapp_account_id' => $account->id,
             'sender_number' => '6281234567890',
@@ -210,7 +214,7 @@ class WhatsAppCenterTest extends TestCase
     {
         $a = $this->makeAccount('wa_nti');
         $b = $this->makeAccount('wa_mgk');
-        $admin = \App\Models\User::factory()->create();
+        $admin = User::factory()->create();
         $admin->assignRole('super-admin');
 
         $response = $this->actingAs($admin)->get(route('whatsapp-center.index'))->assertOk();
@@ -376,7 +380,7 @@ class WhatsAppCenterTest extends TestCase
     public function test_super_admin_can_update_gateway_credentials(): void
     {
         $account = $this->makeAccount();
-        $admin = \App\Models\User::factory()->create();
+        $admin = User::factory()->create();
         $admin->assignRole('super-admin');
 
         Http::fake([
@@ -654,7 +658,7 @@ class WhatsAppCenterTest extends TestCase
 
     public function test_status_endpoint_does_not_call_meta_graph_api(): void
     {
-        $admin = \App\Models\User::factory()->create();
+        $admin = User::factory()->create();
         $admin->assignRole('super-admin');
         Http::fake();
 
@@ -671,7 +675,7 @@ class WhatsAppCenterTest extends TestCase
 
     public function test_check_status_meta_updates_authorized(): void
     {
-        $admin = \App\Models\User::factory()->create();
+        $admin = User::factory()->create();
         $admin->assignRole('super-admin');
 
         $account = $this->makeAccount('wa_wani');
@@ -694,7 +698,7 @@ class WhatsAppCenterTest extends TestCase
 
     public function test_check_status_meta_rejects_non_phone_number_id(): void
     {
-        $admin = \App\Models\User::factory()->create();
+        $admin = User::factory()->create();
         $admin->assignRole('super-admin');
 
         $account = $this->makeAccount('wa_wani');
@@ -738,7 +742,7 @@ class WhatsAppCenterTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->getJson(route('whatsapp-center.messages', [$account, '6281234567890']) . '?limit=1')
+            ->getJson(route('whatsapp-center.messages', [$account, '6281234567890']).'?limit=1')
             ->assertOk()
             ->assertJsonPath('has_more', true)
             ->assertJsonCount(1, 'messages');
@@ -771,6 +775,56 @@ class WhatsAppCenterTest extends TestCase
         $this->assertDatabaseHas('customers', [
             'whatsapp' => '6281234567890',
             'name' => 'Rina Tersimpan',
+        ]);
+    }
+
+    public function test_save_contact_stores_company_as_customer_name(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $account), [
+                'name' => 'Budi',
+                'company' => 'PT Budi Corp',
+                'whatsapp' => '6281234567890',
+            ])
+            ->assertOk()
+            ->assertJsonPath('name', 'PT Budi Corp')
+            ->assertJsonPath('contact_person', 'Budi');
+
+        $this->assertDatabaseHas('customers', [
+            'whatsapp' => '6281234567890',
+            'name' => 'PT Budi Corp',
+            'company' => 'PT Budi Corp',
+            'contact_person' => 'Budi',
+        ]);
+    }
+
+    public function test_save_contact_keeps_existing_company_when_field_empty(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+        $customer = Customer::create([
+            'name' => 'PT Ada Dulu',
+            'company' => 'PT Ada Dulu',
+            'contact_person' => 'Rina',
+            'whatsapp' => '6281234567890',
+        ]);
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $account), [
+                'name' => 'Budi',
+                'company' => '',
+                'whatsapp' => '6281234567890',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('customers', [
+            'id' => $customer->id,
+            'name' => 'PT Ada Dulu',
+            'company' => 'PT Ada Dulu',
+            'contact_person' => 'Budi',
         ]);
     }
 
@@ -824,13 +878,13 @@ class WhatsAppCenterTest extends TestCase
             && $request['to'] === '6281234567890');
     }
 
-    private function fakeBot(string $reply = 'Halo, butuh berapa unit dan brandnya?', ?string $summary = null): \App\Services\WhatsappBot
+    private function fakeBot(string $reply = 'Halo, butuh berapa unit dan brandnya?', ?string $summary = null): WhatsappBot
     {
-        $bot = \Mockery::mock(\App\Services\WhatsappBot::class, [app(\App\Services\WhatsappGateway::class)])->makePartial();
+        $bot = \Mockery::mock(WhatsappBot::class, [app(WhatsappGateway::class)])->makePartial();
         $bot->shouldReceive('generateReply')->andReturn($reply);
         $bot->shouldReceive('summarizeNeeds')->andReturn($summary);
 
-        $this->app->instance(\App\Services\WhatsappBot::class, $bot);
+        $this->app->instance(WhatsappBot::class, $bot);
 
         return $bot;
     }

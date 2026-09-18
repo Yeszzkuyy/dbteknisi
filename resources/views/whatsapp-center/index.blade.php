@@ -581,7 +581,7 @@
     </div>
 
     <div x-show="contactModal" class="wa-modal-backdrop" @keydown.escape.window="contactModal = false" x-transition>
-        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)" x-text="contactForm.customer_id ? '{{ __('Edit kontak') }}' : '{{ __('Simpan nomor') }}'"></h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Data disimpan ke Customer CRM yang sudah ada.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactModal = false" aria-label="{{ __('Tutup') }}">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="saveContact()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama kontak') }}</span><input x-model="contactForm.name" required class="wa-field" maxlength="255"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nomor WhatsApp') }}</span><input x-model="contactForm.whatsapp" required class="wa-field" placeholder="628xxxxxxxxxx" maxlength="50"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Catatan') }}</span><textarea x-model="contactForm.notes" class="wa-field wa-textarea" maxlength="2000" placeholder="{{ __('Catatan internal') }}"></textarea></label><p x-show="contactError" class="text-xs text-red-600" x-text="contactError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="contactModal = false">{{ __('Batal') }}</button><button type="submit" class="wa-primary" :disabled="savingContact" x-text="savingContact ? '{{ __('Menyimpan...') }}' : '{{ __('Simpan kontak') }}'"></button></div></form></div>
+        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)" x-text="contactForm.customer_id ? '{{ __('Edit kontak') }}' : '{{ __('Simpan nomor') }}'"></h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Data disimpan ke Customer CRM yang sudah ada.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactModal = false" aria-label="{{ __('Tutup') }}">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="saveContact()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama kontak') }}</span><input x-model="contactForm.name" required class="wa-field" maxlength="255" placeholder="{{ __('Nama orang / PIC') }}"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama Perusahaan (opsional)') }}</span><input x-model="contactForm.company" class="wa-field" maxlength="255" placeholder="{{ __('Nama perusahaan / PT') }}"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nomor WhatsApp') }}</span><input x-model="contactForm.whatsapp" required class="wa-field" placeholder="628xxxxxxxxxx" maxlength="50"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Catatan') }}</span><textarea x-model="contactForm.notes" class="wa-field wa-textarea" maxlength="2000" placeholder="{{ __('Catatan internal') }}"></textarea></label><p x-show="contactError" class="text-xs text-red-600" x-text="contactError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="contactModal = false">{{ __('Batal') }}</button><button type="submit" class="wa-primary" :disabled="savingContact" x-text="savingContact ? '{{ __('Menyimpan...') }}' : '{{ __('Simpan kontak') }}'"></button></div></form></div>
     </div>
 
 </div>
@@ -627,7 +627,7 @@
             loadingContacts: false,
             directNumber: '',
             contactModal: false,
-            contactForm: { customer_id: null, name: '', whatsapp: '', notes: '' },
+            contactForm: { customer_id: null, name: '', company: '', whatsapp: '', notes: '' },
             savingContact: false,
             contactError: '',
             settings: { enterToSend: true, mediaVisibility: true, notificationSound: true },
@@ -994,7 +994,7 @@
 
             openContactModal() {
                 const customer = this.activeConv?.customer;
-                this.contactForm = { customer_id: customer?.id || null, name: customer?.name || this.activeConv?.sender_name || '', whatsapp: customer?.whatsapp || this.activeConv?.sender_number || '', notes: customer?.notes || '' };
+                this.contactForm = { customer_id: customer?.id || null, name: customer?.contact_person || customer?.name || this.activeConv?.sender_name || '', company: customer?.name || '', whatsapp: customer?.whatsapp || this.activeConv?.sender_number || '', notes: customer?.notes || '' };
                 this.contactError = '';
                 this.contactModal = true;
             },
@@ -1008,7 +1008,7 @@
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || Object.values(data.errors || {}).flat()[0] || '{{ __('Data kontak tidak valid.') }}');
                     this.activeConv.customer = data;
-                    this.activeConv.sender_name = data.name;
+                    this.activeConv.sender_name = data.contact_person || data.name;
                     this.contactModal = false;
                     this.loadConversations(true);
                 } catch (error) { this.contactError = error.message; } finally { this.savingContact = false; }

@@ -24,6 +24,20 @@ class NotificationController extends Controller
         return back();
     }
 
+    public function read(Request $request, string $notification)
+    {
+        $request->user()->notifications()->findOrFail($notification)->markAsRead();
+
+        return response()->json(['unread' => $request->user()->unreadNotifications()->count()]);
+    }
+
+    public function destroy(Request $request, string $notification)
+    {
+        $request->user()->notifications()->findOrFail($notification)->delete();
+
+        return response()->json(['unread' => $request->user()->unreadNotifications()->count()]);
+    }
+
     public static function itemsFor(User $user): array
     {
         return $user->notifications()->limit(10)->get()
