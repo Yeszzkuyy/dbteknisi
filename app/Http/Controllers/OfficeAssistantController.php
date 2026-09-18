@@ -103,7 +103,7 @@ class OfficeAssistantController extends Controller
 
         if (blank(config('ai.providers.openrouter.key'))) {
             return response()->json([
-                'message' => 'Asisten AI belum aktif karena API key OpenRouter belum dikonfigurasi. Hubungi administrator.',
+                'message' => __('Asisten AI belum aktif karena API key OpenRouter belum dikonfigurasi. Hubungi administrator.'),
             ], 422);
         }
 
@@ -113,13 +113,13 @@ class OfficeAssistantController extends Controller
 
             if (! $conversation) {
                 return response()->json([
-                    'message' => 'Percakapan tidak valid. Silakan mulai percakapan baru.',
+                    'message' => __('Percakapan tidak valid. Silakan mulai percakapan baru.'),
                 ], 422);
             }
         }
 
         $message = trim((string) ($validated['message'] ?? ''));
-        $prompt = $message !== '' ? $message : 'Tolong analisis lampiran ini.';
+        $prompt = $message !== '' ? $message : __('Tolong analisis lampiran ini.');
         $storedPaths = [];
 
         try {
@@ -143,7 +143,7 @@ class OfficeAssistantController extends Controller
             Log::error('OfficeAssistant gagal merespons: '.$e->getMessage(), ['exception' => $e]);
 
             return response()->json([
-                'message' => 'Maaf, asisten tidak dapat merespons saat ini. Coba lagi beberapa saat.',
+                'message' => __('Maaf, asisten tidak dapat merespons saat ini. Coba lagi beberapa saat.'),
             ], 500);
         }
     }
@@ -164,7 +164,7 @@ class OfficeAssistantController extends Controller
                 );
 
                 if (! is_string($path)) {
-                    throw new \RuntimeException('Lampiran gagal disimpan.');
+                    throw new \RuntimeException(__('Lampiran gagal disimpan.'));
                 }
 
                 $storedPaths[] = $path;
@@ -198,7 +198,7 @@ class OfficeAssistantController extends Controller
                     : [],
                 'attachments' => $message->role === 'user'
                     ? collect($message->attachments ?? [])->map(fn ($attachment) => [
-                        'name' => $attachment['name'] ?? 'Lampiran',
+                        'name' => $attachment['name'] ?? __('Lampiran'),
                         'type' => $attachment['type'] ?? 'file',
                         'mime' => $attachment['mime'] ?? null,
                     ])->values()->all()
@@ -215,7 +215,7 @@ class OfficeAssistantController extends Controller
     {
         return [
             'id' => $conversation->id,
-            'title' => $conversation->title ?: 'Percakapan baru',
+            'title' => $conversation->title ?: __('Percakapan baru'),
             'updated_at' => $conversation->updated_at?->toISOString(),
         ];
     }
