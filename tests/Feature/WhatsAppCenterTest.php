@@ -693,4 +693,54 @@ class WhatsAppCenterTest extends TestCase
             'name' => 'Rina Tersimpan',
         ]);
     }
+
+    public function test_reply_normalizes_local_number_for_green_api(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123']);
+        $user = $this->marketingUser($account->id);
+
+        Http::fake([
+            'api.green-api.com/*' => Http::response(['idMessage' => 'g_msg_2']),
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.reply', [$account, '081234567890']), ['message_body' => 'Baik'])
+            ->assertOk()
+            ->assertJsonPath('status', 'sent');
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'direction' => 'outbound',
+        ]);
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), '/sendMessage/')
+            && $request['chatId'] === '6281234567890@c.us');
+    }
+
+    public function test_meta_reply_normalizes_recipient_number(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_ID_1', 'gateway_token' => 'tok-meta']);
+        $user = $this->marketingUser($account->id);
+
+        Http::fake([
+            'graph.facebook.com/*' => Http::response(['messages' => [['id' => 'wamid.1']]]),
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.reply', [$account, '081234567890']), ['message_body' => 'Halo'])
+            ->assertOk()
+            ->assertJsonPath('status', 'sent');
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'direction' => 'outbound',
+        ]);
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), '/messages')
+            && $request['to'] === '6281234567890');
+    }
 }

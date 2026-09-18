@@ -243,6 +243,8 @@ class WhatsAppCenterController extends Controller
             'message_body' => 'required|string|max:4000',
         ]);
 
+        $sender = $this->normalizeNumber($sender);
+
         $message = WhatsappMessage::create([
             'whatsapp_account_id' => $account->id,
             'sender_number' => $sender,
@@ -652,15 +654,7 @@ class WhatsAppCenterController extends Controller
 
     private function normalizeNumber(string $number): string
     {
-        $digits = preg_replace('/\D/', '', $number);
-
-        if (str_starts_with($digits, '0')) {
-            $digits = '62' . substr($digits, 1);
-        } elseif (str_starts_with($digits, '8')) {
-            $digits = '62' . $digits;
-        }
-
-        return $digits;
+        return \App\Services\WhatsappGateway::normalizeNumber($number);
     }
 
     private function contactPayload(Customer $customer): array

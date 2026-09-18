@@ -95,7 +95,7 @@ class WhatsappGateway
                 [
                     'messaging_product' => 'whatsapp',
                     'recipient_type' => 'individual',
-                    'to' => $number,
+                    'to' => self::normalizeNumber($number),
                     'type' => 'text',
                     'text' => [
                         'preview_url' => false,
@@ -179,6 +179,25 @@ class WhatsappGateway
 
     private function chatId(string $number): string
     {
-        return preg_replace('/\D/', '', $number) . '@c.us';
+        return self::normalizeNumber($number) . '@c.us';
+    }
+
+    /**
+     * Normalisasi nomor ke format internasional tanpa simbol (mis. 0812... -> 62812...).
+     * Nomor pendek (mis. kode internal) dibiarkan apa adanya.
+     */
+    public static function normalizeNumber(string $number): string
+    {
+        $digits = preg_replace('/\D/', '', $number);
+
+        if (str_starts_with($digits, '0') && strlen($digits) >= 9) {
+            return '62' . substr($digits, 1);
+        }
+
+        if (str_starts_with($digits, '8') && strlen($digits) >= 9) {
+            return '62' . $digits;
+        }
+
+        return $digits;
     }
 }
