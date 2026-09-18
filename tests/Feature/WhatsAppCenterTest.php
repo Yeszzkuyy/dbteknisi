@@ -151,6 +151,33 @@ class WhatsAppCenterTest extends TestCase
         $this->actingAs($user)->get(route('whatsapp-center.conversations', $other))->assertForbidden();
     }
 
+    public function test_conversations_endpoint_lists_chats_with_preferences(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Halo',
+            'direction' => 'inbound',
+        ]);
+
+        \App\Models\WhatsappConversationPreference::create([
+            'user_id' => $user->id,
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'is_pinned' => true,
+        ]);
+
+        $this->actingAs($user)
+            ->getJson(route('whatsapp-center.conversations', $account))
+            ->assertOk()
+            ->assertJsonPath('0.sender_number', '6281234567890')
+            ->assertJsonPath('0.is_pinned', true);
+    }
+
     public function test_super_admin_sees_all_accounts(): void
     {
         $a = $this->makeAccount('wa_nti');

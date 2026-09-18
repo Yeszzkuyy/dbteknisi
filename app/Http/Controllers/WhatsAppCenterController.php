@@ -85,14 +85,14 @@ class WhatsAppCenterController extends Controller
             ->orderBy('id')
             ->get()
             ->groupBy('sender_number')
-            ->map(function ($messages, $sender) {
+            ->map(function ($messages, $sender) use ($preferences) {
                 $last = $messages->last();
                 $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
                 $lead = $messages->whereNotNull('lead_id')->first()?->lead;
                 $preference = $preferences->get($sender);
 
                 return [
-                    'sender_number' => $sender,
+                    'sender_number' => (string) $sender,
                     'sender_name' => $last->sender_name ?? 'Kontak WA',
                     'last_message' => $last->message_body,
                     'last_direction' => $last->direction,
