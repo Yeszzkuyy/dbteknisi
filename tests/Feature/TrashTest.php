@@ -51,8 +51,8 @@ class TrashTest extends TestCase
 
         $this->get(route('trash.index'))
             ->assertOk()
-            ->assertSee('Customer Terhapus')
-            ->assertSee('Project Terhapus')
+            ->assertSee(__('Customer Terhapus'))
+            ->assertSee(__('Project Terhapus'))
             ->assertSeeInOrder(['PT Baru Terhapus', 'Project Lama']);
     }
 
@@ -67,7 +67,7 @@ class TrashTest extends TestCase
             ->assertRedirect(route('trash.index'));
 
         $this->assertDatabaseMissing('customers', ['id' => $customer->id]);
-        $this->get(route('trash.index'))->assertSee('Tidak ada customer yang terhapus.');
+        $this->get(route('trash.index'))->assertSee(__('Tidak ada customer yang terhapus.'));
     }
 
     public function test_hapus_permanen_project_menghilangkan_dari_trash(): void
@@ -81,7 +81,7 @@ class TrashTest extends TestCase
             ->assertRedirect(route('trash.index'));
 
         $this->assertDatabaseMissing('projects', ['id' => $project->id]);
-        $this->get(route('trash.index'))->assertSee('Tidak ada project yang terhapus.');
+        $this->get(route('trash.index'))->assertSee(__('Tidak ada project yang terhapus.'));
     }
 
     public function test_hapus_semua_menghapus_history_sekaligus(): void
@@ -98,7 +98,7 @@ class TrashTest extends TestCase
 
         $this->assertDatabaseMissing('customers', ['id' => $customer->id]);
         $this->assertDatabaseMissing('projects', ['id' => $project->id]);
-        $this->get(route('trash.index'))->assertSee('Tidak ada customer yang terhapus.');
+        $this->get(route('trash.index'))->assertSee(__('Tidak ada customer yang terhapus.'));
     }
 
     public function test_trash_membutuhkan_permission_view_admin(): void

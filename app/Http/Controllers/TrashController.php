@@ -59,7 +59,7 @@ class TrashController extends Controller
         $customer->restore();
 
         return redirect()->route('trash.index')
-            ->with('success', 'Customer "' . $customer->name . '" berhasil direstore');
+            ->with('success', __('Customer ":name" berhasil direstore', ['name' => $customer->name]));
     }
 
     public function restoreProject(int $id)
@@ -68,7 +68,7 @@ class TrashController extends Controller
         $project->restore();
 
         return redirect()->route('trash.index')
-            ->with('success', 'Project "' . $project->project_name . '" berhasil direstore');
+            ->with('success', __('Project ":name" berhasil direstore', ['name' => $project->project_name]));
     }
 
     public function destroyCustomer(int $id)
@@ -77,7 +77,7 @@ class TrashController extends Controller
         $customer->forceDelete();
 
         return redirect()->route('trash.index')
-            ->with('success', 'Customer "' . $customer->name . '" dihapus permanen');
+            ->with('success', __('Customer ":name" dihapus permanen', ['name' => $customer->name]));
     }
 
     public function destroyProject(int $id)
@@ -86,7 +86,7 @@ class TrashController extends Controller
         $project->forceDelete();
 
         return redirect()->route('trash.index')
-            ->with('success', 'Project "' . $project->project_name . '" dihapus permanen');
+            ->with('success', __('Project ":name" dihapus permanen', ['name' => $project->project_name]));
     }
 
     /**
@@ -104,7 +104,7 @@ class TrashController extends Controller
         }
 
         return redirect()->route('trash.index')
-            ->with('success', 'Trash berhasil dibersihkan');
+            ->with('success', __('Trash berhasil dibersihkan'));
     }
 
     /**

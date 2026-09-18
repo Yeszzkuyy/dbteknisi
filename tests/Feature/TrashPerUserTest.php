@@ -51,7 +51,7 @@ class TrashPerUserTest extends TestCase
         $this->assertEquals($b->id, $cb->deleted_by);
 
         $htmlA = $this->actingAs($a)->get('/trash')->assertOk()->getContent();
-        $this->assertStringContainsString('Trash Saya', $htmlA);
+        $this->assertStringContainsString(__('Trash Saya'), $htmlA);
         $this->assertStringContainsString('Milik A', $htmlA);
         $this->assertStringNotContainsString('Milik B', $htmlA);
 
@@ -81,7 +81,7 @@ class TrashPerUserTest extends TestCase
 
         $html = $this->actingAs($sa)->get('/trash')->assertOk()->getContent();
         $this->assertStringContainsString('All Trash', $html);
-        $this->assertStringContainsString('Dihapus Oleh', $html);
+        $this->assertStringContainsString(__('Dihapus Oleh'), $html);
         $this->assertStringContainsString('Milik A', $html);
         $this->assertStringContainsString('Milik B', $html);
 
