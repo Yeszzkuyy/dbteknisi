@@ -994,7 +994,7 @@
 
             openContactModal() {
                 const customer = this.activeConv?.customer;
-                this.contactForm = { customer_id: customer?.id || null, name: customer?.contact_person || customer?.name || this.activeConv?.sender_name || '', company: customer?.name || '', whatsapp: customer?.whatsapp || this.activeConv?.sender_number || '', notes: customer?.notes || '' };
+                this.contactForm = { customer_id: customer?.id || null, name: customer?.contact_person || customer?.name || this.activeConv?.sender_name || '', company: customer?.company || '', whatsapp: customer?.whatsapp || this.activeConv?.sender_number || '', notes: customer?.notes || '' };
                 this.contactError = '';
                 this.contactModal = true;
             },

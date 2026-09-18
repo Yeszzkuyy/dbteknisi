@@ -194,29 +194,26 @@ class WhatsAppCenterController extends Controller
 
         $customer = $this->findCustomer($validated['whatsapp']);
 
+        $contactName = trim($validated['name']);
+        $company = trim((string) ($validated['company'] ?? ''));
+        $displayName = $company !== '' ? $contactName.'-'.$company : $contactName;
+
         if (! $customer) {
-            $company = $validated['company'] ?? null;
-            $companyName = $company ?: $validated['name'];
             $customer = Customer::create([
-                'name' => $companyName,
-                'company' => $companyName,
-                'contact_person' => $validated['name'],
+                'name' => $displayName,
+                'company' => $company !== '' ? $company : $contactName,
+                'contact_person' => $contactName,
                 'whatsapp' => $validated['whatsapp'],
                 'notes' => $validated['notes'] ?? null,
             ]);
         } else {
-            $update = [
-                'contact_person' => $validated['name'],
+            $customer->update([
+                'name' => $displayName,
+                'company' => $company !== '' ? $company : $customer->company,
+                'contact_person' => $contactName,
                 'whatsapp' => $validated['whatsapp'],
                 'notes' => $validated['notes'] ?? $customer->notes,
-            ];
-
-            if (! empty($validated['company'])) {
-                $update['name'] = $validated['company'];
-                $update['company'] = $validated['company'];
-            }
-
-            $customer->update($update);
+            ]);
         }
 
         return response()->json($this->contactPayload($customer->fresh()));

@@ -778,7 +778,7 @@ class WhatsAppCenterTest extends TestCase
         ]);
     }
 
-    public function test_save_contact_stores_company_as_customer_name(): void
+    public function test_save_contact_combines_contact_and_company_as_name(): void
     {
         $account = $this->makeAccount();
         $user = $this->marketingUser($account->id);
@@ -790,12 +790,12 @@ class WhatsAppCenterTest extends TestCase
                 'whatsapp' => '6281234567890',
             ])
             ->assertOk()
-            ->assertJsonPath('name', 'PT Budi Corp')
+            ->assertJsonPath('name', 'Budi-PT Budi Corp')
             ->assertJsonPath('contact_person', 'Budi');
 
         $this->assertDatabaseHas('customers', [
             'whatsapp' => '6281234567890',
-            'name' => 'PT Budi Corp',
+            'name' => 'Budi-PT Budi Corp',
             'company' => 'PT Budi Corp',
             'contact_person' => 'Budi',
         ]);
@@ -822,7 +822,7 @@ class WhatsAppCenterTest extends TestCase
 
         $this->assertDatabaseHas('customers', [
             'id' => $customer->id,
-            'name' => 'PT Ada Dulu',
+            'name' => 'Budi',
             'company' => 'PT Ada Dulu',
             'contact_person' => 'Budi',
         ]);
@@ -1039,5 +1039,47 @@ class WhatsAppCenterTest extends TestCase
 
         $this->assertSame(1, $marketing->notifications()->count());
         $this->assertSame('whatsapp', $marketing->notifications()->first()->data['type']);
+    }
+
+    public function test_save_contact_formats_name_with_company(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $account), [
+                'name' => 'Budi',
+                'company' => 'PT ABC',
+                'whatsapp' => '6281234567890',
+            ])
+            ->assertOk()
+            ->assertJsonPath('name', 'Budi-PT ABC');
+
+        $this->assertDatabaseHas('customers', [
+            'whatsapp' => '6281234567890',
+            'name' => 'Budi-PT ABC',
+            'company' => 'PT ABC',
+            'contact_person' => 'Budi',
+        ]);
+    }
+
+    public function test_save_contact_without_company_uses_contact_name(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $account), [
+                'name' => 'Sinta',
+                'whatsapp' => '628111222333',
+            ])
+            ->assertOk()
+            ->assertJsonPath('name', 'Sinta');
+
+        $this->assertDatabaseHas('customers', [
+            'whatsapp' => '628111222333',
+            'name' => 'Sinta',
+            'contact_person' => 'Sinta',
+        ]);
     }
 }
