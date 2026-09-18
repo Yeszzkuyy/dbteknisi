@@ -178,6 +178,32 @@ class WhatsAppCenterTest extends TestCase
             ->assertJsonPath('0.is_pinned', true);
     }
 
+    public function test_lead_form_prefills_from_whatsapp_chat(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Butuh 10 unit CCTV untuk gudang',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('leads.create', [
+                'whatsapp_account_id' => $account->id,
+                'sender' => '6281234567890',
+                'name' => 'Rina',
+            ]))
+            ->assertOk()
+            ->assertSee('Rina')
+            ->assertSee('6281234567890')
+            ->assertSee('Butuh 10 unit CCTV untuk gudang')
+            ->assertSee('name="whatsapp_account_id"', false);
+    }
+
     public function test_super_admin_sees_all_accounts(): void
     {
         $a = $this->makeAccount('wa_nti');

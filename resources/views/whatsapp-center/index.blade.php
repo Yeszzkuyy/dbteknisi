@@ -442,7 +442,7 @@
                                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
                                     </button>
                                     @can('manage-marketing')
-                                        <button x-show="!activeConv.lead_id" type="button" class="wa-primary hidden min-h-[32px] px-2 text-xs sm:inline-flex" @click="openConvertModal()">Lead</button>
+                                        <button x-show="!activeConv.lead_id" type="button" class="wa-primary hidden min-h-[32px] px-2 text-xs sm:inline-flex" @click="goToLeadForm()">Lead</button>
                                     @endcan
                                 </div>
                             </div>
@@ -577,9 +577,6 @@
         <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)" x-text="contactForm.customer_id ? '{{ __('Edit kontak') }}' : '{{ __('Simpan nomor') }}'"></h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Data disimpan ke Customer CRM yang sudah ada.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactModal = false" aria-label="{{ __('Tutup') }}">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="saveContact()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama kontak') }}</span><input x-model="contactForm.name" required class="wa-field" maxlength="255"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nomor WhatsApp') }}</span><input x-model="contactForm.whatsapp" required class="wa-field" placeholder="628xxxxxxxxxx" maxlength="50"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Catatan') }}</span><textarea x-model="contactForm.notes" class="wa-field wa-textarea" maxlength="2000" placeholder="{{ __('Catatan internal') }}"></textarea></label><p x-show="contactError" class="text-xs text-red-600" x-text="contactError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="contactModal = false">{{ __('Batal') }}</button><button type="submit" class="wa-primary" :disabled="savingContact" x-text="savingContact ? '{{ __('Menyimpan...') }}' : '{{ __('Simpan kontak') }}'"></button></div></form></div>
     </div>
 
-    <div x-show="modalOpen" class="wa-modal-backdrop" @keydown.escape.window="modalOpen = false" x-transition>
-        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)">{{ __('Jadikan lead') }}</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Konversi percakapan ke pipeline sales.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="modalOpen = false" aria-label="{{ __('Tutup') }}">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="convertLead()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama kontak') }}</span><input x-model="convertName" required class="wa-field"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Segment</span><select x-model="convertSegment" required class="wa-field"><option value="end_user">End User</option><option value="vendor">Vendor</option><option value="system_integrator">System Integrator</option><option value="kontraktor">{{ __('Kontraktor') }}</option><option value="gov">Government</option><option value="principle">Principle</option><option value="distributor">Distributor</option><option value="other">{{ __('Lainnya') }}</option></select></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Kebutuhan</span><textarea x-model="convertNeed" class="wa-field wa-textarea" placeholder="{{ __('Ringkasan kebutuhan dari chat') }}"></textarea></label><p x-show="convertError" class="text-xs text-red-600" x-text="convertError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="modalOpen = false">{{ __('Batal') }}</button><button type="submit" class="wa-primary" :disabled="converting" x-text="converting ? '{{ __('Menyimpan...') }}' : '{{ __('Simpan lead') }}'"></button></div></form></div>
-    </div>
 </div>
 
 <script>
@@ -626,12 +623,6 @@
             contactForm: { customer_id: null, name: '', whatsapp: '', notes: '' },
             savingContact: false,
             contactError: '',
-            modalOpen: false,
-            convertName: '',
-            convertSegment: 'end_user',
-            convertNeed: '',
-            converting: false,
-            convertError: '',
             settings: { enterToSend: true, mediaVisibility: true, notificationSound: true },
             notificationPermission: 'default',
             toast: { message: '', type: 'notice' },
@@ -1016,25 +1007,14 @@
                 } catch (error) { this.contactError = error.message; } finally { this.savingContact = false; }
             },
 
-            openConvertModal() {
-                this.convertName = this.conversationName(this.activeConv);
-                this.convertNeed = '';
-                this.convertError = '';
-                this.modalOpen = true;
-            },
-
-            async convertLead() {
-                if (!this.activeConv) return;
-                this.converting = true;
-                this.convertError = '';
-                try {
-                    const response = await fetch('{{ route('whatsapp-center.convert', ['account' => ':id', 'sender' => ':sender']) }}'.replace(':id', this.activeAccount.id).replace(':sender', encodeURIComponent(this.activeConv.sender_number)), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }, body: JSON.stringify({ customer_name: this.convertName, segment: this.convertSegment, kebutuhan: this.convertNeed }) });
-                    const data = await response.json();
-                    if (!response.ok) throw new Error(data.message || '{{ __('Lead tidak dapat dibuat.') }}');
-                    this.modalOpen = false;
-                    this.activeConv.lead_id = data.lead_id;
-                    if (data.redirect) window.location.href = data.redirect;
-                } catch (error) { this.convertError = error.message; } finally { this.converting = false; }
+            goToLeadForm() {
+                if (!this.activeConv || !this.activeAccount) return;
+                const params = new URLSearchParams({
+                    whatsapp_account_id: this.activeAccount.id,
+                    sender: this.activeConv.sender_number,
+                    name: this.conversationName(this.activeConv),
+                });
+                window.location.href = '{{ route('leads.create') }}?' + params.toString();
             },
 
             openFilePicker(accept) { this.attachmentPanel = false; this.$refs.fileInput.accept = accept; this.$refs.fileInput.click(); },

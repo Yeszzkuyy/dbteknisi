@@ -1,4 +1,5 @@
 <x-app-layout>
+    @php($prefill = $prefill ?? [])
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">{{ __('Tambah Lead / Opportunity Baru') }}</h1>
@@ -13,6 +14,9 @@
     <form action="{{ route('leads.store') }}" method="POST" enctype="multipart/form-data"
           class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
         @csrf
+        @if(!empty($prefill['whatsapp_account_id']))
+            <input type="hidden" name="whatsapp_account_id" value="{{ $prefill['whatsapp_account_id'] }}">
+        @endif
 
         {{-- Info Umum --}}
         <section class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
@@ -25,7 +29,7 @@
                         class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     <option value="">{{ __('Pilih PT') }}</option>
                     @foreach($ptGroups as $group)
-                        <option value="{{ $group }}" {{ old('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
+                        <option value="{{ $group }}" {{ old('pt_group', $prefill['pt_group'] ?? null) == $group ? 'selected' : '' }}>{{ $group }}</option>
                     @endforeach
                 </select>
                 @error('pt_group')
@@ -50,7 +54,7 @@
                         class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     <option value="">{{ __('Pilih') }}</option>
                     @foreach($sources as $source)
-                        <option value="{{ $source }}" {{ old('source') == $source ? 'selected' : '' }}>
+                        <option value="{{ $source }}" {{ old('source', $prefill['source'] ?? null) == $source ? 'selected' : '' }}>
                             {{ \App\Http\Controllers\LeadController::label($source) }}
                         </option>
                     @endforeach
@@ -78,7 +82,7 @@
         </section>
 
         {{-- Data Customer --}}
-        <section x-data="{ mode: '{{ old('customer_mode', 'new') }}' }" class="border-t border-slate-200">
+        <section x-data="{ mode: '{{ old('customer_mode', $prefill['customer_mode'] ?? 'new') }}' }" class="border-t border-slate-200">
             <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-3">
                 {{ __('Data Customer') }} <span class="text-red-500">*</span>
                 <x-info-tip tip="{{ __('Pilih Customer Baru kalau belum pernah tercatat, atau Customer Lama kalau sudah ada di database.') }}" />
@@ -100,7 +104,7 @@
                     <label for="customer_name" class="block text-sm font-medium text-slate-700 mb-1">
                         {{ __('Perusahaan') }} <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name') }}"
+                    <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name', $prefill['customer_name'] ?? '') }}"
                            placeholder="{{ __('cth: PT Koin Konstruksi') }}"
                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     @error('customer_name')
@@ -132,7 +136,7 @@
                     </div>
                     <div>
                         <label for="customer_whatsapp" class="block text-sm font-medium text-slate-700 mb-1">{{ __('No WA') }}</label>
-                        <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp') }}"
+                        <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp', $prefill['customer_whatsapp'] ?? '') }}"
                                placeholder="{{ __('cth: 0812-3456-7890') }}"
                                class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
@@ -187,7 +191,7 @@
                     </label>
                     <textarea name="kebutuhan" id="kebutuhan" rows="2"
                               placeholder="{{ __('cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('kebutuhan') }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('kebutuhan', $prefill['kebutuhan'] ?? '') }}</textarea>
                 </div>
             </div>
         </section>

@@ -12,10 +12,13 @@ use App\Models\ProjectDocument;
 use App\Models\ProjectStatus;
 use App\Models\User;
 use App\Models\WorkType;
+use App\Models\WhatsappAccount;
+use App\Models\WhatsappMessage;
 use App\Notifications\NewLeadNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LeadController extends Controller
@@ -204,7 +207,7 @@ class LeadController extends Controller
         return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo', 'funnel', 'leadsByStatus'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $this->authorize('create', Lead::class);
 
@@ -214,7 +217,54 @@ class LeadController extends Controller
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
 
-        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups'));
+        $prefill = $this->prefillFromWhatsapp($request);
+
+        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups', 'prefill'));
+    }
+
+    /**
+     * Prefill form Tambah Lead dari konteks WhatsApp Center (nomor pengirim +
+     * kebutuhan otomatis dari pesan masuk terakhir).
+     *
+     * @return array<string, mixed>
+     */
+    private function prefillFromWhatsapp(Request $request): array
+    {
+        if (! $request->filled('sender') && ! $request->filled('whatsapp_account_id')) {
+            return [];
+        }
+
+        $sender = (string) $request->input('sender', '');
+        $account = $request->filled('whatsapp_account_id')
+            ? WhatsappAccount::find($request->integer('whatsapp_account_id'))
+            : null;
+
+        $kebutuhan = $request->input('kebutuhan');
+
+        if (blank($kebutuhan) && $account && $sender !== '') {
+            $kebutuhan = WhatsappMessage::where('whatsapp_account_id', $account->id)
+                ->where('sender_number', $sender)
+                ->where('direction', 'inbound')
+                ->latest('id')
+                ->limit(10)
+                ->get()
+                ->sortBy('id')
+                ->pluck('message_body')
+                ->filter()
+                ->implode("\n");
+
+            $kebutuhan = $kebutuhan !== '' ? Str::limit($kebutuhan, 2000, '') : null;
+        }
+
+        return array_filter([
+            'customer_mode' => 'new',
+            'customer_name' => (string) $request->input('name', ''),
+            'customer_whatsapp' => $sender,
+            'source' => 'whatsapp',
+            'pt_group' => $account ? strtoupper(substr($account->account_code, 3)) : null,
+            'whatsapp_account_id' => $account?->id,
+            'kebutuhan' => $kebutuhan,
+        ], fn ($v) => filled($v));
     }
 
     public function store(Request $request)
@@ -234,6 +284,7 @@ class LeadController extends Controller
             'partner_id' => 'nullable|exists:partners,id',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
             'assigned_to' => 'nullable|exists:users,id',
+            'whatsapp_account_id' => 'nullable|exists:whatsapp_accounts,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
