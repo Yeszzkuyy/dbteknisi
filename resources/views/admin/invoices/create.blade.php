@@ -2,10 +2,10 @@
     <div>
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800">Buat Invoice</h1>
-                <p class="text-slate-500 mt-1">Buat invoice baru untuk customer.</p>
+                <h1 class="text-3xl font-bold text-slate-800">{{ __('Buat Invoice') }}</h1>
+                <p class="text-slate-500 mt-1">{{ __('Buat invoice baru untuk customer.') }}</p>
             </div>
-            <a href="{{ route('admin.invoices.index') }}" class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">Kembali</a>
+            <a href="{{ route('admin.invoices.index') }}" class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">{{ __('Kembali') }}</a>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
@@ -17,15 +17,15 @@
                         name="customer_id"
                         :options="$customers->mapWithKeys(fn ($c) => [$c->id => $c->name])->all()"
                         :selected="old('customer_id')"
-                        placeholder="Cari & pilih customer..."
+                        placeholder="{{ __('Cari & pilih customer...') }}"
                     />
                     @error('customer_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Proyek Terkait</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Proyek Terkait') }}</label>
                     <select name="project_id" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                             x-data="{ customerId: '' }" @searchable-select:changed.window="customerId = $event.detail.id; $el.value = ''">
-                        <option value="">-- Tidak terkait proyek --</option>
+                        <option value="">{{ __('-- Tidak terkait proyek --') }}</option>
                         @foreach($projects as $p)
                             <option value="{{ $p->id }}" data-customer="{{ $p->customer_id }}"
                                     x-show="!customerId || customerId == '{{ $p->customer_id }}'"
@@ -36,7 +36,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nominal (Rp) <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Nominal (Rp)') }} <span class="text-red-500">*</span></label>
                         <input type="number" name="amount" value="{{ old('amount') }}" required step="0.01" min="0" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
                         @error('amount') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -49,21 +49,21 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Terbit <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Tanggal Terbit') }} <span class="text-red-500">*</span></label>
                         <x-datepicker name="issue_date" required value="{{ old('issue_date', date('Y-m-d')) }}"></x-datepicker>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Jatuh Tempo</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Jatuh Tempo') }}</label>
                         <x-datepicker name="due_date" value="{{ old('due_date') }}"></x-datepicker>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Catatan</label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Catatan') }}</label>
                     <textarea name="notes" rows="2" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes') }}</textarea>
                 </div>
                 <div class="flex gap-3">
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">Simpan</button>
-                    <a href="{{ route('admin.invoices.index') }}" class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">Batal</a>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">{{ __('Simpan') }}</button>
+                    <a href="{{ route('admin.invoices.index') }}" class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">{{ __('Batal') }}</a>
                 </div>
             </form>
         </div>
