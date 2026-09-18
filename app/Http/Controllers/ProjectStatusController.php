@@ -30,7 +30,7 @@ class ProjectStatusController extends Controller
 
         return redirect()
             ->route('admin-panel.project-statuses.index')
-            ->with('success', 'Project Status berhasil ditambahkan.');
+            ->with('success', __('Project Status berhasil ditambahkan.'));
     }
 
     public function edit(ProjectStatus $projectStatus)
@@ -50,7 +50,7 @@ class ProjectStatusController extends Controller
 
         return redirect()
             ->route('admin-panel.project-statuses.index')
-            ->with('success', 'Project Status berhasil diupdate.');
+            ->with('success', __('Project Status berhasil diupdate.'));
     }
 
     public function destroy(ProjectStatus $projectStatus)
@@ -58,6 +58,6 @@ class ProjectStatusController extends Controller
         $projectStatus->delete();
         return redirect()
             ->route('admin-panel.project-statuses.index')
-            ->with('success', 'Project Status berhasil dihapus.');
+            ->with('success', __('Project Status berhasil dihapus.'));
     }
 }

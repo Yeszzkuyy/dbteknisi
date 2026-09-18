@@ -28,7 +28,7 @@ class WorkTypeController extends Controller
 
         return redirect()
             ->route('admin-panel.work-types.index')
-            ->with('success', 'Work Type berhasil ditambahkan.');
+            ->with('success', __('Work Type berhasil ditambahkan.'));
     }
 
     public function edit(WorkType $workType)
@@ -46,7 +46,7 @@ class WorkTypeController extends Controller
 
         return redirect()
             ->route('admin-panel.work-types.index')
-            ->with('success', 'Work Type berhasil diupdate.');
+            ->with('success', __('Work Type berhasil diupdate.'));
     }
 
     public function destroy(WorkType $workType)
@@ -54,6 +54,6 @@ class WorkTypeController extends Controller
         $workType->delete();
         return redirect()
             ->route('admin-panel.work-types.index')
-            ->with('success', 'Work Type berhasil dihapus.');
+            ->with('success', __('Work Type berhasil dihapus.'));
     }
 }

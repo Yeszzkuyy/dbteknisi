@@ -2,12 +2,12 @@
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800">Tambah Account Manager</h1>
-                <p class="text-slate-500 mt-1">Buat data Account Manager baru</p>
+                <h1 class="text-3xl font-bold text-slate-800">{{ __('Tambah Account Manager') }}</h1>
+                <p class="text-slate-500 mt-1">{{ __('Buat data Account Manager baru') }}</p>
             </div>
             <a href="{{ route('admin-panel.account-managers.index') }}" 
                class="px-5 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 font-medium transition">
-                ← Kembali
+                {{ __('← Kembali') }}
             </a>
         </div>
 
@@ -17,9 +17,9 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Account Manager <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Nama Account Manager') }} <span class="text-red-500">*</span></label>
                         <input type="text" name="name" value="{{ old('name') }}" required
-                               placeholder="Contoh: AM Ahmad Dhani"
+                               placeholder="{{ __('Contoh: AM Ahmad Dhani') }}"
                                class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -27,11 +27,11 @@
 
                 <div class="mt-6 flex gap-3">
                     <button type="submit" class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
-                        Simpan
+                        {{ __('Simpan') }}
                     </button>
                     <a href="{{ route('admin-panel.account-managers.index') }}" 
                        class="px-6 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium transition">
-                        Batal
+                        {{ __('Batal') }}
                     </a>
                 </div>
             </form>

@@ -3,11 +3,11 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h1 class="text-3xl font-bold text-slate-800">Project Status</h1>
-                <p class="text-slate-500 mt-1">Kelola status project</p>
+                <p class="text-slate-500 mt-1">{{ __('Kelola status project') }}</p>
             </div>
             <a href="{{ route('admin-panel.project-statuses.create') }}" 
                class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
-                + Tambah Status
+                {{ __('+ Tambah Status') }}
             </a>
         </div>
 
@@ -16,11 +16,11 @@
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
                     <thead class="bg-slate-50 dark:bg-slate-700">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Nama Status</th>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Warna</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Nama Status') }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Warna') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Default</th>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Dibuat Pada</th>
-                            <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Aksi</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Dibuat Pada') }}</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Aksi') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
@@ -46,11 +46,11 @@
                                            class="text-amber-600 hover:text-amber-800">Edit</a>
                                         <form action="{{ route('admin-panel.project-statuses.destroy', $status) }}" 
                                               method="POST" 
-                                              onsubmit="return confirm('Hapus status ini?')"
+                                              onsubmit="return confirm('{{ __('Hapus status ini?') }}')"
                                               class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="text-red-600 hover:text-red-800">Hapus</button>
+                                            <button class="text-red-600 hover:text-red-800">{{ __('Hapus') }}</button>
                                         </form>
                                     </div>
                                 </td>
@@ -58,7 +58,7 @@
                         @empty
                             <tr>
                                 <td colspan="5" class="py-16 text-center text-slate-400">
-                                    Belum ada status project.
+                                    {{ __('Belum ada status project.') }}
                                 </td>
                             </tr>
                         @endforelse

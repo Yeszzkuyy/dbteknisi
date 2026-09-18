@@ -2,11 +2,11 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Edit User: {{ $user->name }}</h1>
-            <p class="text-slate-500 mt-1">Perbarui informasi user dan role</p>
+            <p class="text-slate-500 mt-1">{{ __('Perbarui informasi user dan role') }}</p>
         </div>
         <a href="{{ route('admin-panel.index') }}"
            class="px-4 py-2 bg-accent-400 text-white rounded-xl hover:bg-accent-500 transition">
-            Kembali
+            {{ __('Kembali') }}
         </a>
     </div>
 
@@ -15,7 +15,7 @@
             @csrf @method('PUT')
             
             <div class="mb-4">
-                <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama</label>
+                <label for="name" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Nama') }}</label>
                 <input type="text" id="name" name="name" required value="{{ $user->name }}"
                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
             </div>
@@ -27,13 +27,13 @@
             </div>
 
             <div class="mb-4">
-                <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password Baru (kosongkan jika tidak diubah)</label>
+                <label for="password" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Password Baru (kosongkan jika tidak diubah)') }}</label>
                 <input type="password" id="password" name="password" minlength="8"
                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
             </div>
 
             <div class="mb-4">
-                <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-1">Konfirmasi Password Baru</label>
+                <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Konfirmasi Password Baru') }}</label>
                 <input type="password" id="password_confirmation" name="password_confirmation"
                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
             </div>
@@ -58,11 +58,11 @@
             <div class="flex justify-end gap-3">
                 <a href="{{ route('admin-panel.index') }}"
                    class="px-4 py-2 rounded-xl bg-accent-500 hover:bg-accent-600 text-white transition">
-                    Batal
+                    {{ __('Batal') }}
                 </a>
                 <button type="submit"
                         class="px-4 py-2 bg-accent-600 text-white rounded-xl hover:bg-accent-700 transition">
-                    Simpan Perubahan
+                    {{ __('Simpan Perubahan') }}
                 </button>
             </div>
         </form>
