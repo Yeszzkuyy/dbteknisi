@@ -6,12 +6,12 @@
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('leads.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium transition">
+               class="px-4 py-2.5 rounded-xl bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-medium transition">
                 {{ __('Tabel Lead') }}
             </a>
             @can('manage-marketing')
                 <a href="{{ route('leads.create') }}"
-                   class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                   class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                     {{ __('+ Tambah Lead') }}
                 </a>
             @endcan
@@ -53,7 +53,7 @@
                                     <span class="text-[11px] text-slate-400">{{ $lead->incoming_date?->format('d M y') }}</span>
                                 </div>
                                 <a href="{{ route('leads.show', $lead) }}"
-                                   class="block font-semibold text-slate-800 hover:text-blue-600 leading-snug">
+                                   class="block font-semibold text-slate-800 hover:text-accent-600 leading-snug">
                                     {{ $lead->customer->name ?? 'N/A' }}
                                 </a>
                                 <p class="text-xs text-slate-500 mt-1 line-clamp-2">

@@ -236,7 +236,7 @@ document.addEventListener('alpine:init', () => {
 
             <div class="flex flex-wrap items-center gap-3 pt-5 mt-5 border-t border-slate-100">
                 <button type="button" @click="toEdit()" x-show="canManage"
-                        class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                        class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                     Edit
                 </button>
                 <form x-show="canManage" :action="deleteAction()" method="POST" class="inline"
@@ -269,7 +269,7 @@ document.addEventListener('alpine:init', () => {
                 <div>
                     <x-input-label for="schedule-project" value="Project" />
                     <select id="schedule-project" name="project_id" x-model="form.project_id"
-                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
                         <option value="">{{ __('— Pilih Project —') }}</option>
                         @foreach($projects as $project)
                             <option value="{{ $project->id }}">{{ $project->project_name }}</option>
@@ -281,7 +281,7 @@ document.addEventListener('alpine:init', () => {
                     <x-input-label for="schedule-technician" value="{{ __('Teknisi') }}" />
                     <select id="schedule-technician" name="technician_user_id" x-model="form.technician_user_id"
                             @change="setTechnician()"
-                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
                         <option value="">{{ __('— Pilih Teknisi —') }}</option>
                         @foreach($technicians as $technician)
                             <option value="{{ $technician->id }}" data-email="{{ $technician->email }}">{{ $technician->name }}</option>
@@ -324,7 +324,7 @@ document.addEventListener('alpine:init', () => {
             <div>
                 <x-input-label for="schedule-description" value="{{ __('Deskripsi') }}" />
                 <textarea id="schedule-description" name="description" rows="2" x-model="form.description"
-                          class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
+                          class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm"
                           placeholder="{{ __('Instalasi 8 kamera CCTV') }}"></textarea>
                 <x-input-error :messages="$errors->get('description')" class="mt-1" />
             </div>
@@ -333,7 +333,7 @@ document.addEventListener('alpine:init', () => {
                 <div>
                     <x-input-label for="schedule-status" value="Status" />
                     <select id="schedule-status" name="status" x-model="form.status"
-                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
                         @foreach(\App\Models\TechnicianSchedule::STATUSES as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
@@ -342,7 +342,7 @@ document.addEventListener('alpine:init', () => {
                 <div>
                     <x-input-label for="schedule-reminder" value="Reminder" />
                     <select id="schedule-reminder" name="reminder_minutes" x-model="form.reminder_minutes"
-                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
                         <option value="">{{ __('Tanpa reminder popup') }}</option>
                         <option value="30">{{ __('30 menit sebelum') }}</option>
                         <option value="60">{{ __('1 jam sebelum') }}</option>
@@ -354,7 +354,7 @@ document.addEventListener('alpine:init', () => {
             </div>
 
             <div class="flex flex-wrap items-center gap-3 pt-2">
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                     {{ __('Simpan Jadwal') }}
                 </button>
                 <button type="button" @click="close()" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">

@@ -14,7 +14,7 @@
                     </button>
                 @endif
                 <a href="{{ route('leads.edit', $lead) }}"
-                   class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                   class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                     Edit
                 </a>
                 <form action="{{ route('leads.destroy', $lead) }}" method="POST" class="inline">
@@ -27,7 +27,7 @@
                 </form>
             @endcan
             <a href="{{ route('leads.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
+               class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
                 {{ __('Kembali') }}
             </a>
         </div>
@@ -166,7 +166,7 @@
                                                 data-filename="{{ $doc->file_name }}"
                                                 data-mime="{{ $doc->mime_type }}"
                                                 onclick="openPreviewModal(this.dataset.url, this.dataset.filename, this.dataset.mime)"
-                                                class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
+                                                class="p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
@@ -230,7 +230,7 @@
                                         </div>
                                         <div class="mt-3 flex gap-2">
                                             <a href="{{ route('leads.documents.download', ['lead' => $lead->id, 'document' => $doc->id]) }}"
-                                               class="px-3 py-1.5 text-xs rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 font-medium transition">
+                                               class="px-3 py-1.5 text-xs rounded-lg bg-accent-100 text-accent-700 hover:bg-accent-200 font-medium transition">
                                                 Download
                                             </a>
                                             @if($doc->is_image || $doc->is_pdf)
@@ -268,13 +268,13 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Nama Project') }}</label>
                         <input type="text" name="project_name" required
-                               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
                                placeholder="{{ __('Nama project baru') }}">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Status Project') }}</label>
                         <select name="project_status_id" required
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
                             @foreach($projectStatuses ?? [] as $status)
                                 <option value="{{ $status->id }}">{{ $status->name }}</option>
                             @endforeach
@@ -283,7 +283,7 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Tipe Pekerjaan (Opsional)') }}</label>
                         <select name="work_type_id"
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
                             <option value="">{{ __('-- Pilih Tipe Pekerjaan --') }}</option>
                             @foreach($workTypes ?? [] as $type)
                                 <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -293,7 +293,7 @@
                 </div>
                 <div class="flex justify-end gap-3 p-4 border-t border-slate-200">
                     <button type="button" onclick="closeConvertModal()"
-                            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">
+                            class="px-4 py-2 bg-accent-500 hover:bg-accent-600 text-white rounded-lg transition">
                         {{ __('Batal') }}
                     </button>
                     <button type="submit"
@@ -343,7 +343,7 @@
                 '<svg class="w-16 h-16 mx-auto text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>' +
                 '<p class="text-slate-600 font-medium mb-2">File ini perlu didownload</p>' +
                 '<a href="' + url.replace('/show', '/download') + '" ' +
-                'class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">' +
+                'class="inline-flex items-center gap-2 px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-lg text-sm font-medium transition">' +
                 '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>' +
                 'Download</a>' +
                 '</div>';

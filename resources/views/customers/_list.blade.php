@@ -44,7 +44,7 @@
 
                     <td class="px-5 py-4 text-center sm:px-6">
                         @if($customer->projects_count > 0)
-                            <span class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full bg-blue-100 px-2.5 text-sm font-bold tabular-nums text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
+                            <span class="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full bg-accent-100 px-2.5 text-sm font-bold tabular-nums text-accent-700 dark:bg-accent-500/10 dark:text-accent-300">
                                 {{ $customer->projects_count }}
                             </span>
                         @else
@@ -57,7 +57,7 @@
                             <a href="{{ route('customers.show', $customer) }}"
                                title="{{ __('Lihat customer') }}"
                                aria-label="{{ __('Lihat customer') }} {{ $customer->name }}"
-                               class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700 transition hover:bg-indigo-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
+                               class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-50 text-accent-700 transition hover:bg-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
                                 <x-icon name="eye" class="h-4 w-4" />
                             </a>
 
@@ -65,7 +65,7 @@
                                 <a href="{{ route('customers.edit', $customer) }}"
                                    title="{{ __('Edit customer') }}"
                                    aria-label="{{ __('Edit customer') }} {{ $customer->name }}"
-                                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700 transition hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">
+                                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-100 text-accent-700 transition hover:bg-accent-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
                                     <x-icon name="edit" class="h-4 w-4" />
                                 </a>
                             @endcan

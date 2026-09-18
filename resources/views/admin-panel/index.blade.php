@@ -10,7 +10,7 @@
                 + Tambah Role
             </a>
             <a href="{{ route('admin-panel.users.create') }}"
-               class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">
+               class="px-4 py-2 bg-accent-600 text-white rounded-xl hover:bg-accent-700 transition">
                 + Tambah User
             </a>
         </div>
@@ -52,7 +52,7 @@
                             <td class="px-4 py-3">
                                 <p class="font-medium text-slate-900 dark:text-slate-100">{{ $user->name }}</p>
                                 @if($user->id === auth()->id())
-                                    <span class="text-xs text-blue-600">(Anda)</span>
+                                    <span class="text-xs text-accent-600">(Anda)</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ $user->email }}</td>
@@ -72,7 +72,7 @@
                             <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ $user->created_at->format('d M Y') }}</td>
                             <td class="px-4 py-3 text-right">
                                 <a href="{{ route('admin-panel.users.edit', $user) }}"
-                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">Edit</a>
+                                   class="text-accent-600 hover:text-accent-800 text-sm font-medium mr-3">Edit</a>
                                 @if($user->id !== auth()->id())
                                     <form action="{{ route('admin-panel.users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Hapus user ini?')">
                                         @csrf @method('DELETE')

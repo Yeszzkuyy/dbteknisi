@@ -12,7 +12,7 @@
                     Import
                 </a>
                 <a href="{{ route('leads.create') }}"
-                   class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                   class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                     {{ __('+ Tambah Lead') }}
                 </a>
             </div>
@@ -26,11 +26,11 @@
                     <label class="text-sm font-medium text-slate-500">{{ __('Cari Customer') }}</label>
                     <input type="text" name="search" value="{{ request('search') }}"
                            placeholder="{{ __('Nama customer...') }}"
-                           class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                           class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">Status</label>
-                    <select name="status" class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <select name="status" class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         <option value="">{{ __('Semua Status') }}</option>
                         @foreach($statuses as $status)
                             <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
@@ -41,7 +41,7 @@
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">{{ __('Sumber') }}</label>
-                    <select name="source" class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <select name="source" class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         <option value="">{{ __('Semua Sumber') }}</option>
                         @foreach($sources as $source)
                             <option value="{{ $source }}" {{ request('source') == $source ? 'selected' : '' }}>
@@ -59,10 +59,10 @@
                     <x-datepicker name="date_to" value="{{ request('date_to') }}" class="mt-1"></x-datepicker>
                 </div>
                 <div class="sm:col-span-2 lg:col-span-5 flex items-end gap-2">
-                    <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                         Filter
                     </button>
-                    <a href="{{ route('leads.index') }}" class="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium transition">
+                    <a href="{{ route('leads.index') }}" class="px-4 py-2 rounded-xl bg-accent-500 hover:bg-accent-600 text-white font-medium transition">
                         Reset
                     </a>
                 </div>
@@ -145,7 +145,7 @@
                                 <div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                     @can('view-marketing')
                                         <a href="{{ route('leads.show', $lead) }}" title="{{ __('Lihat detail lead') }}"
-                                           class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
+                                           class="p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
@@ -154,7 +154,7 @@
                                     @endcan
                                     @can('manage-marketing')
                                         <a href="{{ route('leads.edit', $lead) }}" title="Edit lead"
-                                           class="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 transition">
+                                           class="p-2 rounded-lg bg-accent-100 hover:bg-accent-200 text-accent-700 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
                                             </svg>
@@ -175,7 +175,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-6 py-12 text-center text-slate-500">
-                                {{ __('Belum ada lead.') }} <a href="{{ route('leads.create') }}" class="text-blue-600 hover:underline">{{ __('Tambah lead pertama') }}</a>
+                                {{ __('Belum ada lead.') }} <a href="{{ route('leads.create') }}" class="text-accent-600 hover:underline">{{ __('Tambah lead pertama') }}</a>
                             </td>
                         </tr>
                     @endforelse

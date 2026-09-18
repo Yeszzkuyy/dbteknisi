@@ -40,12 +40,12 @@
         {{-- Overview header --}}
         <section class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white px-5 py-6 shadow-sm sm:px-7 sm:py-7 dark:border-slate-700 dark:bg-slate-800" data-reveal>
             <div class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-500/5 dark:bg-blue-400/10"></div>
-            <div class="pointer-events-none absolute bottom-0 right-24 h-1 w-28 rounded-full bg-blue-500/30"></div>
+            <div class="pointer-events-none absolute bottom-0 right-24 h-1 w-28 rounded-full bg-accent-500/30"></div>
 
             <div class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-3">
-                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-300">
+                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-accent-600 dark:text-accent-300">
                             {{ \Carbon\Carbon::now()->locale(app()->getLocale())->translatedFormat('l, d F Y') }}
                         </p>
                         <span class="hidden h-1 w-1 rounded-full bg-slate-300 sm:block dark:bg-slate-600"></span>
@@ -60,7 +60,7 @@
                 </div>
 
                 <div class="flex shrink-0 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/40">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm shadow-blue-600/20">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-600 text-white shadow-sm shadow-accent-600/20">
                         <x-icon name="grid" class="h-5 w-5" />
                     </span>
                     <div>
@@ -83,7 +83,7 @@
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 @foreach($dashboardCards as $card)
-                    <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:border-blue-200 sm:p-6 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-500/40">
+                    <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:border-accent-200 sm:p-6 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-accent-500/40">
                         <div class="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full {{ $card['washClass'] }} transition-transform duration-500 group-hover:scale-125"></div>
                         <div class="relative flex items-start justify-between gap-4">
                             <div class="min-w-0">
@@ -117,7 +117,7 @@
                 <article class="group flex items-start gap-4 border-b border-slate-100 py-4 last:border-0 last:pb-0 dark:border-slate-700">
                     <div class="relative shrink-0">
                         <x-user-avatar :user="$activity->user" size="w-10 h-10" text="text-sm" />
-                        <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-blue-500 dark:border-slate-800"></span>
+                        <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-accent-500 dark:border-slate-800"></span>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">

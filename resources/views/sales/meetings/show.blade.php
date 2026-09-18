@@ -13,7 +13,7 @@
                     </a>
                 @endcan
                 <a href="{{ route('sales.meetings.index') }}"
-                   class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
+                   class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
                     {{ __('Kembali') }}
                 </a>
             </div>
@@ -73,7 +73,7 @@
                     <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Follow Up</h3>
                     @can('manage-sales')
                         <a href="{{ route('sales.follow-ups.create', ['customer_id' => $meeting->customer_id, 'meeting_id' => $meeting->id]) }}"
-                           class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition">
+                           class="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-xs font-medium transition">
                             {{ __('+ Tambah Follow Up') }}
                         </a>
                     @endcan

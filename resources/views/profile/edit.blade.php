@@ -26,13 +26,13 @@
 
                     {{-- Foto profil — klik untuk mengganti --}}
                     <button type="button" @click="$refs.avatar.click()"
-                            class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
+                            class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                             aria-label="{{ __('Ubah foto profil') }}">
                         <img x-show="preview" x-cloak :src="preview" alt="{{ __('Foto profil') }}"
-                             class="h-24 w-24 rounded-full object-cover ring-4 ring-blue-100 shadow-lg dark:ring-blue-900/50 lg:h-28 lg:w-28">
+                             class="h-24 w-24 rounded-full object-cover ring-4 ring-accent-100 shadow-lg dark:ring-accent-900/50 lg:h-28 lg:w-28">
                         <div x-show="!preview" x-cloak aria-hidden="true"
-                             class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-100 ring-4 ring-blue-100 shadow-lg lg:h-28 lg:w-28 dark:bg-blue-900/40 dark:ring-blue-900/50">
-                            <span class="text-3xl font-bold text-blue-600 lg:text-4xl dark:text-blue-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                             class="flex h-24 w-24 items-center justify-center rounded-full bg-accent-100 ring-4 ring-accent-100 shadow-lg lg:h-28 lg:w-28 dark:bg-accent-900/40 dark:ring-accent-900/50">
+                            <span class="text-3xl font-bold text-accent-600 lg:text-4xl dark:text-accent-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                         </div>
 
                         {{-- Overlay hover: gelap + ikon kamera --}}
@@ -40,7 +40,7 @@
                             <x-icon name="camera" class="h-6 w-6" />
                         </span>
                         {{-- Badge kamera, selalu terlihat --}}
-                        <span class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg ring-2 ring-white dark:ring-slate-800">
+                        <span class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-accent-600 text-white shadow-lg ring-2 ring-white dark:ring-slate-800">
                             <x-icon name="camera" class="h-4 w-4" />
                         </span>
                     </button>
@@ -54,7 +54,7 @@
                 <div class="mt-6 space-y-3">
                     <h2 class="text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl dark:text-white">{{ $user->name }}</h2>
                     <div>
-                        <span class="inline-flex items-center rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
+                        <span class="inline-flex items-center rounded-full bg-accent-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-accent-700 dark:bg-accent-500/10 dark:text-accent-400">
                             {{ $user->roles->first()?->name ?? __('Tanpa Role') }}
                         </span>
                     </div>

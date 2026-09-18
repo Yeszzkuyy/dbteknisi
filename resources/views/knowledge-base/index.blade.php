@@ -68,7 +68,7 @@
 
                 <div class="flex items-end">
                     <button type="submit"
-                            class="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+                            class="rounded-xl bg-accent-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-700">
                         Unggah Dokumen
                     </button>
                 </div>
@@ -78,12 +78,12 @@
         {{-- Filter --}}
         <div class="mb-4 flex flex-wrap gap-2">
             <a href="{{ route('knowledge-base.index') }}"
-               class="rounded-full px-4 py-1.5 text-xs font-semibold transition {{ blank($filters['category'] ?? null) ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+               class="rounded-full px-4 py-1.5 text-xs font-semibold transition {{ blank($filters['category'] ?? null) ? 'bg-accent-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
                 Semua Kategori
             </a>
             @foreach($categories as $category)
                 <a href="{{ route('knowledge-base.index', ['category' => $category->value, 'status' => $filters['status'] ?? null]) }}"
-                   class="rounded-full px-4 py-1.5 text-xs font-semibold transition {{ ($filters['category'] ?? null) === $category->value ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                   class="rounded-full px-4 py-1.5 text-xs font-semibold transition {{ ($filters['category'] ?? null) === $category->value ? 'bg-accent-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
                     {{ $category->label() }}
                 </a>
             @endforeach

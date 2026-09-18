@@ -1,6 +1,7 @@
 <x-app-layout>
     @php
         $currentTheme = $user->preference('theme', 'system');
+        $currentAccent = $user->preference('accent', 'ocean');
         $currentLocale = $user->preference('locale', 'en');
         $notifyEmail = (bool) $user->preference('notify_email', false);
         $notifySystem = (bool) $user->preference('notify_system', true);
@@ -9,6 +10,13 @@
             ['value' => 'light', 'label' => __('Terang'), 'icon' => 'sun'],
             ['value' => 'dark', 'label' => __('Gelap'), 'icon' => 'moon'],
             ['value' => 'system', 'label' => __('Sistem'), 'icon' => 'settings'],
+        ];
+
+        $accentOptions = [
+            ['value' => 'ocean', 'label' => 'Ocean', 'color' => '#3b82f6'],
+            ['value' => 'terracotta', 'label' => 'Terracotta', 'color' => '#b45309'],
+            ['value' => 'purple', 'label' => 'Purple', 'color' => '#7c3aed'],
+            ['value' => 'emerald', 'label' => 'Emerald', 'color' => '#059669'],
         ];
     @endphp
 
@@ -47,20 +55,19 @@
             <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-600 dark:bg-slate-800"
                      x-data="{
                         theme: '{{ $currentTheme }}',
+                        accent: '{{ $currentAccent }}',
                         apply(t) {
                             this.theme = t;
-                            const root = document.documentElement;
-                            if (t === 'dark') { root.classList.add('dark'); localStorage.setItem('dark-mode', 'true'); }
-                            else if (t === 'light') { root.classList.remove('dark'); localStorage.setItem('dark-mode', 'false'); }
-                            else {
-                                localStorage.removeItem('dark-mode');
-                                root.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
-                            }
+                            $store.appearance.setMode(t);
+                        },
+                        applyAccent(a) {
+                            this.accent = a;
+                            $store.appearance.setAccent(a);
                         }
                      }">
                 <header>
                     <h2 class="text-lg font-bold text-slate-800">{{ __('Tampilan') }}</h2>
-                    <p class="mt-1 text-sm text-slate-500">{{ __('Pilih tema awal aplikasi saat Anda masuk.') }}</p>
+                    <p class="mt-1 text-sm text-slate-500">{{ __('Pilih tema dan aksen aplikasi saat Anda masuk.') }}</p>
                 </header>
 
                 <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -69,7 +76,7 @@
                             <input type="radio" name="theme" value="{{ $option['value'] }}" class="peer sr-only"
                                    x-model="theme" @change="apply('{{ $option['value'] }}')"
                                    @checked($currentTheme === $option['value'])>
-                            <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm font-semibold text-slate-600 transition peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-checked:ring-2 peer-checked:ring-blue-500 dark:border-slate-600 dark:bg-slate-900/40 dark:text-slate-300 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-900/30 dark:peer-checked:text-blue-300 dark:peer-checked:ring-blue-400">
+                            <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm font-semibold text-slate-600 transition peer-checked:border-accent-500 peer-checked:bg-accent-50 peer-checked:text-accent-700 peer-checked:ring-2 peer-checked:ring-accent-500 dark:border-slate-600 dark:bg-slate-900/40 dark:text-slate-300 dark:peer-checked:border-accent-400 dark:peer-checked:bg-accent-900/30 dark:peer-checked:text-accent-300 dark:peer-checked:ring-accent-400">
                                 <x-icon name="{{ $option['icon'] }}" class="h-5 w-5" />
                                 {{ $option['label'] }}
                             </span>
@@ -77,6 +84,25 @@
                     @endforeach
                 </div>
                 <x-input-error class="mt-2" :messages="$errors->get('theme')" />
+
+                <div class="mt-5">
+                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ __('Aksen warna') }}</p>
+                    <p class="mt-0.5 text-xs text-slate-500">{{ __('Warna yang dipakai tombol utama, link, sidebar aktif, dan fokus.') }}</p>
+                    <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        @foreach($accentOptions as $option)
+                            <label class="cursor-pointer">
+                                <input type="radio" name="accent" value="{{ $option['value'] }}" class="peer sr-only"
+                                       x-model="accent" @change="applyAccent('{{ $option['value'] }}')"
+                                       @checked($currentAccent === $option['value'])>
+                                <span class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm font-semibold text-slate-600 transition peer-checked:border-accent-500 peer-checked:bg-accent-50 peer-checked:text-accent-700 peer-checked:ring-2 peer-checked:ring-accent-500 dark:border-slate-600 dark:bg-slate-900/40 dark:text-slate-300 dark:peer-checked:border-accent-400 dark:peer-checked:bg-accent-900/30 dark:peer-checked:text-accent-300 dark:peer-checked:ring-accent-400">
+                                    <span class="inline-block h-6 w-6 rounded-full ring-2 ring-white" style="background-color: {{ $option['color'] }}"></span>
+                                    {{ $option['label'] }}
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                    <x-input-error class="mt-2" :messages="$errors->get('accent')" />
+                </div>
             </section>
 
             {{-- Notifikasi --}}
@@ -94,7 +120,7 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_email" value="1" class="peer sr-only" @checked($notifyEmail)>
-                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-blue-600 dark:bg-slate-600"></span>
+                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-accent-600 dark:bg-slate-600"></span>
                             <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
@@ -106,7 +132,7 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_system" value="1" class="peer sr-only" @checked($notifySystem)>
-                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-blue-600 dark:bg-slate-600"></span>
+                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-accent-600 dark:bg-slate-600"></span>
                             <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
@@ -123,7 +149,7 @@
                 <div class="mt-5 max-w-xs">
                     <x-input-label for="locale" :value="__('Bahasa')" />
                     <select id="locale" name="locale"
-                            class="mt-1 block w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            class="mt-1 block w-full rounded-lg border-slate-300 shadow-sm focus:border-accent-500 focus:ring-accent-500">
                         <option value="id" @selected($currentLocale === 'id')>Indonesia</option>
                         <option value="en" @selected($currentLocale === 'en')>English</option>
                     </select>
@@ -134,7 +160,7 @@
             {{-- Simpan --}}
             <div class="flex items-center gap-4">
                 <button type="submit"
-                        class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+                        class="inline-flex items-center rounded-xl bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-700">
                     {{ __('Simpan Pengaturan') }}
                 </button>
             </div>
@@ -148,7 +174,7 @@
             </header>
 
             <a href="{{ route('settings.advanced') }}"
-               class="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-50 px-5 py-2.5 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-100">
+               class="mt-5 inline-flex items-center gap-2 rounded-xl bg-accent-50 px-5 py-2.5 text-sm font-semibold text-accent-700 transition hover:bg-accent-100">
                 <x-icon name="settings" class="h-4 w-4" />
                 {{ __('Buka Pengaturan Lanjutan') }}
             </a>

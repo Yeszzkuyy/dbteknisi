@@ -27,7 +27,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,.1);
         }
         .card h2 { font-size: 1.05rem; margin-bottom: .35rem; }
-        .card .time { color: #2563eb; font-size: .9rem; font-weight: 600; margin-bottom: .5rem; }
+        .card .time { color: rgb(var(--theme-blue-600) / 1); font-size: .9rem; font-weight: 600; margin-bottom: .5rem; }
         .card .desc {
             color: #475569;
             font-size: .9rem;

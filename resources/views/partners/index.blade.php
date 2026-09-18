@@ -6,7 +6,7 @@
         </div>
         @can('manage-marketing')
             <a href="{{ route('partners.create') }}"
-               class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition inline-flex items-center gap-2 shrink-0">
+               class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition inline-flex items-center gap-2 shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                 </svg>
@@ -26,10 +26,10 @@
                 </svg>
                 <input type="text" name="search" value="{{ request('search') }}"
                        placeholder="{{ __('Cari nama, kontak, atau telepon...') }}"
-                       class="w-full pl-10 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                       class="w-full pl-10 rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             </div>
             <select name="type"
-                    class="sm:w-44 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    class="sm:w-44 rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                 <option value="">{{ __('Semua Tipe') }}</option>
                 @foreach(\App\Models\Partner::TYPES as $val => $label)
                     <option value="{{ $val }}" {{ request('type') == $val ? 'selected' : '' }}>{{ __($label) }}</option>
@@ -37,11 +37,11 @@
             </select>
             <div class="flex items-center gap-2">
                 <button type="submit"
-                        class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                        class="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                     Filter
                 </button>
                 <a href="{{ route('partners.index') }}"
-                   class="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition">
+                   class="px-4 py-2 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition">
                     Reset
                 </a>
             </div>
@@ -121,7 +121,7 @@
                                 <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                     @can('manage-marketing')
                                         <a href="{{ route('partners.edit', $partner) }}" title="Edit partner"
-                                           class="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 transition">
+                                           class="p-2 rounded-lg bg-accent-100 hover:bg-accent-200 text-accent-700 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
                                             </svg>
@@ -153,7 +153,7 @@
                                 </p>
                                 @can('manage-marketing')
                                     <a href="{{ route('partners.create') }}"
-                                       class="inline-flex mt-4 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                                       class="inline-flex mt-4 px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                                         {{ __('+ Tambah Partner Pertama') }}
                                     </a>
                                 @endcan

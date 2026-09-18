@@ -1,6 +1,13 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 
+const cssColorScale = (name, prefix = 'theme-') => Object.fromEntries(
+    [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((shade) => [
+        shade,
+        `rgb(var(--${prefix}${name}-${shade}) / <alpha-value>)`,
+    ]),
+);
+
 export default {
     darkMode: 'class',
     content: [
@@ -12,6 +19,11 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                blue: cssColorScale('blue'),
+                indigo: cssColorScale('indigo'),
+                accent: cssColorScale('accent', ''),
+            },
             fontFamily: {
                 sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
             },

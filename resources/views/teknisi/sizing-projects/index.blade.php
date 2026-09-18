@@ -22,7 +22,7 @@
             <p class="text-slate-500 dark:text-slate-400 mt-1">{{ __('Kelola hasil sizing / usulan solusi per project') }}</p>
         </div>
         <a href="{{ route('teknisi.sizing-projects.create') }}"
-           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium">
+           class="inline-flex items-center px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-xl text-sm font-medium">
             {{ __('+ Tambah Sizing') }}
         </a>
     </div>
@@ -39,7 +39,7 @@
         <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
             <select name="status"
-                    class="rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    class="rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-accent-500 focus:ring-accent-500">
                 <option value="">{{ __('Semua Status') }}</option>
                 @foreach ($statuses as $value => $label)
                     <option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>
@@ -50,7 +50,7 @@
         <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Project</label>
             <select name="project_id"
-                    class="rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-blue-500 focus:ring-blue-500">
+                    class="rounded-xl border-slate-300 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 text-sm focus:border-accent-500 focus:ring-accent-500">
                 <option value="">{{ __('Semua Project') }}</option>
                 @foreach ($projects as $project)
                     <option value="{{ $project->id }}" @selected(request('project_id') == $project->id)>
@@ -62,7 +62,7 @@
         </div>
 
         <button type="submit"
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium">
+                class="px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-xl text-sm font-medium">
             Filter
         </button>
 
@@ -111,11 +111,11 @@
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('teknisi.sizing-projects.show', $sizing) }}"
-                                       class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700">
+                                       class="px-3 py-1.5 rounded-lg text-xs font-medium bg-accent-50 hover:bg-accent-100 text-accent-700">
                                         {{ __('Lihat') }}
                                     </a>
                                     <a href="{{ route('teknisi.sizing-projects.edit', $sizing) }}"
-                                       class="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-100 hover:bg-blue-200 text-blue-700">
+                                       class="px-3 py-1.5 rounded-lg text-xs font-medium bg-accent-100 hover:bg-accent-200 text-accent-700">
                                         Edit
                                     </a>
                                     <form action="{{ route('teknisi.sizing-projects.destroy', $sizing) }}" method="POST"

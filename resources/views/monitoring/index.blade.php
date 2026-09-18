@@ -19,7 +19,7 @@
                        name="search"
                        value="{{ request('search') }}"
                        placeholder="{{ __('Cari customer...') }}"
-                       class="w-full px-4 py-2 pl-10 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                       class="w-full px-4 py-2 pl-10 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
@@ -34,12 +34,12 @@
             </div>
 
             <button type="submit"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition whitespace-nowrap">
+                    class="px-4 py-2 bg-accent-600 text-white rounded-xl hover:bg-accent-700 transition whitespace-nowrap">
                 Filter
             </button>
 
             <a href="{{ route('monitoring.index') }}"
-               class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white transition whitespace-nowrap">
+               class="px-4 py-2 bg-accent-500 hover:bg-accent-600 text-white transition whitespace-nowrap">
                 Reset
             </a>
         </form>
@@ -52,7 +52,7 @@
                            name="divisi[]"
                            value="{{ $divisi }}"
                            {{ in_array($divisi, request('divisi', [])) ? 'checked' : '' }}
-                           class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                           class="w-4 h-4 rounded border-slate-300 text-accent-600 focus:ring-accent-500">
                     <span class="text-sm font-medium text-slate-700 capitalize">{{ $divisi }}</span>
                 </label>
             @endforeach
@@ -251,7 +251,7 @@
                             </td>
                             <td class="px-4 py-3">
                                 <a href="{{ route('customers.show', $customer) }}"
-                                   class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                                   class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-accent-700 bg-accent-50 rounded-lg hover:bg-accent-100 transition">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>

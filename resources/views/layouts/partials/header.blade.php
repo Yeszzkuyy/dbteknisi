@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-30 bg-white/85 dark:bg-zinc-900 backdrop-blur-xl border-b border-slate-200/70 dark:border-zinc-800 h-16 sm:h-20 flex items-center justify-between px-4 sm:px-8 lg:px-8">
+<header class="app-header sticky top-0 z-30 bg-white/85 backdrop-blur-xl border-b border-slate-200/70 h-16 sm:h-20 flex items-center justify-between px-4 sm:px-8 lg:px-8">
     <div class="flex items-center gap-3">
         {{-- Hamburger, hanya tampil di mobile --}}
         <button id="hamburgerBtn" type="button"
@@ -52,7 +52,7 @@
                         <template x-if="$store.notif.unread > 0">
                             <form method="POST" action="{{ route('notifications.read-all') }}">
                                 @csrf
-                                <button class="text-xs text-blue-600 hover:text-blue-700">{{ __('Tandai semua dibaca') }}</button>
+                                <button class="text-xs text-accent-600 hover:text-accent-700">{{ __('Tandai semua dibaca') }}</button>
                             </form>
                         </template>
                     </div>
@@ -81,7 +81,7 @@
                             <span class="h-2 w-2 shrink-0 rounded-full bg-red-500 animate-ping"></span>
                             <p class="text-sm text-slate-700">
                                 {{ __('Lead baru belum di-assign') }} &mdash;
-                                <a href="{{ route('manage-sales.index') }}" class="font-semibold text-blue-600 hover:text-blue-700">{{ __('kelola') }}</a>
+                                <a href="{{ route('manage-sales.index') }}" class="font-semibold text-accent-600 hover:text-accent-700">{{ __('kelola') }}</a>
                             </p>
                             <button @click="$store.notif.toast = false" class="text-slate-400 hover:text-slate-600" aria-label="{{ __('Tutup') }}">&#10005;</button>
                         </div>
@@ -98,7 +98,7 @@
         <div class="relative" x-data="{ open: false }">
             {{-- Avatar --}}
             <button @click="open = !open"
-                    class="rounded-full hover:ring-2 hover:ring-indigo-300 transition shrink-0">
+                    class="rounded-full hover:ring-2 hover:ring-accent-300 transition shrink-0">
                 <x-user-avatar :user="auth()->user()" size="w-10 h-10" text="text-sm" :clickable="false" />
             </button>
 

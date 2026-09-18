@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-300">{{ __('Data relasi') }}</p>
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-accent-600 dark:text-accent-300">{{ __('Data relasi') }}</p>
             <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 sm:text-3xl">
                 {{ __('Daftar Customer') }}
             </h1>
@@ -12,7 +12,7 @@
 
         @can('manage-sales')
             <a href="{{ route('customers.create') }}"
-               class="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 sm:self-start">
+               class="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-accent-600 px-5 py-2.5 font-medium text-white transition hover:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 sm:self-start">
                 <span class="mr-2 text-lg leading-none" aria-hidden="true">+</span>
                 {{ __('Tambah Customer') }}
             </a>
@@ -35,7 +35,7 @@
                                value="{{ request('search') }}"
                                placeholder="{{ __('Cari nama, perusahaan, atau email...') }}"
                                autocomplete="off"
-                               class="h-11 w-full rounded-xl border-slate-300 pl-10 pr-4 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600"
+                               class="h-11 w-full rounded-xl border-slate-300 pl-10 pr-4 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
                                x-on:input.debounce.400ms="
                                    loading = true;
                                    error = false;
@@ -65,7 +65,7 @@
                     </div>
                 </div>
                 <button type="submit"
-                        class="h-11 rounded-xl bg-blue-600 px-5 font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2">
+                        class="h-11 rounded-xl bg-accent-600 px-5 font-medium text-white transition hover:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2">
                     {{ __('Cari') }}
                 </button>
             </form>

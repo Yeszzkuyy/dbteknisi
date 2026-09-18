@@ -6,7 +6,7 @@
                 <p class="text-slate-500 mt-1">Edit: <span class="font-semibold text-slate-700">{{ $workType->name }}</span></p>
             </div>
             <a href="{{ route('admin-panel.work-types.index') }}" 
-               class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition">
+               class="px-5 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 font-medium transition">
                 ← Kembali
             </a>
         </div>
@@ -20,13 +20,13 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Nama Work Type <span class="text-red-500">*</span></label>
                         <input type="text" name="name" value="{{ old('name', $workType->name) }}" required
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div class="mt-6 flex gap-3">
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                         Update
                     </button>
                     <a href="{{ route('admin-panel.work-types.index') }}" 

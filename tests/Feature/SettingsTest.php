@@ -55,6 +55,67 @@ class SettingsTest extends TestCase
             ->assertSessionHasErrors(['theme', 'locale']);
     }
 
+    public function test_user_can_update_accent_preference(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->patch(route('settings.update'), [
+                'theme' => 'dark',
+                'accent' => 'purple',
+                'locale' => 'en',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('settings.edit'));
+
+        $user->refresh();
+
+        $this->assertSame('purple', $user->preference('accent'));
+    }
+
+    public function test_accent_preference_is_validated(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->patch(route('settings.update'), [
+                'theme' => 'dark',
+                'accent' => 'neon',
+                'locale' => 'en',
+            ])
+            ->assertSessionHasErrors(['accent']);
+    }
+
+    public function test_appearance_endpoint_syncs_theme_and_accent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson(route('settings.appearance'), [
+                'theme' => 'dark',
+                'accent' => 'emerald',
+            ])
+            ->assertOk();
+
+        $user->refresh();
+
+        $this->assertSame('dark', $user->preference('theme'));
+        $this->assertSame('emerald', $user->preference('accent'));
+    }
+
+    public function test_appearance_endpoint_validates_input(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson(route('settings.appearance'), [
+                'theme' => 'neon',
+                'accent' => 'neon',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['theme', 'accent']);
+    }
+
     public function test_advanced_settings_requires_password_confirmation(): void
     {
         $user = User::factory()->create();

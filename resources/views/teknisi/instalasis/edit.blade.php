@@ -19,7 +19,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Project <span class="text-red-500">*</span></label>
-                    <select name="project_id" required class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                    <select name="project_id" required class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-accent-500 focus:ring-accent-500">
                         <option value="">{{ __('Pilih Project') }}</option>
                         @foreach($projects as $project)
                             <option value="{{ $project->id }}" {{ old('project_id', $instalasi->project_id) == $project->id ? 'selected' : '' }}>
@@ -33,12 +33,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('Lokasi') }}</label>
-                        <input type="text" name="location" value="{{ old('location', $instalasi->location) }}" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                        <input type="text" name="location" value="{{ old('location', $instalasi->location) }}" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-accent-500 focus:ring-accent-500">
                         @error('location') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('PIC Teknisi') }}</label>
-                        <input type="text" name="technician_pic" value="{{ old('technician_pic', $instalasi->technician_pic) }}" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                        <input type="text" name="technician_pic" value="{{ old('technician_pic', $instalasi->technician_pic) }}" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-accent-500 focus:ring-accent-500">
                         @error('technician_pic') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
@@ -46,19 +46,19 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('Jadwal') }}</label>
-                        <input type="date" name="schedule_date" value="{{ old('schedule_date', $instalasi->schedule_date?->format('Y-m-d')) }}" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                        <input type="date" name="schedule_date" value="{{ old('schedule_date', $instalasi->schedule_date?->format('Y-m-d')) }}" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-accent-500 focus:ring-accent-500">
                         @error('schedule_date') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Job Status</label>
-                        <input type="text" name="job_status" value="{{ old('job_status', $instalasi->job_status) }}" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                        <input type="text" name="job_status" value="{{ old('job_status', $instalasi->job_status) }}" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-accent-500 focus:ring-accent-500">
                         @error('job_status') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status <span class="text-red-500">*</span></label>
-                    <select name="status" required class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">
+                    <select name="status" required class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-accent-500 focus:ring-accent-500">
                         @foreach(['scheduled' => 'Scheduled', 'on_progress' => 'On Progress', 'waiting' => 'Waiting', 'completed' => 'Completed', 'cancelled' => 'Cancelled'] as $val => $lbl)
                             <option value="{{ $val }}" {{ old('status', $instalasi->status) === $val ? 'selected' : '' }}>{{ $lbl }}</option>
                         @endforeach
@@ -68,19 +68,19 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('Laporan Instalasi') }}</label>
-                    <textarea name="installation_report" rows="4" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">{{ old('installation_report', $instalasi->installation_report) }}</textarea>
+                    <textarea name="installation_report" rows="4" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-accent-500 focus:ring-accent-500">{{ old('installation_report', $instalasi->installation_report) }}</textarea>
                     @error('installation_report') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ __('Catatan') }}</label>
-                    <textarea name="notes" rows="3" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-blue-500 focus:ring-blue-500">{{ old('notes', $instalasi->notes) }}</textarea>
+                    <textarea name="notes" rows="3" class="w-full rounded-xl border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 focus:border-accent-500 focus:ring-accent-500">{{ old('notes', $instalasi->notes) }}</textarea>
                     @error('notes') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 
             <div class="mt-6 flex gap-3">
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">Update</button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">Update</button>
                 <a href="{{ route('teknisi.instalasis.show', $instalasi) }}" class="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 font-medium transition">{{ __('Batal') }}</a>
             </div>
         </form>

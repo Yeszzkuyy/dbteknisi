@@ -6,7 +6,7 @@
                 <p class="text-slate-500 mt-1">{{ __('Catat hasil meeting dengan customer.') }}</p>
             </div>
             <a href="{{ route('sales.meetings.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
+               class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
                 {{ __('Kembali') }}
             </a>
         </div>
@@ -33,14 +33,14 @@
                         <label for="customer_name" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Nama Customer / Perusahaan') }} <span class="text-red-500">*</span></label>
                         <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name') }}"
                                placeholder="{{ __('cth: PT Maju Bersama, CV Karya Abadi, dll...') }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('customer_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div x-show="mode === 'existing'" x-cloak>
                         <label for="customer_id" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Pilih Customer') }} <span class="text-red-500">*</span></label>
                         <select name="customer_id" id="customer_id"
-                                class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                             <option value="">{{ __('-- Pilih Customer --') }}</option>
                             @foreach($customers as $customer)
                                 <option value="{{ $customer->id }}" {{ old('customer_id', $preselectedCustomerId) == $customer->id ? 'selected' : '' }}>
@@ -62,7 +62,7 @@
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Peserta') }}</label>
                     <input type="text" name="participants" value="{{ old('participants') }}"
                            placeholder="{{ __('Nama peserta meeting...') }}"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     @error('participants') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -70,33 +70,33 @@
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Kebutuhan User') }}</label>
                     <textarea name="user_needs" rows="3"
                               placeholder="{{ __('Apa kebutuhan yang disampaikan user?') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('user_needs') }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('user_needs') }}</textarea>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Keluhan User') }}</label>
                     <textarea name="user_complaints" rows="3"
                               placeholder="{{ __('Keluhan atau masalah yang dialami user?') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('user_complaints') }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('user_complaints') }}</textarea>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Sistem Existing') }}</label>
                     <textarea name="existing_system" rows="3"
                               placeholder="{{ __('Sistem atau infrastruktur yang sudah dimiliki user?') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('existing_system') }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('existing_system') }}</textarea>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Catatan Lain') }}</label>
                     <textarea name="notes" rows="2"
                               placeholder="{{ __('Catatan tambahan...') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes') }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('notes') }}</textarea>
                 </div>
 
                 <div class="flex gap-3 pt-2">
                     <button type="submit"
-                            class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                            class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                         {{ __('Simpan') }}
                     </button>
                     <a href="{{ route('sales.meetings.index') }}"

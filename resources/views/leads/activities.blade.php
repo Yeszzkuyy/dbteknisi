@@ -5,13 +5,13 @@
             <p class="text-slate-500 mt-1">
                 {{ __('Riwayat semua perubahan lead beserta user yang melakukannya') }}
                 @if($filterUser)
-                    {{ __('— filter:') }} <span class="font-semibold text-blue-600">{{ $filterUser->name }}</span>
+                    {{ __('— filter:') }} <span class="font-semibold text-accent-600">{{ $filterUser->name }}</span>
                     <a href="{{ route('leads.activities') }}" class="text-slate-400 hover:text-red-500 ml-1" title="{{ __('Hapus filter') }}">&times;</a>
                 @endif
             </p>
         </div>
         <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
             {{ __('Kembali') }}
         </a>
     </div>

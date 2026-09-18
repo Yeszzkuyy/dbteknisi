@@ -1,7 +1,7 @@
 @php
-    $navLink = 'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50';
-    $subNavLink = 'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50';
-    $navActive = 'bg-blue-500/15 text-white';
+    $navLink = 'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50';
+    $subNavLink = 'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50';
+    $navActive = 'bg-accent-500/15 text-white';
     $navInactive = 'text-slate-300 hover:bg-white/5 hover:text-white';
 
     $dashboardActive = request()->routeIs('dashboard*');
@@ -19,7 +19,7 @@
 <aside class="relative flex h-full w-full flex-col overflow-hidden">
     {{-- Aurora mesh background (dekoratif, di belakang konten) --}}
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-        <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blue-500/15 blur-3xl"></div>
+        <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-accent-500/15 blur-3xl"></div>
         <div class="absolute -left-24 top-1/3 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl"></div>
         <div class="absolute -bottom-24 right-0 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl"></div>
     </div>
@@ -32,7 +32,7 @@
             <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
                  class="hidden h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03] dark:block">
             <div class="sidebar-hide min-w-0">
-                <h1 class="truncate text-xl font-bold text-blue-300">3DY App</h1>
+                <h1 class="truncate text-xl font-bold text-accent-300">3DY App</h1>
                 <p class="mt-0.5 text-xs text-slate-400">3DY Group</p>
             </div>
         </a>
@@ -476,14 +476,14 @@
                 <span class="block truncate text-sm font-semibold text-slate-200">{{ auth()->user()->name }}</span>
                 <span class="mt-0.5 block truncate text-[11px] text-slate-400">{{ \Illuminate\Support\Str::headline($roleName) }}</span>
             </span>
-            <x-icon name="chevron-right" class="sidebar-hide h-4 w-4 shrink-0 text-slate-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-blue-300" />
+            <x-icon name="chevron-right" class="sidebar-hide h-4 w-4 shrink-0 text-slate-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-accent-300" />
         </a>
     </div>
 
     {{-- Toggle collapse / expand (posisi bawah, dulu logout) --}}
     <div class="relative z-10 flex-shrink-0 px-3 pb-3">
         <button id="sidebarCollapseBtn" type="button"
-                class="sidebar-collapse group flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50"
+                class="sidebar-collapse group flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-300 transition-all duration-300 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50"
                 aria-label="{{ __('Perkecil sidebar') }}" aria-controls="sidebar" aria-expanded="true">
             <svg class="icon-collapse h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>

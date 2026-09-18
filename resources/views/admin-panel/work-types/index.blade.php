@@ -6,7 +6,7 @@
                 <p class="text-slate-500 mt-1">Kelola data jenis pekerjaan</p>
             </div>
             <a href="{{ route('admin-panel.work-types.create') }}" 
-               class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+               class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                 + Tambah Work Type
             </a>
         </div>

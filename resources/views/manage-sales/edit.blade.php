@@ -43,7 +43,7 @@
                         {{ __('Kebutuhan') }}
                     </label>
                     <textarea name="kebutuhan" id="kebutuhan" rows="2"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
                 </div>
                 <div>
                     <label for="solusi" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
@@ -52,7 +52,7 @@
                     </label>
                     <textarea name="solusi" id="solusi" rows="3"
                               placeholder="{{ __('cth: Rekomendasi Cisco Webex Board 55S untuk ruang meeting') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('solusi', $lead->solusi) }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('solusi', $lead->solusi) }}</textarea>
                 </div>
                 <div>
                     <label for="progress_notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
@@ -61,7 +61,7 @@
                     </label>
                     <textarea name="progress_notes" id="progress_notes" rows="3"
                               placeholder="{{ __('cth: Sudah telepon, menunggu balasan. Follow-up lagi Senin depan.') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('progress_notes', $lead->progress_notes) }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('progress_notes', $lead->progress_notes) }}</textarea>
                 </div>
                 <div class="md:col-span-2">
                     <label for="notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
@@ -70,7 +70,7 @@
                     </label>
                     <textarea name="notes" id="notes" rows="3"
                               placeholder="{{ __('Catatan internal...') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes', $lead->notes) }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('notes', $lead->notes) }}</textarea>
                 </div>
             </div>
         </section>
@@ -84,7 +84,7 @@
                         <x-info-tip tip="{{ __('Jenama penyedia yang menangani lead ini. Bisa diubah jikalau management menggantinya.') }}" />
                     </label>
                     <select name="pt_group" id="pt_group"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         <option value="">{{ __('— Pilih PT —') }}</option>
                         @foreach(\App\Models\Lead::PT_GROUPS as $pt)
                             <option value="{{ $pt }}" {{ old('pt_group', $lead->pt_group) === $pt ? 'selected' : '' }}>{{ $pt }}</option>
@@ -97,7 +97,7 @@
                         <x-info-tip tip="{{ __('Sales yang bertanggung jawab follow-up lead ini.') }}" />
                     </label>
                     <select name="assigned_to" id="assigned_to"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         <option value="">{{ __('— Belum di-assign (NEW) —') }}</option>
                         @foreach($salesUsers as $user)
                             <option value="{{ $user->id }}" {{ old('assigned_to', $lead->assigned_to) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
@@ -120,7 +120,7 @@
                 {{ __('Batal') }}
             </a>
             <button type="submit"
-                    class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                    class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                 {{ __('Simpan') }}
             </button>
         </div>

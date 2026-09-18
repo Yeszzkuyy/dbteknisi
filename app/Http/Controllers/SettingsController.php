@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -26,6 +27,7 @@ class SettingsController extends Controller
     {
         $data = $request->validate([
             'theme' => ['required', 'in:light,dark,system'],
+            'accent' => ['sometimes', 'in:ocean,terracotta,purple,emerald'],
             'locale' => ['required', 'in:id,en'],
             'notify_email' => ['sometimes', 'boolean'],
             'notify_system' => ['sometimes', 'boolean'],
@@ -37,10 +39,31 @@ class SettingsController extends Controller
             'locale' => $data['locale'],
             'notify_email' => $request->boolean('notify_email'),
             'notify_system' => $request->boolean('notify_system'),
+            'accent' => $data['accent'] ?? $user->preference('accent', 'ocean'),
         ]);
         $user->save();
 
         return Redirect::route('settings.edit')->with('status', 'settings-updated');
+    }
+
+    /**
+     * Live-sync appearance from the client (no page reload).
+     */
+    public function appearance(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'theme' => ['required', 'in:light,dark,system'],
+            'accent' => ['required', 'in:ocean,terracotta,purple,emerald'],
+        ]);
+
+        $user = $request->user();
+        $user->preferences = array_merge($user->preferences ?? [], [
+            'theme' => $data['theme'],
+            'accent' => $data['accent'],
+        ]);
+        $user->save();
+
+        return response()->json(['ok' => true]);
     }
 
     /**

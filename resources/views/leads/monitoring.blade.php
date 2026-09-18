@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">{{ __('Rekap lead dan aktivitas terakhir tim Marketing & Sales') }}</p>
         </div>
         <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
             {{ __('Kembali') }}
         </a>
     </div>
@@ -44,13 +44,13 @@
                                         {{ $row->counts[$status] }}
                                     </td>
                                 @endforeach
-                                <td class="py-3 px-3 text-center font-bold text-blue-600">{{ $row->total }}</td>
+                                <td class="py-3 px-3 text-center font-bold text-accent-600">{{ $row->total }}</td>
                                 <td class="py-3 px-3 text-slate-500">
                                     {{ $row->lastActivityAt ? $row->lastActivityAt->diffForHumans() : __('Belum ada aktivitas') }}
                                 </td>
                                 <td class="py-3 px-3 text-right">
                                     <a href="{{ route('leads.activities', ['user' => $row->user->id]) }}"
-                                       class="text-xs font-medium text-blue-600 hover:underline whitespace-nowrap">
+                                       class="text-xs font-medium text-accent-600 hover:underline whitespace-nowrap">
                                         {{ __('Lihat Aktivitas') }} &rarr;
                                     </a>
                                 </td>

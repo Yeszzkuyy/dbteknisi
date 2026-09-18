@@ -25,7 +25,7 @@
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('teknisi.sizing-projects.edit', $sizingProject) }}"
-               class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl text-sm font-medium">
+               class="px-4 py-2 bg-accent-100 hover:bg-accent-200 text-accent-700 rounded-xl text-sm font-medium">
                 Edit
             </a>
             <a href="{{ route('teknisi.sizing-projects.index') }}"

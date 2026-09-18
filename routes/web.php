@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function () {
     // Settings (preferensi aplikasi)
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::post('/settings/appearance', [SettingsController::class, 'appearance'])->name('settings.appearance');
     Route::get('/settings/advanced', [SettingsController::class, 'advanced'])
         ->middleware('password.confirm:password.confirm,1')
         ->name('settings.advanced');

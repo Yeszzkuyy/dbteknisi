@@ -9,7 +9,7 @@
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('customers.show', $project->customer_id) }}" 
-                   class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition">
+                   class="px-5 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 font-medium transition">
                     ← Kembali
                 </a>
             </div>
@@ -26,7 +26,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Kategori</label>
-                        <select name="document_category_id" class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <select name="document_category_id" class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                             <option value="">Tanpa Kategori</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -36,13 +36,13 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Catatan</label>
                         <input type="text" name="notes" placeholder="Catatan dokumen" 
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                 </div>
                 {{-- Drag & Drop Zone --}}
                 <div class="mt-4">
                     <div class="relative border-2 border-dashed rounded-xl p-4 text-center transition-all duration-200"
-                         :class="dragging ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/40 dark:border-blue-400' : 'border-slate-300 dark:border-slate-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/40'"
+                         :class="dragging ? 'border-accent-500 bg-accent-50 dark:bg-accent-900/40 dark:border-accent-400' : 'border-slate-300 dark:border-slate-600 hover:border-accent-500 hover:bg-accent-50 dark:hover:bg-accent-900/40'"
                          @dragover.prevent="dragging = true"
                          @dragenter.prevent="dragging = true"
                          @dragleave.prevent="dragging = false"
@@ -68,7 +68,7 @@
 
                 <div class="mt-4">
                     <button type="submit"
-                        class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                        class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                         Kirim
                     </button>
                 </div>
@@ -86,7 +86,7 @@
                     @foreach($documents as $document)
                         <div class="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition">
                             <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-100 text-blue-600">
+                                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-accent-100 text-accent-600">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -109,11 +109,11 @@
                             <div class="flex items-center gap-3">
                                 <a href="{{ route('project-documents.preview', $document) }}" 
                                    target="_blank"
-                                   class="text-indigo-600 hover:text-indigo-800 text-sm">
+                                   class="text-accent-600 hover:text-accent-800 text-sm">
                                     Preview
                                 </a>
                                 <a href="{{ route('project-documents.download', $document) }}" 
-                                   class="text-blue-600 hover:text-blue-800 text-sm">
+                                   class="text-accent-600 hover:text-accent-800 text-sm">
                                     Download
                                 </a>
                                 @can('manage-teknisi')

@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">{{ __('Ringkasan performa lead dan pipeline') }}</p>
         </div>
         <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-medium transition">
             {{ __('Lihat Lead') }}
         </a>
     </div>
@@ -24,7 +24,7 @@
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                <button type="submit" class="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                     Filter
                 </button>
                 <a href="{{ route('marketing.dashboard') }}"
@@ -46,7 +46,7 @@
                     @foreach($presets as $label => [$from, $to])
                         @php($active = $activeRange === $from . '|' . $to)
                         <a href="{{ route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to]) }}"
-                           class="px-4 py-2.5 text-sm font-medium transition {{ $active ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">
+                           class="px-4 py-2.5 text-sm font-medium transition {{ $active ? 'bg-accent-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">
                             {{ $label }}
                         </a>
                     @endforeach
@@ -136,7 +136,7 @@
                 @foreach($trend as $month)
                     <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                         <span class="text-xs font-semibold text-slate-600">{{ $month->total }}</span>
-                        <div class="w-full max-w-12 rounded-t-[4px] bg-blue-500 transition-all"
+                        <div class="w-full max-w-12 rounded-t-[4px] bg-accent-500 transition-all"
                              style="height: {{ max(round($month->total / $maxTrend * 100), 2) }}%"></div>
                         <span class="text-[11px] text-slate-500 whitespace-nowrap">{{ $month->label }}</span>
                     </div>
@@ -159,7 +159,7 @@
                                 <span class="font-semibold text-slate-700">{{ $row->total }}</span>
                             </div>
                             <div class="h-2.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-                                <div class="h-full rounded-full bg-indigo-500"
+                                <div class="h-full rounded-full bg-accent-500"
                                      style="width: {{ round($row->total / $maxSource * 100) }}%"></div>
                             </div>
                         </div>
@@ -205,7 +205,7 @@
              class="mt-6 border-t border-slate-100 dark:border-slate-700 pt-5">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-semibold text-slate-700 dark:text-slate-200">
-                    {{ __('Detail Lead') }} <span class="text-blue-600 dark:text-blue-400 uppercase" x-text="selectedStatus"></span>
+                    {{ __('Detail Lead') }} <span class="text-accent-600 dark:text-accent-400 uppercase" x-text="selectedStatus"></span>
                     <span class="text-sm font-medium text-slate-400">(<span x-text="(leads[selectedStatus] || []).length"></span> lead)</span>
                 </h3>
                 <button type="button" @click="select(selectedStatus)"
@@ -257,56 +257,70 @@
                 const funnelData = @json($funnel);
 
                 // Warna segmen donut — SAMAKAN dengan warna badge status di view lain.
-                // Palet bawaan: new=blue, contacted=yellow, qualified=purple,
-                // proposal=orange, won=green, lost=red. Ubah nilai hex-nya di sini.
-                const statusColors = {
-                    new:        '#3b82f6', // biru   (bg-blue-100 text-blue-800)
-                    contacted:  '#eab308', // kuning (bg-yellow-100 text-yellow-800)
-                    qualified:  '#a855f7', // ungu   (bg-purple-100 text-purple-800)
-                    proposal:   '#f97316', // oranye (bg-orange-100 text-orange-800)
-                    won:        '#22c55e', // hijau  (bg-green-100 text-green-800)
-                    lost:       '#ef4444', // merah  (bg-red-100 text-red-800)
-                };
+                // Status = SEMANTIK, tidak mengikuti accent. Palet tetap.
+                // 'new' memakai --semantic-info supaya sinkron dengan helper appearance.
+                function statusColors() {
+                    const appColors = window.getAppearanceColors();
+                    return {
+                        new:        appColors.info,   // info (blue) — semantik
+                        contacted:  '#eab308', // kuning (bg-yellow-100 text-yellow-800)
+                        qualified:  '#a855f7', // ungu   (bg-purple-100 text-purple-800)
+                        proposal:   '#f97316', // oranye (bg-orange-100 text-orange-800)
+                        won:        '#22c55e', // hijau  (bg-green-100 text-green-800)
+                        lost:       '#ef4444', // merah  (bg-red-100 text-red-800)
+                    };
+                }
 
-                const isDark = document.documentElement.classList.contains('dark');
-
-                window.marketingDonutChart = new ApexCharts(document.querySelector('#status-donut-chart'), {
-                    chart: {
-                        type: 'donut',
-                        height: 380,
-                        width: '100%', // responsif mengikuti container
-                        toolbar: { show: false },
-                        background: 'transparent',
-                        events: {
-                            dataPointSelection: (event, chartContext, config) => {
-                                const status = config.w.config.labels[config.dataPointIndex].toLowerCase();
-                                // Akses state Alpine via scope dari elemen dengan x-data yang membungkus donut
-                                const scope = Alpine.$data(document.querySelector('#status-donut-chart').closest('[x-data]'));
-                                scope.select(status);
-                            }
-                        },
-                    },
-                    series: funnelData.map(s => s.value),
-                    labels: funnelData.map(s => s.label),
-                    colors: funnelData.map(s => statusColors[s.key]),
-                    theme: { mode: isDark ? 'dark' : 'light' },
-                    stroke: { width: 3, colors: [isDark ? '#1e293b' : '#ffffff'] },
-                    fill: { type: 'solid' },
-                    plotOptions: {
-                        pie: {
-                            donut: {
-                                size: '70%', // rasio lubang tengah donut agar proporsional
+                function donutOptions() {
+                    const c = window.getAppearanceColors();
+                    const sc = statusColors();
+                    return {
+                        chart: {
+                            type: 'donut',
+                            height: 380,
+                            width: '100%', // responsif mengikuti container
+                            toolbar: { show: false },
+                            background: 'transparent',
+                            foreColor: c.dark ? 'rgb(var(--text-secondary) / 1)' : undefined,
+                            events: {
+                                dataPointSelection: (event, chartContext, config) => {
+                                    const status = config.w.config.labels[config.dataPointIndex].toLowerCase();
+                                    // Akses state Alpine via scope dari elemen dengan x-data yang membungkus donut
+                                    const scope = Alpine.$data(document.querySelector('#status-donut-chart').closest('[x-data]'));
+                                    scope.select(status);
+                                }
                             },
                         },
-                    },
-                    legend: {
-                        show: true,
-                        position: 'bottom',
-                        fontSize: '13px',
-                        formatter: (label, opts) => `${label} — ${opts.w.globals.series[opts.seriesIndex]} lead`,
-                    },
-                    dataLabels: { enabled: false },
-                }).render();
+                        series: funnelData.map(s => s.value),
+                        labels: funnelData.map(s => s.label),
+                        colors: funnelData.map(s => sc[s.key]),
+                        theme: { mode: c.dark ? 'dark' : 'light' },
+                        stroke: { width: 3, colors: [c.cardBg] },
+                        fill: { type: 'solid' },
+                        plotOptions: {
+                            pie: {
+                                donut: {
+                                    size: '70%', // rasio lubang tengah donut agar proporsional
+                                },
+                            },
+                        },
+                        legend: {
+                            show: true,
+                            position: 'bottom',
+                            fontSize: '13px',
+                            formatter: (label, opts) => `${label} — ${opts.w.globals.series[opts.seriesIndex]} lead`,
+                        },
+                        dataLabels: { enabled: false },
+                    };
+                }
+
+                if (window.marketingDonutChart) window.marketingDonutChart.destroy();
+                window.marketingDonutChart = new ApexCharts(document.querySelector('#status-donut-chart'), donutOptions()).render();
+
+                // Update tanpa reload saat mode/aksen berubah
+                window.addEventListener('appearance:change', () => {
+                    if (window.marketingDonutChart) window.marketingDonutChart.updateOptions(donutOptions());
+                });
             });
         </script>
     </div>

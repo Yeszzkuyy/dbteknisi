@@ -17,7 +17,7 @@
                 <p class="text-slate-500 dark:text-slate-400 mt-1">{{ __('Permintaan harga perangkat untuk project') }}</p>
             </div>
             <a href="{{ route('teknisi.request-hargas.create') }}"
-               class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 transition">
+               class="inline-flex items-center gap-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium px-5 py-2.5 transition">
                 {{ __('+ Buat Request Harga') }}
             </a>
         </div>
@@ -28,7 +28,7 @@
             <div class="w-full sm:w-56">
                 <label class="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">Status</label>
                 <select name="status"
-                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                     <option value="">{{ __('Semua Status') }}</option>
                     @foreach($statusColors as $status => $color)
                         <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>
@@ -41,7 +41,7 @@
             <div class="w-full sm:w-64">
                 <label class="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">Project</label>
                 <select name="project_id"
-                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                     <option value="">{{ __('Semua Project') }}</option>
                     @foreach($projects as $project)
                         <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>
@@ -53,7 +53,7 @@
 
             <div class="flex gap-2">
                 <button type="submit"
-                        class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-sm font-medium transition">
+                        class="rounded-xl bg-accent-600 hover:bg-accent-700 text-white px-5 py-2.5 text-sm font-medium transition">
                     Filter
                 </button>
                 <a href="{{ route('teknisi.request-hargas.index') }}"
@@ -97,12 +97,12 @@
                                     <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                         <a href="{{ route('teknisi.request-hargas.show', $requestHarga) }}"
                                            title="{{ __('Lihat detail') }}"
-                                           class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
+                                           class="p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition">
                                             <x-icon name="eye" class="w-4 h-4" />
                                         </a>
                                         <a href="{{ route('teknisi.request-hargas.edit', $requestHarga) }}"
                                            title="Edit"
-                                           class="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 transition">
+                                           class="p-2 rounded-lg bg-accent-100 hover:bg-accent-200 text-accent-700 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                             </svg>

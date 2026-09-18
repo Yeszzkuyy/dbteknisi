@@ -7,7 +7,7 @@
         </div>
         <div class="flex gap-2">
             <a href="{{ route('teknisi.surveys.edit', $survey) }}"
-               class="px-5 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium transition">
+               class="px-5 py-2.5 rounded-xl bg-accent-100 hover:bg-accent-200 text-accent-700 font-medium transition">
                 Edit
             </a>
             <a href="{{ route('teknisi.surveys.index') }}"

@@ -6,7 +6,7 @@
         </div>
         @can('manage-admin')
             <a href="{{ route('admin.payments.create') }}"
-               class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
+               class="px-4 py-2 bg-accent-600 text-white text-sm rounded-md hover:bg-accent-700 transition">
                 {{ __('+ Catat Pembayaran') }}
             </a>
         @endcan
@@ -35,7 +35,7 @@
                             <td class="px-4 py-3 text-center">
                                 @if($pm->proof_file)
                                     <a href="{{ route('admin.payments.proof', $pm) }}" target="_blank"
-                                       class="text-blue-600 hover:text-blue-800 text-xs underline">{{ __('Lihat') }}</a>
+                                       class="text-accent-600 hover:text-accent-800 text-xs underline">{{ __('Lihat') }}</a>
                                 @else
                                     <span class="text-slate-400 text-xs">-</span>
                                 @endif
@@ -43,7 +43,7 @@
                             <td class="px-4 py-3 text-right">
                                 <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                     <a href="{{ route('admin.payments.show', $pm) }}" title="{{ __('Detail pembayaran') }}"
-                                       class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
+                                       class="p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178Z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />

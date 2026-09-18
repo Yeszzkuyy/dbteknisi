@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">{{ __('Kelola lead marketing dan opportunity sales') }}</p>
         </div>
         <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
             {{ __('Kembali') }}
         </a>
     </div>
@@ -22,7 +22,7 @@
                         <x-info-tip tip="{{ __('Entitas perusahaan grup yang menangani lead ini: NTI, MGK, TPS, atau WANI.') }}" />
                     </label>
                 <select name="pt_group" id="pt_group" required
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     <option value="">{{ __('Pilih PT') }}</option>
                     @foreach($ptGroups as $group)
                         <option value="{{ $group }}" {{ old('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
@@ -47,7 +47,7 @@
                     <x-info-tip tip="{{ __('Dari mana lead ini berasal: WhatsApp, email, telepon, canvasing, event, dll.') }}" />
                 </label>
                 <select name="source" id="source"
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     <option value="">{{ __('Pilih') }}</option>
                     @foreach($sources as $source)
                         <option value="{{ $source }}" {{ old('source') == $source ? 'selected' : '' }}>
@@ -63,7 +63,7 @@
                     <x-info-tip tip="{{ __('Jenis calon client: End User, Vendor, System Integrator, Kontraktor, Gov, Principle, Distributor, atau lainnya.') }}" />
                 </label>
                 <select name="segment" id="segment" required
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     <option value="">{{ __('Pilih Segmentasi') }}</option>
                     @foreach($segments as $segment)
                         <option value="{{ $segment }}" {{ old('segment') == $segment ? 'selected' : '' }}>
@@ -102,7 +102,7 @@
                     </label>
                     <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name') }}"
                            placeholder="{{ __('cth: PT Koin Konstruksi') }}"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     @error('customer_name')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -113,7 +113,7 @@
                         <label for="customer_address" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Alamat') }}</label>
                         <textarea name="customer_address" id="customer_address" rows="2"
                                   placeholder="{{ __('cth: Plaza Kebon Jeruk Blok D7-8, Jl. Raya Perjuangan, Jakarta Barat 11530') }}"
-                                  class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('customer_address') }}</textarea>
+                                  class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('customer_address') }}</textarea>
                     </div>
                     <div>
                         <label for="customer_contact_person" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
@@ -122,25 +122,25 @@
                         </label>
                         <input type="text" name="customer_contact_person" id="customer_contact_person" value="{{ old('customer_contact_person') }}"
                                placeholder="{{ __('cth: Ibu Vita') }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div>
                         <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Telpon Kantor') }}</label>
                         <input type="text" name="customer_phone" id="customer_phone" value="{{ old('customer_phone') }}"
                                placeholder="{{ __('cth: 0812-3456-7890') }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div>
                         <label for="customer_whatsapp" class="block text-sm font-medium text-slate-700 mb-1">{{ __('No WA') }}</label>
                         <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp') }}"
                                placeholder="{{ __('cth: 0812-3456-7890') }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div class="md:col-span-2">
                         <label for="customer_email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
                         <input type="email" name="customer_email" id="customer_email" value="{{ old('customer_email') }}"
                                placeholder="{{ __('cth: vita@ptkoin.com') }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('customer_email')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -172,7 +172,7 @@
                     </label>
                     <input type="text" name="customer_contact_person" id="customer_contact_person_existing" value="{{ old('customer_contact_person') }}"
                            placeholder="{{ __('kosongkan jika tidak berubah') }}"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                 </div>
             </div>
         </section>
@@ -187,7 +187,7 @@
                     </label>
                     <textarea name="kebutuhan" id="kebutuhan" rows="2"
                               placeholder="{{ __('cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi') }}"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan') }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('kebutuhan') }}</textarea>
                 </div>
             </div>
         </section>
@@ -201,7 +201,7 @@
                         <x-info-tip tip="{{ __('Pilih partner jika lead ini melibatkan vendor/supplier/kontraktor tertentu. Opsional.') }}" />
                     </label>
                     <select name="partner_id" id="partner_id"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         <option value="">{{ __('Tidak Ada Partner') }}</option>
                         @foreach($partners as $partner)
                             <option value="{{ $partner->id }}" {{ old('partner_id') == $partner->id ? 'selected' : '' }}>
@@ -221,7 +221,7 @@
             </label>
             <input type="file" name="attachments[]" multiple
                    accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt,.csv"
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 file:text-sm file:font-medium">
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-accent-50 file:text-accent-700 file:text-sm file:font-medium">
             @error('attachments.*')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -230,11 +230,11 @@
         {{-- Aksi --}}
         <div class="flex justify-end gap-3 border-t border-slate-200">
             <a href="{{ route('leads.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition">
+               class="px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition">
                 {{ __('Batal') }}
             </a>
             <button type="submit"
-                    class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                    class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                 {{ __('Simpan Lead') }}
             </button>
         </div>

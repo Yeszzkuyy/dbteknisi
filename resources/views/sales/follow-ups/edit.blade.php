@@ -6,7 +6,7 @@
                 <p class="text-slate-500 mt-1">{{ __('Perbarui follow up customer.') }}</p>
             </div>
             <a href="{{ route('sales.follow-ups.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
+               class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
                 {{ __('Kembali') }}
             </a>
         </div>
@@ -18,7 +18,7 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Customer <span class="text-red-500">*</span></label>
                     <select name="customer_id" required
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         <option value="">{{ __('-- Pilih Customer --') }}</option>
                         @foreach($customers as $customer)
                             <option value="{{ $customer->id }}" {{ old('customer_id', $followUp->customer_id) == $customer->id ? 'selected' : '' }}>
@@ -31,7 +31,7 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Terkait Meeting') }}</label>
                     <select name="meeting_id"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         <option value="">{{ __('-- Tidak terkait meeting tertentu --') }}</option>
                         @foreach($meetings as $meeting)
                             <option value="{{ $meeting->id }}" {{ old('meeting_id', $followUp->meeting_id) == $meeting->id ? 'selected' : '' }}>
@@ -44,7 +44,7 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Deskripsi') }} <span class="text-red-500">*</span></label>
                     <textarea name="description" rows="4" required
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('description', $followUp->description) }}</textarea>
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('description', $followUp->description) }}</textarea>
                 </div>
 
                 <div>
@@ -54,7 +54,7 @@
 
                 <div class="flex gap-3 pt-2">
                     <button type="submit"
-                            class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                            class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                         Update
                     </button>
                     <a href="{{ route('sales.follow-ups.index') }}"

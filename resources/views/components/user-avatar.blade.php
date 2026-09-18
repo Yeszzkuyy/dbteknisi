@@ -15,7 +15,7 @@
 @if ($canZoom)
     <img src="{{ $photoUrl }}" alt="{{ $user->name }}"
          x-on:click="$dispatch('view-avatar', { src: @js($photoUrl), name: @js($user->name ?? '') })"
-         class="{{ $size }} rounded-full object-cover shrink-0 cursor-zoom-in transition hover:ring-2 hover:ring-blue-300 {{ $class }}"
+         class="{{ $size }} rounded-full object-cover shrink-0 cursor-zoom-in transition hover:ring-2 hover:ring-accent-300 {{ $class }}"
          title="Lihat foto profil" role="button" tabindex="0"
          x-on:keydown.enter="$dispatch('view-avatar', { src: @js($photoUrl), name: @js($user->name ?? '') })">
 @elseif($photoUrl)

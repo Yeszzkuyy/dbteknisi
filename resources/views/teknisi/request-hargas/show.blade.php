@@ -91,7 +91,7 @@
             {{-- Aksi --}}
             <div class="flex justify-end gap-3">
                 <a href="{{ route('teknisi.request-hargas.edit', $requestHarga) }}"
-                   class="rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 px-5 py-2.5 text-sm font-semibold transition">
+                   class="rounded-xl bg-accent-100 hover:bg-accent-200 text-accent-700 px-5 py-2.5 text-sm font-semibold transition">
                     Edit
                 </a>
                 <a href="{{ route('teknisi.request-hargas.index') }}"

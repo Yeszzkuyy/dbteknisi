@@ -9,7 +9,7 @@
                 @can('manage-admin')
                     <a href="{{ route('admin.invoices.edit', $invoice) }}" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium transition">Edit</a>
                 @endcan
-                <a href="{{ route('admin.invoices.index') }}" class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">{{ __('Kembali') }}</a>
+                <a href="{{ route('admin.invoices.index') }}" class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">{{ __('Kembali') }}</a>
             </div>
         </div>
 
@@ -53,9 +53,9 @@
                             </div>
                             <div class="flex gap-2">
                                 @if($payment->proof_file)
-                                    <a href="{{ route('admin.payments.proof', $payment) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">{{ __('Bukti') }}</a>
+                                    <a href="{{ route('admin.payments.proof', $payment) }}" target="_blank" class="text-accent-600 hover:text-accent-800 text-xs underline">{{ __('Bukti') }}</a>
                                 @endif
-                                <a href="{{ route('admin.payments.show', $payment) }}" class="text-blue-600 hover:text-blue-800 text-xs">Detail</a>
+                                <a href="{{ route('admin.payments.show', $payment) }}" class="text-accent-600 hover:text-accent-800 text-xs">Detail</a>
                             </div>
                         </div>
                         @if($payment->notes)<p class="text-xs text-slate-400 mt-1">{{ $payment->notes }}</p>@endif

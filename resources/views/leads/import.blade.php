@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">{{ __('Import data dari file Excel (.xlsx) atau CSV') }}</p>
         </div>
         <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition">
             {{ __('Kembali') }}
         </a>
     </div>
@@ -49,11 +49,11 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <form action="{{ route('leads.import.execute') }}" method="POST" enctype="multipart/form-data" id="importForm">
             @csrf
-            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-10 text-center hover:border-blue-400 transition cursor-pointer"
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-10 text-center hover:border-accent-400 transition cursor-pointer"
                  onclick="document.getElementById('fileInput').click()"
-                 ondragover="event.preventDefault(); this.classList.add('border-blue-400', 'bg-blue-50')"
-                 ondragleave="this.classList.remove('border-blue-400', 'bg-blue-50')"
-                 ondrop="event.preventDefault(); this.classList.remove('border-blue-400', 'bg-blue-50'); document.getElementById('fileInput').files = event.dataTransfer.files; showFileName();">
+                 ondragover="event.preventDefault(); this.classList.add('border-accent-400', 'bg-accent-50')"
+                 ondragleave="this.classList.remove('border-accent-400', 'bg-accent-50')"
+                 ondrop="event.preventDefault(); this.classList.remove('border-accent-400', 'bg-accent-50'); document.getElementById('fileInput').files = event.dataTransfer.files; showFileName();">
                 <input type="file" name="file" id="fileInput" class="hidden"
                        accept=".csv,.txt,.xlsx,.xls"
                        onchange="showFileName()">
@@ -66,11 +66,11 @@
 
             <div class="flex justify-end gap-3 mt-6">
                 <a href="{{ route('leads.index') }}"
-                   class="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition">
+                   class="px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition">
                     {{ __('Batal') }}
                 </a>
                 <button type="submit" id="submitBtn"
-                        class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
                     {{ __('Import Sekarang') }}
                 </button>
             </div>
@@ -122,7 +122,7 @@
         var text = document.getElementById('uploadText');
         if (input.files.length > 0) {
             text.textContent = input.files[0].name;
-            text.classList.add('text-blue-600');
+            text.classList.add('text-accent-600');
         }
     }
 </script>

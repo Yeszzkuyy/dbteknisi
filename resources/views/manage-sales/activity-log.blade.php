@@ -5,13 +5,13 @@
             <p class="text-slate-500 mt-1">
                 {{ __('Riwayat aktivitas user management (assign & kelola lead)') }}
                 @if($filterUser)
-                    {{ __('— filter:') }} <span class="font-semibold text-blue-600">{{ $filterUser->name }}</span>
+                    {{ __('— filter:') }} <span class="font-semibold text-accent-600">{{ $filterUser->name }}</span>
                     <a href="{{ route('manage-sales.activity-log') }}" class="text-slate-400 hover:text-red-500 ml-1" title="{{ __('Hapus filter') }}">&times;</a>
                 @endif
             </p>
         </div>
         <a href="{{ route('manage-sales.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
+           class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
             {{ __('Kembali') }}
         </a>
     </div>
@@ -21,7 +21,7 @@
             <form method="GET" action="{{ route('manage-sales.activity-log') }}" class="flex flex-wrap gap-4">
                 <div>
                     <label for="user" class="sr-only">User</label>
-                    <select id="user" name="user" class="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select id="user" name="user" class="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
                         <option value="">{{ __('Semua User') }}</option>
                         @foreach($managementUsers as $user)
                             <option value="{{ $user->id }}" {{ request('user') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
@@ -36,8 +36,8 @@
                     <label for="date_to" class="sr-only">{{ __('Sampai Tanggal') }}</label>
                     <x-datepicker id="date_to" name="date_to" value="{{ request('date_to') }}"></x-datepicker>
                 </div>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Filter</button>
-                <a href="{{ route('manage-sales.activity-log') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">Reset</a>
+                <button type="submit" class="px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition">Filter</button>
+                <a href="{{ route('manage-sales.activity-log') }}" class="px-4 py-2 bg-accent-500 hover:bg-accent-600 text-white rounded-lg transition">Reset</a>
             </form>
         </div>
 

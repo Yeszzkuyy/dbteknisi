@@ -13,11 +13,11 @@
                 <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Cari Customer') }}</label>
                 <input type="text" name="search" value="{{ request('search') }}"
                        placeholder="{{ __('Nama customer...') }}"
-                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                       class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit"
-                        class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                        class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                     Filter
                 </button>
                 @if(request()->anyFilled(['search']))
@@ -78,7 +78,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex justify-end gap-3">
                                     <a href="{{ route('sales.follow-ups.show', $fu) }}"
-                                       class="text-blue-600 hover:text-blue-800">Detail</a>
+                                       class="text-accent-600 hover:text-accent-800">Detail</a>
                                     @can('manage-sales')
                                         <a href="{{ route('sales.follow-ups.edit', $fu) }}"
                                            class="text-amber-600 hover:text-amber-800">Edit</a>

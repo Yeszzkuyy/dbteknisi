@@ -28,7 +28,7 @@
             <x-icon name="edit" class="w-4 h-4 text-slate-400" />
             <input id="filter-search" type="search" placeholder="{{ __('Cari jadwal, project, customer, teknisi...') }}"
                    oninput="clearTimeout(window.__fcSearch); window.__fcSearch = setTimeout(() => window.teknisiCalendar?.calendar.refetchEvents(), 400)"
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
         </div>
     </div>
 

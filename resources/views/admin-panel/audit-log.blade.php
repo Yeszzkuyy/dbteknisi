@@ -19,15 +19,15 @@
                 </div>
                 <div>
                     <label for="action" class="sr-only">Action</label>
-                    <select id="action" name="action" class="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select id="action" name="action" class="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
                         <option value="">Semua Action</option>
                         <option value="created" {{ request('action') === 'created' ? 'selected' : '' }}>Created</option>
                         <option value="updated" {{ request('action') === 'updated' ? 'selected' : '' }}>Updated</option>
                         <option value="deleted" {{ request('action') === 'deleted' ? 'selected' : '' }}>Deleted</option>
                     </select>
                 </div>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Filter</button>
-                <a href="{{ route('admin-panel.audit-log') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">Reset</a>
+                <button type="submit" class="px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition">Filter</button>
+                <a href="{{ route('admin-panel.audit-log') }}" class="px-4 py-2 bg-accent-500 hover:bg-accent-600 text-white rounded-lg transition">Reset</a>
             </form>
         </div>
 

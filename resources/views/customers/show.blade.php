@@ -23,7 +23,7 @@
                 <div class="flex shrink-0 gap-2">
                     @can('manage-sales')
                         <a href="{{ route('customers.edit', $customer) }}"
-                           class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium transition-all duration-200 hover:scale-[1.03]">
+                           class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-accent-100 hover:bg-accent-200 text-accent-700 text-sm font-medium transition-all duration-200 hover:scale-[1.03]">
                             Edit Customer
                         </a>
                     @endcan
@@ -53,59 +53,59 @@
             {{-- Tab Navigation --}}
             <div class="border-b border-slate-200 dark:border-slate-600">
                 <nav x-ref="tabs" class="relative flex gap-4 sm:gap-6 px-4 sm:px-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                    <span x-ref="indicator" class="tab-indicator absolute bottom-0 left-0 h-0.5 w-0 rounded-full bg-indigo-500"></span>
+                    <span x-ref="indicator" class="tab-indicator absolute bottom-0 left-0 h-0.5 w-0 rounded-full bg-accent-500"></span>
 
                     <button @click="tab = 'overview'; moveIndicator($el)"
-                            :class="tab === 'overview' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'overview' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="grid" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Overview
                     </button>
                     <button @click="tab = 'projects'; moveIndicator($el)"
-                            :class="tab === 'projects' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'projects' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="folder" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Projects
                     </button>
                     <button @click="tab = 'contacts'; moveIndicator($el)"
-                            :class="tab === 'contacts' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'contacts' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="users" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Contacts
                     </button>
                     <button @click="tab = 'documents'; moveIndicator($el)"
-                            :class="tab === 'documents' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'documents' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="book" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Documents
                     </button>
                     @can('view-sales')
                     <button @click="tab = 'meetings'; moveIndicator($el)"
-                            :class="tab === 'meetings' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'meetings' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="handshake" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Meetings
                     </button>
                     <button @click="tab = 'followups'; moveIndicator($el)"
-                            :class="tab === 'followups' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'followups' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="phone" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Follow Up
                     </button>
                     @endcan
                     @can('view-admin')
                     <button @click="tab = 'invoices'; moveIndicator($el)"
-                            :class="tab === 'invoices' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'invoices' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="receipt" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Invoice
                     </button>
                     <button @click="tab = 'pos'; moveIndicator($el)"
-                            :class="tab === 'pos' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'pos' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="file-text" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> PO
                     </button>
                     <button @click="tab = 'payments'; moveIndicator($el)"
-                            :class="tab === 'payments' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'payments' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="credit-card" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Payment
                     </button>
                     @endcan
                     <button @click="tab = 'activity'; moveIndicator($el)"
-                            :class="tab === 'activity' ? 'tab-active text-indigo-600 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
+                            :class="tab === 'activity' ? 'tab-active text-accent-600 dark:text-accent-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'"
                             class="shrink-0 py-3 sm:py-4 px-1 font-medium text-xs sm:text-sm transition-colors duration-200">
                         <x-icon name="activity" class="h-4 w-4 mr-1.5 inline-block align-[-1px]" /> Activity
                     </button>
@@ -245,7 +245,7 @@
                                         <td class="px-6 py-3">
                                             <div class="flex items-center gap-2">
                                                 <div class="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
-                                                    <div class="h-full bg-blue-600 rounded-full" style="width: {{ $project->progress ?? 0 }}%"></div>
+                                                    <div class="h-full bg-accent-600 rounded-full" style="width: {{ $project->progress ?? 0 }}%"></div>
                                                 </div>
                                                 <span class="text-xs text-slate-600 dark:text-slate-300">{{ $project->progress ?? 0 }}%</span>
                                             </div>
@@ -258,7 +258,7 @@
                                         <td class="px-6 py-3 text-right">
                                             <div class="flex flex-wrap justify-end items-center gap-x-3 gap-y-1">
                                                 <a href="{{ route('projects.show', $project) }}"
-                                                   class="text-blue-600 hover:text-blue-800 text-sm whitespace-nowrap">Detail</a>
+                                                   class="text-accent-600 hover:text-accent-800 text-sm whitespace-nowrap">Detail</a>
                                                 @can('manage-teknisi')
                                                     <a href="{{ route('projects.edit', $project) }}"
                                                        class="text-amber-600 hover:text-amber-800 text-sm whitespace-nowrap">Edit</a>
@@ -304,7 +304,7 @@
                             </thead>
                             <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
                                 @foreach($customer->contacts as $contact)
-                                    <tr class="{{ $contact->is_primary ? 'bg-indigo-50 dark:bg-indigo-900/30' : '' }}">
+                                    <tr class="{{ $contact->is_primary ? 'bg-accent-50 dark:bg-accent-900/30' : '' }}">
                                         <td class="px-6 py-3 font-medium text-slate-800 dark:text-slate-100 align-middle">{{ $contact->name }}</td>
                                         <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300 align-middle">{{ $contact->position ?? '-' }}</td>
                                         <td class="px-6 py-3 text-sm text-slate-600 dark:text-slate-300 align-middle">
@@ -317,7 +317,7 @@
                                                 <label class="flex cursor-pointer items-center gap-1.5">
                                                     <input type="checkbox" value="1" {{ $contact->is_primary ? 'checked' : '' }}
                                                            onchange="this.form.submit()"
-                                                           class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                                           class="h-5 w-5 rounded border-slate-300 text-accent-600 focus:ring-accent-500">
                                                     <span class="text-xs text-slate-500">{{ __('Utama') }}</span>
                                                 </label>
                                             </form>
@@ -389,7 +389,7 @@
                                         <div class="flex-1 min-w-0">
                                             {{-- Icon --}}
                                             <div class="flex items-center gap-2 mb-1">
-                                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                 </svg>
@@ -403,9 +403,9 @@
                                         <div class="flex gap-2 flex-shrink-0 ml-2">
                                             <a href="{{ route('project-documents.preview', $doc) }}"
                                                target="_blank"
-                                               class="text-indigo-600 hover:text-indigo-800 text-xs whitespace-nowrap">Preview</a>
+                                               class="text-accent-600 hover:text-accent-800 text-xs whitespace-nowrap">Preview</a>
                                             <a href="{{ route('project-documents.download', $doc) }}"
-                                               class="text-blue-600 hover:text-blue-800 text-xs">Download</a>
+                                               class="text-accent-600 hover:text-accent-800 text-xs">Download</a>
                                         </div>
                                     </div>
                                 </div>
@@ -415,7 +415,7 @@
                         <x-empty-state label="{{ __('dokumen') }}" :description="$firstProject ? null : __('Buat project terlebih dahulu untuk upload dokumen.')">
                             @if($firstProject)
                                 <a href="{{ route('project-documents.index', $firstProject) }}"
-                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                   class="text-accent-600 hover:text-accent-800 text-sm font-medium">
                                     {{ __('Upload dokumen sekarang') }}
                                 </a>
                             @endif
@@ -446,7 +446,7 @@
                                         <p class="text-sm text-slate-500 mt-1">{{ __('Peserta:') }} {{ $meeting->participants ?? '-' }}</p>
                                     </div>
                                     <a href="{{ route('sales.meetings.show', $meeting) }}"
-                                       class="text-blue-600 hover:text-blue-800 text-sm">Detail</a>
+                                       class="text-accent-600 hover:text-accent-800 text-sm">Detail</a>
                                 </div>
                                 @if($meeting->user_needs)
                                     <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">
@@ -543,7 +543,7 @@
                                             @endphp
                                             <x-status-badge :color="$invBadgeColor">{{ $inv->status === 'paid' ? __('Lunas') : ($inv->status === 'cancelled' ? __('Dibatalkan') : __('Belum Bayar')) }}</x-status-badge>
                                         </td>
-                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.invoices.show', $inv) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.invoices.show', $inv) }}" class="text-accent-600 hover:text-accent-800 text-sm">Detail</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -590,7 +590,7 @@
                                             @endphp
                                             <x-status-badge :color="$poBadgeColor">{{ $po->statusLabel() }}</x-status-badge>
                                         </td>
-                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.pos.show', $po) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.pos.show', $po) }}" class="text-accent-600 hover:text-accent-800 text-sm">Detail</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -628,8 +628,8 @@
                                         <td class="px-6 py-3 font-mono text-sm text-slate-800 dark:text-slate-100">{{ $pm->invoice->invoice_number }}</td>
                                         <td class="px-6 py-3 text-slate-600 dark:text-slate-300">{{ $pm->payment_date->format('d M Y') }}</td>
                                         <td class="px-6 py-3 text-right font-mono text-slate-800 dark:text-slate-100">Rp {{ number_format($pm->amount, 0, ',', '.') }}</td>
-                                        <td class="px-6 py-3 text-center">@if($pm->proof_file)<a href="{{ route('admin.payments.proof', $pm) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">{{ __('Lihat') }}</a>@else - @endif</td>
-                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.payments.show', $pm) }}" class="text-blue-600 hover:text-blue-800 text-sm">Detail</a></td>
+                                        <td class="px-6 py-3 text-center">@if($pm->proof_file)<a href="{{ route('admin.payments.proof', $pm) }}" target="_blank" class="text-accent-600 hover:text-accent-800 text-xs underline">{{ __('Lihat') }}</a>@else - @endif</td>
+                                        <td class="px-6 py-3 text-right"><a href="{{ route('admin.payments.show', $pm) }}" class="text-accent-600 hover:text-accent-800 text-sm">Detail</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -656,7 +656,7 @@
                             <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-slate-200"></div>
                             @foreach($allActivities as $activity)
                                 <div class="relative pl-12 pb-6 last:pb-0">
-                                    <div class="absolute left-2 top-1 w-5 h-5 rounded-full bg-indigo-500 border-4 border-white shadow-sm"></div>
+                                    <div class="absolute left-2 top-1 w-5 h-5 rounded-full bg-accent-500 border-4 border-white shadow-sm"></div>
                                     <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4">
                                         <div class="flex items-center gap-3">
                                             <span class="font-semibold text-sm text-slate-800 dark:text-slate-100">{{ $activity->user?->name ?? 'System' }}</span>

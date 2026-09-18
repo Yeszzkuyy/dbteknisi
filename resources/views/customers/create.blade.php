@@ -9,7 +9,7 @@
             </p>
         </div>
         <a href="{{ route('customers.index') }}"
-           class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition sm:self-start">
+           class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition sm:self-start">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
@@ -26,7 +26,7 @@
                 {{ __('Nama Perusahaan') }} <span class="text-red-500">*</span>
             </label>
             <input type="text" id="name" name="name" value="{{ old('name') }}" required
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -35,7 +35,7 @@
                 Address
             </label>
             <textarea id="address" name="address" rows="3"
-                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('address') }}</textarea>
+                      class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('address') }}</textarea>
             @error('address') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -45,7 +45,7 @@
             </label>
             <input type="text" id="phone" name="phone" value="{{ old('phone') }}"
                    placeholder="{{ __('cth: 021-1234-5678') }}"
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -56,7 +56,7 @@
             <input type="text" id="whatsapp" name="whatsapp" value="{{ old('whatsapp') }}"
                    placeholder="{{ __('cth: 0812-3456-7890') }}"
                    inputmode="tel"
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -65,7 +65,7 @@
                 Email
             </label>
             <input type="email" id="email" name="email" value="{{ old('email') }}"
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
@@ -74,17 +74,17 @@
                 Notes
             </label>
             <textarea id="notes" name="notes" rows="3"
-                      class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes') }}</textarea>
+                      class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('notes') }}</textarea>
             @error('notes') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 border-t border-slate-200 dark:border-slate-600 pt-5">
             <a href="{{ route('customers.index') }}"
-               class="px-6 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition text-center">
+               class="px-6 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition text-center">
                 {{ __('Batal') }}
             </a>
             <button type="submit"
-                    class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                    class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                 {{ __('Simpan Customer') }}
             </button>
         </div>

@@ -66,12 +66,12 @@
         {{-- Overview header --}}
         <section class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white px-5 py-6 shadow-sm sm:px-7 sm:py-7 dark:border-slate-700 dark:bg-slate-800" data-reveal>
             <div class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-blue-500/5 dark:bg-blue-400/10"></div>
-            <div class="pointer-events-none absolute bottom-0 right-24 h-1 w-28 rounded-full bg-blue-500/30"></div>
+            <div class="pointer-events-none absolute bottom-0 right-24 h-1 w-28 rounded-full bg-accent-500/30"></div>
 
             <div class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-3">
-                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-300">
+                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-accent-600 dark:text-accent-300">
                             {{ $now->translatedFormat('l, d F Y') }}
                         </p>
                         <span class="hidden h-1 w-1 rounded-full bg-slate-300 sm:block dark:bg-slate-600"></span>
@@ -87,7 +87,7 @@
 
                 <div class="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
                     <div class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/40">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm shadow-blue-600/20">
+                        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-600 text-white shadow-sm shadow-accent-600/20">
                             <x-icon name="tools" class="h-5 w-5" />
                         </span>
                         <div>
@@ -96,7 +96,7 @@
                         </div>
                     </div>
                     <a href="{{ route('teknisi.jadwal') }}"
-                       class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition hover:bg-blue-700">
+                       class="inline-flex items-center justify-center gap-2 rounded-xl bg-accent-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-accent-600/20 transition hover:bg-accent-700">
                         <x-icon name="calendar" class="h-4 w-4" />
                         {{ __('Buka Jadwal') }}
                     </a>
@@ -117,7 +117,7 @@
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     @foreach($dashboardCards as $card)
-                        <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:border-blue-200 sm:p-6 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-500/40">
+                        <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:border-accent-200 sm:p-6 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-accent-500/40">
                             <div class="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full {{ $card['washClass'] }} transition-transform duration-500 group-hover:scale-125"></div>
                             <div class="relative flex items-start justify-between gap-4">
                                 <div class="min-w-0">
@@ -157,7 +157,7 @@
                         @forelse($topStatuses as $status)
                             <li class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 text-sm transition duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/40">
                                 <span class="flex min-w-0 items-center gap-2.5">
-                                    <span class="h-3 w-3 shrink-0 rounded-full"
+                                    <span data-status-color="{{ $status['name'] }}" class="h-3 w-3 shrink-0 rounded-full"
                                           style="background-color: {{ $statusBarColors[$status['name']] ?? '#64748b' }}"></span>
                                     <span class="truncate font-semibold text-slate-700 dark:text-slate-200">{{ $status['name'] }}</span>
                                 </span>
@@ -197,7 +197,7 @@
                         <h2 id="recent-projects-heading" class="text-lg font-bold text-slate-900 dark:text-slate-100">{{ __('Project Terbaru') }}</h2>
                         <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{{ __('Project yang baru ditambahkan.') }}</p>
                     </div>
-                    <a href="{{ route('projects.index') }}" class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 transition hover:text-blue-700">
+                    <a href="{{ route('projects.index') }}" class="inline-flex items-center gap-1 text-sm font-semibold text-accent-600 transition hover:text-accent-700">
                         {{ __('Lihat Semua') }} <x-icon name="chevron-right" class="h-4 w-4" />
                     </a>
                 </div>
@@ -243,7 +243,7 @@
                                 <div class="mt-1 flex flex-col gap-0.5">
                                     @foreach($projectsByTechnician[$technician->id] as $project)
                                         <a href="{{ route('projects.show', $project) }}"
-                                           class="truncate text-xs font-medium text-blue-600 transition hover:text-blue-700 hover:underline">
+                                           class="truncate text-xs font-medium text-accent-600 transition hover:text-accent-700 hover:underline">
                                             {{ $project->project_name }}
                                         </a>
                                     @endforeach
@@ -310,42 +310,55 @@
             const donutData = @json($donutData);
             if (!donutData.length || typeof window.ApexCharts === 'undefined') return;
 
-            const isDark = document.documentElement.classList.contains('dark');
+            // Status = semantik (Open-info, dst) — tidak mengikuti accent dan mode.
+            const chartColors = donutData.map((item) => item.color);
 
-            new ApexCharts(document.querySelector('#teknisi-donut-chart'), {
-                chart: {
-                    type: 'donut',
-                    height: 240,
-                    width: '100%',
-                    toolbar: { show: false },
-                    background: 'transparent',
-                    animations: {
-                        enabled: true,
-                        easing: 'easeout',
-                        speed: 700,
-                    },
-                },
-                series: donutData.map(d => d.value),
-                labels: donutData.map(d => d.label),
-                colors: donutData.map(d => d.color),
-                theme: { mode: isDark ? 'dark' : 'light' },
-                stroke: { width: 3, colors: [isDark ? '#1e293b' : '#ffffff'] },
-                fill: { type: 'solid' },
-                dataLabels: { enabled: false },
-                legend: { show: false },
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: '75%',
+            function donutOptions() {
+                const c = window.getAppearanceColors();
+                return {
+                    chart: {
+                        type: 'donut',
+                        height: 240,
+                        width: '100%',
+                        toolbar: { show: false },
+                        background: 'transparent',
+                        animations: {
+                            enabled: true,
+                            easing: 'easeout',
+                            speed: 700,
                         },
                     },
-                },
-                tooltip: {
-                    enabled: true,
-                    theme: isDark ? 'dark' : 'light',
-                    y: { formatter: (val) => val + ' project' },
-                },
-            }).render();
+                    series: donutData.map(d => d.value),
+                    labels: donutData.map(d => d.label),
+                    colors: chartColors,
+                    theme: { mode: c.dark ? 'dark' : 'light' },
+                    stroke: { width: 3, colors: [c.cardBg] },
+                    fill: { type: 'solid' },
+                    dataLabels: { enabled: false },
+                    legend: { show: false },
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '75%',
+                            },
+                        },
+                    },
+                    tooltip: {
+                        enabled: true,
+                        theme: c.dark ? 'dark' : 'light',
+                        y: { formatter: (val) => val + ' project' },
+                    },
+                };
+            }
+
+            const el = document.querySelector('#teknisi-donut-chart');
+            if (window.teknisiDonutChart) window.teknisiDonutChart.destroy();
+            window.teknisiDonutChart = new ApexCharts(el, donutOptions()).render();
+
+            // Update tanpa reload saat mode/aksen berubah
+            window.addEventListener('appearance:change', () => {
+                if (window.teknisiDonutChart) window.teknisiDonutChart.updateOptions(donutOptions());
+            });
         });
     </script>
 </x-app-layout>

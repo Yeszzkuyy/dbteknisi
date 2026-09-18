@@ -42,7 +42,7 @@
             <div>
                 <label for="project_id" class="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">Project</label>
                 <select id="project_id" name="project_id" required
-                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                     <option value="">{{ __('Pilih Project') }}</option>
                     @foreach($projects as $project)
                         <option value="{{ $project->id }}"
@@ -61,7 +61,7 @@
                 <div class="flex items-center justify-between mb-2">
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Items</label>
                     <button type="button" @click="addItem()"
-                            class="rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1.5 text-xs font-semibold transition">
+                            class="rounded-lg bg-accent-100 hover:bg-accent-200 text-accent-700 px-3 py-1.5 text-xs font-semibold transition">
                         {{ __('+ Tambah Item') }}
                     </button>
                 </div>
@@ -73,18 +73,18 @@
                                 <label class="block text-xs font-medium text-slate-500 mb-1" x-text="'Device #' + (index + 1)"></label>
                                 <input type="text" x-model="item.device" name="items[][device]"
                                        placeholder="{{ __('Nama perangkat') }}"
-                                       class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                                       class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                             </div>
                             <div class="sm:col-span-2">
                                 <label class="block text-xs font-medium text-slate-500 mb-1">Qty</label>
                                 <input type="number" min="1" x-model.number="item.quantity" name="items[][quantity]"
-                                       class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                                       class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                             </div>
                             <div class="sm:col-span-4">
                                 <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Spesifikasi') }}</label>
                                 <input type="text" x-model="item.specification" name="items[][specification]"
                                        placeholder="{{ __('Opsional') }}"
-                                       class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                                       class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                             </div>
                             <div class="sm:col-span-1 flex items-end justify-end">
                                 <button type="button" @click="removeItem(index)" :disabled="items.length <= 1"
@@ -107,7 +107,7 @@
                 <label for="notes" class="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">{{ __('Catatan') }}</label>
                 <textarea id="notes" name="notes" rows="3"
                           placeholder="{{ __('Catatan tambahan (opsional)') }}"
-                          class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">{{ old('notes', $requestHarga->notes) }}</textarea>
+                          class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">{{ old('notes', $requestHarga->notes) }}</textarea>
                 @error('notes')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -117,7 +117,7 @@
             <div>
                 <label for="status" class="block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300">Status</label>
                 <select id="status" name="status" required
-                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                     @foreach(['draft', 'submitted', 'approved', 'rejected', 'completed'] as $status)
                         <option value="{{ $status }}" {{ old('status', $requestHarga->status) === $status ? 'selected' : '' }}>
                             {{ ucfirst($status) }}
@@ -135,7 +135,7 @@
                     {{ __('Batal') }}
                 </a>
                 <button type="submit"
-                        class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 text-sm font-semibold transition">
+                        class="rounded-xl bg-accent-600 hover:bg-accent-700 text-white px-6 py-2.5 text-sm font-semibold transition">
                     {{ __('Simpan Perubahan') }}
                 </button>
             </div>

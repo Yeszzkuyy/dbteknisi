@@ -1,0 +1,19 @@
+/* ============================================================
+   Accent theme: OCEAN (default / baseline existing)
+   Baseline = palet biru Tailwind yang sudah dipakai aplikasi.
+   Dipakai ketika html[data-theme="ocean"] atau tanpa atribut.
+   ============================================================ */
+:root,
+html[data-theme="ocean"] {
+    --accent-50: 239 246 255;   /* #EFF6FF */
+    --accent-100: 219 234 254;  /* #DBEAFE */
+    --accent-200: 191 219 254;  /* #BFDBFE */
+    --accent-300: 147 197 253;  /* #93C5FD */
+    --accent-400: 96 165 250;   /* #60A5FA */
+    --accent-500: 59 130 246;   /* #3B82F6 */
+    --accent-600: 37 99 235;    /* #2563EB */
+    --accent-700: 29 78 216;    /* #1D4ED8 */
+    --accent-800: 30 64 175;    /* #1E40AF */
+    --accent-900: 30 58 138;    /* #1E3A8A */
+    --accent-950: 23 37 84;     /* #172554 */
+}

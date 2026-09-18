@@ -35,7 +35,7 @@
                     <p class="text-sm mt-2 text-slate-800">
                         {{ __('Your email address is unverified.') }}
 
-                        <button form="send-verification" class="underline text-sm text-slate-600 hover:text-slate-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button form="send-verification" class="underline text-sm text-slate-600 hover:text-slate-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>
@@ -51,7 +51,7 @@
 
         <div class="flex items-center gap-4">
             <button type="submit"
-                    class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+                    class="inline-flex items-center rounded-xl bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-700">
                 {{ __('Save') }}
             </button>
 

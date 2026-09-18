@@ -10,7 +10,7 @@
                 </p>
             </div>
             <a href="{{ route('customers.show', $customer) }}" 
-               class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition">
+               class="px-5 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 font-medium transition">
                 {{ __('← Kembali ke Customer') }}
             </a>
         </div>
@@ -29,7 +29,7 @@
                                name="name" 
                                value="{{ old('name') }}" 
                                required
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -42,7 +42,7 @@
                                name="position" 
                                value="{{ old('position') }}"
                                placeholder="{{ __('Contoh: Manager, Teknisi, dll') }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('position') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -56,7 +56,7 @@
                                value="{{ old('whatsapp') }}"
                                placeholder="{{ __('Nomor WhatsApp PIC') }}"
                                inputmode="tel"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -69,7 +69,7 @@
                                name="email" 
                                value="{{ old('email') }}"
                                placeholder="{{ __('Email PIC') }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -80,7 +80,7 @@
                                id="is_primary" 
                                value="1" 
                                {{ old('is_primary') ? 'checked' : '' }}
-                               class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                               class="w-5 h-5 rounded border-slate-300 text-accent-600 focus:ring-accent-500">
                         <label for="is_primary" class="text-sm font-medium text-slate-700">
                             {{ __('Jadikan PIC Utama (Primary)') }}
                         </label>
@@ -89,7 +89,7 @@
                 </div>
 
                 <div class="mt-6 flex gap-3">
-                    <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition text-base">
+                    <button type="submit" class="px-6 py-3 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition text-base">
                         {{ __('Simpan PIC') }}
                     </button>
                     <a href="{{ route('customers.show', $customer) }}" 
