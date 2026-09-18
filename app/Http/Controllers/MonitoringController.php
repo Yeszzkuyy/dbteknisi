@@ -210,7 +210,7 @@ class MonitoringController extends Controller
 
         $projects = $customer->projects;
         foreach ($projects as $project) {
-            $statusName = $project->status?->name ?? 'Belum Memulai';
+            $statusName = $project->status?->name ?? __('Belum Memulai');
             $activities->push([
                 'type' => 'project',
                 'label' => 'Project: ' . $statusName,
@@ -259,7 +259,7 @@ class MonitoringController extends Controller
     {
         // Status mengikuti aktivitas terbaru apa pun divisinya,
         // supaya konsisten dengan kolom Divisi Terakhir Update & Waktu.
-        return $this->getLatestActivity($customer)['overall'] ?? 'Baru';
+        return $this->getLatestActivity($customer)['overall'] ?? __('Baru');
     }
 
     private function getLatestDivisi(Customer $customer): ?string

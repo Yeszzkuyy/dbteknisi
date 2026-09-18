@@ -619,5 +619,19 @@
     "pada": "on",
     "Target assignment harus user dengan role Sales.": "Assignment target must be a user with the Sales role.",
     "Lead berhasil diperbarui": "Lead updated successfully",
-    "Lead di-assign ke": "Lead assigned to"
+    "Lead di-assign ke": "Lead assigned to",
+    "Dashboard Monitoring - Semua Divisi": "Monitoring Dashboard - All Divisions",
+    "Overview lengkap aktivitas lintas divisi": "Complete overview of cross-division activity",
+    "Cari customer...": "Search customer...",
+    "Dari tanggal": "From date",
+    "Meeting Bulan Ini": "Meetings This Month",
+    "Instalasi Proses": "Installations In Progress",
+    "Instalasi Selesai": "Installations Completed",
+    "PO Menunggu Proses": "POs Awaiting Processing",
+    "Progress Tiap Customer": "Progress per Customer",
+    "Divisi Terakhir Update": "Last Updated Division",
+    "Waktu": "Time",
+    "Lihat Detail": "View Detail",
+    "Tidak ada data customer.": "No customer data.",
+    "Baru": "New"
 }
