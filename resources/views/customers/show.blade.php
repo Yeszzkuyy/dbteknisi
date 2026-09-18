@@ -412,7 +412,7 @@
                             @endforeach
                         </div>
                     @else
-                        <x-empty-state label="{{ __('dokumen') }}" :description="$firstProject ? null : '{{ __('Buat project terlebih dahulu untuk upload dokumen.') }}'">
+                        <x-empty-state label="{{ __('dokumen') }}" :description="$firstProject ? null : __('Buat project terlebih dahulu untuk upload dokumen.')">
                             @if($firstProject)
                                 <a href="{{ route('project-documents.index', $firstProject) }}"
                                    class="text-blue-600 hover:text-blue-800 text-sm font-medium">

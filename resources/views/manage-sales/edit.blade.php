@@ -1,12 +1,12 @@
 <x-app-layout>
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Kelola Lead: {{ $lead->customer->name ?? 'N/A' }}</h1>
-            <p class="text-slate-500 mt-1">Isi solusi, progress follow-up, catatan internal, dan assign ke Sales</p>
+            <h1 class="text-3xl font-bold text-slate-800">{{ __('Kelola Lead:') }} {{ $lead->customer->name ?? 'N/A' }}</h1>
+            <p class="text-slate-500 mt-1">{{ __('Isi solusi, progress follow-up, catatan internal, dan assign ke Sales') }}</p>
         </div>
         <a href="{{ route('manage-sales.index') }}"
            class="px-4 py-2.5 rounded-xl bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 text-sm font-medium transition">
-            Kembali
+            {{ __('Kembali') }}
         </a>
     </div>
 
@@ -18,7 +18,7 @@
         {{-- Info Lead --}}
         <section class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 dark:bg-slate-700 rounded-xl p-4">
             <div>
-                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Lead dari PT</div>
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">{{ __('Lead dari PT') }}</div>
                 @if($lead->pt_group)
                     <span class="inline-flex px-2 py-0.5 rounded {{ \App\Models\Lead::PT_COLORS[$lead->pt_group] ?? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' }} text-xs font-semibold mt-1">{{ $lead->pt_group }}</span>
                 @else
@@ -30,7 +30,7 @@
                 <div class="text-sm text-slate-700 mt-1">{{ $lead->customer->contact_person ?? '-' }}</div>
             </div>
             <div>
-                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Tanggal Masuk</div>
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">{{ __('Tanggal Masuk') }}</div>
                 <div class="text-sm text-slate-700 mt-1">{{ $lead->incoming_date?->format('d M Y') ?? '-' }}</div>
             </div>
         </section>
@@ -40,36 +40,36 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div class="md:col-span-2">
                     <label for="kebutuhan" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Kebutuhan
+                        {{ __('Kebutuhan') }}
                     </label>
                     <textarea name="kebutuhan" id="kebutuhan" rows="2"
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
                 </div>
                 <div>
                     <label for="solusi" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Solusi
-                        <x-info-tip tip="Solusi yang ditawarkan untuk memenuhi kebutuhan customer." />
+                        {{ __('Solusi') }}
+                        <x-info-tip tip="{{ __('Solusi yang ditawarkan untuk memenuhi kebutuhan customer.') }}" />
                     </label>
                     <textarea name="solusi" id="solusi" rows="3"
-                              placeholder="cth: Rekomendasi Cisco Webex Board 55S untuk ruang meeting"
+                              placeholder="{{ __('cth: Rekomendasi Cisco Webex Board 55S untuk ruang meeting') }}"
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('solusi', $lead->solusi) }}</textarea>
                 </div>
                 <div>
                     <label for="progress_notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Progress FollowUp / Keterangan
-                        <x-info-tip tip="Catatan progress follow-up: sudah dihubungi, jadwal meeting, status negosiasi, dll." />
+                        {{ __('Progress FollowUp / Keterangan') }}
+                        <x-info-tip tip="{{ __('Catatan progress follow-up: sudah dihubungi, jadwal meeting, status negosiasi, dll.') }}" />
                     </label>
                     <textarea name="progress_notes" id="progress_notes" rows="3"
-                              placeholder="cth: Sudah telepon, menunggu balasan. Follow-up lagi Senin depan."
+                              placeholder="{{ __('cth: Sudah telepon, menunggu balasan. Follow-up lagi Senin depan.') }}"
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('progress_notes', $lead->progress_notes) }}</textarea>
                 </div>
                 <div class="md:col-span-2">
                     <label for="notes" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Catatan Internal
-                        <x-info-tip tip="Catatan khusus tim, tidak ditampilkan ke customer." />
+                        {{ __('Catatan Internal') }}
+                        <x-info-tip tip="{{ __('Catatan khusus tim, tidak ditampilkan ke customer.') }}" />
                     </label>
                     <textarea name="notes" id="notes" rows="3"
-                              placeholder="Catatan internal..."
+                              placeholder="{{ __('Catatan internal...') }}"
                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes', $lead->notes) }}</textarea>
                 </div>
             </div>
@@ -80,12 +80,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
                     <label for="pt_group" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Lead dari PT
-                        <x-info-tip tip="Jenama penyedia yang menangani lead ini. Bisa diubah jikalau management menggantinya." />
+                        {{ __('Lead dari PT') }}
+                        <x-info-tip tip="{{ __('Jenama penyedia yang menangani lead ini. Bisa diubah jikalau management menggantinya.') }}" />
                     </label>
                     <select name="pt_group" id="pt_group"
                             class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">— Pilih PT —</option>
+                        <option value="">{{ __('— Pilih PT —') }}</option>
                         @foreach(\App\Models\Lead::PT_GROUPS as $pt)
                             <option value="{{ $pt }}" {{ old('pt_group', $lead->pt_group) === $pt ? 'selected' : '' }}>{{ $pt }}</option>
                         @endforeach
@@ -93,20 +93,20 @@
                 </div>
                 <div>
                     <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Assign / Direct ke Sales
-                        <x-info-tip tip="Sales yang bertanggung jawab follow-up lead ini." />
+                        {{ __('Assign / Direct ke Sales') }}
+                        <x-info-tip tip="{{ __('Sales yang bertanggung jawab follow-up lead ini.') }}" />
                     </label>
                     <select name="assigned_to" id="assigned_to"
                             class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">— Belum di-assign (NEW) —</option>
+                        <option value="">{{ __('— Belum di-assign (NEW) —') }}</option>
                         @foreach($salesUsers as $user)
                             <option value="{{ $user->id }}" {{ old('assigned_to', $lead->assigned_to) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                         @endforeach
                     </select>
                     @if($lead->assignee)
                         <p class="mt-1 text-xs text-slate-500">
-                            Di-assign ke {{ $lead->assignee->name }}
-                            @if($lead->assigned_at) pada {{ $lead->assigned_at->format('d M Y H:i') }} @endif
+                            {{ __('Di-assign ke') }} {{ $lead->assignee->name }}
+                            @if($lead->assigned_at) {{ __('pada') }} {{ $lead->assigned_at->format('d M Y H:i') }} @endif
                         </p>
                     @endif
                 </div>
@@ -117,11 +117,11 @@
         <div class="flex justify-end gap-3 border-t border-slate-200">
             <a href="{{ route('manage-sales.index') }}"
                class="px-4 py-2.5 rounded-xl bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 text-sm font-medium transition">
-                Batal
+                {{ __('Batal') }}
             </a>
             <button type="submit"
                     class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
-                Simpan
+                {{ __('Simpan') }}
             </button>
         </div>
     </form>
