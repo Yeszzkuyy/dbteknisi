@@ -12,15 +12,16 @@ use App\Models\WhatsappMessage;
 use App\Notifications\NewLeadNotification;
 use App\Notifications\WhatsappInboundNotification;
 use App\Services\WhatsappGateway;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
 
 class WhatsAppCenterController extends Controller
 {
     public function __construct(
         private readonly WhatsappGateway $gateway,
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -28,7 +29,7 @@ class WhatsAppCenterController extends Controller
         $accountTabs = $accounts->map(fn ($a) => [
             'id' => $a->id,
             'account_code' => $a->account_code,
-            'label' => $a->name ?: 'WA ' . strtoupper(substr($a->account_code, 3)),
+            'label' => $a->name ?: 'WA '.strtoupper(substr($a->account_code, 3)),
             'name' => $a->name,
             'phone_number' => $a->phone_number,
             'gateway_status' => $a->gateway_status,
@@ -57,7 +58,7 @@ class WhatsAppCenterController extends Controller
 
         // Cek status manual (satu kali), khusus untuk akun Meta agar tidak
         // memicu rate limit lewat polling otomatis tiap 5 detik.
-        if (!$this->gateway->isMeta($account)) {
+        if (! $this->gateway->isMeta($account)) {
             return response()->json([
                 'gateway_status' => $account->gateway_status,
             ]);
@@ -107,7 +108,7 @@ class WhatsAppCenterController extends Controller
                 ];
             })
             ->values()
-            ->sortByDesc(fn ($conversation) => ($conversation['is_pinned'] ? '1' : '0') . $conversation['last_at'])
+            ->sortByDesc(fn ($conversation) => ($conversation['is_pinned'] ? '1' : '0').$conversation['last_at'])
             ->values();
 
         return response()->json($rows);
@@ -121,7 +122,7 @@ class WhatsAppCenterController extends Controller
         $query = WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->where('sender_number', $sender)
             ->when($request->filled('before'), fn ($query) => $query->where('id', '<', $request->integer('before')))
-            ->when($request->filled('q'), fn ($query) => $query->where('message_body', 'like', '%' . $request->string('q') . '%'))
+            ->when($request->filled('q'), fn ($query) => $query->where('message_body', 'like', '%'.$request->string('q').'%'))
             ->orderByDesc('id');
 
         $messages = $query->limit($limit + 1)->get();
@@ -173,27 +174,36 @@ class WhatsAppCenterController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'company' => 'nullable|string|max:255',
             'whatsapp' => 'required|string|max:50',
             'notes' => 'nullable|string|max:2000',
         ]);
 
         $customer = $this->findCustomer($validated['whatsapp']);
 
-        if (!$customer) {
+        if (! $customer) {
+            $company = $validated['company'] ?? null;
+            $companyName = $company ?: $validated['name'];
             $customer = Customer::create([
-                'name' => $validated['name'],
-                'company' => $validated['name'],
+                'name' => $companyName,
+                'company' => $companyName,
                 'contact_person' => $validated['name'],
                 'whatsapp' => $validated['whatsapp'],
                 'notes' => $validated['notes'] ?? null,
             ]);
         } else {
-            $customer->update([
-                'name' => $validated['name'],
-                'contact_person' => $customer->contact_person ?: $validated['name'],
+            $update = [
+                'contact_person' => $validated['name'],
                 'whatsapp' => $validated['whatsapp'],
                 'notes' => $validated['notes'] ?? $customer->notes,
-            ]);
+            ];
+
+            if (! empty($validated['company'])) {
+                $update['name'] = $validated['company'];
+                $update['company'] = $validated['company'];
+            }
+
+            $customer->update($update);
         }
 
         return response()->json($this->contactPayload($customer->fresh()));
@@ -256,7 +266,7 @@ class WhatsAppCenterController extends Controller
             'status' => 'queued',
         ]);
 
-        if (!$this->gateway->configured($account)) {
+        if (! $this->gateway->configured($account)) {
             $status = 'queued';
         } elseif ($gatewayMessageId = $this->gateway->sendText($account, $sender, $validated['message_body'])) {
             $message->update([
@@ -285,14 +295,14 @@ class WhatsAppCenterController extends Controller
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'segment' => 'required|in:' . implode(',', LeadController::SEGMENTS),
+            'segment' => 'required|in:'.implode(',', LeadController::SEGMENTS),
             'kebutuhan' => 'nullable|string|max:2000',
         ]);
 
         $number = $this->normalizeNumber($sender);
         $customer = $this->findCustomer($number);
 
-        if (!$customer) {
+        if (! $customer) {
             $customer = Customer::create([
                 'name' => $validated['customer_name'],
                 'company' => $validated['customer_name'],
@@ -302,7 +312,7 @@ class WhatsAppCenterController extends Controller
         }
 
         $ptGroup = strtoupper(substr($account->account_code, 3));
-        if (!in_array($ptGroup, Lead::PT_GROUPS)) {
+        if (! in_array($ptGroup, Lead::PT_GROUPS)) {
             $ptGroup = Lead::PT_GROUPS[0];
         }
 
@@ -371,11 +381,11 @@ class WhatsAppCenterController extends Controller
     /**
      * Proses notifikasi Green API (dipakai webhook & polling receiveNotification).
      */
-    public function handleNotification(array $payload): \Illuminate\Http\JsonResponse
+    public function handleNotification(array $payload): JsonResponse
     {
         $type = data_get($payload, 'typeWebhook');
 
-        if (!$type) {
+        if (! $type) {
             return $this->storeInboundFromLegacy($payload);
         }
 
@@ -384,7 +394,7 @@ class WhatsAppCenterController extends Controller
             ? WhatsappAccount::where('gateway_instance', $instance)->first()
             : null;
 
-        if (!$account) {
+        if (! $account) {
             return response()->json(['error' => 'unknown instance'], 422);
         }
 
@@ -401,13 +411,13 @@ class WhatsAppCenterController extends Controller
      * Akun dituju dicocokkan lewat value.metadata.phone_number_id
      * dengan kolom gateway_instance, sehingga mendukung banyak akun Meta.
      */
-    public function handleMetaNotification(array $payload): \Illuminate\Http\JsonResponse
+    public function handleMetaNotification(array $payload): JsonResponse
     {
         foreach (data_get($payload, 'entry.0.changes', []) as $change) {
             $value = data_get($change, 'value', []);
             $phoneNumberId = data_get($value, 'metadata.phone_number_id');
 
-            if (!$phoneNumberId) {
+            if (! $phoneNumberId) {
                 return response()->json(['error' => 'missing phone_number_id'], 422);
             }
 
@@ -416,7 +426,7 @@ class WhatsAppCenterController extends Controller
                 ->where('is_active', true)
                 ->first();
 
-            if (!$account) {
+            if (! $account) {
                 return response()->json(['error' => 'unknown account'], 422);
             }
 
@@ -475,7 +485,7 @@ class WhatsAppCenterController extends Controller
 
     public function updateCredentials(Request $request, WhatsappAccount $account)
     {
-        if (!auth()->user()->hasRole('super-admin') && !auth()->user()->hasPermissionTo('manage-sales-leads')) {
+        if (! auth()->user()->hasRole('super-admin') && ! auth()->user()->hasPermissionTo('manage-sales-leads')) {
             abort(403);
         }
 
@@ -498,7 +508,7 @@ class WhatsAppCenterController extends Controller
             ->with('success', 'Kredensial gateway disimpan.');
     }
 
-    private function handleIncoming(WhatsappAccount $account, array $payload): \Illuminate\Http\JsonResponse
+    private function handleIncoming(WhatsappAccount $account, array $payload): JsonResponse
     {
         $messageData = data_get($payload, 'messageData', []);
         $type = data_get($messageData, 'typeMessage');
@@ -537,7 +547,7 @@ class WhatsAppCenterController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    private function handleOutgoingStatus(WhatsappAccount $account, array $payload): \Illuminate\Http\JsonResponse
+    private function handleOutgoingStatus(WhatsappAccount $account, array $payload): JsonResponse
     {
         WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->where('gateway_message_id', data_get($payload, 'idMessage'))
@@ -546,7 +556,7 @@ class WhatsAppCenterController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    private function handleInstanceStatus(WhatsappAccount $account, array $payload): \Illuminate\Http\JsonResponse
+    private function handleInstanceStatus(WhatsappAccount $account, array $payload): JsonResponse
     {
         $state = data_get($payload, 'stateInstance') ?? data_get($payload, 'body.stateInstance');
 
@@ -557,9 +567,9 @@ class WhatsAppCenterController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    private function storeInboundFromLegacy(array $payload): \Illuminate\Http\JsonResponse
+    private function storeInboundFromLegacy(array $payload): JsonResponse
     {
-        $validated = \Illuminate\Support\Facades\Validator::make($payload, [
+        $validated = Validator::make($payload, [
             'account_code' => 'required|string',
             'sender_number' => 'required|string',
             'sender_name' => 'nullable|string|max:255',
@@ -569,11 +579,11 @@ class WhatsAppCenterController extends Controller
 
         $account = WhatsappAccount::where('account_code', $validated['account_code'])->first();
 
-        if (!$account) {
+        if (! $account) {
             return response()->json(['error' => 'unknown account'], 422);
         }
 
-        if (!empty($validated['wa_message_id'])
+        if (! empty($validated['wa_message_id'])
             && WhatsappMessage::where('wa_message_id', $validated['wa_message_id'])->exists()) {
             return response()->json(['status' => 'duplicate']);
         }
@@ -649,7 +659,7 @@ class WhatsAppCenterController extends Controller
 
         return WhatsappAccount::where('is_active', true)
             ->when(
-                !$user->hasRole('super-admin') && !$user->hasPermissionTo('manage-sales-leads'),
+                ! $user->hasRole('super-admin') && ! $user->hasPermissionTo('manage-sales-leads'),
                 fn ($q) => $q->where('assigned_to', $user->id)
             )
             ->orderBy('account_code');
@@ -657,7 +667,7 @@ class WhatsAppCenterController extends Controller
 
     private function authorizeAccount(WhatsappAccount $account): void
     {
-        if (!$this->visibleAccounts()->whereKey($account->id)->exists()) {
+        if (! $this->visibleAccounts()->whereKey($account->id)->exists()) {
             abort(403);
         }
     }
@@ -680,7 +690,7 @@ class WhatsAppCenterController extends Controller
     {
         $normalized = $this->normalizeNumber($number);
 
-        if (!$normalized) {
+        if (! $normalized) {
             return null;
         }
 
@@ -691,7 +701,7 @@ class WhatsAppCenterController extends Controller
 
     private function normalizeNumber(string $number): string
     {
-        return \App\Services\WhatsappGateway::normalizeNumber($number);
+        return WhatsappGateway::normalizeNumber($number);
     }
 
     private function contactPayload(Customer $customer): array
@@ -699,6 +709,7 @@ class WhatsAppCenterController extends Controller
         return [
             'id' => $customer->id,
             'name' => $customer->name,
+            'contact_person' => $customer->contact_person,
             'company' => $customer->company,
             'whatsapp' => $customer->whatsapp ?? $customer->phone,
             'notes' => $customer->notes,
