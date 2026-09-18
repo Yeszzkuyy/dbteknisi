@@ -23,8 +23,6 @@ class WhatsAppCenterController extends Controller
 {
     public function __construct(
         private readonly WhatsappGateway $gateway,
-    public function __construct(
-        private readonly WhatsappGateway $gateway,
         private readonly WhatsappBot $bot,
     ) {}
 
