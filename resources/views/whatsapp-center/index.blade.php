@@ -312,10 +312,10 @@
                     <button type="button" class="wa-icon-button" @click="view = 'status'; mobileChat = true" aria-label="Status">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.8" d="M4 12a8 8 0 0116 0M7 12a5 5 0 0110 0M10 12a2 2 0 014 0"/></svg>
                     </button>
-                    <button type="button" class="wa-icon-button" @click="view = 'settings'; mobileChat = true" aria-label="Pengaturan">
+                    <button type="button" class="wa-icon-button" @click="view = 'settings'; mobileChat = true" aria-label="{{ __('Pengaturan') }}">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.8" d="M10.3 3.3l.4-1.1h2.6l.4 1.1a2 2 0 002.5.9l1-.5 1.8 1.8-.5 1a2 2 0 00.9 2.5l1.1.4v2.6l-1.1.4a2 2 0 00-.9 2.5l.5 1-1.8 1.8-1-.5a2 2 0 00-2.5.9l-.4 1.1h-2.6l-.4-1.1a2 2 0 00-2.5-.9l-1 .5L5 15.9l.5-1a2 2 0 00-.9-2.5l-1.1-.4V9.4l1.1-.4a2 2 0 00.9-2.5L5 5.5l1.8-1.8 1 .5a2 2 0 002.5-.9z"/><circle cx="12" cy="10.7" r="2.5" stroke-width="1.8"/></svg>
                     </button>
-                    <button type="button" class="wa-icon-button" @click="startNewChat()" aria-label="Chat baru">
+                    <button type="button" class="wa-icon-button" @click="startNewChat()" aria-label="{{ __('Chat baru') }}">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.8" d="M12 5v14M5 12h14"/></svg>
                     </button>
                 </div>
@@ -326,7 +326,7 @@
                     <span class="flex min-w-0 items-center gap-2">
                         <span class="wa-status-dot" :class="accountStatusClass(activeAccount)"></span>
                         <span class="min-w-0">
-                            <span class="block truncate text-xs font-semibold" style="color:var(--wa-ink)" x-text="activeAccount?.name || 'Pilih akun WhatsApp'"></span>
+                            <span class="block truncate text-xs font-semibold" style="color:var(--wa-ink)" x-text="activeAccount?.name || '{{ __('Pilih akun WhatsApp') }}'"></span>
                             <span class="block truncate text-[11px]" style="color:var(--wa-muted)" x-text="activeAccount?.phone_number || activeAccount?.account_code || ''"></span>
                         </span>
                     </span>
@@ -343,22 +343,22 @@
                             <span x-show="account.id === activeAccount?.id" style="color:var(--wa-green)">✓</span>
                         </button>
                     </template>
-                    <div x-show="accounts.length === 0" class="px-3 py-3 text-xs" style="color:var(--wa-muted)">Tidak ada akun yang dapat diakses.</div>
+                    <div x-show="accounts.length === 0" class="px-3 py-3 text-xs" style="color:var(--wa-muted)">{{ __('Tidak ada akun yang dapat diakses.') }}</div>
                 </div>
             </div>
 
             <div class="px-3 py-2.5">
                 <div class="wa-search-wrap">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M16 16l5 5"/></svg>
-                    <input x-model="search" type="search" class="wa-search" placeholder="Cari atau mulai chat" aria-label="Cari chat">
+                    <input x-model="search" type="search" class="wa-search" placeholder="{{ __('Cari atau mulai chat') }}" aria-label="{{ __('Cari chat') }}">
                 </div>
             </div>
 
             <div class="flex items-center gap-1 overflow-x-auto px-3 pb-2">
-                <button type="button" class="wa-filter" :class="filter === 'all' ? 'is-active' : ''" @click="filter = 'all'">Semua</button>
-                <button type="button" class="wa-filter" :class="filter === 'unread' ? 'is-active' : ''" @click="filter = 'unread'">Belum dibaca</button>
-                <button type="button" class="wa-filter" :class="filter === 'pinned' ? 'is-active' : ''" @click="filter = 'pinned'">Disematkan</button>
-                <button type="button" class="wa-filter" :class="filter === 'archived' ? 'is-active' : ''" @click="filter = 'archived'">Diarsipkan</button>
+                <button type="button" class="wa-filter" :class="filter === 'all' ? 'is-active' : ''" @click="filter = 'all'">{{ __('Semua') }}</button>
+                <button type="button" class="wa-filter" :class="filter === 'unread' ? 'is-active' : ''" @click="filter = 'unread'">{{ __('Belum dibaca') }}</button>
+                <button type="button" class="wa-filter" :class="filter === 'pinned' ? 'is-active' : ''" @click="filter = 'pinned'">{{ __('Disematkan') }}</button>
+                <button type="button" class="wa-filter" :class="filter === 'archived' ? 'is-active' : ''" @click="filter = 'archived'">{{ __('Diarsipkan') }}</button>
             </div>
 
             <div class="wa-conversations flex-1">
@@ -368,8 +368,8 @@
                 <template x-if="!loadingConversations && filteredConversations.length === 0">
                     <div class="flex flex-col items-center justify-center px-8 py-16 text-center">
                         <svg class="mb-3 h-9 w-9" style="color:var(--wa-muted)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.6" d="M20 11.5a7.5 7.5 0 01-8 7.45 8.5 8.5 0 01-3.3-.65L4 20l1.7-4.3A7.4 7.4 0 014.5 11.5 7.5 7.5 0 1120 11.5z"/></svg>
-                        <p class="text-sm font-medium" style="color:var(--wa-ink)" x-text="search ? 'Chat tidak ditemukan' : (filter === 'archived' ? 'Belum ada chat diarsipkan' : 'Belum ada percakapan')"></p>
-                        <p class="mt-1 text-xs" style="color:var(--wa-muted)" x-text="search ? 'Coba nama atau nomor lain.' : 'Mulai percakapan baru dari tombol +.'"></p>
+                        <p class="text-sm font-medium" style="color:var(--wa-ink)" x-text="search ? '{{ __('Chat tidak ditemukan') }}' : (filter === 'archived' ? '{{ __('Belum ada chat diarsipkan') }}' : '{{ __('Belum ada percakapan') }}')"></p>
+                        <p class="mt-1 text-xs" style="color:var(--wa-muted)" x-text="search ? '{{ __('Coba nama atau nomor lain.') }}' : '{{ __('Mulai percakapan baru dari tombol +.') }}'"></p>
                     </div>
                 </template>
                 <template x-for="conv in filteredConversations" :key="conv.sender_number">
@@ -386,15 +386,15 @@
                                     <span x-show="conv.unread > 0" class="wa-unread shrink-0" x-text="conv.unread > 99 ? '99+' : conv.unread"></span>
                                 </span>
                                 <span class="mt-1 flex items-center gap-1.5 text-[10px]" style="color:var(--wa-muted)">
-                                    <span x-show="conv.is_pinned" title="Disematkan">📌</span>
-                                    <span x-show="conv.is_muted" title="Notifikasi dibisukan">⌁</span>
+                                    <span x-show="conv.is_pinned" title="{{ __('Disematkan') }}">📌</span>
+                                    <span x-show="conv.is_muted" title="{{ __('Notifikasi dibisukan') }}">⌁</span>
                                     <span x-show="conv.lead_id" class="font-semibold" style="color:var(--wa-green)">Lead</span>
-                                    <span x-show="!conv.lead_id && conv.customer" class="font-semibold" style="color:#54656f">Tersimpan</span>
-                                    <span x-show="!conv.lead_id && !conv.customer" class="font-semibold" style="color:#a47719">Nomor baru</span>
+                                    <span x-show="!conv.lead_id && conv.customer" class="font-semibold" style="color:#54656f">{{ __('Tersimpan') }}</span>
+                                    <span x-show="!conv.lead_id && !conv.customer" class="font-semibold" style="color:#a47719">{{ __('Nomor baru') }}</span>
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="wa-icon-button !h-8 !w-8 shrink-0 self-center" @click.stop="openContextMenu($event, conv)" aria-label="Menu chat">
+                        <button type="button" class="wa-icon-button !h-8 !w-8 shrink-0 self-center" @click.stop="openContextMenu($event, conv)" aria-label="{{ __('Menu chat') }}">
                             <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
                         </button>
                     </div>
@@ -411,9 +411,9 @@
                                 <div class="wa-chat-empty-mark mx-auto">
                                     <svg class="h-9 w-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.6" d="M20 11.5a7.5 7.5 0 01-8 7.45 8.5 8.5 0 01-3.3-.65L4 20l1.7-4.3A7.4 7.4 0 014.5 11.5 7.5 7.5 0 1120 11.5z"/></svg>
                                 </div>
-                                <h2 class="text-lg font-medium" style="color:var(--wa-ink)">WhatsApp untuk tim</h2>
-                                <p class="mt-2 text-sm leading-relaxed" style="color:var(--wa-muted)">Pilih chat di sebelah kiri untuk membaca dan membalas pesan. Percakapan tetap terhubung ke akun WhatsApp yang dipilih.</p>
-                                <button type="button" class="wa-primary mt-5" @click="startNewChat()">Mulai chat baru</button>
+                                <h2 class="text-lg font-medium" style="color:var(--wa-ink)">{{ __('WhatsApp untuk tim') }}</h2>
+                                <p class="mt-2 text-sm leading-relaxed" style="color:var(--wa-muted)">{{ __('Pilih chat di sebelah kiri untuk membaca dan membalas pesan. Percakapan tetap terhubung ke akun WhatsApp yang dipilih.') }}</p>
+                                <button type="button" class="wa-primary mt-5" @click="startNewChat()">{{ __('Mulai chat baru') }}</button>
                             </div>
                         </div>
                     </template>
@@ -421,7 +421,7 @@
                     <template x-if="activeConv">
                         <div class="flex h-full min-h-0 flex-col">
                             <div class="wa-chat-head">
-                                <button type="button" class="wa-icon-button md:hidden" @click="mobileChat = false; activeConv = null" aria-label="Kembali ke daftar chat">
+                                <button type="button" class="wa-icon-button md:hidden" @click="mobileChat = false; activeConv = null" aria-label="{{ __('Kembali ke daftar chat') }}">
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.8" d="M15 18l-6-6 6-6"/></svg>
                                 </button>
                                 <button type="button" class="flex min-w-0 flex-1 items-center gap-3 text-left" @click="contactPanel = true">
@@ -432,13 +432,13 @@
                                     </span>
                                 </button>
                                 <div class="flex items-center gap-0.5">
-                                    <button type="button" class="wa-icon-button" @click="messageSearchOpen = !messageSearchOpen; $nextTick(() => messageSearchOpen && $refs.messageSearch?.focus())" aria-label="Cari dalam chat">
+                                    <button type="button" class="wa-icon-button" @click="messageSearchOpen = !messageSearchOpen; $nextTick(() => messageSearchOpen && $refs.messageSearch?.focus())" aria-label="{{ __('Cari dalam chat') }}">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M16 16l5 5"/></svg>
                                     </button>
-                                    <button type="button" class="wa-icon-button" @click="contactPanel = true" aria-label="Info kontak">
+                                    <button type="button" class="wa-icon-button" @click="contactPanel = true" aria-label="{{ __('Info kontak') }}">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M12 10.5v5M12 7.5h.01"/></svg>
                                     </button>
-                                    <button type="button" class="wa-icon-button" @click="chatMenu = !chatMenu" aria-label="Menu chat">
+                                    <button type="button" class="wa-icon-button" @click="chatMenu = !chatMenu" aria-label="{{ __('Menu chat') }}">
                                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
                                     </button>
                                     @can('manage-marketing')
@@ -448,38 +448,38 @@
                             </div>
 
                             <div x-show="chatMenu" @click.away="chatMenu = false" class="wa-context-menu" style="right:12px;top:55px;left:auto" x-transition>
-                                <button type="button" class="wa-menu-item" @click="contactPanel = true; chatMenu = false"><span>ⓘ</span><span>Info kontak</span></button>
-                                <button type="button" class="wa-menu-item" @click="messageSearchOpen = true; chatMenu = false; $nextTick(() => $refs.messageSearch?.focus())"><span>⌕</span><span>Cari</span></button>
-                                <button type="button" class="wa-menu-item" @click="togglePreference(activeConv, 'is_muted'); chatMenu = false"><span>⌁</span><span x-text="activeConv.is_muted ? 'Bunyikan notifikasi' : 'Bisukan notifikasi'"></span></button>
-                                <button type="button" class="wa-menu-item" @click="togglePreference(activeConv, 'is_archived'); chatMenu = false"><span>⌄</span><span x-text="activeConv.is_archived ? 'Keluarkan dari arsip' : 'Arsipkan chat'"></span></button>
-                                <button type="button" class="wa-menu-item" @click="markConversation(activeConv, activeConv.unread > 0); chatMenu = false"><span>✓</span><span x-text="activeConv.unread > 0 ? 'Tandai dibaca' : 'Tandai belum dibaca'"></span></button>
-                                <button type="button" class="wa-menu-item" disabled title="Clear messages belum didukung backend">⌫ <span>Bersihkan pesan</span></button>
-                                <button type="button" class="wa-menu-item" disabled title="Export chat belum didukung backend">⇩ <span>Ekspor chat</span></button>
+                                <button type="button" class="wa-menu-item" @click="contactPanel = true; chatMenu = false"><span>ⓘ</span><span>{{ __('Info kontak') }}</span></button>
+                                <button type="button" class="wa-menu-item" @click="messageSearchOpen = true; chatMenu = false; $nextTick(() => $refs.messageSearch?.focus())"><span>⌕</span><span>{{ __('Cari') }}</span></button>
+                                <button type="button" class="wa-menu-item" @click="togglePreference(activeConv, 'is_muted'); chatMenu = false"><span>⌁</span><span x-text="activeConv.is_muted ? '{{ __('Bunyikan notifikasi') }}' : '{{ __('Bisukan notifikasi') }}'"></span></button>
+                                <button type="button" class="wa-menu-item" @click="togglePreference(activeConv, 'is_archived'); chatMenu = false"><span>⌄</span><span x-text="activeConv.is_archived ? '{{ __('Keluarkan dari arsip') }}' : '{{ __('Arsipkan chat') }}'"></span></button>
+                                <button type="button" class="wa-menu-item" @click="markConversation(activeConv, activeConv.unread > 0); chatMenu = false"><span>✓</span><span x-text="activeConv.unread > 0 ? __('Tandai dibaca') : __('Tandai belum dibaca')"></span></button>
+                                <button type="button" class="wa-menu-item" disabled title="{{ __('Clear messages belum didukung backend') }}">⌫ <span>{{ __('Bersihkan pesan') }}</span></button>
+                                <button type="button" class="wa-menu-item" disabled title="{{ __('Export chat belum didukung backend') }}">⇩ <span>{{ __('Ekspor chat') }}</span></button>
                             </div>
 
                             <div x-show="messageSearchOpen" class="wa-search-bar" x-transition>
                                 <svg class="h-4 w-4" style="color:var(--wa-muted)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M16 16l5 5"/></svg>
-                                <input x-ref="messageSearch" x-model="messageSearch" @keydown.enter.prevent="searchInChat()" type="search" placeholder="Cari pesan dalam chat">
+                                <input x-ref="messageSearch" x-model="messageSearch" @keydown.enter.prevent="searchInChat()" type="search" placeholder="{{ __('Cari pesan dalam chat') }}">
                                 <span class="whitespace-nowrap text-[11px]" style="color:var(--wa-muted)" x-text="messageSearchResultText"></span>
-                                <button type="button" class="wa-icon-button !h-8 !w-8" @click="clearMessageSearch()" aria-label="Tutup pencarian">×</button>
+                                <button type="button" class="wa-icon-button !h-8 !w-8" @click="clearMessageSearch()" aria-label="{{ __('Tutup pencarian') }}">×</button>
                             </div>
 
                             <div x-show="selectedMessages.length" class="wa-selection-bar" x-transition>
-                                <button type="button" class="wa-icon-button !h-8 !w-8" @click="selectedMessages = []" aria-label="Batalkan pilihan">×</button>
+                                <button type="button" class="wa-icon-button !h-8 !w-8" @click="selectedMessages = []" aria-label="{{ __('Batalkan pilihan') }}">×</button>
                                 <span class="flex-1 text-sm" style="color:var(--wa-ink)" x-text="selectedMessages.length + ' pesan dipilih'"></span>
-                                <button type="button" class="wa-icon-button !h-8 !w-8" @click="copySelectedMessages()" aria-label="Salin pesan terpilih">
+                                <button type="button" class="wa-icon-button !h-8 !w-8" @click="copySelectedMessages()" aria-label="{{ __('Salin pesan terpilih') }}">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="11" height="13" x="4" y="3" rx="1.5" stroke-width="1.6"/><path stroke-width="1.6" d="M8 7h9a2 2 0 012 2v10a2 2 0 01-2 2H10a2 2 0 01-2-2V7z"/></svg>
                                 </button>
                             </div>
 
                             <div x-ref="messageArea" class="wa-messages" @scroll="handleMessageScroll($event)">
-                                <div x-show="loadingOlder" class="py-2 text-center text-xs" style="color:var(--wa-muted)">Memuat pesan sebelumnya...</div>
-                                <button x-show="hasMore && !loadingMessages && !messageSearchActive" type="button" class="mx-auto mb-3 block rounded-full px-3 py-1 text-xs" style="background:var(--wa-surface);color:var(--wa-muted)" @click="loadOlder()">Muat pesan sebelumnya</button>
+                                <div x-show="loadingOlder" class="py-2 text-center text-xs" style="color:var(--wa-muted)">{{ __('Memuat pesan sebelumnya...') }}</div>
+                                <button x-show="hasMore && !loadingMessages && !messageSearchActive" type="button" class="mx-auto mb-3 block rounded-full px-3 py-1 text-xs" style="background:var(--wa-surface);color:var(--wa-muted)" @click="loadOlder()">{{ __('Muat pesan sebelumnya') }}</button>
                                 <template x-if="loadingMessages && messages.length === 0">
                                     <div class="space-y-2 py-4"><div class="mx-auto h-8 w-32 rounded-lg" style="background:var(--wa-surface)"></div><div class="ml-auto h-14 w-48 rounded-lg" style="background:var(--wa-out)"></div><div class="h-12 w-44 rounded-lg" style="background:var(--wa-surface)"></div></div>
                                 </template>
                                 <template x-if="!loadingMessages && displayMessages.length === 0">
-                                    <div class="flex h-full min-h-[260px] items-center justify-center text-center"><div><p class="text-sm font-medium" style="color:var(--wa-ink)" x-text="messageSearchActive ? 'Pesan tidak ditemukan' : 'Belum ada pesan' "></p><p class="mt-1 text-xs" style="color:var(--wa-muted)" x-text="messageSearchActive ? 'Coba kata kunci lain.' : 'Kirim pesan pertama untuk memulai percakapan.'"></p></div></div>
+                                    <div class="flex h-full min-h-[260px] items-center justify-center text-center"><div><p class="text-sm font-medium" style="color:var(--wa-ink)" x-text="messageSearchActive ? '{{ __('Pesan tidak ditemukan') }}' : '{{ __('Belum ada pesan') }}' "></p><p class="mt-1 text-xs" style="color:var(--wa-muted)" x-text="messageSearchActive ? '{{ __('Coba kata kunci lain.') }}' : '{{ __('Kirim pesan pertama untuk memulai percakapan.') }}'"></p></div></div>
                                 </template>
                                 <template x-for="(msg, index) in displayMessages" :key="msg.id">
                                     <div>
@@ -499,49 +499,49 @@
 
                             <div class="wa-composer-wrap">
                                 <div x-show="replyTo" class="mb-2 flex items-center gap-2 rounded-lg px-3 py-2 text-xs" style="background:var(--wa-surface);border-left:3px solid var(--wa-green)" x-transition>
-                                    <span class="min-w-0 flex-1"><span class="block font-semibold" style="color:var(--wa-green)" x-text="replyTo?.direction === 'outbound' ? 'Pesan Anda' : conversationName(activeConv)"></span><span class="block truncate" style="color:var(--wa-muted)" x-text="replyTo?.message_body"></span></span>
-                                    <button type="button" class="wa-icon-button !h-7 !w-7" @click="replyTo = null" aria-label="Batal membalas">×</button>
+                                    <span class="min-w-0 flex-1"><span class="block font-semibold" style="color:var(--wa-green)" x-text="replyTo?.direction === 'outbound' ? '{{ __('Pesan Anda') }}' : conversationName(activeConv)"></span><span class="block truncate" style="color:var(--wa-muted)" x-text="replyTo?.message_body"></span></span>
+                                    <button type="button" class="wa-icon-button !h-7 !w-7" @click="replyTo = null" aria-label="{{ __('Batal membalas') }}">×</button>
                                 </div>
                                 <div x-show="attachmentName" class="mb-2 flex items-center gap-2 rounded-lg px-3 py-2 text-xs" style="background:var(--wa-notice)" x-transition>
                                     <span class="min-w-0 flex-1 truncate" x-text="attachmentName"></span>
-                                    <button type="button" class="font-semibold" @click="clearAttachment()">Hapus</button>
+                                    <button type="button" class="font-semibold" @click="clearAttachment()">{{ __('Hapus') }}</button>
                                 </div>
                                 <div x-show="emojiOpen" class="wa-popover" x-transition>
-                                    <div class="mb-2 flex items-center justify-between"><span class="text-xs font-semibold" style="color:var(--wa-ink)">Emoji</span><button type="button" class="text-xs" style="color:var(--wa-muted)" @click="emojiOpen = false">Tutup</button></div>
+                                    <div class="mb-2 flex items-center justify-between"><span class="text-xs font-semibold" style="color:var(--wa-ink)">Emoji</span><button type="button" class="text-xs" style="color:var(--wa-muted)" @click="emojiOpen = false">{{ __('Tutup') }}</button></div>
                                     <div class="wa-emoji-grid"><template x-for="emoji in emojis" :key="emoji"><button type="button" @click="reply += emoji"> <span x-text="emoji"></span></button></template></div>
                                 </div>
                                 <div x-show="attachmentPanel" class="wa-popover" x-transition>
-                                    <p class="mb-2 text-xs font-semibold" style="color:var(--wa-ink)">Lampiran</p>
+                                    <p class="mb-2 text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Lampiran') }}</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <button type="button" class="wa-secondary" @click="openFilePicker('image/*,video/*')">Foto / Video</button>
-                                        <button type="button" class="wa-secondary" @click="openFilePicker('.pdf,.doc,.docx,.xls,.xlsx,.txt')">Dokumen</button>
+                                        <button type="button" class="wa-secondary" @click="openFilePicker('image/*,video/*')">{{ __('Foto / Video') }}</button>
+                                        <button type="button" class="wa-secondary" @click="openFilePicker('.pdf,.doc,.docx,.xls,.xlsx,.txt')">{{ __('Dokumen') }}</button>
                                         <button type="button" class="wa-secondary" disabled>Audio</button>
-                                        <button type="button" class="wa-secondary" disabled>Kontak</button>
+                                        <button type="button" class="wa-secondary" disabled>{{ __('Kontak') }}</button>
                                     </div>
-                                    <p class="mt-2 text-[11px] leading-relaxed" style="color:var(--wa-muted)">Gateway aktif saat ini hanya menyediakan pesan teks. Pilihan file disiapkan di UI, tetapi tidak akan dikirim sebelum endpoint media tersedia.</p>
+                                    <p class="mt-2 text-[11px] leading-relaxed" style="color:var(--wa-muted)">{{ __('Gateway aktif saat ini hanya menyediakan pesan teks. Pilihan file disiapkan di UI, tetapi tidak akan dikirim sebelum endpoint media tersedia.') }}</p>
                                 </div>
                                 <input x-ref="fileInput" type="file" class="hidden" @change="handleAttachment($event)">
                                 <div class="wa-composer">
                                     <button type="button" class="wa-icon-button" @click="emojiOpen = !emojiOpen; attachmentPanel = false" aria-label="Emoji"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" stroke-width="1.7"/><path stroke-linecap="round" stroke-width="1.7" d="M8.5 14.2a4.4 4.4 0 007 0M9 9.5h.01M15 9.5h.01"/></svg></button>
-                                    <button type="button" class="wa-icon-button" @click="attachmentPanel = !attachmentPanel; emojiOpen = false" aria-label="Lampiran"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.8" d="M8.5 12.5l5.2-5.2a3 3 0 114.2 4.2l-6.8 6.8a4.5 4.5 0 11-6.4-6.4l7.1-7.1"/></svg></button>
-                                    <textarea x-model="reply" class="wa-composer-input" rows="1" placeholder="Ketik pesan" @keydown="handleComposerKeydown($event)" @input="resizeComposer($event)"></textarea>
-                                    <button type="button" class="wa-icon-button" disabled aria-label="Pesan suara" title="Pesan suara belum didukung gateway"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" stroke-width="1.7"/><path stroke-linecap="round" stroke-width="1.7" d="M6.5 11a5.5 5.5 0 0011 0M12 16.5V21M9.5 21h5"/></svg></button>
-                                    <button type="button" class="wa-send" @click="sendReply()" :disabled="!canSend" aria-label="Kirim pesan"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4l16 8-16 8 3-8-3-8zm3 8h13"/></svg></button>
+                                    <button type="button" class="wa-icon-button" @click="attachmentPanel = !attachmentPanel; emojiOpen = false" aria-label="{{ __('Lampiran') }}"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.8" d="M8.5 12.5l5.2-5.2a3 3 0 114.2 4.2l-6.8 6.8a4.5 4.5 0 11-6.4-6.4l7.1-7.1"/></svg></button>
+                                    <textarea x-model="reply" class="wa-composer-input" rows="1" placeholder="{{ __('Ketik pesan') }}" @keydown="handleComposerKeydown($event)" @input="resizeComposer($event)"></textarea>
+                                    <button type="button" class="wa-icon-button" disabled aria-label="{{ __('Pesan suara') }}" title="{{ __('Pesan suara belum didukung gateway') }}"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" stroke-width="1.7"/><path stroke-linecap="round" stroke-width="1.7" d="M6.5 11a5.5 5.5 0 0011 0M12 16.5V21M9.5 21h5"/></svg></button>
+                                    <button type="button" class="wa-send" @click="sendReply()" :disabled="!canSend" aria-label="{{ __('Kirim pesan') }}"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4l16 8-16 8 3-8-3-8zm3 8h13"/></svg></button>
                                 </div>
-                                <p x-show="!canManage" class="mt-1 text-center text-[11px]" style="color:var(--wa-muted)">Mode baca. Anda tidak memiliki izin untuk mengirim pesan.</p>
-                                <p x-show="attachmentName" class="mt-1 text-center text-[11px]" style="color:#866b11">Lampiran belum dikirim karena gateway saat ini hanya mendukung teks.</p>
+                                <p x-show="!canManage" class="mt-1 text-center text-[11px]" style="color:var(--wa-muted)">{{ __('Mode baca. Anda tidak memiliki izin untuk mengirim pesan.') }}</p>
+                                <p x-show="attachmentName" class="mt-1 text-center text-[11px]" style="color:#866b11">{{ __('Lampiran belum dikirim karena gateway saat ini hanya mendukung teks.') }}</p>
                             </div>
                         </div>
                     </template>
                 </div>
             </template>
 
-            <template x-if="view === 'status'"><div class="wa-panel"><div class="wa-panel-head"><div><h2 class="wa-panel-title">Status</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">Pembaruan status dari kontak WhatsApp.</p></div><button type="button" class="wa-icon-button" @click="view = 'chats'; mobileChat = false" aria-label="Tutup status">×</button></div><div class="wa-panel-body"><div class="wa-settings-section"><div class="flex items-center gap-3 p-4"><span class="wa-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span><span class="min-w-0 flex-1"><span class="block text-sm font-semibold" style="color:var(--wa-ink)">Status saya</span><span class="block text-xs" style="color:var(--wa-muted)">Tambahkan pembaruan status</span></span><button type="button" class="wa-icon-button" disabled title="Status belum didukung gateway">＋</button></div></div><div class="wa-settings-section p-6 text-center"><svg class="mx-auto mb-3 h-9 w-9" style="color:var(--wa-muted)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.6"/><path stroke-linecap="round" stroke-width="1.6" d="M12 8v4l2.5 2.5"/></svg><p class="text-sm font-medium" style="color:var(--wa-ink)">Status belum tersedia</p><p class="mx-auto mt-1 max-w-sm text-xs leading-relaxed" style="color:var(--wa-muted)">Gateway WhatsApp yang terhubung saat ini tidak menyediakan API status/story. UI ini tidak menampilkan data contoh.</p></div></div></div></template>
+            <template x-if="view === 'status'"><div class="wa-panel"><div class="wa-panel-head"><div><h2 class="wa-panel-title">Status</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Pembaruan status dari kontak WhatsApp.') }}</p></div><button type="button" class="wa-icon-button" @click="view = 'chats'; mobileChat = false" aria-label="{{ __('Tutup status') }}">×</button></div><div class="wa-panel-body"><div class="wa-settings-section"><div class="flex items-center gap-3 p-4"><span class="wa-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span><span class="min-w-0 flex-1"><span class="block text-sm font-semibold" style="color:var(--wa-ink)">{{ __('Status saya') }}</span><span class="block text-xs" style="color:var(--wa-muted)">{{ __('Tambahkan pembaruan status') }}</span></span><button type="button" class="wa-icon-button" disabled title="{{ __('Status belum didukung gateway') }}">＋</button></div></div><div class="wa-settings-section p-6 text-center"><svg class="mx-auto mb-3 h-9 w-9" style="color:var(--wa-muted)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.6"/><path stroke-linecap="round" stroke-width="1.6" d="M12 8v4l2.5 2.5"/></svg><p class="text-sm font-medium" style="color:var(--wa-ink)">{{ __('Status belum tersedia') }}</p><p class="mx-auto mt-1 max-w-sm text-xs leading-relaxed" style="color:var(--wa-muted)">{{ __('Gateway WhatsApp yang terhubung saat ini tidak menyediakan API status/story. UI ini tidak menampilkan data contoh.') }}</p></div></div></div></template>
 
-            <template x-if="view === 'settings'"><div class="wa-panel"><div class="wa-panel-head"><div><h2 class="wa-panel-title">Pengaturan</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">Preferensi pengalaman WhatsApp Center di perangkat ini.</p></div><button type="button" class="wa-icon-button" @click="view = 'chats'; mobileChat = false" aria-label="Tutup pengaturan">×</button></div><div class="wa-panel-body"><div class="mb-4 flex items-center gap-3 rounded-xl p-4" style="background:var(--wa-sidebar)"><span class="wa-avatar wa-avatar-large">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span><div><p class="text-lg font-semibold" style="color:var(--wa-ink)">{{ auth()->user()->name }}</p><p class="text-sm" style="color:var(--wa-muted)">{{ auth()->user()->email }}</p><a href="{{ route('profile.edit') }}" class="mt-2 inline-block text-xs font-semibold" style="color:var(--wa-green-deep)">Edit profil akun</a></div></div><div class="wa-settings-section"><div class="wa-settings-row"><span><span class="block font-semibold">Chat</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">Pengaturan percakapan</span></span><span style="color:var(--wa-muted)">›</span></div><button type="button" class="wa-settings-row w-full text-left" @click="settings.enterToSend = !settings.enterToSend; persistSettings()"><span><span class="block">Enter untuk mengirim</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">Shift + Enter tetap membuat baris baru</span></span><span class="wa-toggle" :class="settings.enterToSend ? 'is-on' : ''"></span></button><button type="button" class="wa-settings-row w-full text-left" @click="settings.mediaVisibility = !settings.mediaVisibility; persistSettings()"><span><span class="block">Tampilkan media</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">Preferensi lokal browser</span></span><span class="wa-toggle" :class="settings.mediaVisibility ? 'is-on' : ''"></span></button></div><div class="wa-settings-section"><div class="wa-settings-row"><span><span class="block font-semibold">Notifikasi</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">Notifikasi browser untuk pesan baru</span></span><button type="button" class="wa-secondary !min-h-[32px] !px-3 !text-xs" @click="requestNotifications()" x-text="notificationPermission === 'granted' ? 'Aktif' : 'Izinkan'"></button></div><button type="button" class="wa-settings-row w-full text-left" @click="settings.notificationSound = !settings.notificationSound; persistSettings()"><span><span class="block">Suara notifikasi</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">Mainkan suara saat ada notifikasi baru</span></span><span class="wa-toggle" :class="settings.notificationSound ? 'is-on' : ''"></span></button></div><div class="wa-settings-section"><div class="wa-settings-row"><span><span class="block font-semibold">Privasi</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">Pengaturan ini mengikuti akun WhatsApp provider</span></span><span class="text-xs" style="color:var(--wa-muted)">Provider</span></div><div class="wa-settings-row"><span>Read receipts</span><span class="text-xs" style="color:var(--wa-muted)">Dikelola gateway</span></div><div class="wa-settings-row"><span>Kontak diblokir</span><span class="text-xs" style="color:var(--wa-muted)">Belum tersedia</span></div></div><div class="wa-settings-section"><div class="wa-settings-row"><span><span class="block font-semibold">Akun WhatsApp</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">Pilih nomor aktif dari sidebar untuk mengganti akun.</span></span><span class="text-xs" style="color:var(--wa-green)" x-text="accounts.length + ' akun'"></span></div></div>@if(auth()->user()->hasRole('super-admin') || auth()->user()->hasPermissionTo('manage-sales-leads'))<div class="wa-settings-section"><div class="p-4"><p class="text-sm font-semibold" style="color:var(--wa-ink)">Kredensial gateway</p><p class="mt-1 text-xs leading-relaxed" style="color:var(--wa-muted)">Pengaturan teknis tetap memakai endpoint yang sama dan hanya terlihat oleh pengelola.</p></div>@foreach($accounts as $account)<form method="POST" action="{{ route('whatsapp-center.credentials', $account) }}" class="border-t p-4" style="border-color:var(--wa-line)">@csrf @method('PUT')<div class="mb-2 flex items-center justify-between"><span class="text-xs font-semibold" style="color:var(--wa-ink)">{{ $account->name }}</span><span class="text-[11px]" style="color:var(--wa-muted)">{{ $account->gateway_status ?: 'belum dikonfigurasi' }}</span></div><div class="grid gap-2 sm:grid-cols-[1fr_1fr_auto]"><input name="gateway_instance" value="{{ $account->gateway_instance }}" placeholder="IdInstance" class="wa-field"><input type="password" name="gateway_token" value="{{ $account->gateway_token }}" placeholder="ApiTokenInstance" class="wa-field"><button type="submit" class="wa-primary">Simpan</button></div></form>@endforeach</div>@endif<div class="mt-5 flex items-center gap-2 text-xs" style="color:var(--wa-muted)"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.6"/><path stroke-linecap="round" stroke-width="1.6" d="M9.5 9a2.5 2.5 0 015 0c0 1.7-2.5 2-2.5 3.5M12 16h.01"/></svg><span>Fitur media, status, reactions, dan panggilan memerlukan dukungan gateway tambahan.</span></div></div></div></template>
+            <template x-if="view === 'settings'"><div class="wa-panel"><div class="wa-panel-head"><div><h2 class="wa-panel-title">{{ __('Pengaturan') }}</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Preferensi pengalaman WhatsApp Center di perangkat ini.') }}</p></div><button type="button" class="wa-icon-button" @click="view = 'chats'; mobileChat = false" aria-label="{{ __('Tutup pengaturan') }}">×</button></div><div class="wa-panel-body"><div class="mb-4 flex items-center gap-3 rounded-xl p-4" style="background:var(--wa-sidebar)"><span class="wa-avatar wa-avatar-large">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span><div><p class="text-lg font-semibold" style="color:var(--wa-ink)">{{ auth()->user()->name }}</p><p class="text-sm" style="color:var(--wa-muted)">{{ auth()->user()->email }}</p><a href="{{ route('profile.edit') }}" class="mt-2 inline-block text-xs font-semibold" style="color:var(--wa-green-deep)">{{ __('Edit profil akun') }}</a></div></div><div class="wa-settings-section"><div class="wa-settings-row"><span><span class="block font-semibold">Chat</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">{{ __('Pengaturan percakapan') }}</span></span><span style="color:var(--wa-muted)">›</span></div><button type="button" class="wa-settings-row w-full text-left" @click="settings.enterToSend = !settings.enterToSend; persistSettings()"><span><span class="block">{{ __('Enter untuk mengirim') }}</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">{{ __('Shift + Enter tetap membuat baris baru') }}</span></span><span class="wa-toggle" :class="settings.enterToSend ? 'is-on' : ''"></span></button><button type="button" class="wa-settings-row w-full text-left" @click="settings.mediaVisibility = !settings.mediaVisibility; persistSettings()"><span><span class="block">{{ __('Tampilkan media') }}</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">{{ __('Preferensi lokal browser') }}</span></span><span class="wa-toggle" :class="settings.mediaVisibility ? 'is-on' : ''"></span></button></div><div class="wa-settings-section"><div class="wa-settings-row"><span><span class="block font-semibold">{{ __('Notifikasi') }}</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">{{ __('Notifikasi browser untuk pesan baru') }}</span></span><button type="button" class="wa-secondary !min-h-[32px] !px-3 !text-xs" @click="requestNotifications()" x-text="notificationPermission === 'granted' ? '{{ __('Aktif') }}' : '{{ __('Izinkan') }}'"></button></div><button type="button" class="wa-settings-row w-full text-left" @click="settings.notificationSound = !settings.notificationSound; persistSettings()"><span><span class="block">{{ __('Suara notifikasi') }}</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">{{ __('Mainkan suara saat ada notifikasi baru') }}</span></span><span class="wa-toggle" :class="settings.notificationSound ? 'is-on' : ''"></span></button></div><div class="wa-settings-section"><div class="wa-settings-row"><span><span class="block font-semibold">{{ __('Privasi') }}</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">{{ __('Pengaturan ini mengikuti akun WhatsApp provider') }}</span></span><span class="text-xs" style="color:var(--wa-muted)">Provider</span></div><div class="wa-settings-row"><span>Read receipts</span><span class="text-xs" style="color:var(--wa-muted)">{{ __('Dikelola gateway') }}</span></div><div class="wa-settings-row"><span>{{ __('Kontak diblokir') }}</span><span class="text-xs" style="color:var(--wa-muted)">{{ __('Belum tersedia') }}</span></div></div><div class="wa-settings-section"><div class="wa-settings-row"><span><span class="block font-semibold">{{ __('Akun WhatsApp') }}</span><span class="mt-1 block text-xs" style="color:var(--wa-muted)">{{ __('Pilih nomor aktif dari sidebar untuk mengganti akun.') }}</span></span><span class="text-xs" style="color:var(--wa-green)" x-text="accounts.length + ' akun'"></span></div></div>@if(auth()->user()->hasRole('super-admin') || auth()->user()->hasPermissionTo('manage-sales-leads'))<div class="wa-settings-section"><div class="p-4"><p class="text-sm font-semibold" style="color:var(--wa-ink)">{{ __('Kredensial gateway') }}</p><p class="mt-1 text-xs leading-relaxed" style="color:var(--wa-muted)">{{ __('Pengaturan teknis tetap memakai endpoint yang sama dan hanya terlihat oleh pengelola.') }}</p></div>@foreach($accounts as $account)<form method="POST" action="{{ route('whatsapp-center.credentials', $account) }}" class="border-t p-4" style="border-color:var(--wa-line)">@csrf @method('PUT')<div class="mb-2 flex items-center justify-between"><span class="text-xs font-semibold" style="color:var(--wa-ink)">{{ $account->name }}</span><span class="text-[11px]" style="color:var(--wa-muted)">{{ $account->gateway_status ?: __('belum dikonfigurasi') }}</span></div><div class="grid gap-2 sm:grid-cols-[1fr_1fr_auto]"><input name="gateway_instance" value="{{ $account->gateway_instance }}" placeholder="IdInstance" class="wa-field"><input type="password" name="gateway_token" value="{{ $account->gateway_token }}" placeholder="ApiTokenInstance" class="wa-field"><button type="submit" class="wa-primary">{{ __('Simpan') }}</button></div></form>@endforeach</div>@endif<div class="mt-5 flex items-center gap-2 text-xs" style="color:var(--wa-muted)"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.6"/><path stroke-linecap="round" stroke-width="1.6" d="M9.5 9a2.5 2.5 0 015 0c0 1.7-2.5 2-2.5 3.5M12 16h.01"/></svg><span>{{ __('Fitur media, status, reactions, dan panggilan memerlukan dukungan gateway tambahan.') }}</span></div></div></div></template>
 
             <div x-show="contactPanel && activeConv" class="wa-info-panel" x-transition>
-                <div class="wa-info-head"><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactPanel = false" aria-label="Tutup info kontak"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.8" d="M15 18l-6-6 6-6"/></svg></button><span class="text-sm font-semibold" style="color:var(--wa-ink)">Info kontak</span></div><div class="flex flex-col items-center px-5 py-7 text-center"><span class="wa-avatar wa-avatar-large" x-text="initials(conversationName(activeConv))"></span><h3 class="mt-3 text-lg font-semibold" style="color:var(--wa-ink)" x-text="conversationName(activeConv)"></h3><p class="mt-1 text-sm" style="color:var(--wa-muted)" x-text="activeConv?.sender_number"></p><div class="mt-4 flex gap-2"><button x-show="canManage" type="button" class="wa-secondary !min-h-[34px] !px-3 !text-xs" @click="openContactModal()" x-text="activeConv?.customer ? 'Edit kontak' : 'Simpan kontak'"></button><a x-show="activeConv?.customer" :href="activeConv.customer?.url || '{{ route('customers.index') }}'" class="wa-secondary !min-h-[34px] !px-3 !text-xs">Buka customer</a></div></div><div class="wa-info-section"><p class="wa-info-label">Nomor WhatsApp</p><p class="wa-info-value mt-1" x-text="activeConv?.sender_number"></p></div><div class="wa-info-section"><p class="wa-info-label">Tentang</p><p class="wa-info-value mt-1 whitespace-pre-wrap" x-text="activeConv?.customer?.notes || 'Belum ada catatan kontak.'"></p></div><div class="wa-info-section"><p class="wa-info-label">Chat</p><div class="mt-3 grid grid-cols-2 gap-2"><button type="button" class="wa-secondary !min-h-[34px] !px-2 !text-xs" @click="togglePreference(activeConv, 'is_muted')" x-text="activeConv?.is_muted ? 'Bunyikan' : 'Bisukan'"></button><button type="button" class="wa-secondary !min-h-[34px] !px-2 !text-xs" @click="togglePreference(activeConv, 'is_archived')" x-text="activeConv?.is_archived ? 'Keluarkan arsip' : 'Arsipkan'"></button></div></div><div class="wa-info-section"><p class="wa-info-label">Media, link, dan dokumen</p><p class="mt-1 text-xs leading-relaxed" style="color:var(--wa-muted)">Belum dapat ditampilkan karena gateway hanya mengirim pesan teks.</p></div></div>
+                <div class="wa-info-head"><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactPanel = false" aria-label="{{ __('Tutup info kontak') }}"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-width="1.8" d="M15 18l-6-6 6-6"/></svg></button><span class="text-sm font-semibold" style="color:var(--wa-ink)">{{ __('Info kontak') }}</span></div><div class="flex flex-col items-center px-5 py-7 text-center"><span class="wa-avatar wa-avatar-large" x-text="initials(conversationName(activeConv))"></span><h3 class="mt-3 text-lg font-semibold" style="color:var(--wa-ink)" x-text="conversationName(activeConv)"></h3><p class="mt-1 text-sm" style="color:var(--wa-muted)" x-text="activeConv?.sender_number"></p><div class="mt-4 flex gap-2"><button x-show="canManage" type="button" class="wa-secondary !min-h-[34px] !px-3 !text-xs" @click="openContactModal()" x-text="activeConv?.customer ? '{{ __('Edit kontak') }}' : '{{ __('Simpan kontak') }}'"></button><a x-show="activeConv?.customer" :href="activeConv.customer?.url || '{{ route('customers.index') }}'" class="wa-secondary !min-h-[34px] !px-3 !text-xs">{{ __('Buka customer') }}</a></div></div><div class="wa-info-section"><p class="wa-info-label">{{ __('Nomor WhatsApp') }}</p><p class="wa-info-value mt-1" x-text="activeConv?.sender_number"></p></div><div class="wa-info-section"><p class="wa-info-label">{{ __('Tentang') }}</p><p class="wa-info-value mt-1 whitespace-pre-wrap" x-text="activeConv?.customer?.notes || '{{ __('Belum ada catatan kontak.') }}'"></p></div><div class="wa-info-section"><p class="wa-info-label">Chat</p><div class="mt-3 grid grid-cols-2 gap-2"><button type="button" class="wa-secondary !min-h-[34px] !px-2 !text-xs" @click="togglePreference(activeConv, 'is_muted')" x-text="activeConv?.is_muted ? '{{ __('Bunyikan') }}' : '{{ __('Bisukan') }}'"></button><button type="button" class="wa-secondary !min-h-[34px] !px-2 !text-xs" @click="togglePreference(activeConv, 'is_archived')" x-text="activeConv?.is_archived ? '{{ __('Keluarkan arsip') }}' : '{{ __('Arsipkan') }}'"></button></div></div><div class="wa-info-section"><p class="wa-info-label">{{ __('Media, link, dan dokumen') }}</p><p class="mt-1 text-xs leading-relaxed" style="color:var(--wa-muted)">{{ __('Belum dapat ditampilkan karena gateway hanya mengirim pesan teks.') }}</p></div></div>
         </section>
     </div>
 
@@ -550,35 +550,35 @@
     </div>
 
     <div x-show="contextMenu.open" @click.away="contextMenu.open = false" class="wa-context-menu" :style="`left:${contextMenu.x}px;top:${contextMenu.y}px`" x-transition>
-        <button type="button" class="wa-menu-item" @click="togglePreference(contextMenu.conversation, 'is_pinned'); contextMenu.open = false"><span>📌</span><span x-text="contextMenu.conversation?.is_pinned ? 'Lepas sematan' : 'Sematkan chat'"></span></button>
-        <button type="button" class="wa-menu-item" @click="togglePreference(contextMenu.conversation, 'is_muted'); contextMenu.open = false"><span>⌁</span><span x-text="contextMenu.conversation?.is_muted ? 'Bunyikan notifikasi' : 'Bisukan notifikasi'"></span></button>
-        <button type="button" class="wa-menu-item" @click="togglePreference(contextMenu.conversation, 'is_archived'); contextMenu.open = false"><span>⌄</span><span x-text="contextMenu.conversation?.is_archived ? 'Keluarkan dari arsip' : 'Arsipkan chat'"></span></button>
-        <button type="button" class="wa-menu-item" @click="markConversation(contextMenu.conversation, contextMenu.conversation?.unread > 0); contextMenu.open = false"><span>✓</span><span x-text="contextMenu.conversation?.unread > 0 ? 'Tandai dibaca' : 'Tandai belum dibaca'"></span></button>
-        <button type="button" class="wa-menu-item" @click="openContactPanelFor(contextMenu.conversation); contextMenu.open = false"><span>ⓘ</span><span>Info kontak</span></button>
+        <button type="button" class="wa-menu-item" @click="togglePreference(contextMenu.conversation, 'is_pinned'); contextMenu.open = false"><span>📌</span><span x-text="contextMenu.conversation?.is_pinned ? '{{ __('Lepas sematan') }}' : '{{ __('Sematkan chat') }}'"></span></button>
+        <button type="button" class="wa-menu-item" @click="togglePreference(contextMenu.conversation, 'is_muted'); contextMenu.open = false"><span>⌁</span><span x-text="contextMenu.conversation?.is_muted ? '{{ __('Bunyikan notifikasi') }}' : '{{ __('Bisukan notifikasi') }}'"></span></button>
+        <button type="button" class="wa-menu-item" @click="togglePreference(contextMenu.conversation, 'is_archived'); contextMenu.open = false"><span>⌄</span><span x-text="contextMenu.conversation?.is_archived ? '{{ __('Keluarkan dari arsip') }}' : '{{ __('Arsipkan chat') }}'"></span></button>
+        <button type="button" class="wa-menu-item" @click="markConversation(contextMenu.conversation, contextMenu.conversation?.unread > 0); contextMenu.open = false"><span>✓</span><span x-text="contextMenu.conversation?.unread > 0 ? __('Tandai dibaca') : __('Tandai belum dibaca')"></span></button>
+        <button type="button" class="wa-menu-item" @click="openContactPanelFor(contextMenu.conversation); contextMenu.open = false"><span>ⓘ</span><span>{{ __('Info kontak') }}</span></button>
     </div>
 
     <div x-show="messageMenu.open" @click.away="messageMenu.open = false" class="wa-context-menu" :style="`left:${messageMenu.x}px;top:${messageMenu.y}px`" x-transition>
-        <button type="button" class="wa-menu-item" @click="copyMessage(messageMenu.message); messageMenu.open = false"><span>⧉</span><span>Salin</span></button>
-        <button type="button" class="wa-menu-item" @click="toggleMessageSelection(messageMenu.message); messageMenu.open = false"><span>✓</span><span>Pilih</span></button>
-        <button type="button" class="wa-menu-item" disabled title="Reply terstruktur belum didukung gateway"><span>↩</span><span>Balas</span></button>
-        <button type="button" class="wa-menu-item" disabled title="Forward belum didukung gateway"><span>↗</span><span>Teruskan</span></button>
-        <button type="button" class="wa-menu-item" disabled title="Reaksi belum didukung gateway"><span>☺</span><span>Reaksi</span></button>
-        <button type="button" class="wa-menu-item" disabled title="Penghapusan pesan belum didukung gateway"><span>⌫</span><span>Hapus</span></button>
+        <button type="button" class="wa-menu-item" @click="copyMessage(messageMenu.message); messageMenu.open = false"><span>⧉</span><span>{{ __('Salin') }}</span></button>
+        <button type="button" class="wa-menu-item" @click="toggleMessageSelection(messageMenu.message); messageMenu.open = false"><span>✓</span><span>{{ __('Pilih') }}</span></button>
+        <button type="button" class="wa-menu-item" disabled title="{{ __('Reply terstruktur belum didukung gateway') }}"><span>↩</span><span>{{ __('Balas') }}</span></button>
+        <button type="button" class="wa-menu-item" disabled title="{{ __('Forward belum didukung gateway') }}"><span>↗</span><span>{{ __('Teruskan') }}</span></button>
+        <button type="button" class="wa-menu-item" disabled title="{{ __('Reaksi belum didukung gateway') }}"><span>☺</span><span>{{ __('Reaksi') }}</span></button>
+        <button type="button" class="wa-menu-item" disabled title="{{ __('Penghapusan pesan belum didukung gateway') }}"><span>⌫</span><span>{{ __('Hapus') }}</span></button>
     </div>
 
     <div x-show="newChatOpen" class="wa-modal-backdrop" @keydown.escape.window="newChatOpen = false" x-transition>
         <div class="wa-modal" @click.stop>
-            <div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)">Chat baru</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">Pilih customer tersimpan atau masukkan nomor WhatsApp.</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="newChatOpen = false" aria-label="Tutup">×</button></div>
-            <div class="wa-modal-body"><div class="wa-search-wrap"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M16 16l5 5"/></svg><input x-model="contactSearch" @input.debounce.300ms="loadContacts()" type="search" class="wa-field !pl-10" placeholder="Cari nama atau nomor"></div><div class="my-3 flex items-center gap-2"><input x-model="directNumber" type="text" class="wa-field" placeholder="628xxxxxxxxxx"><button type="button" class="wa-primary shrink-0" @click="startNumberChat()" :disabled="!directNumber.trim()">Chat</button></div><div class="mb-2 text-[11px] font-semibold uppercase tracking-wide" style="color:var(--wa-muted)">Kontak tersimpan</div><div class="max-h-64 overflow-y-auto rounded-lg" style="border:1px solid var(--wa-line)"><template x-if="loadingContacts"><div class="p-4 text-center text-xs" style="color:var(--wa-muted)">Mencari kontak...</div></template><template x-for="contact in contacts" :key="contact.id"><button type="button" class="flex w-full items-center gap-3 border-b px-3 py-2.5 text-left last:border-b-0" style="border-color:var(--wa-line)" @click="chooseContact(contact)"><span class="wa-avatar wa-avatar-small" x-text="initials(contact.name)"></span><span class="min-w-0 flex-1"><span class="block truncate text-sm font-semibold" style="color:var(--wa-ink)" x-text="contact.name"></span><span class="block truncate text-xs" style="color:var(--wa-muted)" x-text="contact.whatsapp"></span></span><span style="color:var(--wa-muted)">›</span></button></template><template x-if="!loadingContacts && contacts.length === 0"><p class="p-5 text-center text-xs" style="color:var(--wa-muted)">Kontak dengan nomor WhatsApp tidak ditemukan.</p></template></div></div>
+            <div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)">{{ __('Chat baru') }}</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Pilih customer tersimpan atau masukkan nomor WhatsApp.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="newChatOpen = false" aria-label="{{ __('Tutup') }}">×</button></div>
+            <div class="wa-modal-body"><div class="wa-search-wrap"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8" stroke-width="1.8"/><path stroke-linecap="round" stroke-width="1.8" d="M16 16l5 5"/></svg><input x-model="contactSearch" @input.debounce.300ms="loadContacts()" type="search" class="wa-field !pl-10" placeholder="{{ __('Cari nama atau nomor') }}"></div><div class="my-3 flex items-center gap-2"><input x-model="directNumber" type="text" class="wa-field" placeholder="628xxxxxxxxxx"><button type="button" class="wa-primary shrink-0" @click="startNumberChat()" :disabled="!directNumber.trim()">Chat</button></div><div class="mb-2 text-[11px] font-semibold uppercase tracking-wide" style="color:var(--wa-muted)">{{ __('Kontak tersimpan') }}</div><div class="max-h-64 overflow-y-auto rounded-lg" style="border:1px solid var(--wa-line)"><template x-if="loadingContacts"><div class="p-4 text-center text-xs" style="color:var(--wa-muted)">{{ __('Mencari kontak...') }}</div></template><template x-for="contact in contacts" :key="contact.id"><button type="button" class="flex w-full items-center gap-3 border-b px-3 py-2.5 text-left last:border-b-0" style="border-color:var(--wa-line)" @click="chooseContact(contact)"><span class="wa-avatar wa-avatar-small" x-text="initials(contact.name)"></span><span class="min-w-0 flex-1"><span class="block truncate text-sm font-semibold" style="color:var(--wa-ink)" x-text="contact.name"></span><span class="block truncate text-xs" style="color:var(--wa-muted)" x-text="contact.whatsapp"></span></span><span style="color:var(--wa-muted)">›</span></button></template><template x-if="!loadingContacts && contacts.length === 0"><p class="p-5 text-center text-xs" style="color:var(--wa-muted)">{{ __('Kontak dengan nomor WhatsApp tidak ditemukan.') }}</p></template></div></div>
         </div>
     </div>
 
     <div x-show="contactModal" class="wa-modal-backdrop" @keydown.escape.window="contactModal = false" x-transition>
-        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)" x-text="contactForm.customer_id ? 'Edit kontak' : 'Simpan nomor'"></h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">Data disimpan ke Customer CRM yang sudah ada.</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactModal = false" aria-label="Tutup">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="saveContact()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Nama kontak</span><input x-model="contactForm.name" required class="wa-field" maxlength="255"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Nomor WhatsApp</span><input x-model="contactForm.whatsapp" required class="wa-field" placeholder="628xxxxxxxxxx" maxlength="50"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Catatan</span><textarea x-model="contactForm.notes" class="wa-field wa-textarea" maxlength="2000" placeholder="Catatan internal"></textarea></label><p x-show="contactError" class="text-xs text-red-600" x-text="contactError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="contactModal = false">Batal</button><button type="submit" class="wa-primary" :disabled="savingContact" x-text="savingContact ? 'Menyimpan...' : 'Simpan kontak'"></button></div></form></div>
+        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)" x-text="contactForm.customer_id ? '{{ __('Edit kontak') }}' : '{{ __('Simpan nomor') }}'"></h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Data disimpan ke Customer CRM yang sudah ada.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactModal = false" aria-label="{{ __('Tutup') }}">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="saveContact()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama kontak') }}</span><input x-model="contactForm.name" required class="wa-field" maxlength="255"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nomor WhatsApp') }}</span><input x-model="contactForm.whatsapp" required class="wa-field" placeholder="628xxxxxxxxxx" maxlength="50"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Catatan') }}</span><textarea x-model="contactForm.notes" class="wa-field wa-textarea" maxlength="2000" placeholder="{{ __('Catatan internal') }}"></textarea></label><p x-show="contactError" class="text-xs text-red-600" x-text="contactError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="contactModal = false">{{ __('Batal') }}</button><button type="submit" class="wa-primary" :disabled="savingContact" x-text="savingContact ? '{{ __('Menyimpan...') }}' : '{{ __('Simpan kontak') }}'"></button></div></form></div>
     </div>
 
     <div x-show="modalOpen" class="wa-modal-backdrop" @keydown.escape.window="modalOpen = false" x-transition>
-        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)">Jadikan lead</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">Konversi percakapan ke pipeline sales.</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="modalOpen = false" aria-label="Tutup">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="convertLead()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Nama kontak</span><input x-model="convertName" required class="wa-field"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Segment</span><select x-model="convertSegment" required class="wa-field"><option value="end_user">End User</option><option value="vendor">Vendor</option><option value="system_integrator">System Integrator</option><option value="kontraktor">Kontraktor</option><option value="gov">Government</option><option value="principle">Principle</option><option value="distributor">Distributor</option><option value="other">Lainnya</option></select></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Kebutuhan</span><textarea x-model="convertNeed" class="wa-field wa-textarea" placeholder="Ringkasan kebutuhan dari chat"></textarea></label><p x-show="convertError" class="text-xs text-red-600" x-text="convertError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="modalOpen = false">Batal</button><button type="submit" class="wa-primary" :disabled="converting" x-text="converting ? 'Menyimpan...' : 'Simpan lead'"></button></div></form></div>
+        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)">{{ __('Jadikan lead') }}</h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Konversi percakapan ke pipeline sales.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="modalOpen = false" aria-label="{{ __('Tutup') }}">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="convertLead()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama kontak') }}</span><input x-model="convertName" required class="wa-field"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Segment</span><select x-model="convertSegment" required class="wa-field"><option value="end_user">End User</option><option value="vendor">Vendor</option><option value="system_integrator">System Integrator</option><option value="kontraktor">{{ __('Kontraktor') }}</option><option value="gov">Government</option><option value="principle">Principle</option><option value="distributor">Distributor</option><option value="other">{{ __('Lainnya') }}</option></select></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">Kebutuhan</span><textarea x-model="convertNeed" class="wa-field wa-textarea" placeholder="{{ __('Ringkasan kebutuhan dari chat') }}"></textarea></label><p x-show="convertError" class="text-xs text-red-600" x-text="convertError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="modalOpen = false">{{ __('Batal') }}</button><button type="submit" class="wa-primary" :disabled="converting" x-text="converting ? '{{ __('Menyimpan...') }}' : '{{ __('Simpan lead') }}'"></button></div></form></div>
     </div>
 </div>
 
@@ -679,7 +679,7 @@
             },
 
             get messageSearchResultText() {
-                return this.messageSearchActive ? `${this.messageSearchCount} hasil` : '';
+                return this.messageSearchActive ? `${this.messageSearchCount} {{ __('hasil') }}` : '';
             },
 
             get canSend() {
@@ -705,7 +705,7 @@
             },
 
             conversationName(conv) {
-                return conv?.customer?.name || conv?.sender_name || conv?.sender_number || 'Kontak WhatsApp';
+                return conv?.customer?.name || conv?.sender_name || conv?.sender_number || '{{ __('Kontak WhatsApp') }}';
             },
 
             initials(value) {
@@ -730,7 +730,7 @@
                 if (!silent) this.loadingConversations = true;
                 try {
                     const response = await fetch('{{ route('whatsapp-center.conversations', ['account' => ':id']) }}'.replace(':id', this.activeAccount.id), { headers: { Accept: 'application/json' } });
-                    if (!response.ok) throw new Error('Gagal memuat percakapan');
+                    if (!response.ok) throw new Error('{{ __('Gagal memuat percakapan') }}');
                     const data = await response.json();
                     this.conversations = data;
                     if (this.activeConv) {
@@ -738,7 +738,7 @@
                         if (updated) this.activeConv = { ...this.activeConv, ...updated };
                     }
                 } catch (error) {
-                    if (!silent) this.showError('Percakapan tidak dapat dimuat.');
+                    if (!silent) this.showError('{{ __('Percakapan tidak dapat dimuat.') }}');
                 } finally {
                     this.loadingConversations = false;
                 }
@@ -751,7 +751,7 @@
                 try {
                     const url = '{{ route('whatsapp-center.messages', ['account' => ':id', 'sender' => ':sender']) }}'.replace(':id', this.activeAccount.id).replace(':sender', encodeURIComponent(sender)) + '?' + query;
                     const response = await fetch(url, { headers: { Accept: 'application/json' } });
-                    if (!response.ok) throw new Error('Gagal memuat pesan');
+                    if (!response.ok) throw new Error('{{ __('Gagal memuat pesan') }}');
                     const data = await response.json();
                     const previousLastId = this.messages.length ? this.messages[this.messages.length - 1].id : null;
                     const shouldScroll = !silent || this.isNearBottom();
@@ -764,7 +764,7 @@
                     if (incomingNew.length) this.notifyIncoming(incomingNew[incomingNew.length - 1]);
                     if (!silent) this.markConversation(this.activeConv, true);
                 } catch (error) {
-                    if (!silent) this.showError('Pesan tidak dapat dimuat.');
+                    if (!silent) this.showError('{{ __('Pesan tidak dapat dimuat.') }}');
                 } finally {
                     this.loadingMessages = false;
                 }
@@ -784,7 +784,7 @@
                     this.nextBefore = data.next_before;
                     this.$nextTick(() => { if (area) area.scrollTop = area.scrollHeight - oldHeight; });
                 } catch (error) {
-                    this.showError('Pesan sebelumnya tidak dapat dimuat.');
+                    this.showError('{{ __('Pesan sebelumnya tidak dapat dimuat.') }}');
                 } finally {
                     this.loadingOlder = false;
                 }
@@ -810,7 +810,7 @@
                         headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
                         body: JSON.stringify({ message_body: body }),
                     });
-                    if (!response.ok) throw new Error('Gagal mengirim pesan');
+                    if (!response.ok) throw new Error('{{ __('Gagal mengirim pesan') }}');
                     const message = await response.json();
                     message.created_iso = new Date().toISOString();
                     this.messages.push(message);
@@ -819,7 +819,7 @@
                     this.$nextTick(() => { this.resizeComposer({ target: document.querySelector('.wa-composer-input') }); this.scrollToBottom(true); });
                     this.loadConversations(true);
                 } catch (error) {
-                    this.showError('Pesan gagal dikirim. Coba lagi.');
+                    this.showError('{{ __('Pesan gagal dikirim. Coba lagi.') }}');
                 }
             },
 
@@ -872,8 +872,8 @@
                 const now = new Date();
                 const yesterday = new Date();
                 yesterday.setDate(now.getDate() - 1);
-                if (date.toDateString() === now.toDateString()) return 'Hari ini';
-                if (date.toDateString() === yesterday.toDateString()) return 'Kemarin';
+                if (date.toDateString() === now.toDateString()) return '{{ __('Hari ini') }}';
+                if (date.toDateString() === yesterday.toDateString()) return '{{ __('Kemarin') }}';
                 return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
             },
 
@@ -882,7 +882,7 @@
             },
 
             statusLabel(status) {
-                return { queued: 'Menunggu pengiriman', sending: 'Mengirim', sent: 'Terkirim ke gateway', delivered: 'Terkirim ke perangkat', read: 'Dibaca', failed: 'Gagal dikirim' }[status] || 'Status belum tersedia';
+                return { queued: '{{ __('Menunggu pengiriman') }}', sending: '{{ __('Mengirim') }}', sent: '{{ __('Terkirim ke gateway') }}', delivered: '{{ __('Terkirim ke perangkat') }}', read: '{{ __('Dibaca') }}', failed: '{{ __('Gagal dikirim') }}' }[status] || '{{ __('Status belum tersedia') }}';
             },
 
             async markConversation(conv, read) {
@@ -900,12 +900,12 @@
                 const value = !conv[key];
                 try {
                     const response = await fetch('{{ route('whatsapp-center.preference', ['account' => ':id', 'sender' => ':sender']) }}'.replace(':id', this.activeAccount.id).replace(':sender', encodeURIComponent(conv.sender_number)), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }, body: JSON.stringify({ [key]: value }) });
-                    if (!response.ok) throw new Error('Gagal menyimpan preferensi');
+                    if (!response.ok) throw new Error('{{ __('Gagal menyimpan preferensi') }}');
                     conv[key] = value;
                     if (this.activeConv?.sender_number === conv.sender_number) this.activeConv[key] = value;
                     if (key === 'is_archived' && value && this.filter !== 'archived') this.activeConv = null;
                     this.conversations = [...this.conversations].sort((a, b) => (b.is_pinned - a.is_pinned) || new Date(b.last_at) - new Date(a.last_at));
-                } catch (error) { this.showError('Preferensi chat tidak dapat disimpan.'); }
+                } catch (error) { this.showError('{{ __('Preferensi chat tidak dapat disimpan.') }}'); }
             },
 
             openContextMenu(event, conv) {
@@ -931,7 +931,7 @@
 
             async copyMessage(message) {
                 if (!message) return;
-                try { await navigator.clipboard.writeText(message.message_body); this.showNotice('Pesan disalin.'); } catch (error) { this.showError('Pesan tidak dapat disalin.'); }
+                try { await navigator.clipboard.writeText(message.message_body); this.showNotice('{{ __('Pesan disalin.') }}'); } catch (error) { this.showError('{{ __('Pesan tidak dapat disalin.') }}'); }
             },
 
             async copySelectedMessages() {
@@ -950,7 +950,7 @@
                     this.messages = data.messages;
                     this.messageSearchCount = data.messages.length;
                     this.hasMore = false;
-                } catch (error) { this.showError('Pencarian pesan gagal.'); }
+                } catch (error) { this.showError('{{ __('Pencarian pesan gagal.') }}'); }
             },
 
             clearMessageSearch(reload = true) {
@@ -1008,7 +1008,7 @@
                 try {
                     const response = await fetch('{{ route('whatsapp-center.contact-save', ['account' => ':id']) }}'.replace(':id', this.activeAccount.id), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }, body: JSON.stringify(this.contactForm) });
                     const data = await response.json();
-                    if (!response.ok) throw new Error(data.message || Object.values(data.errors || {}).flat()[0] || 'Data kontak tidak valid.');
+                    if (!response.ok) throw new Error(data.message || Object.values(data.errors || {}).flat()[0] || '{{ __('Data kontak tidak valid.') }}');
                     this.activeConv.customer = data;
                     this.activeConv.sender_name = data.name;
                     this.contactModal = false;
@@ -1030,7 +1030,7 @@
                 try {
                     const response = await fetch('{{ route('whatsapp-center.convert', ['account' => ':id', 'sender' => ':sender']) }}'.replace(':id', this.activeAccount.id).replace(':sender', encodeURIComponent(this.activeConv.sender_number)), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }, body: JSON.stringify({ customer_name: this.convertName, segment: this.convertSegment, kebutuhan: this.convertNeed }) });
                     const data = await response.json();
-                    if (!response.ok) throw new Error(data.message || 'Lead tidak dapat dibuat.');
+                    if (!response.ok) throw new Error(data.message || '{{ __('Lead tidak dapat dibuat.') }}');
                     this.modalOpen = false;
                     this.activeConv.lead_id = data.lead_id;
                     if (data.redirect) window.location.href = data.redirect;
@@ -1044,13 +1044,13 @@
             persistSettings() { localStorage.setItem('whatsapp-center-settings', JSON.stringify(this.settings)); },
 
             requestNotifications() {
-                if (!('Notification' in window)) { this.showError('Browser ini tidak mendukung notifikasi.'); return; }
+                if (!('Notification' in window)) { this.showError('{{ __('Browser ini tidak mendukung notifikasi.') }}'); return; }
                 Notification.requestPermission().then((permission) => { this.notificationPermission = permission; });
             },
 
             notifyIncoming(message) {
                 if (document.visibilityState === 'visible' || this.notificationPermission !== 'granted' || this.activeConv?.sender_number === message.sender_number) return;
-                new Notification('Pesan WhatsApp baru', { body: message.message_body, tag: `wa-${message.id}` });
+                new Notification('{{ __('Pesan WhatsApp baru') }}', { body: message.message_body, tag: `wa-${message.id}` });
                 if (this.settings.notificationSound) new Audio('/sounds/wa-notification.wav').play().catch(() => {});
             },
 
