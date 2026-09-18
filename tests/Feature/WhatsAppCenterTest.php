@@ -650,7 +650,7 @@ class WhatsAppCenterTest extends TestCase
         $account->update(['gateway_instance' => '123', 'gateway_token' => 'tok', 'gateway_status' => null]);
 
         Http::fake([
-            'graph.facebook.com/v19.0/123' => Http::response(['id' => '123']),
+            'graph.facebook.com/v19.0/123*' => Http::response(['id' => '123', 'display_phone_number' => '6281111111101']),
         ]);
 
         $this->actingAs($admin)
@@ -661,6 +661,31 @@ class WhatsAppCenterTest extends TestCase
         $this->assertDatabaseHas('whatsapp_accounts', [
             'id' => $account->id,
             'gateway_status' => 'authorized',
+        ]);
+    }
+
+    public function test_check_status_meta_rejects_non_phone_number_id(): void
+    {
+        $admin = \App\Models\User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'APP_ID_123', 'gateway_token' => 'tok', 'gateway_status' => 'authorized']);
+
+        Http::fake([
+            'graph.facebook.com/v19.0/APP_ID_123*' => Http::response([
+                'error' => ['message' => 'Tried accessing nonexisting field', 'code' => 100],
+            ], 400),
+        ]);
+
+        $this->actingAs($admin)
+            ->getJson(route('whatsapp-center.check-status', $account))
+            ->assertOk()
+            ->assertJson(['gateway_status' => null]);
+
+        $this->assertDatabaseHas('whatsapp_accounts', [
+            'id' => $account->id,
+            'gateway_status' => null,
         ]);
     }
 

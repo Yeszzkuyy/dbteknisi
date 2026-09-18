@@ -63,7 +63,7 @@ class WhatsAppCenterController extends Controller
         }
 
         $state = $this->gateway->getState($account);
-        $status = $state ?? $account->gateway_status;
+        $status = $state;
 
         if ($status !== $account->gateway_status) {
             $account->update(['gateway_status' => $status]);

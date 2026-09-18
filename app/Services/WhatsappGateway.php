@@ -121,9 +121,15 @@ class WhatsappGateway
                 rtrim(config('whatsapp.meta.graph_base_url'), '/'),
                 config('whatsapp.meta.api_version'),
                 $account->gateway_instance
-            ));
+            ), [
+                'fields' => 'display_phone_number',
+            ]);
 
-        return $response->successful() ? 'authorized' : null;
+        // Pastikan ID benar-benar Phone Number ID (punya display_phone_number),
+        // bukan App ID / ID lain yang kebetulan bisa di-GET.
+        return $response->successful() && $response->json('display_phone_number')
+            ? 'authorized'
+            : null;
     }
 
     /**
