@@ -1019,7 +1019,7 @@
                 const params = new URLSearchParams({
                     whatsapp_account_id: this.activeAccount.id,
                     sender: this.activeConv.sender_number,
-                    name: this.conversationName(this.activeConv),
+                    name: this.activeConv.customer?.company || this.conversationName(this.activeConv),
                 });
                 window.location.href = '{{ route('leads.create') }}?' + params.toString();
             },
