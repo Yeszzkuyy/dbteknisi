@@ -10,6 +10,7 @@ use App\Models\WhatsappAccount;
 use App\Models\WhatsappConversationPreference;
 use App\Models\WhatsappMessage;
 use App\Notifications\NewLeadNotification;
+use App\Notifications\WhatsappInboundNotification;
 use App\Services\WhatsappGateway;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -468,6 +469,8 @@ class WhatsAppCenterController extends Controller
             'wa_message_id' => $messageId,
             'created_at' => $timestamp ? now()->setTimestamp((int) $timestamp) : now(),
         ]);
+
+        $this->notifyInbound($account, (string) $waId, $text);
     }
 
     public function updateCredentials(Request $request, WhatsappAccount $account)
@@ -479,9 +482,13 @@ class WhatsAppCenterController extends Controller
         $validated = $request->validate([
             'gateway_instance' => 'nullable|string|max:255',
             'gateway_token' => 'nullable|string|max:255',
+            'bot_enabled' => 'nullable|boolean',
         ]);
 
-        $account->update(array_merge($validated, ['gateway_status' => null]));
+        $account->update(array_merge($validated, [
+            'bot_enabled' => $request->boolean('bot_enabled'),
+            'gateway_status' => null,
+        ]));
 
         if ($state = $this->gateway->getState($account)) {
             $account->update(['gateway_status' => $state]);
@@ -524,6 +531,8 @@ class WhatsAppCenterController extends Controller
             'wa_message_id' => $idMessage,
             'created_at' => data_get($payload, 'timestamp') ? now()->setTimestamp(data_get($payload, 'timestamp')) : now(),
         ]);
+
+        $this->notifyInbound($account, $senderNumber, $text);
 
         return response()->json(['status' => 'ok']);
     }
@@ -578,7 +587,35 @@ class WhatsAppCenterController extends Controller
             'wa_message_id' => $validated['wa_message_id'] ?? null,
         ]);
 
+        $this->notifyInbound($account, (string) $validated['sender_number'], $validated['message_body']);
+
         return response()->json(['status' => 'ok']);
+    }
+
+    /**
+     * Notifikasi ke tim marketing saat percakapan baru masuk (sekali per 6 jam).
+     */
+    private function notifyInbound(WhatsappAccount $account, string $sender, string $preview): void
+    {
+        $recent = WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->where('sender_number', $sender)
+            ->where('direction', 'inbound')
+            ->where('created_at', '>=', now()->subHours(6))
+            ->count();
+
+        if ($recent > 1) {
+            return;
+        }
+
+        Notification::send(
+            User::permission('manage-marketing')->get(),
+            new WhatsappInboundNotification(
+                $account->id,
+                $account->name ?: $account->account_code,
+                $sender,
+                mb_substr($preview, 0, 120),
+            )
+        );
     }
 
     public function simulate(Request $request, WhatsappAccount $account)

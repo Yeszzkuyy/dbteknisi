@@ -242,18 +242,22 @@ class LeadController extends Controller
         $kebutuhan = $request->input('kebutuhan');
 
         if (blank($kebutuhan) && $account && $sender !== '') {
-            $kebutuhan = WhatsappMessage::where('whatsapp_account_id', $account->id)
-                ->where('sender_number', $sender)
-                ->where('direction', 'inbound')
-                ->latest('id')
-                ->limit(10)
-                ->get()
-                ->sortBy('id')
-                ->pluck('message_body')
-                ->filter()
-                ->implode("\n");
+            $kebutuhan = app(\App\Services\WhatsappBot::class)->summarizeNeeds($account, $sender);
 
-            $kebutuhan = $kebutuhan !== '' ? Str::limit($kebutuhan, 2000, '') : null;
+            if (blank($kebutuhan)) {
+                $kebutuhan = WhatsappMessage::where('whatsapp_account_id', $account->id)
+                    ->where('sender_number', $sender)
+                    ->where('direction', 'inbound')
+                    ->latest('id')
+                    ->limit(10)
+                    ->get()
+                    ->sortBy('id')
+                    ->pluck('message_body')
+                    ->filter()
+                    ->implode("\n");
+
+                $kebutuhan = $kebutuhan !== '' ? Str::limit($kebutuhan, 2000, '') : null;
+            }
         }
 
         return array_filter([

@@ -191,6 +191,8 @@ class WhatsAppCenterTest extends TestCase
             'direction' => 'inbound',
         ]);
 
+        $this->fakeBot(summary: 'Butuh 10 unit CCTV untuk gudang');
+
         $this->actingAs($user)
             ->get(route('leads.create', [
                 'whatsapp_account_id' => $account->id,
@@ -820,5 +822,115 @@ class WhatsAppCenterTest extends TestCase
 
         Http::assertSent(fn ($request) => str_contains($request->url(), '/messages')
             && $request['to'] === '6281234567890');
+    }
+
+    private function fakeBot(string $reply = 'Halo, butuh berapa unit dan brandnya?', ?string $summary = null): \App\Services\WhatsappBot
+    {
+        $bot = \Mockery::mock(\App\Services\WhatsappBot::class, [app(\App\Services\WhatsappGateway::class)])->makePartial();
+        $bot->shouldReceive('generateReply')->andReturn($reply);
+        $bot->shouldReceive('summarizeNeeds')->andReturn($summary);
+
+        $this->app->instance(\App\Services\WhatsappBot::class, $bot);
+
+        return $bot;
+    }
+
+    public function test_bot_replies_to_pending_inbound_and_marks_as_bot(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123', 'bot_enabled' => true]);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Halo mau tanya CCTV',
+            'direction' => 'inbound',
+        ]);
+
+        Http::fake([
+            'api.green-api.com/*' => Http::response(['idMessage' => 'bot_msg_1']),
+        ]);
+
+        $bot = $this->fakeBot();
+
+        $this->assertSame(1, $bot->replyPending());
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'direction' => 'outbound',
+            'is_bot' => true,
+            'status' => 'sent',
+            'gateway_message_id' => 'bot_msg_1',
+        ]);
+    }
+
+    public function test_bot_skips_conversation_recently_handled_by_human(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-123', 'bot_enabled' => true]);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'Halo',
+            'direction' => 'inbound',
+        ]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'Baik, saya bantu',
+            'direction' => 'outbound',
+            'is_bot' => false,
+        ]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'makasih',
+            'direction' => 'inbound',
+        ]);
+
+        Http::fake();
+        $bot = $this->fakeBot();
+
+        $this->assertSame(0, $bot->replyPending());
+    }
+
+    public function test_lead_form_prefill_uses_ai_summary(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'message_body' => 'halo selamat siang',
+            'direction' => 'inbound',
+        ]);
+
+        $this->fakeBot(summary: 'CCTV 8 kamera (Hikvision) untuk gudang');
+
+        $this->actingAs($user)
+            ->get(route('leads.create', [
+                'whatsapp_account_id' => $account->id,
+                'sender' => '6281234567890',
+                'name' => 'Rina',
+            ]))
+            ->assertOk()
+            ->assertSee('CCTV 8 kamera (Hikvision) untuk gudang');
+    }
+
+    public function test_new_inbound_notifies_marketing_users(): void
+    {
+        $account = $this->makeAccount();
+        $marketing = $this->marketingUser($account->id);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'account_code' => $account->account_code,
+            'sender_number' => '6281234567890',
+            'message_body' => 'Halo, mau tanya harga CCTV',
+        ])->assertOk();
+
+        $this->assertSame(1, $marketing->notifications()->count());
+        $this->assertSame('whatsapp', $marketing->notifications()->first()->data['type']);
     }
 }

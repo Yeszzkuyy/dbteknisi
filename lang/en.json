@@ -889,5 +889,6 @@
     "Reply terstruktur belum didukung gateway": "Structured reply not yet supported by the gateway",
     "Forward belum didukung gateway": "Forward not yet supported by the gateway",
     "Reaksi belum didukung gateway": "Reactions not yet supported by the gateway",
-    "Penghapusan pesan belum didukung gateway": "Message deletion not yet supported by the gateway"
+    "Penghapusan pesan belum didukung gateway": "Message deletion not yet supported by the gateway",
+    "Bot balas otomatis": "Auto-reply bot"
 }

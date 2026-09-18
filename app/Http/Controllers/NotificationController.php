@@ -27,13 +27,22 @@ class NotificationController extends Controller
     public static function itemsFor(User $user): array
     {
         return $user->notifications()->limit(10)->get()
-            ->map(fn ($n) => [
-                'id' => $n->id,
-                'url' => route('manage-sales.edit', $n->data['lead_id'] ?? 0),
-                'customer' => $n->data['customer'] ?? 'Lead baru',
-                'read' => (bool) $n->read_at,
-                'ago' => $n->created_at->diffForHumans(),
-            ])
+            ->map(function ($n) {
+                $data = $n->data;
+                $isWhatsapp = ($data['type'] ?? null) === 'whatsapp';
+
+                return [
+                    'id' => $n->id,
+                    'url' => $isWhatsapp
+                        ? ($data['url'] ?? route('whatsapp-center.index'))
+                        : route('manage-sales.edit', $data['lead_id'] ?? 0),
+                    'customer' => $data['customer'] ?? 'Lead baru',
+                    'preview' => $isWhatsapp ? ($data['preview'] ?? '') : null,
+                    'type' => $isWhatsapp ? 'whatsapp' : 'lead',
+                    'read' => (bool) $n->read_at,
+                    'ago' => $n->created_at->diffForHumans(),
+                ];
+            })
             ->values()
             ->all();
     }
