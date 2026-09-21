@@ -91,11 +91,16 @@ class WhatsAppCenterController extends Controller
             ->get()
             ->keyBy('sender_number');
 
+        $blocked = $this->foreignOwnedSenderNumbers($account);
+
         $rows = WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->orderBy('id')
             ->get()
             ->groupBy('sender_number')
-            ->map(function ($messages, $sender) use ($preferences, $conversations, $account) {
+            ->map(function ($messages, $sender) use ($preferences, $conversations, $account, $blocked) {
+                if (in_array($this->normalizeNumber((string) $sender), $blocked, true)) {
+                    return null;
+                }
                 $last = $messages->last();
                 $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
                 $lead = $messages->whereNotNull('lead_id')->first()?->lead;
@@ -119,6 +124,7 @@ class WhatsAppCenterController extends Controller
                     'bot_turns' => (int) ($conversation?->bot_turns ?? 0),
                 ];
             })
+            ->filter()
             ->values()
             ->sortByDesc(fn ($conversation) => ($conversation['is_pinned'] ? '1' : '0').$conversation['last_at'])
             ->values();
@@ -745,12 +751,17 @@ class WhatsAppCenterController extends Controller
 
     private function unreadCount(WhatsappAccount $account): int
     {
+        $blocked = $this->foreignOwnedSenderNumbers($account);
+
         return WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->where('direction', 'inbound')
             ->orderBy('id')
             ->get()
             ->groupBy('sender_number')
-            ->sum(function ($messages) {
+            ->sum(function ($messages) use ($blocked) {
+                if (in_array($this->normalizeNumber((string) $messages->first()->sender_number), $blocked, true)) {
+                    return 0;
+                }
                 $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
 
                 return $messages->where('id', '>', $lastOutboundId)->whereNull('read_at')->count();
@@ -816,6 +827,15 @@ class WhatsAppCenterController extends Controller
     {
         return WhatsappMessage::where('whatsapp_account_id', $account->id)->distinct()->pluck('sender_number')
             ->merge(WhatsappConversation::where('whatsapp_account_id', $account->id)->distinct()->pluck('sender_number'))
+            ->filter()->unique()->values()->all();
+    }
+
+    private function foreignOwnedSenderNumbers(WhatsappAccount $account): array
+    {
+        return Customer::whereNotNull('whatsapp_account_id')
+            ->where('whatsapp_account_id', '!=', $account->id)
+            ->get(['whatsapp', 'phone'])
+            ->flatMap(fn ($c) => [$this->normalizeNumber($c->whatsapp ?? ''), $this->normalizeNumber($c->phone ?? '')])
             ->filter()->unique()->values()->all();
     }
 

@@ -1230,4 +1230,34 @@ class WhatsAppCenterTest extends TestCase
             ->post(route('whatsapp-center.reply', [$wani, '628999888777']), ['message_body' => 'Halo baru'])
             ->assertOk();
     }
+
+    public function test_conversations_hides_senders_owned_by_other_account(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $mgk = $this->makeAccount('wa_mgk');
+        $user = $this->userWithAccounts($wani, $mgk);
+
+        Customer::create([
+            'name' => 'PT Gasken',
+            'company' => 'PT Gasken',
+            'contact_person' => 'Yeski',
+            'whatsapp' => '6281234567890',
+            'whatsapp_account_id' => $wani->id,
+        ]);
+        foreach ([$wani, $mgk] as $account) {
+            WhatsappMessage::create([
+                'whatsapp_account_id' => $account->id,
+                'sender_number' => '6281234567890',
+                'sender_name' => 'Yeski',
+                'message_body' => 'Halo',
+                'direction' => 'inbound',
+            ]);
+        }
+
+        $mgkSenders = collect($this->actingAs($user)->getJson(route('whatsapp-center.conversations', $mgk))->assertOk()->json())->pluck('sender_number');
+        $waniSenders = collect($this->actingAs($user)->getJson(route('whatsapp-center.conversations', $wani))->assertOk()->json())->pluck('sender_number');
+
+        $this->assertFalse($mgkSenders->contains('6281234567890'));
+        $this->assertTrue($waniSenders->contains('6281234567890'));
+    }
 }
