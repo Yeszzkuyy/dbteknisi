@@ -60,8 +60,8 @@
             el.hidden = false;
             setTimeout(function () {
                 el.classList.add('skel-done');
-                setTimeout(function () { el.remove(); }, 350);
-            }, 1000);
+                setTimeout(function () { el.remove(); }, 500);
+            }, 3000);
         })();
     </script>
     @php
