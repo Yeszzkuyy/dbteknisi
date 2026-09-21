@@ -170,7 +170,7 @@
     </div>
 
     {{-- Donut Lead per Status (SVG, tanpa ApexCharts) + tabel dinamis --}}
-    <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4" x-data="{
+    <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4" data-reveal x-data="{
         selectedStatus: null,
         leads: @js($leadsByStatus),
         segments: @js($donutMarketing->values()),
@@ -199,7 +199,7 @@
         <p class="text-sm text-slate-500 dark:text-slate-400 -mt-2 mb-4">{{ __('Klik segmen untuk melihat detail lead pada status tersebut.') }}</p>
         <div class="relative w-full max-w-[320px] mx-auto">
             <div id="status-donut-chart" class="w-full">
-                <x-donut-chart :data="$donutMarketing" :size="280" :strokeWidth="34" />
+                <x-donut-chart :data="$donutMarketing" :size="280" :strokeWidth="34" :scroll="true" />
             </div>
             <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-10">
                 <span class="text-xs font-medium text-slate-400 dark:text-slate-500 truncate max-w-full" x-text="activeSeg() ? activeSeg().label : 'Total Lead'">Total Lead</span>

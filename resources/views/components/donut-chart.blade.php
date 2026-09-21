@@ -1,9 +1,10 @@
 {{-- Donut chart SVG murni (pengganti ApexCharts pie/donut).
-    Props: :data="[{label, value, color, key?}]", :size="250", :strokeWidth="30"
+    Props: :data="[{label, value, color, key?}]", :size="250", :strokeWidth="30",
+    :scroll="false" (true = sweep ditahan sampai ancestor [data-reveal].in-view)
     Interaksi: hover NONAKTIF (diagram diam); klik kirim CustomEvent
     window donut-select dengan detail {key, label, value}.
 --}}
-@props(['data' => [], 'size' => 250, 'strokeWidth' => 30])
+@props(['data' => [], 'size' => 250, 'strokeWidth' => 30, 'scroll' => false])
 
 @php
 $size = max(80, (int) $size);
@@ -23,7 +24,7 @@ $cum = 0.0;
 
 <svg
     viewBox="0 0 {{ $size }} {{ $size }}"
-    class="donut-svg h-auto w-full -rotate-90 overflow-visible"
+    class="donut-svg h-auto w-full -rotate-90 overflow-visible{{ $scroll ? ' donut-scroll' : '' }}"
     role="img"
     aria-label="{{ __('Diagram donat') }}"
 >
@@ -90,6 +91,10 @@ $cum = 0.0;
         from { stroke-dashoffset: var(--c); opacity: 0; }
         to { stroke-dashoffset: var(--off); opacity: 1; }
     }
+    /* Mode scroll: sweep ditahan (pause di frame awal = tak kasat mata)
+       sampai ancestor [data-reveal] dapat .in-view dari observer layout */
+    .donut-svg.donut-scroll .donut-seg { animation-play-state: paused; }
+    [data-reveal].in-view .donut-svg.donut-scroll .donut-seg { animation-play-state: running; }
     @media (prefers-reduced-motion: reduce) {
         .donut-svg .donut-seg { animation: none; }
     }
