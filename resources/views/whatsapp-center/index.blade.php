@@ -751,6 +751,7 @@
                 try {
                     const url = '{{ route('whatsapp-center.messages', ['account' => ':id', 'sender' => ':sender']) }}'.replace(':id', this.activeAccount.id).replace(':sender', encodeURIComponent(sender)) + '?' + query;
                     const response = await fetch(url, { headers: { Accept: 'application/json' } });
+                    if (response.status === 404) throw new Error('{{ __('Chat tidak tersedia di akun ini (milik company lain).') }}');
                     if (!response.ok) throw new Error('{{ __('Gagal memuat pesan') }}');
                     const data = await response.json();
                     const previousLastId = this.messages.length ? this.messages[this.messages.length - 1].id : null;
@@ -764,7 +765,7 @@
                     if (incomingNew.length) this.notifyIncoming(incomingNew[incomingNew.length - 1]);
                     if (!silent) this.markConversation(this.activeConv, true);
                 } catch (error) {
-                    if (!silent) this.showError('{{ __('Pesan tidak dapat dimuat.') }}');
+                    if (!silent) this.showError(error.message || '{{ __('Pesan tidak dapat dimuat.') }}');
                 } finally {
                     this.loadingMessages = false;
                 }

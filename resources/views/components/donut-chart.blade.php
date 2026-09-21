@@ -99,6 +99,7 @@ $cum = 0.0;
         .donut-svg .donut-seg { animation: none; }
     }
 </style>
+<noscript><style>.donut-svg.donut-scroll .donut-seg { animation: none !important; opacity: 1 !important; }</style></noscript>
 <script>
     // ponytail: hanya klik (donut-select); hover sengaja tidak dipasang agar diagram diam
     (function () {

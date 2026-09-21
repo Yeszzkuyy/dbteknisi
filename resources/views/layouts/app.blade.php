@@ -224,6 +224,8 @@
                 nav.scrollTop=+(sessionStorage.getItem('sidebar-scroll')||0);
                 nav.addEventListener('scroll',function(){sessionStorage.setItem('sidebar-scroll',nav.scrollTop)});
             }
+            // Penanda JS aktif untuk animasi progresif (tanpa JS: tampil final)
+            document.documentElement.classList.add('js');
             // Reveal saat scroll — hormati prefers-reduced-motion
             if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){
                 var io=new IntersectionObserver(function(entries){

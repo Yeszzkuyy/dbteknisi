@@ -91,11 +91,16 @@ class WhatsAppCenterController extends Controller
             ->get()
             ->keyBy('sender_number');
 
+        $blocked = $this->foreignOwnedSenderNumbers($account);
+
         $rows = WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->orderBy('id')
             ->get()
             ->groupBy('sender_number')
-            ->map(function ($messages, $sender) use ($preferences, $conversations) {
+            ->map(function ($messages, $sender) use ($preferences, $conversations, $account, $blocked) {
+                if (in_array($this->normalizeNumber((string) $sender), $blocked, true)) {
+                    return null;
+                }
                 $last = $messages->last();
                 $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
                 $lead = $messages->whereNotNull('lead_id')->first()?->lead;
@@ -109,7 +114,7 @@ class WhatsAppCenterController extends Controller
                     'last_direction' => $last->direction,
                     'last_at' => $last->created_at->toIso8601String(),
                     'unread' => $messages->where('direction', 'inbound')->where('id', '>', $lastOutboundId)->whereNull('read_at')->count(),
-                    'customer' => $this->findCustomer($sender),
+                    'customer' => $this->visibleCustomer($account, $sender),
                     'lead_id' => $lead?->id,
                     'is_pinned' => (bool) $preference?->is_pinned,
                     'is_muted' => (bool) $preference?->is_muted,
@@ -119,6 +124,7 @@ class WhatsAppCenterController extends Controller
                     'bot_turns' => (int) ($conversation?->bot_turns ?? 0),
                 ];
             })
+            ->filter()
             ->values()
             ->sortByDesc(fn ($conversation) => ($conversation['is_pinned'] ? '1' : '0').$conversation['last_at'])
             ->values();
@@ -129,6 +135,7 @@ class WhatsAppCenterController extends Controller
     public function messages(Request $request, WhatsappAccount $account, string $sender)
     {
         $this->authorizeAccount($account);
+        $this->ensureSenderAccessible($account, $sender);
 
         $limit = min(max($request->integer('limit', 50), 1), 100);
         $query = WhatsappMessage::where('whatsapp_account_id', $account->id)
@@ -163,7 +170,15 @@ class WhatsAppCenterController extends Controller
         $this->authorizeAccount($account);
 
         $term = trim((string) $request->input('q', ''));
+        $senders = $this->accountSenderNumbers($account);
         $customers = Customer::query()
+            ->where(function ($query) use ($account, $senders) {
+                $query->where('whatsapp_account_id', $account->id)
+                    ->orWhereIn('id', Lead::where('whatsapp_account_id', $account->id)->select('customer_id'));
+                if ($senders !== []) {
+                    $query->orWhereIn('whatsapp', $senders)->orWhereIn('phone', $senders);
+                }
+            })
             ->when($term !== '', function ($query) use ($term) {
                 $query->where(function ($query) use ($term) {
                     $query->whereLike(['name', 'company', 'whatsapp', 'phone', 'email'], $term);
@@ -194,8 +209,13 @@ class WhatsAppCenterController extends Controller
 
         $customer = $this->findCustomer($validated['whatsapp']);
 
+        if ($customer && $customer->whatsapp_account_id && (int) $customer->whatsapp_account_id !== (int) $account->id) {
+            abort(403, 'Kontak ini milik company lain.');
+        }
+
         $contactName = trim($validated['name']);
         $company = trim((string) ($validated['company'] ?? ''));
+        $number = $this->normalizeNumber($validated['whatsapp']);
 
         if (! $customer) {
             $dbName = $company !== '' ? $company : $contactName;
@@ -203,7 +223,8 @@ class WhatsAppCenterController extends Controller
                 'name' => $dbName,
                 'company' => $company !== '' ? $company : $contactName,
                 'contact_person' => $contactName,
-                'whatsapp' => $validated['whatsapp'],
+                'whatsapp' => $number,
+                'whatsapp_account_id' => $account->id,
                 'notes' => $validated['notes'] ?? null,
             ]);
         } else {
@@ -212,7 +233,8 @@ class WhatsAppCenterController extends Controller
                 'name' => $dbName,
                 'company' => $company !== '' ? $company : $customer->company,
                 'contact_person' => $contactName,
-                'whatsapp' => $validated['whatsapp'],
+                'whatsapp' => $number,
+                'whatsapp_account_id' => $customer->whatsapp_account_id ?? $account->id,
                 'notes' => $validated['notes'] ?? $customer->notes,
             ]);
         }
@@ -223,6 +245,7 @@ class WhatsAppCenterController extends Controller
     public function markRead(Request $request, WhatsappAccount $account, string $sender)
     {
         $this->authorizeAccount($account);
+        $this->ensureSenderAccessible($account, $sender);
 
         $read = $request->boolean('read', true);
         $updated = WhatsappMessage::where('whatsapp_account_id', $account->id)
@@ -237,6 +260,7 @@ class WhatsAppCenterController extends Controller
     public function preference(Request $request, WhatsappAccount $account, string $sender)
     {
         $this->authorizeAccount($account);
+        $this->ensureSenderAccessible($account, $sender);
 
         $validated = $request->validate([
             'is_pinned' => 'sometimes|boolean',
@@ -260,6 +284,7 @@ class WhatsAppCenterController extends Controller
     {
         $this->authorizeAccount($account);
         $this->authorize('manage-marketing');
+        $this->ensureSenderAccessible($account, $sender);
 
         $validated = $request->validate([
             'message_body' => 'required|string|max:4000',
@@ -306,6 +331,7 @@ class WhatsAppCenterController extends Controller
     {
         $this->authorizeAccount($account);
         $this->authorize('manage-marketing');
+        $this->ensureSenderAccessible($account, $sender);
 
         $conversation = $this->bot->takeover($account, $this->normalizeNumber($sender), auth()->user());
 
@@ -320,6 +346,7 @@ class WhatsAppCenterController extends Controller
     {
         $this->authorizeAccount($account);
         $this->authorize('manage-marketing');
+        $this->ensureSenderAccessible($account, $sender);
 
         $conversation = $this->bot->release($account, $this->normalizeNumber($sender));
 
@@ -334,6 +361,7 @@ class WhatsAppCenterController extends Controller
     {
         $this->authorizeAccount($account);
         $this->authorize('manage-marketing');
+        $this->ensureSenderAccessible($account, $sender);
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
@@ -344,13 +372,20 @@ class WhatsAppCenterController extends Controller
         $number = $this->normalizeNumber($sender);
         $customer = $this->findCustomer($number);
 
+        if ($customer && $customer->whatsapp_account_id && (int) $customer->whatsapp_account_id !== (int) $account->id) {
+            abort(403, 'Kontak ini milik company lain.');
+        }
+
         if (! $customer) {
             $customer = Customer::create([
                 'name' => $validated['customer_name'],
                 'company' => $validated['customer_name'],
-                'whatsapp' => $sender,
+                'whatsapp' => $number,
+                'whatsapp_account_id' => $account->id,
                 'contact_person' => $validated['customer_name'],
             ]);
+        } elseif (! $customer->whatsapp_account_id) {
+            $customer->update(['whatsapp_account_id' => $account->id]);
         }
 
         $ptGroup = strtoupper(substr($account->account_code, 3));
@@ -716,12 +751,17 @@ class WhatsAppCenterController extends Controller
 
     private function unreadCount(WhatsappAccount $account): int
     {
+        $blocked = $this->foreignOwnedSenderNumbers($account);
+
         return WhatsappMessage::where('whatsapp_account_id', $account->id)
             ->where('direction', 'inbound')
             ->orderBy('id')
             ->get()
             ->groupBy('sender_number')
-            ->sum(function ($messages) {
+            ->sum(function ($messages) use ($blocked) {
+                if (in_array($this->normalizeNumber((string) $messages->first()->sender_number), $blocked, true)) {
+                    return 0;
+                }
                 $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
 
                 return $messages->where('id', '>', $lastOutboundId)->whereNull('read_at')->count();
@@ -739,6 +779,64 @@ class WhatsAppCenterController extends Controller
         return Customer::whereNotNull('whatsapp')->orWhereNotNull('phone')->get()
             ->first(fn ($c) => $this->normalizeNumber($c->whatsapp ?? '') === $normalized
                 || $this->normalizeNumber($c->phone ?? '') === $normalized);
+    }
+
+    /**
+     * Isolasi antar-company: nomor milik akun lain atau yang riwayatnya
+     * hanya ada di akun lain tidak bisa dibuka dari akun ini.
+     */
+    private function ensureSenderAccessible(WhatsappAccount $account, string $sender): void
+    {
+        $number = $this->normalizeNumber($sender);
+        $customer = $number ? $this->findCustomer($number) : null;
+
+        if ($customer && $customer->whatsapp_account_id && (int) $customer->whatsapp_account_id !== (int) $account->id) {
+            abort(404);
+        }
+
+        $variants = array_values(array_unique(array_filter([$sender, $number])));
+        $hasLocal = WhatsappConversation::where('whatsapp_account_id', $account->id)->whereIn('sender_number', $variants)->exists()
+            || WhatsappMessage::where('whatsapp_account_id', $account->id)->whereIn('sender_number', $variants)->exists();
+
+        if ($hasLocal) {
+            return;
+        }
+
+        $historyElsewhere = $number !== '' && (
+            WhatsappConversation::where('sender_number', $number)->where('whatsapp_account_id', '!=', $account->id)->exists()
+            || WhatsappMessage::where('sender_number', $number)->where('whatsapp_account_id', '!=', $account->id)->exists()
+        );
+
+        if ($historyElsewhere) {
+            abort(404);
+        }
+    }
+
+    private function visibleCustomer(WhatsappAccount $account, string $sender): ?Customer
+    {
+        $customer = $this->findCustomer($sender);
+
+        if ($customer && $customer->whatsapp_account_id && (int) $customer->whatsapp_account_id !== (int) $account->id) {
+            return null;
+        }
+
+        return $customer;
+    }
+
+    private function accountSenderNumbers(WhatsappAccount $account): array
+    {
+        return WhatsappMessage::where('whatsapp_account_id', $account->id)->distinct()->pluck('sender_number')
+            ->merge(WhatsappConversation::where('whatsapp_account_id', $account->id)->distinct()->pluck('sender_number'))
+            ->filter()->unique()->values()->all();
+    }
+
+    private function foreignOwnedSenderNumbers(WhatsappAccount $account): array
+    {
+        return Customer::whereNotNull('whatsapp_account_id')
+            ->where('whatsapp_account_id', '!=', $account->id)
+            ->get(['whatsapp', 'phone'])
+            ->flatMap(fn ($c) => [$this->normalizeNumber($c->whatsapp ?? ''), $this->normalizeNumber($c->phone ?? '')])
+            ->filter()->unique()->values()->all();
     }
 
     private function normalizeNumber(string $number): string
