@@ -282,9 +282,18 @@ class LeadController extends Controller
             }
         }
 
+        // Perusahaan hanya di-prefill bila benar-benar diketahui (customer tersimpan).
+        // Nama orang pengirim masuk ke PIC, bukan ke Perusahaan.
+        $company = (string) $request->input('company', $request->input('name', ''));
+        $pic = (string) $request->input('pic', '');
+        if ($pic !== '' && $pic === $sender) {
+            $pic = '';
+        }
+
         return array_filter([
             'customer_mode' => 'new',
-            'customer_name' => (string) $request->input('name', ''),
+            'customer_name' => $company,
+            'customer_contact_person' => $pic,
             'customer_whatsapp' => $sender,
             'source' => 'whatsapp',
             'pt_group' => $account ? strtoupper(substr($account->account_code, 3)) : null,
