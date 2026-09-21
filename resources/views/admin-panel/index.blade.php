@@ -6,7 +6,7 @@
         </div>
         <div class="flex gap-3">
             <a href="{{ route('admin-panel.roles.create') }}"
-               class="px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition">
+               class="px-4 py-2 bg-accent-600 text-white rounded-xl hover:bg-accent-700 transition">
                 {{ __('+ Tambah Role') }}
             </a>
             <a href="{{ route('admin-panel.users.create') }}"

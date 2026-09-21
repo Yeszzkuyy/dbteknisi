@@ -73,7 +73,7 @@ Berjalan **satu sistem tampilan** (mode × accent). Detail lengkap: `docs/DARK_M
 | Kelas | Menjadi |
 |---|---|
 | `bg-white`, `bg-slate-50` | `var(--card-bg)` |
-| `bg-slate-100/200/300`, `bg-gray-300` | `#362222 / #423F3E / #423F3E` |
+| `bg-slate-100/200/300`, `bg-gray-300` | `#2B2B2B / #3F3F46 / #3F3F46` |
 | `border-slate-200` / `-300` | `var(--card-border)` / `var(--input-border)` |
 | `text-slate-700/800/900` | `var(--text-primary)` |
 | `text-slate-600` | `var(--text-secondary)` |
@@ -82,8 +82,8 @@ Berjalan **satu sistem tampilan** (mode × accent). Detail lengkap: `docs/DARK_M
 ### Aturan
 - **Jangan** tambah `dark:bg-slate-700`/`dark:text-slate-*` untuk properti yang sudah di-override di atas — kalah `!important`, mubasir.
 - Untuk properti tanpa override, `dark:` biasa tetap jalan (mis. `dark:bg-slate-700`, `dark:border-slate-600`).
-- Input (text/select/textarea) diatur global via CSS var — **jangan** paksa `bg-white`/`border-slate-300` di blade; `--input-border` dark memakai `#5A5451` untuk visibilitas.
-- Dark mode memakai surface `#171010`, `#2B2B2B`, `#362222`, dan `#423F3E`. Surface **tidak berubah** per accent.
+- Input (text/select/textarea) diatur global via CSS var — **jangan** paksa `bg-white`/`border-slate-300` di blade; `--input-border` dark memakai `#4B5563` untuk visibilitas.
+- Dark mode memakai surface `#111111`, `#2B2B2B`, `#333333`, dan `#3F3F46`. Surface **tidak berubah** per accent.
 - Utility `blue`/`indigo` adalah lapisan kompatibilitas: **tetap Ocean di kedua mode** (sebelumnya berubah jadi terracotta di dark). Komponen interaksi baru harus pakai `accent-*`.
 - Input focus mengikuti accent via `--input-border-focus`.
 - Menambah override baru? Tambahkan aturan `!important` di blok `<style>` `app.blade.php` mengikuti pola yang ada; hardcoded hex harus memakai token var.

@@ -180,9 +180,8 @@
 
             @forelse($activities as $activity)
                 <article class="group flex items-start gap-4 border-b border-slate-100 py-4 last:border-0 last:pb-0 dark:border-slate-700">
-                    <div class="relative shrink-0">
+                    <div class="shrink-0">
                         <x-user-avatar :user="$activity->user" size="w-10 h-10" text="text-sm" />
-                        <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-accent-500 dark:border-slate-800"></span>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
