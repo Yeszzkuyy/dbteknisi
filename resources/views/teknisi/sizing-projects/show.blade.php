@@ -25,12 +25,12 @@
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('teknisi.sizing-projects.edit', $sizingProject) }}"
-               class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl text-sm font-medium">
+               class="px-4 py-2 bg-accent-100 hover:bg-accent-200 text-accent-700 rounded-xl text-sm font-medium">
                 Edit
             </a>
             <a href="{{ route('teknisi.sizing-projects.index') }}"
                class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 rounded-xl text-sm">
-                Kembali
+                {{ __('Kembali') }}
             </a>
         </div>
     </div>
@@ -68,10 +68,10 @@
             @php
                 $sections = [
                     'Customer Needs' => $sizingProject->customer_needs,
-                    'Rekomendasi' => $sizingProject->recommendation,
-                    'Spesifikasi' => $sizingProject->specifications,
-                    'Topologi' => $sizingProject->topology,
-                    'Catatan Teknis' => $sizingProject->technical_notes,
+                    __('Rekomendasi') => $sizingProject->recommendation,
+                    __('Spesifikasi') => $sizingProject->specifications,
+                    __('Topologi') => $sizingProject->topology,
+                    __('Catatan Teknis') => $sizingProject->technical_notes,
                     'Notes' => $sizingProject->notes,
                 ];
             @endphp

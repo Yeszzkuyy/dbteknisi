@@ -14,7 +14,7 @@
                aria-current="{{ $active ? 'page' : 'false' }}"
                class="inline-flex items-center gap-2 border-b-2 px-1 pb-3 pt-1 text-sm font-semibold transition
                       {{ $active
-                            ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-300'
+                            ? 'border-accent-600 text-accent-600 dark:border-accent-400 dark:text-accent-300'
                             : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200' }}">
                 <x-icon name="{{ $tab['icon'] }}" class="h-4 w-4" />
                 {{ $tab['label'] }}

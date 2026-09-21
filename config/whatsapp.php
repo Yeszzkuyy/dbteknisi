@@ -18,6 +18,16 @@ return [
     'base_url' => env('GREEN_API_BASE_URL', 'https://api.green-api.com'),
 
     /*
+    | Bot WhatsApp otomatis (lihat App\Services\WhatsappBot).
+    | max_turns: batas balasan bot per percakapan sebelum handoff ke manusia.
+    | reminder_minutes: jeda minimal notifikasi pengingat untuk percakapan mode human.
+    */
+    'bot' => [
+        'max_turns' => (int) env('WA_BOT_MAX_TURNS', 5),
+        'reminder_minutes' => (int) env('WA_BOT_REMINDER_MINUTES', 30),
+    ],
+
+    /*
     | Meta WhatsApp Business Cloud API.
     | verify_token: string bebas yang KAMU karang sendiri (bukan token Meta),
     | harus sama persis dengan yang dimasukkan di Dashboard Meta →

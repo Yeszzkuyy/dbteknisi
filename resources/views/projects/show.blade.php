@@ -20,10 +20,10 @@
     <div x-data="{ tab: 'info' }" class="space-y-6">
         <div class="border-b border-slate-200 dark:border-slate-700">
             <nav class="flex gap-6">
-                <button @click="tab = 'info'" :class="tab === 'info' ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-300' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="inline-flex items-center gap-2 border-b-2 px-1 pb-3 pt-1 text-sm font-semibold transition">
+                <button @click="tab = 'info'" :class="tab === 'info' ? 'border-accent-600 text-accent-600 dark:border-accent-400 dark:text-accent-300' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="inline-flex items-center gap-2 border-b-2 px-1 pb-3 pt-1 text-sm font-semibold transition">
                     <span>Informasi</span>
                 </button>
-                <button @click="tab = 'workflow'" :class="tab === 'workflow' ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-300' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="inline-flex items-center gap-2 border-b-2 px-1 pb-3 pt-1 text-sm font-semibold transition">
+                <button @click="tab = 'workflow'" :class="tab === 'workflow' ? 'border-accent-600 text-accent-600 dark:border-accent-400 dark:text-accent-300' : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'" class="inline-flex items-center gap-2 border-b-2 px-1 pb-3 pt-1 text-sm font-semibold transition">
                     <span>Workflow</span>
                 </button>
             </nav>
@@ -80,7 +80,7 @@
                         <span class="font-bold text-slate-800">{{ $progress }}%</span>
                     </div>
                     <div class="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-blue-600 rounded-full transition-all duration-500" style="width: {{ $progress }}%"></div>
+                        <div class="h-full bg-accent-600 rounded-full transition-all duration-500" style="width: {{ $progress }}%"></div>
                     </div>
                 </div>
 
@@ -104,7 +104,7 @@
                                 <div class="flex items-center justify-between gap-2">
                                     <h4 class="text-sm font-bold text-slate-800">{{ $step['label'] }}</h4>
                                     @if($step['link'])
-                                        <a href="{{ $step['link'] }}" class="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium shrink-0">
+                                        <a href="{{ $step['link'] }}" class="text-xs text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 font-medium shrink-0">
                                             {{ $step['done'] ? 'Lihat' : 'Mulai' }} →
                                         </a>
                                     @endif

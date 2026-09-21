@@ -1,185 +1,167 @@
-# Dark Mode System
+# Theme System (Dark Mode + Accent)
 
-Project ini menggunakan **dua sistem dark mode yang berjalan bersamaan**:
+Aplikasi memakai **satu sistem tampilan** berbasis dua sumbu:
 
-1. **Tailwind `dark:` variants** — digunakan di semua file Blade.
-2. **CSS custom properties + `!important` override** — didefinisikan di `<style>` inline `resources/views/layouts/app.blade.php:19-50`.
+- **Mode** (light / dark / system) — dikendalikan kelas `.dark` pada `<html>`.
+- **Accent** (ocean / terracotta / purple / emerald) — dikendalikan atribut `data-theme`.
 
-Kedua sistem harus selaras. `!important` override **mematikan** Tailwind `dark:` untuk properti tertentu, jadi menambah `dark:bg-slate-700` saja **tidak cukup** jika kelas dasarnya sudah masuk daftar override.
+Mode dan accent **independen**: mengubah accent tidak mengubah surface/mode, dan sebaliknya.
 
 ---
 
-## CSS Custom Properties
+## Arsitektur Token
 
-### Deklarasi
+Token dideklarasikan di `resources/css/app.css` + `resources/css/themes/accent/*.css`, **tidak lagi di inline `<style>` layout**.
+
+| Layer | Token | Dideklarasikan | Fungsi |
+|---|---|---|---|
+| Accent | `--accent-50..950` (RGB triplet) | `themes/accent/{ocean,terracotta,purple,emerald}.css`, dipilih via `html[data-theme=...]` | Identitas brand/interaksi: tombol utama, link, sidebar aktif, fokus input, today marker kalender |
+| Semantic | `--semantic-info/success/warning/danger` (RGB triplet) | `:root` app.css | Status (Open/Done/Cancelled/dll), badge, donut. **Tidak mengikuti accent** |
+| Surface | `--bg`, `--sidebar-bg`, `--card-bg`, `--input-*`, `--nav-*`, `--text-*`, dll | `:root` (light) + `.dark` (dark) | Permukaan & tipografi, bergantung mode saja |
+| Compatibility | `--theme-blue-*`, `--theme-indigo-*` | `:root` app.css (bernilai Ocean) | Lapisan legacy: seluruh utility `blue-*`/`indigo-*` yang belum dimigrasi |
+
+### Aturan pakai
+
+- **Kode baru**: jangan pakai `blue-*`/`indigo-*` sebagai aksen. Gunakan `accent-*` (mis. `bg-accent-600`, `text-accent-600`, `ring-accent-500`).
+- **Status & data-viz**: tetap pakai warna semantik (`green-*`, `red-*`, `yellow-*`, hex status), jangan sampai berubah karena accent.
+- **Menambah accent baru**: buat file `resources/css/themes/accent/<nama>.css` berisi 11 triplet `--accent-50..950`, tambahkan opsi di `settings/edit.blade.php`, dan masukkan ke validasi `SettingsController` (`in:ocean,terracotta,purple,emerald`) + test `SettingsTest`.
+- **Menambah kelas Tailwind accent/baru**: jalankan `npm run build`.
+
+### Nilai surface dark (fixed)
 
 ```css
-:root {                                         /* Light mode */
-  --sidebar-bg: #fff;
-  --sidebar-border: #e2e8f0;                    /* border-slate-200 */
-  --card-bg: #fff;                              /* bg-white */
-  --card-border: #e2e8f0;                       /* border-slate-200 */
-  --card-bg-hover: #f8fafc;                     /* hover:bg-slate-50 */
-  --text-primary: #1e293b;                      /* text-slate-800 */
-  --text-secondary: #64748b;                    /* text-slate-500 */
-  --text-muted: #94a3b8;                        /* text-slate-400 */
-  --input-bg: #f1f5f9;                          /* bg-slate-100 */
-  --input-border: #cbd5e1;                      /* border-slate-300 */
-  --input-text: #1e293b;                        /* text-slate-800 */
-}
-
-.dark {                                          /* Dark mode */
-  --sidebar-bg: #1e293b;
-  --sidebar-border: #334155;                     /* border-slate-600 */
-  --card-bg: #1e293b;                            /* bg-slate-800 */
-  --card-border: #334155;                        /* border-slate-600 */
-  --card-bg-hover: #2d3a4e;                     /* sedikit lebih terang dari card-bg */
-  --text-primary: #f1f5f9;                       /* text-slate-100 */
-  --text-secondary: #cbd5e1;                     /* text-slate-300 */
-  --text-muted: #64748b;                         /* text-slate-500 */
-  --input-bg: #243244;                          /* sedikit lebih terang dari --card-bg */
-  --input-border: #475569;                       /* border-slate-500 */
-  --input-text: #f1f5f9;                         /* text-slate-100 */
+.dark {
+  --bg:#111111; --sidebar-bg:#111111; --sidebar-border:#3F3F46;
+  --card-bg:#2B2B2B; --card-border:#3F3F46; --card-bg-hover:#333333;
+  --input-bg:#2B2B2B; --input-bg-hover:#333333; --input-border:#4B5563;
+  --input-border-focus:rgb(var(--accent-400)/1);
+  --nav-active-bg:rgb(var(--accent-500)/.18); --nav-active-text:rgb(var(--accent-300)/1);
 }
 ```
 
-### Variabel & Padanan Tailwind
+**Jangan mengubah surface per accent.**
 
-| Variabel        | Light value | Dark value  | Padanan Tailwind |
-|-----------------|-------------|-------------|------------------|
-| `--sidebar-bg`  | `#fff`      | `#1e293b`   | `bg-white` / `bg-slate-800` |
-| `--sidebar-border` | `#e2e8f0` | `#334155`  | `border-slate-200` / `border-slate-600` |
-| `--card-bg`     | `#fff`      | `#1e293b`   | `bg-white` / `bg-slate-800` |
-| `--card-border` | `#e2e8f0`   | `#334155`   | `border-slate-200` / `border-slate-600` |
-| `--card-bg-hover` | `#f8fafc` | `#2d3a4e`  | `hover:bg-slate-50` (light) / hover variant (dark) |
-| `--text-primary` | `#1e293b`  | `#f1f5f9`   | `text-slate-800` / `text-slate-100` |
-| `--text-secondary` | `#64748b` | `#cbd5e1` | `text-slate-500` / `text-slate-300` |
-| `--text-muted`  | `#94a3b8`   | `#64748b`   | `text-slate-400` / `text-slate-500` |
-| `--input-bg`    | `#f1f5f9`   | `#243244`   | `bg-slate-100` (light) / sedikit lebih terang dari `--card-bg` |
-| `--input-border` | `#cbd5e1` | `#475569`  | `border-slate-300` / `border-slate-500` |
-| `--input-text`  | `#1e293b`   | `#f1f5f9`   | `text-slate-800` / `text-slate-100` |
+---
+
+## Alur Preferensi
+
+1. **Penyimpanan**: `users.preferences` (JSON) — kolom `theme` dan `accent`. Dikelola `SettingsController` (`update`, `appearance`).
+2. **Render server** (`layouts/app.blade.php`): `<html lang data-mode="..." data-theme="...">` diisi dari preferensi user.
+3. **FOUC script** di `<head>` (sebelum CSS): baca preferensi server + `localStorage` (`appearance-mode` / `appearance-accent`), set `data-mode`, `data-theme`, dan kelas `dark`. Sinkron pre-CSS → tanpa flash.
+4. **Interaksi** (Settings): `.store.appearance` di `resources/js/app.js` menerapkan mode/accent secara instan, menulis `localStorage`, dan sync ke `POST /settings/appearance` (async).
+5. **livewire:navigated / navigasi SPA**: `data-theme` dan `data-mode` melekat pada `<html>` sehingga tidak hilang saat navigate.
+
+### Precedence nilai
+
+`localStorage` (perangkat) → preferensi server (persisten antar perangkat) → `prefers-color-scheme` (hanya saat mode = system).
+
+---
+
+## Sinkronisasi `data-theme` / `data-mode` (FOUC)
+
+Script antarmuka sebelum CSS memakai urutan:
+
+```js
+var pref   = <theme server>;            // 'light'|'dark'|'system'
+var accent = <accent server>;           // 'ocean'|'terracotta'|...
+var mode   = localStorage['appearance-mode'] || pref;
+var acc    = localStorage['appearance-accent'] || accent;
+// legacy migrasi: localStorage['dark-mode'] === 'true'/'false' → 'dark'/'light'
+root.setAttribute('data-mode', mode);
+root.setAttribute('data-theme', acc);
+root.classList.toggle('dark', mode==='dark' || (mode==='system' && matchMedia('(prefers-color-scheme:dark)').matches));
+```
 
 ---
 
 ## !important Override Rules (app.blade.php)
 
-Aturan berikut **mengoverride Tailwind dark: variants** untuk kelas tertentu:
+Aturan override dark di `<style>` layout **masih berlaku** untuk kelas legacy (`bg-slate-*`, `bg-white`, `text-slate-*`, dll). Perubahan dari versi lama:
 
-```css
-/* Background — static */
-.dark .bg-white              { background-color: var(--card-bg) !important; }
-.dark .bg-slate-50           { background-color: var(--card-bg) !important; }
+- Semua hardcoded hex (`#171010`, `#2B2B2B`, `#423F3E`, `#362222`, `#5A5451`, `#E0A370`) diganti token (`var(--card-bg)`, `var(--input-bg)`, dst).
+- Override `.dark .text-blue-*` → `#E0A370` **dihapus** — blue/indigo kini semantic Ocean, bukan terracotta.
+- Override `[data-status-color]` yang memetakan ke terracotta **dihapus** — status tetap berwarna semantiknya sendiri.
+- Toggle ON dan fokus input pakai `var(--accent-*)`.
 
-/* Background — tombol sekunder & elemen abu (Kembali/Batal, pill, track) */
-.dark .bg-slate-100          { background-color: #243244 !important; }
-.dark .bg-slate-200          { background-color: #334155 !important; }
-.dark .bg-slate-300          { background-color: #475569 !important; }
-.dark .bg-gray-300           { background-color: #475569 !important; }
-
-/* Background — hover */
-.dark .hover\:bg-slate-50:hover { background-color: var(--card-bg-hover) !important; }
-.dark .hover\:bg-gray-50:hover  { background-color: var(--card-bg-hover) !important; }
-.dark .hover\:bg-slate-100:hover { background-color: #243244 !important; }
-.dark .hover\:bg-slate-200:hover { background-color: #334155 !important; }
-.dark .hover\:bg-slate-300:hover { background-color: #475569 !important; }
-
-/* Border */
-.dark .border-slate-200      { border-color: var(--card-border) !important; }
-.dark .border-slate-300      { border-color: var(--input-border) !important; }
-
-/* Text — primary */
-.dark .text-slate-800,
-.dark .text-gray-900,
-.dark .text-slate-700        { color: var(--text-primary) !important; }
-
-/* Text — secondary */
-.dark .text-slate-600,
-.dark .text-gray-600         { color: var(--text-secondary) !important; }
-
-/* Text — muted */
-.dark .text-slate-500,
-.dark .text-gray-500         { color: var(--text-muted) !important; }
-
-/* Text — table header (override text-slate-500/600 khusus th) */
-.dark th.text-slate-500,
-.dark th.text-slate-600      { color: var(--text-secondary) !important; }
-
-/* Shadow */
-.dark .shadow-sm             { box-shadow: 0 1px 3px 0 rgba(0,0,0,.3) !important; }
-```
-
-### Catatan penting
-
-- Semua aturan di atas pakai `!important` — **lebih tinggi dari Tailwind `dark:` biasa**.
-- Menambah `dark:bg-slate-700` pada elemen yang juga punya kelas `bg-white` atau `bg-slate-50` **tidak akan berefek** karena `!important` override menang.
-- Satu-satunya cara agar perubahan dark mode dihormati adalah: **tambah aturan `!important` baru di blok `<style>` ini**, dengan selektor yang sama spesifik atau lebih spesifik dari aturan di atas.
+> Catatan: karena `--theme-blue-*` kini selalu Ocean (bukan terracotta di dark), view legacy dengan `text-blue-600`/`bg-blue-600` di dark mode tetap **biru**, bukan hangat seperti sebelumnya. Ini disengaja (semantic tetap biru). Migrasi bertahap ke `accent-*` terjadi per komponen.
 
 ---
 
-## Form Input (input, textarea, select)
+## Input / Form
 
-Semua input teks, textarea, dan select di **layout app** (bukan halaman auth yang standalone) diberi styling seragam via aturan elemen global:
+Aturan global input (background, border, teks, placeholder) tetap seperti sebelum, kini fokus memakai `var(--input-border-focus)` (accent-aware):
 
 ```css
-/* Background, border, dan teks — menang atas base @tailwindcss/forms (#fff) */
-input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]):not([type=range]):not([type=hidden]),
-select, textarea {
-  background-color: var(--input-bg) !important;
-  border-color: var(--input-border) !important;
-  color: var(--input-text) !important;
-}
-
-/* Focus: pertahankan border biru yang sebelumnya via focus:border-blue-500 */
-input:focus, select:focus, textarea:focus { border-color: #3b82f6 !important; }
-
-/* Placeholder — reuse --text-muted */
-input::placeholder, textarea::placeholder { color: var(--text-muted) !important; }
+input:focus, select:focus, textarea:focus { border-color: var(--input-border-focus) !important; }
 ```
 
-Catatan penting:
-
-- **Jangan menambah `bg-white`/`border-slate-300` di blade untuk input** — aturan global `!important` di atas sudah mengatur semuanya; kelas blade seperti `focus:ring-blue-500` (ring) tetap jalan karena box-shadow tidak disentuh.
-- **Tidak perlu `dark:` variants** untuk background/border input — variabel otomatis berubah lewat `.dark`.
-- **Pengecualian**: checkbox, radio, file, color, range, hidden tidak kena (selektor `:not`), jadi styling checkbox `text-blue-600` tetap terlihat.
-- **Halaman auth** (login/register/forgot/reset) tidak memakai `layouts/app.blade.php`, jadi tidak terpengaruh aturan ini.
-- Error state input: jangan pakai `border-red-*` sebagai satu-satunya indikator — akan kalah oleh override di atas; tampilkan error sebagai teks pesan.
+Aturan-aturan lama yang lain (input tidak kena `:not([type=...])`, halaman auth standalone, error state teks) tetap berlaku.
 
 ---
 
-## Aturan Menambah Komponen/Tabel Baru
+## Chart (ApexCharts)
 
-**1. Gunakan kelas Tailwind standar** yang sudah ada override-nya (lihat daftar di atas):
-   - `bg-white` / `bg-slate-50` → otomatis gelap via `--card-bg`
-   - `bg-slate-100` / `bg-slate-200` / `bg-slate-300` / `bg-gray-300` → otomatis gelap (tombol sekunder Kembali/Batal)
-   - `border-slate-200` → otomatis gelap via `--card-border`
-   - `border-slate-300` → otomatis gelap via `--input-border`
-   - `text-slate-800` / `text-slate-700` → otomatis gelap via `--text-primary`
-   - `text-slate-600` → otomatis gelap via `--text-secondary`
-   - `text-slate-500` → otomatis gelap via `--text-muted`
+Gunakan helper global `window.getAppearanceColors()` (`resources/js/app.js`) — membaca token live dari computed style sehingga **tidak perlu snapshot `isDark` saat render**:
 
-**2. Jangan bergantung pada `dark:` variants** untuk properti yang sudah di-override. Contoh:
-   ```html
-   <!-- ✅ BENER — bg-slate-50 sudah di-override -->
-   <div class="bg-slate-50 ...">
+```js
+const c = window.getAppearanceColors();
+// c.dark, c.theme, c.accent500..., c.info/success/warning/danger, c.cardBg
+```
 
-   <!-- ❌ MUBASIR — dark:bg-slate-700 kalah sama !important override bg-slate-50 -->
-   <div class="bg-slate-50 dark:bg-slate-700 ...">
-   ```
+Contoh donut (marketing): warna status **semantik tetap**, hanya `theme.mode` dan `stroke` yang ikut mode/accent. Semua donut meregistrasi instance-nya (mis. `window.marketingDonutChart`) dan dipanggil ulang lewat listener `appearance:change`:
 
-**3. Untuk properti yang TIDAK ada override-nya**, Tailwind `dark:` variants masih jalan:
-   - `dark:text-white`, `dark:text-slate-200`
-   - `dark:bg-slate-700`, `dark:bg-slate-600`
-   - `dark:divide-slate-600`, `dark:divide-slate-700`
-   - dll.
+```js
+window.addEventListener('appearance:change', () => {
+  if (window.marketingDonutChart) window.marketingDonutChart.updateOptions(donutOptions());
+});
+```
 
-**4. Menambah override baru**: jika ada kelas baru yang butuh dark mode, tambahkan aturan `!important` di blok `<style>` `app.blade.php`, ikuti pola yang sudah ada:
-   ```css
-   .dark .KELAS-BARU { PROPERTY: var(--VARIABEL) !important; }
-   ```
+**Dilarang** me-hardcode warna status per mode (misal `isDark ? '#D18B5C' : '#3b82f6'`) — status harus tetap semantik di kedua mode.
 
-**5. Tabel — header (`<thead>`)**: pakai `bg-slate-50` agar background ikut `--card-bg` di dark mode. Teks `<th>` pakai `text-slate-500` atau `text-slate-600`, sudah di-override khusus untuk `th` dengan `--text-secondary` (lebih terang dari `text-slate-500` biasa).
+---
 
-**6. Rebuild CSS** setelah menambah kelas baru (terutama kelas tanpa override) agar Tailwind JIT mengenerate CSS-nya:
-   ```bash
-   npm run build
-   ```
+## Compat Layer `--theme-blue-*` / `--theme-indigo-*`
+
+Variabel kompatibilitas **hanya** digunakan 3 lokasi (audit terakhir); semuanya halaman/section **standalone** yang tidak memakai token accent — sengaja DIPERTAHANKAN:
+
+| Lokasi | Penggunaan | Alasan keep |
+|---|---|---|
+| `resources/css/app.css` | Definisi variabel + conic-gradient notifikasi (app.css:450-455) | Layer compat Ocean (fixed) + gradien dekoratif |
+| `resources/views/ai/chat.blade.php` | ~46 ref CSS scoped `.ai-*` | Halaman standalone brand AI |
+| `resources/views/calendar.blade.php` | 1 ref (`.card .time`) | Halaman standalone |
+
+Semua `.blade.php` lain sudah dimigrasi dari `blue-*`/`indigo-*` ke `accent-*`. Halaman `auth/*` memakai inline `--accent` scoped sendiri (brand) — di luar sistem theme, dibiarkan.
+
+Cleanup lebih lanjut (migrasi ai-chat) = pekerjaan terpisah, tidak menyentuh sistem token.
+
+---
+
+## Ringkasan Migrasi Accent (seluruh UI)
+
+Setelah sistem token live, seluruh UI aplikasi dimigrasi dari `blue-*`/`indigo-*` hardcode ke skala `accent-*` (Tailwind) sehingga ikut preferensi accent user. Klasifikasi hasil:
+
+**MIGRASI (±1.050 kemunculan, 114 file views):**
+- Focus ring/border input & focus-visible → `accent-500` / `dark:accent-400`
+- Tombol primer/submit → `bg-accent-600 hover:bg-accent-700`
+- Link utama & label aktif → `text-accent-600/700` (`dark:text-accent-300/400`)
+- Tab aktif (projects/show, customers/show) → `border/text-accent-600`
+- Checkbox/radio terpilih → `text-accent-600`
+- Progress bar & pill filter aktif → `bg-accent-600`
+- Toggle settings (`peer-checked:bg-accent-600`)
+- Tindakan ikon lunak (Lihat/Edit/Download) → `bg-accent-50/100`
+- Komponen reuse (15 file) — primary-button, text-input, nav-link, profile-tabs, dll.
+
+**KEEP (sengaja tetap `blue-*`/`indigo-*`):**
+- Badge status semantik (`status-badge` 'blue', status survey 'scheduled', status lead 'new', `*_COLORS`)
+- Warna avatar data (`user-avatar` palette) & chip kategori
+- Pair stat-card dekoratif di dashboard (biru+indigo, merah, hijau, dll) supaya kartunya berbeda-beda
+- Blob/glow aurora dekoratif + bullet dot sidebar
+- Rule CSS `.peer-checked\:bg-blue-600` di `app.blade.php:113` (nama dev tetap, nilainya sudah `--accent-600`)
+
+> Aturan: kalau warna = **semantik** (status), pasangan statistik (pair), atau data-kategori → jangan ubah. Kalau = aksi primer/selected/fokus/link → pakai `accent-*`.
+
+---
+
+## Regresi & Verifikasi
+
+Matriks regresi: **Light/Dark × Ocean/Terracotta/Purple/Emerald** pada Dashboard, Teknisi, Marketing, Sales, Sidebar, Header, Tables, Forms, Modal, Dropdown, Tabs, Calendar, Charts, Status badge, Settings. Verifikasi: `npm run build` + `php artisan test` (218 hijau).

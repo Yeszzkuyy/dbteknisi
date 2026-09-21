@@ -50,12 +50,15 @@ Route::middleware('auth')->group(function () {
     // Settings (preferensi aplikasi)
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::post('/settings/appearance', [SettingsController::class, 'appearance'])->name('settings.appearance');
     Route::get('/settings/advanced', [SettingsController::class, 'advanced'])
         ->middleware('password.confirm:password.confirm,1')
         ->name('settings.advanced');
 
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
     Route::get('/notifications/status', [NotificationController::class, 'status'])->name('notifications.status');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     // ============================================
     // AI ASSISTANT (OfficeAssistant)
@@ -316,6 +319,8 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware('permission:manage-marketing')->group(function () {
             Route::post('/{account}/messages/{sender}', [WhatsAppCenterController::class, 'store'])->name('reply');
+            Route::post('/{account}/conversations/{sender}/takeover', [WhatsAppCenterController::class, 'takeover'])->name('takeover');
+            Route::post('/{account}/conversations/{sender}/release', [WhatsAppCenterController::class, 'release'])->name('release');
             Route::post('/{account}/convert/{sender}', [WhatsAppCenterController::class, 'convert'])->name('convert');
             Route::post('/{account}/contacts', [WhatsAppCenterController::class, 'saveContact'])->name('contact-save');
             Route::post('/{account}/simulate', [WhatsAppCenterController::class, 'simulate'])->name('simulate');

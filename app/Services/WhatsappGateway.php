@@ -95,7 +95,7 @@ class WhatsappGateway
                 [
                     'messaging_product' => 'whatsapp',
                     'recipient_type' => 'individual',
-                    'to' => $number,
+                    'to' => self::normalizeNumber($number),
                     'type' => 'text',
                     'text' => [
                         'preview_url' => false,
@@ -121,9 +121,15 @@ class WhatsappGateway
                 rtrim(config('whatsapp.meta.graph_base_url'), '/'),
                 config('whatsapp.meta.api_version'),
                 $account->gateway_instance
-            ));
+            ), [
+                'fields' => 'display_phone_number',
+            ]);
 
-        return $response->successful() ? 'authorized' : null;
+        // Pastikan ID benar-benar Phone Number ID (punya display_phone_number),
+        // bukan App ID / ID lain yang kebetulan bisa di-GET.
+        return $response->successful() && $response->json('display_phone_number')
+            ? 'authorized'
+            : null;
     }
 
     /**
@@ -179,6 +185,25 @@ class WhatsappGateway
 
     private function chatId(string $number): string
     {
-        return preg_replace('/\D/', '', $number) . '@c.us';
+        return self::normalizeNumber($number) . '@c.us';
+    }
+
+    /**
+     * Normalisasi nomor ke format internasional tanpa simbol (mis. 0812... -> 62812...).
+     * Nomor pendek (mis. kode internal) dibiarkan apa adanya.
+     */
+    public static function normalizeNumber(string $number): string
+    {
+        $digits = preg_replace('/\D/', '', $number);
+
+        if (str_starts_with($digits, '0') && strlen($digits) >= 9) {
+            return '62' . substr($digits, 1);
+        }
+
+        if (str_starts_with($digits, '8') && strlen($digits) >= 9) {
+            return '62' . $digits;
+        }
+
+        return $digits;
     }
 }

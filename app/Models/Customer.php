@@ -20,6 +20,7 @@ class Customer extends Model
         'notes',
         'status',
         'deleted_by',
+        'whatsapp_account_id',
     ];
 
     protected $casts = [
@@ -64,6 +65,11 @@ class Customer extends Model
     public function leads()
     {
         return $this->hasMany(Lead::class);
+    }
+
+    public function whatsappAccount()
+    {
+        return $this->belongsTo(WhatsappAccount::class);
     }
 
     public function waLink(string $text = ''): ?string

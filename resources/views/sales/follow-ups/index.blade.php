@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Follow Up Customer</h1>
-            <p class="text-slate-500 mt-1">Pantau tindak lanjut dengan customer.</p>
+            <p class="text-slate-500 mt-1">{{ __('Pantau tindak lanjut dengan customer.') }}</p>
         </div>
     </div>
 
@@ -10,14 +10,14 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6">
         <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Cari Customer</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Cari Customer') }}</label>
                 <input type="text" name="search" value="{{ request('search') }}"
-                       placeholder="Nama customer..."
-                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                       placeholder="{{ __('Nama customer...') }}"
+                       class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit"
-                        class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                        class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                     Filter
                 </button>
                 @if(request()->anyFilled(['search']))
@@ -37,11 +37,11 @@
                 <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Customer</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Deskripsi</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Terkait Meeting</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Tanggal Follow Up</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Oleh</th>
-                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Deskripsi') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Terkait Meeting') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Tanggal Follow Up') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Oleh') }}</th>
+                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
@@ -78,12 +78,12 @@
                             <td class="px-6 py-4">
                                 <div class="flex justify-end gap-3">
                                     <a href="{{ route('sales.follow-ups.show', $fu) }}"
-                                       class="text-blue-600 hover:text-blue-800">Detail</a>
+                                       class="text-accent-600 hover:text-accent-800">Detail</a>
                                     @can('manage-sales')
                                         <a href="{{ route('sales.follow-ups.edit', $fu) }}"
                                            class="text-amber-600 hover:text-amber-800">Edit</a>
                                         <form action="{{ route('sales.follow-ups.destroy', $fu) }}"
-                                              method="POST" onsubmit="return confirm('Hapus follow up ini?')">
+                                              method="POST" onsubmit="return confirm('{{ __('Hapus follow up ini?') }}')">
                                             @csrf @method('DELETE')
                                             <button class="text-red-600 hover:text-red-800">Hapus</button>
                                         </form>
@@ -93,7 +93,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-16 text-center text-slate-400">Belum ada follow up.</td>
+                            <td colspan="6" class="py-16 text-center text-slate-400">{{ __('Belum ada follow up.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -27,7 +27,7 @@ class ManageMenuTest extends TestCase
         foreach (['manage.marketing.index', 'manage.technical.index', 'manage.admin.index'] as $route) {
             $this->get(route($route))
                 ->assertOk()
-                ->assertSee('Dalam Pengembangan');
+                ->assertSee(__('Dalam Pengembangan'));
         }
     }
 

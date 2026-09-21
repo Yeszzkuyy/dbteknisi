@@ -7,11 +7,11 @@
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('project-documents.download', $document) }}" 
-                   class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                   class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                     Download
                 </a>
                 <a href="{{ route('project-documents.index', $document->project) }}" 
-                   class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition">
+                   class="px-5 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 font-medium transition">
                     ← Kembali
                 </a>
             </div>
@@ -59,7 +59,7 @@
                     <p class="text-slate-600 font-medium">File Office tidak bisa di-preview di browser</p>
                     <p class="text-slate-400 text-sm mt-2">Silakan download untuk membuka file</p>
                     <a href="{{ route('project-documents.download', $document) }}" 
-                       class="mt-4 inline-block px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                       class="mt-4 inline-block px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                         Download File
                     </a>
                 </div>
@@ -73,7 +73,7 @@
                     </svg>
                     <p class="text-slate-600 font-medium">Preview tidak tersedia untuk file ini</p>
                     <a href="{{ route('project-documents.download', $document) }}" 
-                       class="mt-4 inline-block px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                       class="mt-4 inline-block px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                         Download File
                     </a>
                 </div>

@@ -18,14 +18,20 @@ Dokumen ini adalah acuan tunggal untuk gaya visual, komponen, dan konvensi UI di
 - **Plus Jakarta Sans** (400–800) dimuat via `fonts.bunny.net` di `layouts/app.blade.php:14`; fallback ke `defaultTheme.fontFamily.sans`.
 
 ### Warna aksen
-- Aksen utama: **blue-600** `#2563eb` (action utama, link, fokus ring `#3b82f6`).
+- Sistem tampilan = **2 sumbu: Mode (light/dark/system) + Accent (ocean/terracotta/purple/emerald)**.
+  Detail lengkap: `docs/DARK_MODE_SYSTEM.md`.
+- Aksen dipilih pengguna di Settings; token `--accent-50..950` di
+  `resources/css/themes/accent/*.css`. Default: **Ocean** (`#3b82f6`).
+- Komponen interaksi baru pakai kelas `accent-*` (`bg-accent-600`, `text-accent-600`, `ring-accent-500`).
+  Kelas `blue-*`/`indigo-*` adalah **lapisan kompatibilitas** (tetap Ocean) — jangan dipakai untuk kode baru.
 - Netral: palet **slate** (50–900) — dasar semua permukaan & teks.
+- Status (Open/Done/Cancelled, dll) **tidak mengikuti accent** — selalu semantik (green/red/yellow/blue, dst).
 
 ### Status project (donut, badge, bar)
 
 | Status | Warna | Hex (bar/donut) |
 |---|---|---|
-| Open | blue | `#3b82f6` |
+| Open | blue (info) | `#3b82f6` |
 | On Progress | yellow | `#eab308` |
 | Pending | orange | `#f97316` |
 | Hold | red | `#dc2626` |
@@ -59,17 +65,15 @@ Dark mode memakai varian hitam lebih pekat.
 - Header di atas `main`; flash message (success/error) di bawah header.
 - Struktur ada di `layouts/app.blade.php` + `layouts/partials/`.
 
-## 4. Dark Mode
+## 4. Dark Mode & Aksen
 
-Berjalan **dua sistem paralel** (detail lengkap: `docs/DARK_MODE_SYSTEM.md`):
-1. Tailwind `dark:` variants.
-2. CSS vars + `!important` override di `<style>` `app.blade.php:34-84`.
+Berjalan **satu sistem tampilan** (mode × accent). Detail lengkap: `docs/DARK_MODE_SYSTEM.md`.
 
 ### Kelas yang di-override `!important` (dark)
 | Kelas | Menjadi |
 |---|---|
 | `bg-white`, `bg-slate-50` | `var(--card-bg)` |
-| `bg-slate-100/200/300`, `bg-gray-300` | `#243244 / #334155 / #475569` |
+| `bg-slate-100/200/300`, `bg-gray-300` | `#2B2B2B / #3F3F46 / #3F3F46` |
 | `border-slate-200` / `-300` | `var(--card-border)` / `var(--input-border)` |
 | `text-slate-700/800/900` | `var(--text-primary)` |
 | `text-slate-600` | `var(--text-secondary)` |
@@ -78,8 +82,11 @@ Berjalan **dua sistem paralel** (detail lengkap: `docs/DARK_MODE_SYSTEM.md`):
 ### Aturan
 - **Jangan** tambah `dark:bg-slate-700`/`dark:text-slate-*` untuk properti yang sudah di-override di atas — kalah `!important`, mubasir.
 - Untuk properti tanpa override, `dark:` biasa tetap jalan (mis. `dark:bg-slate-700`, `dark:border-slate-600`).
-- Input (text/select/textarea) diatur global via CSS var — **jangan** paksa `bg-white`/`border-slate-300` di blade; fokus ring `focus:ring-blue-500` tetap jalan.
-- Menambah override baru? Tambahkan aturan `!important` di blok `<style>` `app.blade.php` mengikuti pola yang ada.
+- Input (text/select/textarea) diatur global via CSS var — **jangan** paksa `bg-white`/`border-slate-300` di blade; `--input-border` dark memakai `#4B5563` untuk visibilitas.
+- Dark mode memakai surface `#111111`, `#2B2B2B`, `#333333`, dan `#3F3F46`. Surface **tidak berubah** per accent.
+- Utility `blue`/`indigo` adalah lapisan kompatibilitas: **tetap Ocean di kedua mode** (sebelumnya berubah jadi terracotta di dark). Komponen interaksi baru harus pakai `accent-*`.
+- Input focus mengikuti accent via `--input-border-focus`.
+- Menambah override baru? Tambahkan aturan `!important` di blok `<style>` `app.blade.php` mengikuti pola yang ada; hardcoded hex harus memakai token var.
 
 ## 5. Komponen Blade (`resources/views/components/`)
 
@@ -123,9 +130,10 @@ Berjalan **dua sistem paralel** (detail lengkap: `docs/DARK_MODE_SYSTEM.md`):
 
 ## 8. Chart (ApexCharts)
 
-- Donut dipakai di `marketing/dashboard.blade.php:197-235` dan donut CSS di `teknisi/dashboard.blade.php` (conic-gradient + counter).
-- Palet status project untuk donut teknisi lihat tabel di §2.
-- Data di-passing via `@json($data)` dalam event `DOMContentLoaded` (ApexCharts tersedia setelah bundle Vite).
+- Donut dipakai di `marketing/dashboard.blade.php` dan `teknisi/dashboard.blade.php`.
+- Warna **status** selalu semantik — jangan diubah per mode/accent.
+- Ambil warna token via `window.getAppearanceColors()` (live computed style) — tanpa snapshot `isDark`.
+- Mode/accent berubah tanpa reload: dengarkan `appearance:change` lalu `updateOptions()`. Instance chart disimpan di `window.*DonutChart`.
 
 ## 9. Aturan Kontribusi UI
 

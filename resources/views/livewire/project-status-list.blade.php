@@ -13,7 +13,7 @@
                 <input type="text" 
                        wire:model="name" 
                        placeholder="Nama Status"
-                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                       class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                 @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div class="flex items-center gap-3">
@@ -24,15 +24,15 @@
                 <input type="text" 
                        wire:model="color" 
                        placeholder="#3b82f6"
-                       class="flex-1 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                       class="flex-1 rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             </div>
             <div class="flex items-center gap-4">
                 <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <input type="checkbox" wire:model="is_default" class="w-5 h-5 rounded border-slate-300 text-blue-600">
+                    <input type="checkbox" wire:model="is_default" class="w-5 h-5 rounded border-slate-300 text-accent-600">
                     Default
                 </label>
                 <button wire:click="save" 
-                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">
+                        class="px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-xl transition">
                     + Tambah
                 </button>
             </div>
@@ -56,7 +56,7 @@
                         <tr class="hover:bg-slate-50 transition" wire:key="status-{{ $status->id }}">
                             <td class="px-6 py-4 font-medium text-slate-800">{{ $status->name }}</td>
                             <td class="px-6 py-4">
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full" 
+                                <span data-status-color="{{ $status->color ?? '#3b82f6' }}" class="px-3 py-1 text-xs font-semibold rounded-full"
                                       style="background-color: {{ $status->color ?? '#3b82f6' }}20; color: {{ $status->color ?? '#3b82f6' }}">
                                     {{ $status->color ?? 'Default' }}
                                 </span>
@@ -81,13 +81,13 @@
 
                         {{-- Row Edit --}}
                         @if($editId == $status->id)
-                            <tr class="bg-blue-50">
+                            <tr class="bg-accent-50">
                                 <td colspan="4" class="px-6 py-4">
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
                                             <input type="text" 
                                                    wire:model="editName" 
-                                                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                                             @error('editName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="flex items-center gap-3">
@@ -96,15 +96,15 @@
                                                    class="w-12 h-12 rounded border-slate-300 cursor-pointer">
                                             <input type="text" 
                                                    wire:model="editColor" 
-                                                   class="flex-1 rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                                                   class="flex-1 rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                                         </div>
                                         <div class="flex items-center gap-4">
                                             <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
-                                                <input type="checkbox" wire:model="editIsDefault" class="w-5 h-5 rounded border-slate-300 text-blue-600">
+                                                <input type="checkbox" wire:model="editIsDefault" class="w-5 h-5 rounded border-slate-300 text-accent-600">
                                                 Default
                                             </label>
                                             <button wire:click="update" 
-                                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">
+                                                    class="px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-xl transition">
                                                 Update
                                             </button>
                                             <button wire:click="cancelEdit" 

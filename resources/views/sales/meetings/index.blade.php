@@ -2,12 +2,12 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Tracker Meeting Customer</h1>
-            <p class="text-slate-500 mt-1">Catat dan pantau seluruh meeting dengan customer.</p>
+            <p class="text-slate-500 mt-1">{{ __('Catat dan pantau seluruh meeting dengan customer.') }}</p>
         </div>
         @can('manage-sales')
             <a href="{{ route('sales.meetings.create') }}"
-               class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
-                + Catat Meeting
+               class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
+                {{ __('+ Catat Meeting') }}
             </a>
         @endcan
     </div>
@@ -16,22 +16,22 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6">
         <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Cari Customer</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Cari Customer') }}</label>
                 <input type="text" name="search" value="{{ request('search') }}"
-                       placeholder="Nama customer..."
-                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                       placeholder="{{ __('Nama customer...') }}"
+                       class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Dari Tanggal</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Dari Tanggal') }}</label>
                 <x-datepicker name="date_from" value="{{ request('date_from') }}"></x-datepicker>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Sampai Tanggal</label>
+                <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Sampai Tanggal') }}</label>
                 <x-datepicker name="date_to" value="{{ request('date_to') }}"></x-datepicker>
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit"
-                        class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                        class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                     Filter
                 </button>
                 @if(request()->anyFilled(['search', 'date_from', 'date_to']))
@@ -51,11 +51,11 @@
                 <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Customer</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Tanggal</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Peserta</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Kebutuhan (ringkas)</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Tanggal') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Peserta') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Kebutuhan (ringkas)') }}</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Follow Up</th>
-                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Aksi</th>
+                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
@@ -83,12 +83,12 @@
                             <td class="px-6 py-4">
                                 <div class="flex justify-end gap-3">
                                     <a href="{{ route('sales.meetings.show', $meeting) }}"
-                                       class="text-blue-600 hover:text-blue-800">Detail</a>
+                                       class="text-accent-600 hover:text-accent-800">Detail</a>
                                     @can('manage-sales')
                                         <a href="{{ route('sales.meetings.edit', $meeting) }}"
                                            class="text-amber-600 hover:text-amber-800">Edit</a>
                                         <form action="{{ route('sales.meetings.destroy', $meeting) }}"
-                                              method="POST" onsubmit="return confirm('Hapus meeting ini?')">
+                                              method="POST" onsubmit="return confirm('{{ __('Hapus meeting ini?') }}')">
                                             @csrf @method('DELETE')
                                             <button class="text-red-600 hover:text-red-800">Hapus</button>
                                         </form>
@@ -98,7 +98,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-16 text-center text-slate-400">Belum ada meeting.</td>
+                            <td colspan="6" class="py-16 text-center text-slate-400">{{ __('Belum ada meeting.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -6,15 +6,15 @@
                     Edit Customer
                 </h1>
                 <p class="text-slate-500 mt-1">
-                    Edit data customer: <span class="font-semibold text-slate-700">{{ $customer->name }}</span>
+                    {{ __('Edit data customer:') }} <span class="font-semibold text-slate-700">{{ $customer->name }}</span>
                 </p>
             </div>
             <a href="{{ route('customers.show', $customer) }}" 
-               class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition sm:self-start">
+               class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition sm:self-start">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Kembali ke Customer
+                {{ __('Kembali ke Customer') }}
             </a>
         </div>
 
@@ -27,13 +27,13 @@
                     {{-- Nama Perusahaan --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            Nama Perusahaan <span class="text-red-500">*</span>
+                            {{ __('Nama Perusahaan') }} <span class="text-red-500">*</span>
                         </label>
                         <input type="text"
                                name="name"
                                value="{{ old('name', $customer->name) }}"
                                required
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -44,32 +44,32 @@
                         </label>
                         <textarea name="address" 
                                   rows="3"
-                                  class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('address', $customer->address) }}</textarea>
+                                  class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('address', $customer->address) }}</textarea>
                         @error('address') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     {{-- Phone --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            No Telp
+                            {{ __('No Telp') }}
                         </label>
                         <input type="text" 
                                name="phone" 
                                value="{{ old('phone', $customer->phone) }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     {{-- WhatsApp --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">
-                            No WA
+                            {{ __('No WA') }}
                         </label>
                         <input type="text"
                                name="whatsapp"
                                value="{{ old('whatsapp', $customer->whatsapp) }}"
                                inputmode="tel"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('whatsapp') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -81,7 +81,7 @@
                         <input type="email" 
                                name="email" 
                                value="{{ old('email', $customer->email) }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -92,18 +92,18 @@
                         </label>
                         <textarea name="notes" 
                                   rows="3"
-                                  class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('notes', $customer->notes) }}</textarea>
+                                  class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('notes', $customer->notes) }}</textarea>
                         @error('notes') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
                 <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3">
                     <a href="{{ route('customers.show', $customer) }}" 
-                       class="px-6 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-medium transition text-base text-center">
-                        Batal
+                       class="px-6 py-3 rounded-xl bg-accent-500 hover:bg-accent-600 text-white font-medium transition text-base text-center">
+                        {{ __('Batal') }}
                     </a>
-                    <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition text-base">
-                        Update Customer
+                    <button type="submit" class="px-6 py-3 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition text-base">
+                        {{ __('Update Customer') }}
                     </button>
                 </div>
             </form>

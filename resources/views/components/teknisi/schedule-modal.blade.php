@@ -190,7 +190,7 @@ document.addEventListener('alpine:init', () => {
 <x-modal name="schedule-modal" maxWidth="2xl" :show="false">
     <div x-data="scheduleForm" class="max-h-[85vh] overflow-y-auto">
         <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800" x-text="mode === 'view' ? 'Detail Jadwal' : (mode === 'edit' ? 'Edit Jadwal' : 'Tambah Jadwal')"></h3>
+            <h3 class="text-lg font-bold text-slate-800" x-text="mode === 'view' ? '{{ __('Detail Jadwal') }}' : (mode === 'edit' ? '{{ __('Edit Jadwal') }}' : '{{ __('Tambah Jadwal') }}')"></h3>
             <button @click="close()" class="text-slate-400 hover:text-slate-600" type="button">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -210,45 +210,45 @@ document.addEventListener('alpine:init', () => {
                         <dd class="mt-0.5 text-slate-700" x-text="detail.customer || '-'"></dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Teknisi</dt>
+                        <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ __('Teknisi') }}</dt>
                         <dd class="mt-0.5 text-slate-700" x-text="detail.technician || '-'"></dd>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Tanggal</dt>
+                        <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ __('Tanggal') }}</dt>
                         <dd class="mt-0.5 text-slate-700" x-text="detail.date"></dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Jam</dt>
+                        <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ __('Jam') }}</dt>
                         <dd class="mt-0.5 text-slate-700" x-text="detail.time"></dd>
                     </div>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Lokasi</dt>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ __('Lokasi') }}</dt>
                     <dd class="mt-0.5 text-slate-700" x-text="detail.location || '-'"></dd>
                 </div>
                 <div x-show="detail.description">
-                    <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Deskripsi</dt>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ __('Deskripsi') }}</dt>
                     <dd class="mt-0.5 text-slate-700" x-text="detail.description"></dd>
                 </div>
             </dl>
 
             <div class="flex flex-wrap items-center gap-3 pt-5 mt-5 border-t border-slate-100">
                 <button type="button" @click="toEdit()" x-show="canManage"
-                        class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                        class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                     Edit
                 </button>
                 <form x-show="canManage" :action="deleteAction()" method="POST" class="inline"
-                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?')">
+                      onsubmit="return confirm('{{ __('Apakah Anda yakin ingin menghapus jadwal ini?') }}')">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">
                     <button type="submit" class="px-4 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium transition text-sm">
-                        Hapus
+                        {{ __('Hapus') }}
                     </button>
                 </form>
                 <button type="button" @click="close()" class="ml-auto px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
-                    Tutup
+                    {{ __('Tutup') }}
                 </button>
             </div>
         </div>
@@ -260,8 +260,8 @@ document.addEventListener('alpine:init', () => {
             <input type="hidden" name="_schedule_id" :value="scheduleId">
 
             <div>
-                <x-input-label for="schedule-title" value="Nama Project / Pekerjaan" />
-                <x-text-input id="schedule-title" name="title" class="mt-1 w-full" x-model="form.title" placeholder="Instalasi CCTV PT ABC" required />
+                <x-input-label for="schedule-title" value="{{ __('Nama Project / Pekerjaan') }}" />
+                <x-text-input id="schedule-title" name="title" class="mt-1 w-full" x-model="form.title" placeholder="{{ __('Instalasi CCTV PT ABC') }}" required />
                 <x-input-error :messages="$errors->get('title')" class="mt-1" />
             </div>
 
@@ -269,8 +269,8 @@ document.addEventListener('alpine:init', () => {
                 <div>
                     <x-input-label for="schedule-project" value="Project" />
                     <select id="schedule-project" name="project_id" x-model="form.project_id"
-                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
-                        <option value="">— Pilih Project —</option>
+                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
+                        <option value="">{{ __('— Pilih Project —') }}</option>
                         @foreach($projects as $project)
                             <option value="{{ $project->id }}">{{ $project->project_name }}</option>
                         @endforeach
@@ -278,11 +278,11 @@ document.addEventListener('alpine:init', () => {
                     <x-input-error :messages="$errors->get('project_id')" class="mt-1" />
                 </div>
                 <div>
-                    <x-input-label for="schedule-technician" value="Teknisi" />
+                    <x-input-label for="schedule-technician" value="{{ __('Teknisi') }}" />
                     <select id="schedule-technician" name="technician_user_id" x-model="form.technician_user_id"
                             @change="setTechnician()"
-                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
-                        <option value="">— Pilih Teknisi —</option>
+                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
+                        <option value="">{{ __('— Pilih Teknisi —') }}</option>
                         @foreach($technicians as $technician)
                             <option value="{{ $technician->id }}" data-email="{{ $technician->email }}">{{ $technician->name }}</option>
                         @endforeach
@@ -293,17 +293,17 @@ document.addEventListener('alpine:init', () => {
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                    <x-input-label for="schedule-date" value="Tanggal" />
+                    <x-input-label for="schedule-date" value="{{ __('Tanggal') }}" />
                     <x-datepicker id="schedule-date" name="date" class="mt-1 w-full" x-model="form.date" required></x-datepicker>
                     <x-input-error :messages="$errors->get('date')" class="mt-1" />
                 </div>
                 <div>
-                    <x-input-label for="schedule-start" value="Jam Mulai" />
+                    <x-input-label for="schedule-start" value="{{ __('Jam Mulai') }}" />
                     <x-text-input id="schedule-start" type="time" name="start_time" class="mt-1 w-full" x-model="form.start_time" required />
                     <x-input-error :messages="$errors->get('start_time')" class="mt-1" />
                 </div>
                 <div>
-                    <x-input-label for="schedule-end" value="Jam Selesai" />
+                    <x-input-label for="schedule-end" value="{{ __('Jam Selesai') }}" />
                     <x-text-input id="schedule-end" type="time" name="end_time" class="mt-1 w-full" x-model="form.end_time" required />
                     <x-input-error :messages="$errors->get('end_time')" class="mt-1" />
                 </div>
@@ -311,21 +311,21 @@ document.addEventListener('alpine:init', () => {
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <x-input-label for="schedule-location" value="Lokasi" />
+                    <x-input-label for="schedule-location" value="{{ __('Lokasi') }}" />
                     <x-text-input id="schedule-location" name="location" class="mt-1 w-full" x-model="form.location" placeholder="Klaten" />
                     <x-input-error :messages="$errors->get('location')" class="mt-1" />
                 </div>
                 <div>
-                    <x-input-label for="schedule-email" value="Email Teknisi" />
-                    <x-text-input id="schedule-email" class="mt-1 w-full bg-slate-50" x-model="technicianEmail" readonly placeholder="Otomatis dari teknisi" />
+                    <x-input-label for="schedule-email" value="{{ __('Email Teknisi') }}" />
+                    <x-text-input id="schedule-email" class="mt-1 w-full bg-slate-50" x-model="technicianEmail" readonly placeholder="{{ __('Otomatis dari teknisi') }}" />
                 </div>
             </div>
 
             <div>
-                <x-input-label for="schedule-description" value="Deskripsi" />
+                <x-input-label for="schedule-description" value="{{ __('Deskripsi') }}" />
                 <textarea id="schedule-description" name="description" rows="2" x-model="form.description"
-                          class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
-                          placeholder="Instalasi 8 kamera CCTV"></textarea>
+                          class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm"
+                          placeholder="{{ __('Instalasi 8 kamera CCTV') }}"></textarea>
                 <x-input-error :messages="$errors->get('description')" class="mt-1" />
             </div>
 
@@ -333,7 +333,7 @@ document.addEventListener('alpine:init', () => {
                 <div>
                     <x-input-label for="schedule-status" value="Status" />
                     <select id="schedule-status" name="status" x-model="form.status"
-                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
                         @foreach(\App\Models\TechnicianSchedule::STATUSES as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
@@ -342,32 +342,32 @@ document.addEventListener('alpine:init', () => {
                 <div>
                     <x-input-label for="schedule-reminder" value="Reminder" />
                     <select id="schedule-reminder" name="reminder_minutes" x-model="form.reminder_minutes"
-                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
-                        <option value="">Tanpa reminder popup</option>
-                        <option value="30">30 menit sebelum</option>
-                        <option value="60">1 jam sebelum</option>
-                        <option value="120">2 jam sebelum</option>
-                        <option value="1440">1 hari sebelum</option>
+                            class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
+                        <option value="">{{ __('Tanpa reminder popup') }}</option>
+                        <option value="30">{{ __('30 menit sebelum') }}</option>
+                        <option value="60">{{ __('1 jam sebelum') }}</option>
+                        <option value="120">{{ __('2 jam sebelum') }}</option>
+                        <option value="1440">{{ __('1 hari sebelum') }}</option>
                     </select>
-                    <p class="mt-1 text-xs text-slate-400">Email reminder 24 jam sebelum selalu dikirim.</p>
+                    <p class="mt-1 text-xs text-slate-400">{{ __('Email reminder 24 jam sebelum selalu dikirim.') }}</p>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-3 pt-2">
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
-                    Simpan Jadwal
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
+                    {{ __('Simpan Jadwal') }}
                 </button>
                 <button type="button" @click="close()" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
-                    Batal
+                    {{ __('Batal') }}
                 </button>
                 <div class="ml-auto flex items-center gap-3">
                     <span x-show="mode === 'edit' && connected" x-text="syncLabel()" class="text-xs text-slate-500"></span>
                     <form x-show="mode === 'edit' && canManage" :action="deleteAction()" method="POST" class="inline"
-                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?')">
+                          onsubmit="return confirm('{{ __('Apakah Anda yakin ingin menghapus jadwal ini?') }}')">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="px-4 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-medium transition text-sm">
-                            Hapus
+                            {{ __('Hapus') }}
                         </button>
                     </form>
                 </div>

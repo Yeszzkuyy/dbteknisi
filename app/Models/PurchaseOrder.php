@@ -40,4 +40,15 @@ class PurchaseOrder extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function statusLabel(): string
+    {
+        return match ($this->status) {
+            'draft' => __('Draft'),
+            'diproses' => __('Diproses'),
+            'selesai' => __('Selesai'),
+            'dibatalkan' => __('Dibatalkan'),
+            default => ucfirst((string) $this->status),
+        };
+    }
 }

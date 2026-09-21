@@ -3,8 +3,8 @@
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Jadwal Teknisi</h1>
-            <p class="text-slate-500 mt-1">Kalender jadwal pekerjaan teknisi terintegrasi dengan Google Calendar</p>
+            <h1 class="text-3xl font-bold text-slate-800">{{ __('Jadwal Teknisi') }}</h1>
+            <p class="text-slate-500 mt-1">{{ __('Kalender jadwal pekerjaan teknisi terintegrasi dengan Google Calendar') }}</p>
         </div>
         <div class="flex items-center gap-2">
             @if(session('sync_message'))
@@ -12,11 +12,11 @@
             @endif
             @if($connected)
                 <x-status-badge color="green" icon="✓">
-                    Google Calendar Terhubung
+                    {{ __('Google Calendar Terhubung') }}
                 </x-status-badge>
             @else
                 <x-status-badge color="slate">
-                    Google Calendar Belum Terhubung
+                    {{ __('Google Calendar Belum Terhubung') }}
                 </x-status-badge>
             @endif
         </div>
@@ -26,9 +26,9 @@
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-4 mb-4 flex flex-wrap items-center gap-3">
         <div class="flex items-center gap-2 flex-1 min-w-48">
             <x-icon name="edit" class="w-4 h-4 text-slate-400" />
-            <input id="filter-search" type="search" placeholder="Cari jadwal, project, customer, teknisi..."
+            <input id="filter-search" type="search" placeholder="{{ __('Cari jadwal, project, customer, teknisi...') }}"
                    oninput="clearTimeout(window.__fcSearch); window.__fcSearch = setTimeout(() => window.teknisiCalendar?.calendar.refetchEvents(), 400)"
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
         </div>
     </div>
 

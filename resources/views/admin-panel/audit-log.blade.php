@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Audit Log</h1>
-            <p class="text-slate-500 mt-1">Riwayat aktivitas user di sistem</p>
+            <p class="text-slate-500 mt-1">{{ __('Riwayat aktivitas user di sistem') }}</p>
         </div>
     </div>
 
@@ -10,24 +10,24 @@
         <div class="p-4 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700">
             <form method="GET" action="{{ route('admin-panel.audit-log') }}" class="flex flex-wrap gap-4">
                 <div>
-                    <label for="date_from" class="sr-only">Dari Tanggal</label>
+                    <label for="date_from" class="sr-only">{{ __('Dari Tanggal') }}</label>
                     <x-datepicker id="date_from" name="date_from" value="{{ request('date_from') }}"></x-datepicker>
                 </div>
                 <div>
-                    <label for="date_to" class="sr-only">Sampai Tanggal</label>
+                    <label for="date_to" class="sr-only">{{ __('Sampai Tanggal') }}</label>
                     <x-datepicker id="date_to" name="date_to" value="{{ request('date_to') }}"></x-datepicker>
                 </div>
                 <div>
                     <label for="action" class="sr-only">Action</label>
-                    <select id="action" name="action" class="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">Semua Action</option>
+                    <select id="action" name="action" class="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
+                        <option value="">{{ __('Semua Action') }}</option>
                         <option value="created" {{ request('action') === 'created' ? 'selected' : '' }}>Created</option>
                         <option value="updated" {{ request('action') === 'updated' ? 'selected' : '' }}>Updated</option>
                         <option value="deleted" {{ request('action') === 'deleted' ? 'selected' : '' }}>Deleted</option>
                     </select>
                 </div>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Filter</button>
-                <a href="{{ route('admin-panel.audit-log') }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">Reset</a>
+                <button type="submit" class="px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition">Filter</button>
+                <a href="{{ route('admin-panel.audit-log') }}" class="px-4 py-2 bg-accent-500 hover:bg-accent-600 text-white rounded-lg transition">Reset</a>
             </form>
         </div>
 
@@ -41,7 +41,7 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider">Description</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider">Properties</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider">IP Address</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider">Waktu</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-200 uppercase tracking-wider">{{ __('Waktu') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
@@ -73,7 +73,7 @@
                                 <svg class="w-12 h-12 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
-                                <p>Belum ada audit log</p>
+                                <p>{{ __('Belum ada audit log') }}</p>
                             </td>
                         </tr>
                     @endforelse

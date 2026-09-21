@@ -1,31 +1,35 @@
 <x-app-layout>
+    @php($prefill = $prefill ?? [])
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Tambah Lead / Opportunity Baru</h1>
-            <p class="text-slate-500 mt-1">Kelola lead marketing dan opportunity sales</p>
+            <h1 class="text-3xl font-bold text-slate-800">{{ __('Tambah Lead / Opportunity Baru') }}</h1>
+            <p class="text-slate-500 mt-1">{{ __('Kelola lead marketing dan opportunity sales') }}</p>
         </div>
         <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
-            Kembali
+           class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
+            {{ __('Kembali') }}
         </a>
     </div>
 
     <form action="{{ route('leads.store') }}" method="POST" enctype="multipart/form-data"
           class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
         @csrf
+        @if(!empty($prefill['whatsapp_account_id']))
+            <input type="hidden" name="whatsapp_account_id" value="{{ $prefill['whatsapp_account_id'] }}">
+        @endif
 
         {{-- Info Umum --}}
         <section class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
             <div>
 <label for="pt_group" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Lead dari PT <span class="text-red-500">*</span>
-                        <x-info-tip tip="Entitas perusahaan grup yang menangani lead ini: NTI, MGK, TPS, atau WANI." />
+                        {{ __('Lead dari PT') }} <span class="text-red-500">*</span>
+                        <x-info-tip tip="{{ __('Entitas perusahaan grup yang menangani lead ini: NTI, MGK, TPS, atau WANI.') }}" />
                     </label>
                 <select name="pt_group" id="pt_group" required
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih PT</option>
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    <option value="">{{ __('Pilih PT') }}</option>
                     @foreach($ptGroups as $group)
-                        <option value="{{ $group }}" {{ old('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
+                        <option value="{{ $group }}" {{ old('pt_group', $prefill['pt_group'] ?? null) == $group ? 'selected' : '' }}>{{ $group }}</option>
                     @endforeach
                 </select>
                 @error('pt_group')
@@ -35,22 +39,22 @@
 
             <div>
                 <label for="incoming_date" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Tanggal Masuk <span class="text-red-500">*</span>
-                    <x-info-tip tip="Tanggal pertama kali lead ini masuk ke tim (misal dari chat/email)." />
+                    {{ __('Tanggal Masuk') }} <span class="text-red-500">*</span>
+                    <x-info-tip tip="{{ __('Tanggal pertama kali lead ini masuk ke tim (misal dari chat/email).') }}" />
                 </label>
                 <x-datepicker name="incoming_date" id="incoming_date" required value="{{ old('incoming_date', now()->toDateString()) }}"></x-datepicker>
             </div>
 
             <div>
                 <label for="source" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Masuk by
-                    <x-info-tip tip="Dari mana lead ini berasal: WhatsApp, email, telepon, canvasing, event, dll." />
+                    {{ __('Masuk by') }}
+                    <x-info-tip tip="{{ __('Dari mana lead ini berasal: WhatsApp, email, telepon, canvasing, event, dll.') }}" />
                 </label>
                 <select name="source" id="source"
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih</option>
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    <option value="">{{ __('Pilih') }}</option>
                     @foreach($sources as $source)
-                        <option value="{{ $source }}" {{ old('source') == $source ? 'selected' : '' }}>
+                        <option value="{{ $source }}" {{ old('source', $prefill['source'] ?? null) == $source ? 'selected' : '' }}>
                             {{ \App\Http\Controllers\LeadController::label($source) }}
                         </option>
                     @endforeach
@@ -59,12 +63,12 @@
 
             <div>
                 <label for="segment" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Segmentasi <span class="text-red-500">*</span>
-                    <x-info-tip tip="Jenis calon client: End User, Vendor, System Integrator, Kontraktor, Gov, Principle, Distributor, atau lainnya." />
+                    {{ __('Segmentasi') }} <span class="text-red-500">*</span>
+                    <x-info-tip tip="{{ __('Jenis calon client: End User, Vendor, System Integrator, Kontraktor, Gov, Principle, Distributor, atau lainnya.') }}" />
                 </label>
                 <select name="segment" id="segment" required
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih Segmentasi</option>
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    <option value="">{{ __('Pilih Segmentasi') }}</option>
                     @foreach($segments as $segment)
                         <option value="{{ $segment }}" {{ old('segment') == $segment ? 'selected' : '' }}>
                             {{ \App\Http\Controllers\LeadController::label($segment) }}
@@ -78,31 +82,31 @@
         </section>
 
         {{-- Data Customer --}}
-        <section x-data="{ mode: '{{ old('customer_mode', 'new') }}' }" class="border-t border-slate-200">
+        <section x-data="{ mode: '{{ old('customer_mode', $prefill['customer_mode'] ?? 'new') }}' }" class="border-t border-slate-200">
             <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-3">
-                Data Customer <span class="text-red-500">*</span>
-                <x-info-tip tip="Pilih Customer Baru kalau belum pernah tercatat, atau Customer Lama kalau sudah ada di database." />
+                {{ __('Data Customer') }} <span class="text-red-500">*</span>
+                <x-info-tip tip="{{ __('Pilih Customer Baru kalau belum pernah tercatat, atau Customer Lama kalau sudah ada di database.') }}" />
             </label>
 
             <div class="flex items-center gap-6 mb-4">
                 <label class="inline-flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
                     <input type="radio" name="customer_mode" value="new" x-model="mode" class="accent-blue-600">
-                    Customer Baru
+                    {{ __('Customer Baru') }}
                 </label>
                 <label class="inline-flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
                     <input type="radio" name="customer_mode" value="existing" x-model="mode" class="accent-blue-600">
-                    Customer Lama
+                    {{ __('Customer Lama') }}
                 </label>
             </div>
 
             <div x-show="mode === 'new'" x-cloak class="space-y-4">
                 <div>
                     <label for="customer_name" class="block text-sm font-medium text-slate-700 mb-1">
-                        Perusahaan <span class="text-red-500">*</span>
+                        {{ __('Perusahaan') }} <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name') }}"
-                           placeholder="cth: PT Koin Konstruksi"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name', $prefill['customer_name'] ?? '') }}"
+                           placeholder="{{ __('cth: PT Koin Konstruksi') }}"
+                           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     @error('customer_name')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -110,37 +114,37 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <label for="customer_address" class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
+                        <label for="customer_address" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Alamat') }}</label>
                         <textarea name="customer_address" id="customer_address" rows="2"
-                                  placeholder="cth: Plaza Kebon Jeruk Blok D7-8, Jl. Raya Perjuangan, Jakarta Barat 11530"
-                                  class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('customer_address') }}</textarea>
+                                  placeholder="{{ __('cth: Plaza Kebon Jeruk Blok D7-8, Jl. Raya Perjuangan, Jakarta Barat 11530') }}"
+                                  class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('customer_address') }}</textarea>
                     </div>
                     <div>
                         <label for="customer_contact_person" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                             PIC
-                            <x-info-tip tip="Nama orang yang bisa dihubungi di perusahaan tersebut." />
+                            <x-info-tip tip="{{ __('Nama orang yang bisa dihubungi di perusahaan tersebut.') }}" />
                         </label>
                         <input type="text" name="customer_contact_person" id="customer_contact_person" value="{{ old('customer_contact_person') }}"
-                               placeholder="cth: Ibu Vita"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               placeholder="{{ __('cth: Ibu Vita') }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div>
-                        <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">Telpon Kantor</label>
+                        <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Telpon Kantor') }}</label>
                         <input type="text" name="customer_phone" id="customer_phone" value="{{ old('customer_phone') }}"
-                               placeholder="cth: 0812-3456-7890"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               placeholder="{{ __('cth: 0812-3456-7890') }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div>
-                        <label for="customer_whatsapp" class="block text-sm font-medium text-slate-700 mb-1">No WA</label>
-                        <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp') }}"
-                               placeholder="cth: 0812-3456-7890"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                        <label for="customer_whatsapp" class="block text-sm font-medium text-slate-700 mb-1">{{ __('No WA') }}</label>
+                        <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp', $prefill['customer_whatsapp'] ?? '') }}"
+                               placeholder="{{ __('cth: 0812-3456-7890') }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div class="md:col-span-2">
                         <label for="customer_email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
                         <input type="email" name="customer_email" id="customer_email" value="{{ old('customer_email') }}"
-                               placeholder="cth: vita@ptkoin.com"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               placeholder="{{ __('cth: vita@ptkoin.com') }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('customer_email')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -151,14 +155,14 @@
             <div x-show="mode === 'existing'" x-cloak class="space-y-4">
                 <div>
                     <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Pilih Customer <span class="text-red-500">*</span>
-                        <x-info-tip tip="Ketik nama perusahaan untuk mencari customer yang sudah terdaftar." />
+                        {{ __('Pilih Customer') }} <span class="text-red-500">*</span>
+                        <x-info-tip tip="{{ __('Ketik nama perusahaan untuk mencari customer yang sudah terdaftar.') }}" />
                     </label>
                     <x-searchable-select
                         name="customer_id"
                         :options="$customers->mapWithKeys(fn ($c) => [$c->id => $c->name.($c->contact_person ? ' - '.$c->contact_person : '')])->all()"
                         :selected="old('customer_id')"
-                        placeholder="Ketik nama customer untuk mencari..."
+                        placeholder="{{ __('Ketik nama customer untuk mencari...') }}"
                     />
                     @error('customer_id')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -167,12 +171,12 @@
 
                 <div>
                     <label for="customer_contact_person_existing" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        PIC (perbarui kontak customer)
-                        <x-info-tip tip="Isi hanya jika ingin memperbarui nama PIC customer ini." />
+                        {{ __('PIC (perbarui kontak customer)') }}
+                        <x-info-tip tip="{{ __('Isi hanya jika ingin memperbarui nama PIC customer ini.') }}" />
                     </label>
                     <input type="text" name="customer_contact_person" id="customer_contact_person_existing" value="{{ old('customer_contact_person') }}"
-                           placeholder="kosongkan jika tidak berubah"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                           placeholder="{{ __('kosongkan jika tidak berubah') }}"
+                           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                 </div>
             </div>
         </section>
@@ -182,12 +186,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                 <div>
                     <label for="kebutuhan" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Kebutuhan
-                        <x-info-tip tip="Ringkasan apa yang dibutuhkan user: produk, jumlah, dan apakah termasuk instalasi." />
+                        {{ __('Kebutuhan') }}
+                        <x-info-tip tip="{{ __('Ringkasan apa yang dibutuhkan user: produk, jumlah, dan apakah termasuk instalasi.') }}" />
                     </label>
                     <textarea name="kebutuhan" id="kebutuhan" rows="2"
-                              placeholder="cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan') }}</textarea>
+                              placeholder="{{ __('cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi') }}"
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('kebutuhan', $prefill['kebutuhan'] ?? '') }}</textarea>
                 </div>
             </div>
         </section>
@@ -197,15 +201,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
                     <label for="partner_id" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Partner Terkait
-                        <x-info-tip tip="Pilih partner jika lead ini melibatkan vendor/supplier/kontraktor tertentu. Opsional." />
+                        {{ __('Partner Terkait') }}
+                        <x-info-tip tip="{{ __('Pilih partner jika lead ini melibatkan vendor/supplier/kontraktor tertentu. Opsional.') }}" />
                     </label>
                     <select name="partner_id" id="partner_id"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Tidak Ada Partner</option>
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                        <option value="">{{ __('Tidak Ada Partner') }}</option>
                         @foreach($partners as $partner)
                             <option value="{{ $partner->id }}" {{ old('partner_id') == $partner->id ? 'selected' : '' }}>
-                                {{ $partner->name }} ({{ ucfirst($partner->type) }})
+                                {{ $partner->name }} ({{ __(\App\Models\Partner::TYPES[$partner->type] ?? $partner->type) }})
                             </option>
                         @endforeach
                     </select>
@@ -216,12 +220,12 @@
         {{-- Lampiran --}}
         <section class="border-t border-slate-200">
             <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                Lampiran (BOQ / Kebutuhan User)
-                <x-info-tip tip="Unggah file BOQ awal, spesifikasi, atau dokumen kebutuhan dari user. Maksimal 5 file, 10 MB per file." />
+                {{ __('Lampiran (BOQ / Kebutuhan User)') }}
+                <x-info-tip tip="{{ __('Unggah file BOQ awal, spesifikasi, atau dokumen kebutuhan dari user. Maksimal 5 file, 10 MB per file.') }}" />
             </label>
             <input type="file" name="attachments[]" multiple
                    accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt,.csv"
-                   class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 file:text-sm file:font-medium">
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-accent-50 file:text-accent-700 file:text-sm file:font-medium">
             @error('attachments.*')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -230,12 +234,12 @@
         {{-- Aksi --}}
         <div class="flex justify-end gap-3 border-t border-slate-200">
             <a href="{{ route('leads.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition">
-                Batal
+               class="px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition">
+                {{ __('Batal') }}
             </a>
             <button type="submit"
-                    class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
-                Simpan Lead
+                    class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
+                {{ __('Simpan Lead') }}
             </button>
         </div>
     </form>

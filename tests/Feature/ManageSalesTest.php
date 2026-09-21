@@ -182,7 +182,7 @@ class ManageSalesTest extends TestCase
             ->assertOk();
 
         $this->assertStringNotContainsString('assigned_to', $res->getContent());
-        $this->assertStringContainsString('Lead dari PT', $res->getContent());
+        $this->assertStringContainsString(__('Lead dari PT'), $res->getContent());
     }
 
     public function test_management_activity_log_shows_management_actions(): void

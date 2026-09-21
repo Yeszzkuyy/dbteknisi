@@ -15,7 +15,7 @@
                     <div>
                         <label for="title" class="block text-sm font-medium text-gray-700">Judul Task</label>
                         <input type="text" name="title" id="title" value="{{ old('title') }}"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-accent-500 focus:ring-accent-500">
                         @error('title')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
@@ -24,7 +24,7 @@
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                         <textarea name="description" id="description" rows="3"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-accent-500 focus:ring-accent-500">{{ old('description') }}</textarea>
                         @error('description')
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
@@ -33,7 +33,7 @@
                     <div>
                         <label for="assigned_to" class="block text-sm font-medium text-gray-700">Assigned To</label>
                         <select name="assigned_to" id="assigned_to"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-accent-500 focus:ring-accent-500">
                             <option value="">-- Belum Ditentukan --</option>
                             @foreach($engineers as $engineer)
                                 <option value="{{ $engineer->id }}" @selected(old('assigned_to') == $engineer->id)>
@@ -52,7 +52,7 @@
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                         <select name="status" id="status"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-accent-500 focus:ring-accent-500">
                             <option value="">-- Pilih Status --</option>
                             <option value="Pending" @selected(old('status') === 'Pending')>Pending</option>
                             <option value="In Progress" @selected(old('status') === 'In Progress')>In Progress</option>
@@ -83,7 +83,7 @@
 
                     <div class="flex items-center gap-3 pt-2">
                         <button type="submit"
-                            class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+                            class="px-4 py-2 bg-accent-600 text-white text-sm rounded-md hover:bg-accent-700">
                             Tambah Task
                         </button>
                         <a href="{{ route('projects.show', $project) }}" class="text-sm text-gray-600 hover:underline">

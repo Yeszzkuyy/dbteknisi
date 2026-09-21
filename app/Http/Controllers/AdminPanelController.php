@@ -51,7 +51,7 @@ class AdminPanelController extends Controller
         }
 
         return redirect()->route('admin-panel.index')
-            ->with('success', 'User berhasil dibuat.');
+            ->with('success', __('User berhasil dibuat.'));
     }
 
     public function editUser(User $user)
@@ -85,18 +85,18 @@ class AdminPanelController extends Controller
         }
 
         return redirect()->route('admin-panel.index')
-            ->with('success', 'User berhasil diupdate.');
+            ->with('success', __('User berhasil diupdate.'));
     }
 
     public function destroyUser(User $user)
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'Tidak bisa menghapus akun sendiri.');
+            return back()->with('error', __('Tidak bisa menghapus akun sendiri.'));
         }
 
         $user->delete();
         return redirect()->route('admin-panel.index')
-            ->with('success', 'User berhasil dihapus.');
+            ->with('success', __('User berhasil dihapus.'));
     }
 
     // ========== ROLE MANAGEMENT ==========
@@ -120,13 +120,13 @@ class AdminPanelController extends Controller
         }
 
         return redirect()->route('admin-panel.index')
-            ->with('success', 'Role berhasil dibuat.');
+            ->with('success', __('Role berhasil dibuat.'));
     }
 
     public function editRole(Role $role)
     {
         if ($role->name === 'super-admin') {
-            abort(403, 'Role super-admin tidak bisa diedit.');
+            abort(403, __('Role super-admin tidak bisa diedit.'));
         }
         
         return view('admin-panel.roles.edit', compact('role') + ['permissions' => $this->groupedPermissions()]);
@@ -135,7 +135,7 @@ class AdminPanelController extends Controller
     public function updateRole(Request $request, Role $role)
     {
         if ($role->name === 'super-admin') {
-            abort(403, 'Role super-admin tidak bisa diedit.');
+            abort(403, __('Role super-admin tidak bisa diedit.'));
         }
 
         $request->validate([
@@ -152,18 +152,18 @@ class AdminPanelController extends Controller
         }
 
         return redirect()->route('admin-panel.index')
-            ->with('success', 'Role berhasil diupdate.');
+            ->with('success', __('Role berhasil diupdate.'));
     }
 
     public function destroyRole(Role $role)
     {
         if ($role->name === 'super-admin') {
-            abort(403, 'Role super-admin tidak bisa dihapus.');
+            abort(403, __('Role super-admin tidak bisa dihapus.'));
         }
         
         $role->delete();
         return redirect()->route('admin-panel.index')
-            ->with('success', 'Role berhasil dihapus.');
+            ->with('success', __('Role berhasil dihapus.'));
     }
 
     // ========== AUDIT LOG ==========

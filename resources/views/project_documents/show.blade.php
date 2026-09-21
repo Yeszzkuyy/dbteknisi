@@ -42,7 +42,7 @@
 
                 <div class="mt-6 flex items-center gap-4">
                     <a href="{{ route('project-documents.preview', $projectDocument) }}" target="_blank"
-                        class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
+                        class="px-4 py-2 bg-accent-600 text-white text-sm rounded-md hover:bg-accent-700">
                         Lihat / Download File
                     </a>
                     <a href="{{ route('projects.show', $projectDocument->project) }}" class="text-sm text-red-600 hover:underline">

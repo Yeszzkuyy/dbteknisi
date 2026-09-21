@@ -1,5 +1,9 @@
+@php
+    $themePref = auth()->check() ? auth()->user()->preference('theme', 'system') : 'system';
+    $accentPref = auth()->check() ? auth()->user()->preference('accent', 'ocean') : 'ocean';
+@endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-mode="{{ $themePref }}" data-theme="{{ $accentPref }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,22 +15,29 @@
     <link rel="apple-touch-icon" href="{{ asset('images/logo/logo.png') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|exo-2:500,600,700,800&display=swap" rel="stylesheet" />
 
-    @php
-        $themePref = auth()->check() ? auth()->user()->preference('theme', 'system') : 'system';
-    @endphp
     <script>
         (function () {
             var pref = @json($themePref);
-            var stored = localStorage.getItem('dark-mode');
-            var dark;
-            if (stored === 'true') { dark = true; }
-            else if (stored === 'false') { dark = false; }
-            else if (pref === 'dark') { dark = true; }
-            else if (pref === 'light') { dark = false; }
-            else { dark = window.matchMedia('(prefers-color-scheme:dark)').matches; }
-            document.documentElement.classList.toggle('dark', dark);
+            var stored = localStorage.getItem('appearance-mode');
+            var mode = stored || pref;
+            if (!mode) mode = pref;
+            // Migrasi dari key lama 'dark-mode' bila belum pakai appearance-mode
+            if (!stored) {
+                var legacy = localStorage.getItem('dark-mode');
+                if (legacy === 'true') mode = 'dark';
+                else if (legacy === 'false') mode = 'light';
+            }
+            var accentStored = localStorage.getItem('appearance-accent');
+            var accent = accentStored || @json($accentPref);
+            var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+            var root = document.documentElement;
+            root.classList.toggle('dark', dark);
+            root.setAttribute('data-mode', mode);
+            root.setAttribute('data-theme', accent);
+            window.__appearanceMode = mode;
+            window.__appearanceAccent = accent;
         })();
     </script>
 
@@ -47,6 +58,9 @@
         }
     @endphp
     <script>window.notifInit = @json($notifInit);</script>
+    {{-- Penanda JS aktif sepagi mungkin (sebelum CSS) agar animasi appear
+         sempat mulai dari state awal, bukan langsung final --}}
+    <script>document.documentElement.classList.add('js');</script>
 
     @livewireStyles
 
@@ -56,8 +70,6 @@
         *{margin:0;padding:0;box-sizing:border-box}
         [x-cloak]{display:none!important}
         .icon-expand{display:none}
-        :root{--sidebar-bg:#f8fafc;--sidebar-border:#e2e8f0;--card-bg:#fff;--card-border:#e2e8f0;--card-bg-hover:#f8fafc;--text-primary:#1e293b;--text-secondary:#64748b;--text-muted:#94a3b8;--input-bg:#f1f5f9;--input-border:#cbd5e1;--input-text:#1e293b;--nav-text:#334155;--nav-muted:#64748b;--nav-hover-bg:rgba(15,23,42,.05);--nav-hover-text:#0f172a;--nav-active-bg:rgba(59,130,246,.10);--nav-active-text:#1d4ed8;--sidebar-logo-text:#1d4ed8;--sidebar-border-soft:#e2e8f0;--sidebar-panel-bg:rgba(15,23,42,.04)}
-        .dark{--sidebar-bg:#111113;--sidebar-border:#2a2a2d;--card-bg:#1e293b;--card-border:#334155;--card-bg-hover:#2d3a4e;--text-primary:#f1f5f9;--text-secondary:#cbd5e1;--text-muted:#64748b;--input-bg:#243244;--input-border:#475569;--input-text:#f1f5f9;--nav-text:#c9c9cf;--nav-muted:#84848d;--nav-hover-bg:rgba(255,255,255,.06);--nav-hover-text:#fff;--nav-active-bg:rgba(59,130,246,.16);--nav-active-text:#93c5fd;--sidebar-logo-text:#93c5fd;--sidebar-border-soft:rgba(255,255,255,.1);--sidebar-panel-bg:rgba(255,255,255,.06)}
         .sidebar{position:fixed;top:0;left:0;height:100vh;width:280px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out,width .3s cubic-bezier(.16,1,.3,1);overflow-y:auto}
         .sidebar.open{transform:translateX(0)}
         .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998}
@@ -97,16 +109,16 @@
         .dark .bg-white{background-color:var(--card-bg)!important}
         .dark #darkToggle .bg-white{background-color:#fff!important}
         .dark .bg-slate-50{background-color:var(--card-bg)!important}
-        .dark .bg-slate-100{background-color:#243244!important}
-        .dark .bg-slate-200{background-color:#334155!important}
-        .dark .bg-slate-300{background-color:#475569!important}
-        /* Toggle ON tetap biru walau dark-mode mengoverride bg-slate-300 (lebar selektor lebih spesifik) */
-        .peer:checked ~ .peer-checked\:bg-blue-600{background-color:#2563eb!important}
-        .dark .bg-gray-300{background-color:#475569!important}
-        .dark .bg-gray-100{background-color:#243244!important}
-        .dark .hover\:bg-slate-100:hover{background-color:#243244!important}
-        .dark .hover\:bg-slate-200:hover{background-color:#334155!important}
-        .dark .hover\:bg-slate-300:hover{background-color:#475569!important}
+        .dark .bg-slate-100{background-color:var(--input-bg)!important}
+        .dark .bg-slate-200{background-color:var(--card-border)!important}
+        .dark .bg-slate-300{background-color:var(--card-border)!important}
+        /* Toggle ON memakai accent token walau dark-mode mengoverride bg-slate-300 */
+        .peer:checked ~ .peer-checked\:bg-blue-600{background-color:rgb(var(--accent-600) / 1)!important}
+        .dark .bg-gray-300{background-color:var(--card-border)!important}
+        .dark .bg-gray-100{background-color:var(--input-bg)!important}
+        .dark .hover\:bg-slate-100:hover{background-color:var(--input-bg)!important}
+        .dark .hover\:bg-slate-200:hover{background-color:var(--card-border)!important}
+        .dark .hover\:bg-slate-300:hover{background-color:var(--card-border)!important}
         .dark .hover\:bg-slate-50:hover{background-color:var(--card-bg-hover)!important}
         .dark .hover\:bg-gray-50:hover{background-color:var(--card-bg-hover)!important}
         .dark .border-slate-200{border-color:var(--card-border)!important}
@@ -116,11 +128,12 @@
         .dark .text-slate-600,.dark .text-gray-600{color:var(--text-secondary)!important}
         .dark .text-slate-500,.dark .text-gray-500{color:var(--text-muted)!important}
         /* Teks tanpa class warna ikut var tema — jangan biarkan hitam bawaan browser di mode gelap */
-        body{background-color:#f1f5f9}
-        html.dark body{background-color:#18181b!important;color:var(--text-primary)}
+        body{background-color:var(--bg)}
+        html.dark body{background-color:var(--bg)!important;color:var(--text-primary)}
         .dark th.text-slate-500,.dark th.text-slate-600{color:var(--text-secondary)!important}
         input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]):not([type=range]):not([type=hidden]),select,textarea{background-color:var(--input-bg)!important;border-color:var(--input-border)!important;color:var(--input-text)!important}
-        input:focus,select:focus,textarea:focus{border-color:#3b82f6!important}
+        input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]):not([type=range]):not([type=hidden]):hover,select:hover,textarea:hover{background-color:var(--input-bg-hover)!important}
+        input:focus,select:focus,textarea:focus{border-color:var(--input-border-focus)!important}
         input::placeholder,textarea::placeholder{color:var(--text-muted)!important}
         .dark input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]){color-scheme:dark}
     </style>
@@ -147,7 +160,7 @@
                 @endif
                 @if($errors->any())
                     <div class="rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-5 py-3 mb-4">
-                        <p class="font-semibold mb-1">Terdapat kesalahan pada form:</p>
+                        <p class="font-semibold mb-1">{{ __('Terdapat kesalahan pada form:') }}</p>
                         <ul class="list-disc list-inside text-sm">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -184,7 +197,7 @@
             function setCollapsed(v){
                 root.classList.toggle('sidebar-collapsed',v);
                 try{localStorage.setItem('sidebar-collapsed',v?'1':'0')}catch(e){}
-                if(cb){cb.setAttribute('aria-expanded',String(!v));cb.setAttribute('aria-label',v?'Perluas sidebar':'Perkecil sidebar')}
+                if(cb){cb.setAttribute('aria-expanded',String(!v));cb.setAttribute('aria-label',v?@json(__('Perluas sidebar')):@json(__('Perkecil sidebar')))}
                 syncTitles();
             }
             syncTitles();
@@ -201,7 +214,15 @@
             window.addEventListener('resize',function(){window.innerWidth>=1024&&close()});
             document.addEventListener('keydown',function(e){e.key==='Escape'&&s.classList.contains('open')&&close()});
             var t=document.getElementById('darkToggle');
-            t&&t.addEventListener('click',function(){var d=document.documentElement.classList.toggle('dark');localStorage.setItem('dark-mode',d)});
+            t&&t.addEventListener('click',function(){
+                var root=document.documentElement;
+                var dark=!root.classList.contains('dark');
+                root.classList.toggle('dark',dark);
+                var mode=dark?'dark':'light';
+                root.setAttribute('data-mode',mode);
+                try{localStorage.setItem('appearance-mode',mode);localStorage.setItem('dark-mode',dark)}catch(e){}
+                window.dispatchEvent(new CustomEvent('appearance:change'));
+            });
             var nav=document.getElementById('sidebar-navigation');
             if(nav){
                 nav.scrollTop=+(sessionStorage.getItem('sidebar-scroll')||0);
@@ -215,6 +236,29 @@
                 document.querySelectorAll('[data-reveal]').forEach(function(el){io.observe(el)});
             }else{
                 document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('in-view')});
+            }
+            // Parallax mouse halus untuk [data-parallax-mouse] — nonaktif di
+            // touch / reduced-motion; kembali ke posisi awal saat mouse pergi
+            if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.matchMedia('(hover: hover)').matches){
+                var pxEls=Array.prototype.slice.call(document.querySelectorAll('[data-parallax-mouse]'));
+                var pxRaf=null;
+                pxEls.forEach(function(el){
+                    var host=el.closest('section')||document.body;
+                    var max=parseFloat(el.getAttribute('data-parallax-mouse'))||10;
+                    host.addEventListener('mousemove',function(ev){
+                        var r=host.getBoundingClientRect();
+                        var dx=(ev.clientX-r.left)/r.width-0.5,dy=(ev.clientY-r.top)/r.height-0.5;
+                        if(pxRaf)cancelAnimationFrame(pxRaf);
+                        pxRaf=requestAnimationFrame(function(){
+                            el.style.setProperty('--px',(dx*max).toFixed(1)+'px');
+                            el.style.setProperty('--py',(dy*max).toFixed(1)+'px');
+                        });
+                    });
+                    host.addEventListener('mouseleave',function(){
+                        el.style.setProperty('--px','0px');
+                        el.style.setProperty('--py','0px');
+                    });
+                });
             }
         });
     </script>

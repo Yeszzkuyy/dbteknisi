@@ -1,12 +1,12 @@
 <x-app-layout>
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">Tambah Role Baru</h1>
-            <p class="text-slate-500 mt-1">Buat role baru dan assign permission</p>
+            <h1 class="text-3xl font-bold text-slate-800">{{ __('Tambah Role Baru') }}</h1>
+            <p class="text-slate-500 mt-1">{{ __('Buat role baru dan assign permission') }}</p>
         </div>
         <a href="{{ route('admin-panel.index') }}"
-           class="px-4 py-2 bg-blue-400 text-white rounded-xl hover:bg-blue-500 transition">
-            Kembali
+           class="px-4 py-2 bg-accent-400 text-white rounded-xl hover:bg-accent-500 transition">
+            {{ __('Kembali') }}
         </a>
     </div>
 
@@ -15,18 +15,18 @@
             @csrf
             
             <div class="mb-6">
-                <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Role</label>
+                <label for="name" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Nama Role') }}</label>
                 <input type="text" id="name" name="name" required
-                       class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                       placeholder="Contoh: finance, hr, dll">
+                       class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                       placeholder="{{ __('Contoh: finance, hr, dll') }}">
             </div>
 
             <div class="mb-6">
                 <div class="flex items-center justify-between mb-3">
                     <label class="block text-sm font-medium text-slate-700">Permissions</label>
                     <div class="flex gap-2">
-                        <button type="button" id="select-all" class="px-3 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white">Pilih Semua</button>
-                        <button type="button" id="deselect-all" class="px-3 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white">Batal Pilih</button>
+                        <button type="button" id="select-all" class="px-3 py-1 text-xs bg-accent-500 hover:bg-accent-600 text-white">{{ __('Pilih Semua') }}</button>
+                        <button type="button" id="deselect-all" class="px-3 py-1 text-xs bg-accent-500 hover:bg-accent-600 text-white">{{ __('Batal Pilih') }}</button>
                     </div>
                 </div>
                 
@@ -38,7 +38,7 @@
                                 @foreach($perms as $perm)
                                     <label class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
                                         <input type="checkbox" name="permissions[]" value="{{ $perm->name }}"
-                                               class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                               class="w-4 h-4 rounded border-slate-300 text-accent-600 focus:ring-accent-500">
                                         <span class="text-sm text-slate-700">{{ $perm->name }}</span>
                                     </label>
                                 @endforeach
@@ -50,12 +50,12 @@
 
             <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
                 <a href="{{ route('admin-panel.index') }}"
-                   class="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition">
-                    Batal
+                   class="px-4 py-2 rounded-xl bg-accent-500 hover:bg-accent-600 text-white transition">
+                    {{ __('Batal') }}
                 </a>
                 <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">
-                    Simpan Role
+                        class="px-4 py-2 bg-accent-600 text-white rounded-xl hover:bg-accent-700 transition">
+                    {{ __('Simpan Role') }}
                 </button>
             </div>
         </form>

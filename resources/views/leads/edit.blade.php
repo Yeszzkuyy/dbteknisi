@@ -2,11 +2,11 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Edit Lead: {{ $lead->customer->name }}</h1>
-            <p class="text-slate-500 mt-1">Perbarui informasi lead / opportunity</p>
+            <p class="text-slate-500 mt-1">{{ __('Perbarui informasi lead / opportunity') }}</p>
         </div>
         <a href="{{ route('leads.show', $lead) }}"
-           class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
-            Kembali
+           class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
+            {{ __('Kembali') }}
         </a>
     </div>
 
@@ -19,12 +19,12 @@
         <section class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
             <div>
 <label for="pt_group" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Lead dari PT <span class="text-red-500">*</span>
-                        <x-info-tip tip="Entitas perusahaan grup yang menangani lead ini: NTI, MGK, TPS, atau WANI." />
+                        {{ __('Lead dari PT') }} <span class="text-red-500">*</span>
+                        <x-info-tip tip="{{ __('Entitas perusahaan grup yang menangani lead ini: NTI, MGK, TPS, atau WANI.') }}" />
                     </label>
                 <select name="pt_group" id="pt_group" required
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih PT</option>
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    <option value="">{{ __('Pilih PT') }}</option>
                     @foreach($ptGroups as $group)
                         <option value="{{ $group }}" {{ old('pt_group', $lead->pt_group) == $group ? 'selected' : '' }}>{{ $group }}</option>
                     @endforeach
@@ -36,20 +36,20 @@
 
             <div>
                 <label for="incoming_date" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Tanggal Masuk <span class="text-red-500">*</span>
-                    <x-info-tip tip="Tanggal pertama kali lead ini masuk ke tim (misal dari chat/email)." />
+                    {{ __('Tanggal Masuk') }} <span class="text-red-500">*</span>
+                    <x-info-tip tip="{{ __('Tanggal pertama kali lead ini masuk ke tim (misal dari chat/email).') }}" />
                 </label>
                 <x-datepicker name="incoming_date" id="incoming_date" required value="{{ old('incoming_date', $lead->incoming_date?->format('Y-m-d')) }}"></x-datepicker>
             </div>
 
             <div>
                 <label for="source" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Masuk by
-                    <x-info-tip tip="Dari mana lead ini berasal: WhatsApp, email, telepon, canvasing, event, dll." />
+                    {{ __('Masuk by') }}
+                    <x-info-tip tip="{{ __('Dari mana lead ini berasal: WhatsApp, email, telepon, canvasing, event, dll.') }}" />
                 </label>
                 <select name="source" id="source"
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih</option>
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    <option value="">{{ __('Pilih') }}</option>
                     @foreach($sources as $source)
                         <option value="{{ $source }}" {{ old('source', $lead->source) == $source ? 'selected' : '' }}>
                             {{ \App\Http\Controllers\LeadController::label($source) }}
@@ -60,12 +60,12 @@
 
             <div>
                 <label for="segment" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Segmentasi <span class="text-red-500">*</span>
-                    <x-info-tip tip="Jenis calon client: End User, Vendor, System Integrator, Kontraktor, Gov, Principle, Distributor, atau lainnya." />
+                    {{ __('Segmentasi') }} <span class="text-red-500">*</span>
+                    <x-info-tip tip="{{ __('Jenis calon client: End User, Vendor, System Integrator, Kontraktor, Gov, Principle, Distributor, atau lainnya.') }}" />
                 </label>
                 <select name="segment" id="segment" required
-                        class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Pilih Segmentasi</option>
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    <option value="">{{ __('Pilih Segmentasi') }}</option>
                     @foreach($segments as $segment)
                         <option value="{{ $segment }}" {{ old('segment', $lead->segment) == $segment ? 'selected' : '' }}>
                             {{ \App\Http\Controllers\LeadController::label($segment) }}
@@ -81,8 +81,8 @@
         {{-- Data Customer --}}
         <section class="border-t border-slate-200">
             <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-3">
-                Data Customer <span class="text-red-500">*</span>
-                <x-info-tip tip="Perbarui data customer yang terkait dengan lead ini." />
+                {{ __('Data Customer') }} <span class="text-red-500">*</span>
+                <x-info-tip tip="{{ __('Perbarui data customer yang terkait dengan lead ini.') }}" />
             </label>
 
             <input type="hidden" name="customer_mode" value="existing">
@@ -91,11 +91,11 @@
             <div class="space-y-4">
                 <div>
                     <label for="customer_name" class="block text-sm font-medium text-slate-700 mb-1">
-                        Perusahaan <span class="text-red-500">*</span>
+                        {{ __('Perusahaan') }} <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name', $lead->customer->name) }}"
-                           placeholder="cth: PT Koin Konstruksi"
-                           class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                           placeholder="{{ __('cth: PT Koin Konstruksi') }}"
+                           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     @error('customer_name')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -103,37 +103,37 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <label for="customer_address" class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
+                        <label for="customer_address" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Alamat') }}</label>
                         <textarea name="customer_address" id="customer_address" rows="2"
-                                  placeholder="cth: Plaza Kebon Jeruk Blok D7-8, Jl. Raya Perjuangan, Jakarta Barat 11530"
-                                  class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('customer_address', $lead->customer->address) }}</textarea>
+                                  placeholder="{{ __('cth: Plaza Kebon Jeruk Blok D7-8, Jl. Raya Perjuangan, Jakarta Barat 11530') }}"
+                                  class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('customer_address', $lead->customer->address) }}</textarea>
                     </div>
                     <div>
                         <label for="customer_contact_person" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                             PIC
-                            <x-info-tip tip="Nama orang yang bisa dihubungi di perusahaan tersebut." />
+                            <x-info-tip tip="{{ __('Nama orang yang bisa dihubungi di perusahaan tersebut.') }}" />
                         </label>
                         <input type="text" name="customer_contact_person" id="customer_contact_person" value="{{ old('customer_contact_person', $lead->customer->contact_person) }}"
-                               placeholder="cth: Ibu Vita"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               placeholder="{{ __('cth: Ibu Vita') }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div>
-                        <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">Telpon Kantor</label>
+                        <label for="customer_phone" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Telpon Kantor') }}</label>
                         <input type="text" name="customer_phone" id="customer_phone" value="{{ old('customer_phone', $lead->customer->phone) }}"
-                               placeholder="cth: 0812-3456-7890"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               placeholder="{{ __('cth: 0812-3456-7890') }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div>
-                        <label for="customer_whatsapp" class="block text-sm font-medium text-slate-700 mb-1">No WA</label>
+                        <label for="customer_whatsapp" class="block text-sm font-medium text-slate-700 mb-1">{{ __('No WA') }}</label>
                         <input type="text" name="customer_whatsapp" id="customer_whatsapp" value="{{ old('customer_whatsapp', $lead->customer->whatsapp) }}"
-                               placeholder="cth: 0812-3456-7890"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               placeholder="{{ __('cth: 0812-3456-7890') }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                     </div>
                     <div class="md:col-span-2">
                         <label for="customer_email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
                         <input type="email" name="customer_email" id="customer_email" value="{{ old('customer_email', $lead->customer->email) }}"
-                               placeholder="cth: vita@ptkoin.com"
-                               class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                               placeholder="{{ __('cth: vita@ptkoin.com') }}"
+                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
                         @error('customer_email')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -147,12 +147,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
                 <div>
                     <label for="kebutuhan" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Kebutuhan
-                        <x-info-tip tip="Ringkasan apa yang dibutuhkan user: produk, jumlah, dan apakah termasuk instalasi." />
+                        {{ __('Kebutuhan') }}
+                        <x-info-tip tip="{{ __('Ringkasan apa yang dibutuhkan user: produk, jumlah, dan apakah termasuk instalasi.') }}" />
                     </label>
                     <textarea name="kebutuhan" id="kebutuhan" rows="2"
-                              placeholder="cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi"
-                              class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
+                              placeholder="{{ __('cth: Kebutuhan Cisco IP Phone 780 Series dengan instalasi') }}"
+                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('kebutuhan', $lead->kebutuhan) }}</textarea>
                 </div>
             </div>
         </section>
@@ -162,15 +162,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
                     <label for="partner_id" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                        Partner Terkait
-                        <x-info-tip tip="Pilih partner jika lead ini melibatkan vendor/supplier/kontraktor tertentu. Opsional." />
+                        {{ __('Partner Terkait') }}
+                        <x-info-tip tip="{{ __('Pilih partner jika lead ini melibatkan vendor/supplier/kontraktor tertentu. Opsional.') }}" />
                     </label>
                     <select name="partner_id" id="partner_id"
-                            class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Tidak Ada Partner</option>
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                        <option value="">{{ __('Tidak Ada Partner') }}</option>
                         @foreach($partners as $partner)
                             <option value="{{ $partner->id }}" {{ old('partner_id', $lead->partner_id) == $partner->id ? 'selected' : '' }}>
-                                {{ $partner->name }} ({{ ucfirst($partner->type) }})
+                                {{ $partner->name }} ({{ __(\App\Models\Partner::TYPES[$partner->type] ?? $partner->type) }})
                             </option>
                         @endforeach
                     </select>
@@ -183,18 +183,18 @@
             @if($lead->documents->isNotEmpty())
                 <div>
                     <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-2">
-                        Lampiran Saat Ini
-                        <x-info-tip tip="Klik nama file untuk melihat isinya." />
+                        {{ __('Lampiran Saat Ini') }}
+                        <x-info-tip tip="{{ __('Klik nama file untuk melihat isinya.') }}" />
                     </label>
                     <ul class="space-y-1">
                         @foreach($lead->documents as $doc)
                             <li class="flex items-center justify-between gap-3">
                                 <a href="{{ route('leads.attachments.show', [$lead, $doc]) }}" target="_blank"
-                                   class="text-sm text-blue-600 hover:underline">{{ $doc->file_name }}</a>
+                                   class="text-sm text-accent-600 hover:underline">{{ $doc->file_name }}</a>
                                 <button type="button"
                                         class="text-xs font-medium text-red-500 hover:underline"
-                                        onclick="if(confirm('Yakin hapus lampiran ini?')){fetch('{{ route('leads.attachments.destroy', [$lead, $doc]) }}',{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({_method:'DELETE'})}).then(r=>r.ok&&location.reload())}">
-                                    Hapus
+                                        onclick="if(confirm('{{ __('Yakin hapus lampiran ini?') }}')){fetch('{{ route('leads.attachments.destroy', [$lead, $doc]) }}',{method:'POST',headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({_method:'DELETE'})}).then(r=>r.ok&&location.reload())}">
+                                    {{ __('Hapus') }}
                                 </button>
                             </li>
                         @endforeach
@@ -204,12 +204,12 @@
 
             <div>
                 <label class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
-                    Tambah Lampiran (BOQ / Kebutuhan User)
-                    <x-info-tip tip="Unggah file BOQ awal, spesifikasi, atau dokumen kebutuhan dari user. Maksimal 5 file per simpan, 10 MB per file." />
+                    {{ __('Tambah Lampiran (BOQ / Kebutuhan User)') }}
+                    <x-info-tip tip="{{ __('Unggah file BOQ awal, spesifikasi, atau dokumen kebutuhan dari user. Maksimal 5 file per simpan, 10 MB per file.') }}" />
                 </label>
                 <input type="file" name="attachments[]" multiple
                        accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt,.csv"
-                       class="w-full rounded-xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 file:text-sm file:font-medium">
+                       class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-accent-50 file:text-accent-700 file:text-sm file:font-medium">
                 @error('attachments')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -222,12 +222,12 @@
         {{-- Aksi --}}
         <div class="flex justify-end gap-3 border-t border-slate-200">
             <a href="{{ route('leads.show', $lead) }}"
-               class="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition">
-                Batal
+               class="px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition">
+                {{ __('Batal') }}
             </a>
             <button type="submit"
-                    class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
-                Perbarui Lead
+                    class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
+                {{ __('Perbarui Lead') }}
             </button>
         </div>
     </form>

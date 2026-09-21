@@ -13,8 +13,8 @@
                     </a>
                 @endcan
                 <a href="{{ route('sales.meetings.index') }}"
-                   class="px-4 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition">
-                    Kembali
+                   class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
+                    {{ __('Kembali') }}
                 </a>
             </div>
         </div>
@@ -22,22 +22,22 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Main Info --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 lg:col-span-2">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Informasi Meeting</h3>
+                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">{{ __('Informasi Meeting') }}</h3>
                 <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <dt class="text-xs text-slate-400">Customer</dt>
                         <dd class="font-medium text-slate-800">{{ $meeting->customer?->name ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs text-slate-400">Tanggal Meeting</dt>
+                        <dt class="text-xs text-slate-400">{{ __('Tanggal Meeting') }}</dt>
                         <dd class="font-medium text-slate-800">{{ $meeting->meeting_date->format('d M Y') }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs text-slate-400">Peserta</dt>
+                        <dt class="text-xs text-slate-400">{{ __('Peserta') }}</dt>
                         <dd class="font-medium text-slate-800">{{ $meeting->participants ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs text-slate-400">Dicatat oleh</dt>
+                        <dt class="text-xs text-slate-400">{{ __('Dicatat oleh') }}</dt>
                         <dd class="font-medium text-slate-800">{{ $meeting->creator?->name ?? '-' }}</dd>
                     </div>
                 </dl>
@@ -45,25 +45,25 @@
 
             {{-- User Needs --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Kebutuhan User</h3>
+                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Kebutuhan User') }}</h3>
                 <p class="text-slate-700 whitespace-pre-wrap">{{ $meeting->user_needs ?? '-' }}</p>
             </div>
 
             {{-- User Complaints --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Keluhan User</h3>
+                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Keluhan User') }}</h3>
                 <p class="text-slate-700 whitespace-pre-wrap">{{ $meeting->user_complaints ?? '-' }}</p>
             </div>
 
             {{-- Existing System --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Sistem Existing</h3>
+                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Sistem Existing') }}</h3>
                 <p class="text-slate-700 whitespace-pre-wrap">{{ $meeting->existing_system ?? '-' }}</p>
             </div>
 
             {{-- Notes --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Catatan</h3>
+                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Catatan') }}</h3>
                 <p class="text-slate-700 whitespace-pre-wrap">{{ $meeting->notes ?? '-' }}</p>
             </div>
 
@@ -73,8 +73,8 @@
                     <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Follow Up</h3>
                     @can('manage-sales')
                         <a href="{{ route('sales.follow-ups.create', ['customer_id' => $meeting->customer_id, 'meeting_id' => $meeting->id]) }}"
-                           class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition">
-                            + Tambah Follow Up
+                           class="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-xs font-medium transition">
+                            {{ __('+ Tambah Follow Up') }}
                         </a>
                     @endcan
                 </div>
@@ -92,7 +92,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-slate-400 text-sm text-center py-4">Belum ada follow up.</p>
+                    <p class="text-slate-400 text-sm text-center py-4">{{ __('Belum ada follow up.') }}</p>
                 @endforelse
             </div>
         </div>

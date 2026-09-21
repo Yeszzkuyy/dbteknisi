@@ -97,7 +97,7 @@ class TechnicianScheduleTest extends TestCase
         $this->actingAs($user)
             ->get(route('teknisi.jadwal'))
             ->assertOk()
-            ->assertSee('Jadwal Teknisi')
+            ->assertSee(__('Jadwal Teknisi'))
             ->assertSee('Hubungkan Google Calendar')
             ->assertDontSee('Semua Teknisi')
             ->assertDontSee('filter-teknisi');

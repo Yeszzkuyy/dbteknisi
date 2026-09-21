@@ -2,11 +2,11 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Dashboard Marketing</h1>
-            <p class="text-slate-500 mt-1">Ringkasan performa lead dan pipeline</p>
+            <p class="text-slate-500 mt-1">{{ __('Ringkasan performa lead dan pipeline') }}</p>
         </div>
         <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium transition">
-            Lihat Lead
+           class="px-4 py-2.5 rounded-xl bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-medium transition">
+            {{ __('Lihat Lead') }}
         </a>
     </div>
 
@@ -14,17 +14,17 @@
         <form method="GET" action="{{ route('marketing.dashboard') }}" class="flex flex-wrap items-end gap-x-6 gap-y-4">
             <div class="flex flex-wrap sm:flex-nowrap items-end gap-4">
                 <div>
-                    <label class="text-sm font-medium text-slate-500">Dari Tanggal</label>
+                    <label class="text-sm font-medium text-slate-500">{{ __('Dari Tanggal') }}</label>
                     <x-datepicker name="date_from" value="{{ $dateFrom }}" class="mt-1"></x-datepicker>
                 </div>
                 <div>
-                    <label class="text-sm font-medium text-slate-500">Sampai Tanggal</label>
+                    <label class="text-sm font-medium text-slate-500">{{ __('Sampai Tanggal') }}</label>
                     <x-datepicker name="date_to" value="{{ $dateTo }}" class="mt-1"></x-datepicker>
                 </div>
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition">
+                <button type="submit" class="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
                     Filter
                 </button>
                 <a href="{{ route('marketing.dashboard') }}"
@@ -36,9 +36,9 @@
             <div class="flex items-end">
                 @php
                     $presets = [
-                        'Bulan Ini' => [now()->startOfMonth()->toDateString(), now()->toDateString()],
-                        '3 Bulan' => [now()->subMonths(2)->startOfMonth()->toDateString(), now()->toDateString()],
-                        '6 Bulan' => [now()->subMonths(5)->startOfMonth()->toDateString(), now()->toDateString()],
+                        __('Bulan Ini') => [now()->startOfMonth()->toDateString(), now()->toDateString()],
+                        __('3 Bulan') => [now()->subMonths(2)->startOfMonth()->toDateString(), now()->toDateString()],
+                        __('6 Bulan') => [now()->subMonths(5)->startOfMonth()->toDateString(), now()->toDateString()],
                     ];
                     $activeRange = $dateFrom . '|' . $dateTo;
                 @endphp
@@ -46,7 +46,7 @@
                     @foreach($presets as $label => [$from, $to])
                         @php($active = $activeRange === $from . '|' . $to)
                         <a href="{{ route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to]) }}"
-                           class="px-4 py-2.5 text-sm font-medium transition {{ $active ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">
+                           class="px-4 py-2.5 text-sm font-medium transition {{ $active ? 'bg-accent-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">
                             {{ $label }}
                         </a>
                     @endforeach
@@ -60,10 +60,10 @@
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-blue-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Lead Bulan Ini</p>
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('Lead Bulan Ini') }}</p>
                     <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['this_month'] }}</p>
                     <p class="text-xs mt-1 {{ $stats['this_month'] >= $stats['last_month'] ? 'text-green-600' : 'text-red-500' }}">
-                        {{ $stats['this_month'] >= $stats['last_month'] ? '▲' : '▼' }} bulan lalu: {{ $stats['last_month'] }}
+                        {{ $stats['this_month'] >= $stats['last_month'] ? '▲' : '▼' }} {{ __('bulan lalu:') }} {{ $stats['last_month'] }}
                     </p>
                 </div>
                 <div class="shrink-0 p-2.5 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
@@ -89,7 +89,7 @@
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-amber-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
-                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Lead Aktif</p>
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('Lead Aktif') }}</p>
                     <p class="text-2xl font-extrabold text-slate-800 dark:text-white mt-1.5">{{ $stats['active'] }}</p>
                 </div>
                 <div class="shrink-0 p-2.5 rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">
@@ -129,15 +129,15 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {{-- Tren lead masuk --}}
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Lead Masuk — {{ $dateFrom }} s/d {{ $dateTo }}</h2>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6" data-reveal>
+            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Lead Masuk') }} — {{ $dateFrom }} {{ __('s/d') }} {{ $dateTo }}</h2>
             @php($maxTrend = max($trend->max('total'), 1))
             <div class="flex items-end justify-between gap-3 h-44">
                 @foreach($trend as $month)
                     <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                         <span class="text-xs font-semibold text-slate-600">{{ $month->total }}</span>
-                        <div class="w-full max-w-12 rounded-t-[4px] bg-blue-500 transition-all"
-                             style="height: {{ max(round($month->total / $maxTrend * 100), 2) }}%"></div>
+                        <div class="w-full max-w-12 rounded-t-[4px] bg-accent-500" data-grow-h
+                             style="--h: {{ max(round($month->total / $maxTrend * 100), 2) }}%; --d: {{ $loop->index * 120 }}ms"></div>
                         <span class="text-[11px] text-slate-500 whitespace-nowrap">{{ $month->label }}</span>
                     </div>
                 @endforeach
@@ -145,10 +145,10 @@
         </div>
 
         {{-- Lead per sumber --}}
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
-            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Lead per Sumber</h2>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6" data-reveal>
+            <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Lead per Sumber') }}</h2>
             @if($perSource->isEmpty())
-                <p class="text-sm text-slate-500 py-8 text-center">Belum ada data lead.</p>
+                <p class="text-sm text-slate-500 py-8 text-center">{{ __('Belum ada data lead.') }}</p>
             @else
                 @php($maxSource = max($perSource->max('total'), 1))
                 <div class="space-y-3">
@@ -159,8 +159,8 @@
                                 <span class="font-semibold text-slate-700">{{ $row->total }}</span>
                             </div>
                             <div class="h-2.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-                                <div class="h-full rounded-full bg-indigo-500"
-                                     style="width: {{ round($row->total / $maxSource * 100) }}%"></div>
+                                <div class="h-full rounded-full bg-accent-500" data-grow-w
+                                     style="--w: {{ round($row->total / $maxSource * 100) }}%; --d: {{ $loop->index * 120 }}ms"></div>
                             </div>
                         </div>
                     @endforeach
@@ -169,69 +169,96 @@
         </div>
     </div>
 
-    {{-- Donut Lead per Status (ApexCharts) + tabel dinamis --}}
-    <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4" x-data="{
+    {{-- Donut Lead per Status (SVG, tanpa ApexCharts) + tabel dinamis --}}
+    <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4" data-reveal x-data="{
         selectedStatus: null,
         leads: @js($leadsByStatus),
+        segments: @js($donutMarketing->values()),
+        total: {{ $funnelTotal }},
         select(status) {
             this.selectedStatus = this.selectedStatus === status ? null : status;
-            this.applyMuted();
+            this.hl();
         },
-        applyMuted() {
-            const chart = window.marketingDonutChart;
-            if (!chart) return;
-            const slices = document.querySelectorAll('#status-donut-chart .apexcharts-pie-series path');
-            const index = this.selectedStatus
-                ? chart.w.globals.labels.map(l => l.toLowerCase()).indexOf(this.selectedStatus)
-                : -1;
-            slices.forEach((slice, i) => {
-                slice.style.opacity = this.selectedStatus && i !== index ? '0.35' : '1';
+        hl() {
+            const key = this.selectedStatus;
+            document.querySelectorAll('#status-donut-chart .donut-seg').forEach((seg) => {
+                if (key && seg.dataset.key === key) seg.dataset.active = 'true';
+                else delete seg.dataset.active;
             });
-        }
-    }">
-        <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">Pipeline Lead per Status</h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400 -mt-2 mb-4">Klik segmen untuk melihat detail lead pada status tersebut.</p>
-        <div class="relative w-full max-w-[420px] mx-auto">
-            <div id="status-donut-chart" class="w-full"></div>
-            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">Total Lead</span>
-                <span class="mt-0.5 text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100">{{ $stats['total'] }}</span>
+        },
+        activeSeg() { return this.segments.find((s) => s.key === this.selectedStatus); },
+        statusLabel(key) { const s = this.segments.find((s) => s.key === key); return s ? s.label : key; },
+        filteredLeads() {
+            if (this.selectedStatus) return (this.leads[this.selectedStatus] || []).map((l) => ({ ...l, _status: this.selectedStatus }));
+            return Object.entries(this.leads).flatMap(([status, arr]) => (arr || []).map((l) => ({ ...l, _status: status })));
+        },
+    }"
+    x-on:donut-select.window="select($event.detail.key)"
+    >
+        <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Pipeline Lead per Status') }}</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 -mt-2 mb-4">{{ __('Klik segmen untuk melihat detail lead pada status tersebut.') }}</p>
+        <div class="relative w-full max-w-[320px] mx-auto">
+            <div id="status-donut-chart" class="w-full">
+                <x-donut-chart :data="$donutMarketing" :size="280" :strokeWidth="34" :scroll="true" />
+            </div>
+            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-10">
+                <span class="text-xs font-medium text-slate-400 dark:text-slate-500 truncate max-w-full" x-text="activeSeg() ? activeSeg().label : 'Total Lead'">Total Lead</span>
+                <span class="mt-0.5 text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100" x-text="activeSeg() ? activeSeg().value : total">{{ $stats['total'] }}</span>
+                <span x-show="activeSeg() && total > 0" class="text-sm font-medium text-slate-400" x-text="activeSeg() ? '[' + Math.round(activeSeg().value / total * 100) + '%]' : ''"></span>
             </div>
         </div>
 
-        {{-- Tabel dinamis per status --}}
-        <div x-cloak x-show="selectedStatus !== null" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
-             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-2"
-             class="mt-6 border-t border-slate-100 dark:border-slate-700 pt-5">
+        {{-- Legenda interaktif (hover menyorot segmen, klik membuka detail) --}}
+        <div class="mt-4 grid grid-cols-1 gap-1 sm:grid-cols-2">
+            @foreach($donutMarketing as $seg)
+                <button type="button" @click="select('{{ $seg['key'] }}')"
+                        class="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+                        :class="selectedStatus === '{{ $seg['key'] }}' && 'bg-slate-50 dark:bg-slate-700/40 ring-1 ring-slate-200 dark:ring-slate-600'">
+                    <span class="flex min-w-0 items-center gap-2.5">
+                        <span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {{ $seg['color'] }}"></span>
+                        <span class="truncate font-medium text-slate-600 dark:text-slate-300">{{ $seg['label'] }}</span>
+                    </span>
+                    <span class="shrink-0 font-semibold text-slate-700 tabular-nums dark:text-slate-200">{{ $seg['value'] }}
+                        <span class="font-medium text-slate-400">· {{ $funnelTotal > 0 ? round($seg['value'] / $funnelTotal * 100) : 0 }}%</span>
+                    </span>
+                </button>
+            @endforeach
+        </div>
+
+        {{-- Tabel lead — selalu tampil: semua lead bila belum filter, per status bila diklik --}}
+        <div class="mt-6 border-t border-slate-100 dark:border-slate-700 pt-5">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-semibold text-slate-700 dark:text-slate-200">
-                    Detail Lead <span class="text-blue-600 dark:text-blue-400 uppercase" x-text="selectedStatus"></span>
-                    <span class="text-sm font-medium text-slate-400">(<span x-text="(leads[selectedStatus] || []).length"></span> lead)</span>
+                    <span x-show="!selectedStatus">{{ __('Semua Lead') }}</span>
+                    <span x-show="selectedStatus">{{ __('Detail Lead') }} <span class="text-accent-600 dark:text-accent-400 uppercase" x-text="selectedStatus"></span></span>
+                    <span class="text-sm font-medium text-slate-400">(<span x-text="filteredLeads().length"></span> lead)</span>
                 </h3>
-                <button type="button" @click="select(selectedStatus)"
+                <button type="button" x-show="selectedStatus" @click="select(selectedStatus)"
                         class="text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition">
-                    Tutup
+                    Tampilkan semua
                 </button>
             </div>
 
-            <template x-if="(leads[selectedStatus] || []).length > 0">
+            <template x-if="filteredLeads().length > 0">
                 <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
                     <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700 text-sm">
                         <thead class="bg-slate-50 dark:bg-slate-900/40">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Lead / Customer</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Sumber</th>
+                                <th x-show="!selectedStatus" class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">{{ __('Sumber') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Partner</th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Tanggal Masuk</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">{{ __('Tanggal Masuk') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
-                            <template x-for="lead in leads[selectedStatus]" :key="lead.id">
+                            <template x-for="lead in filteredLeads()" :key="lead.id">
                                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
                                     <td class="px-4 py-3">
                                         <p class="font-medium text-slate-800 dark:text-slate-100" x-text="lead.name"></p>
                                         <p class="text-xs text-slate-500" x-show="lead.company" x-text="lead.company"></p>
                                     </td>
+                                    <td x-show="!selectedStatus" class="px-4 py-3 text-slate-600 dark:text-slate-300 uppercase" x-text="statusLabel(lead._status)"></td>
                                     <td class="px-4 py-3 text-slate-600 dark:text-slate-300 capitalize" x-text="lead.source"></td>
                                     <td class="px-4 py-3 text-slate-600 dark:text-slate-300" x-text="lead.partner"></td>
                                     <td class="px-4 py-3 text-right text-slate-500 whitespace-nowrap" x-text="lead.date"></td>
@@ -242,72 +269,14 @@
                 </div>
             </template>
 
-            <template x-if="(leads[selectedStatus] || []).length === 0">
+            <template x-if="filteredLeads().length === 0">
                 <div class="rounded-xl bg-slate-50 dark:bg-slate-900/40 px-5 py-8 text-center">
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Tidak ada lead berstatus <span class="uppercase" x-text="selectedStatus"></span> pada rentang tanggal ini.</p>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                        <span x-show="!selectedStatus">{{ __('Belum ada lead pada rentang tanggal ini.') }}</span>
+                        <span x-show="selectedStatus">{{ __('Tidak ada lead berstatus') }} <span class="uppercase" x-text="selectedStatus"></span> {{ __('pada rentang tanggal ini.') }}</span>
+                    </p>
                 </div>
             </template>
         </div>
-
-        <script>
-            // Tunggu DOM siap: bundle Vite dimuat sebagai module (deferred),
-            // jadi window.ApexCharts baru tersedia setelah DOMContentLoaded.
-            document.addEventListener('DOMContentLoaded', function () {
-                // Data donut dari controller: [{ label, value, key }, ...] urut New → Lost
-                const funnelData = @json($funnel);
-
-                // Warna segmen donut — SAMAKAN dengan warna badge status di view lain.
-                // Palet bawaan: new=blue, contacted=yellow, qualified=purple,
-                // proposal=orange, won=green, lost=red. Ubah nilai hex-nya di sini.
-                const statusColors = {
-                    new:        '#3b82f6', // biru   (bg-blue-100 text-blue-800)
-                    contacted:  '#eab308', // kuning (bg-yellow-100 text-yellow-800)
-                    qualified:  '#a855f7', // ungu   (bg-purple-100 text-purple-800)
-                    proposal:   '#f97316', // oranye (bg-orange-100 text-orange-800)
-                    won:        '#22c55e', // hijau  (bg-green-100 text-green-800)
-                    lost:       '#ef4444', // merah  (bg-red-100 text-red-800)
-                };
-
-                const isDark = document.documentElement.classList.contains('dark');
-
-                window.marketingDonutChart = new ApexCharts(document.querySelector('#status-donut-chart'), {
-                    chart: {
-                        type: 'donut',
-                        height: 380,
-                        width: '100%', // responsif mengikuti container
-                        toolbar: { show: false },
-                        background: 'transparent',
-                        events: {
-                            dataPointSelection: (event, chartContext, config) => {
-                                const status = config.w.config.labels[config.dataPointIndex].toLowerCase();
-                                // Akses state Alpine via scope dari elemen dengan x-data yang membungkus donut
-                                const scope = Alpine.$data(document.querySelector('#status-donut-chart').closest('[x-data]'));
-                                scope.select(status);
-                            }
-                        },
-                    },
-                    series: funnelData.map(s => s.value),
-                    labels: funnelData.map(s => s.label),
-                    colors: funnelData.map(s => statusColors[s.key]),
-                    theme: { mode: isDark ? 'dark' : 'light' },
-                    stroke: { width: 3, colors: [isDark ? '#1e293b' : '#ffffff'] },
-                    fill: { type: 'solid' },
-                    plotOptions: {
-                        pie: {
-                            donut: {
-                                size: '70%', // rasio lubang tengah donut agar proporsional
-                            },
-                        },
-                    },
-                    legend: {
-                        show: true,
-                        position: 'bottom',
-                        fontSize: '13px',
-                        formatter: (label, opts) => `${label} — ${opts.w.globals.series[opts.seriesIndex]} lead`,
-                    },
-                    dataLabels: { enabled: false },
-                }).render();
-            });
-        </script>
     </div>
 </x-app-layout>

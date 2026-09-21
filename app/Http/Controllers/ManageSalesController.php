@@ -51,7 +51,7 @@ class ManageSalesController extends Controller
         if (!empty($validated['assigned_to'])) {
             $salesUser = User::find($validated['assigned_to']);
             if (!$salesUser?->hasRole('sales')) {
-                abort(422, 'Target assignment harus user dengan role Sales.');
+                abort(422, __('Target assignment harus user dengan role Sales.'));
             }
         }
 
@@ -80,7 +80,7 @@ class ManageSalesController extends Controller
 
         return redirect()
             ->route('manage-sales.index')
-            ->with('success', 'Lead berhasil diperbarui');
+            ->with('success', __('Lead berhasil diperbarui'));
     }
 
     public function assign(Request $request, Lead $lead)
@@ -106,7 +106,7 @@ class ManageSalesController extends Controller
 
         return redirect()
             ->route('manage-sales.index')
-            ->with('success', "Lead di-assign ke {$salesUser->name}");
+            ->with('success', __('Lead di-assign ke') . ' ' . $salesUser->name);
     }
 
     public function myLeads()

@@ -44,5 +44,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Polling pesan masuk & status WhatsApp (Green API) — untuk localhost tanpa webhook publik
         $schedule->command('whatsapp:receive')->everyThirtySeconds()
             ->withoutOverlapping();
+
+        // Bot WhatsApp: balas otomatis customer yang belum dijawab
+        $schedule->command('whatsapp:bot')->everyThirtySeconds()
+            ->withoutOverlapping();
     })
     ->create();

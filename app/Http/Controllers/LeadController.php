@@ -12,10 +12,13 @@ use App\Models\ProjectDocument;
 use App\Models\ProjectStatus;
 use App\Models\User;
 use App\Models\WorkType;
+use App\Models\WhatsappAccount;
+use App\Models\WhatsappMessage;
 use App\Notifications\NewLeadNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LeadController extends Controller
@@ -32,7 +35,10 @@ class LeadController extends Controller
             'gov' => 'Gov',
             'principle' => 'Principle',
             'distributor' => 'Distributor',
-            default => ucfirst(str_replace('_', ' ', $value)),
+            'kontraktor' => __('Kontraktor'),
+            'canvasing' => __('Canvasing'),
+            'telpon' => __('Telpon'),
+            default => __(ucfirst(str_replace('_', ' ', $value))),
         };
     }
 
@@ -181,6 +187,28 @@ class LeadController extends Controller
             'key'   => $status,
         ]);
 
+        // Warna segmen donut — SAMAKAN dengan warna badge status di view lain.
+        // Status = SEMANTIK, tidak mengikuti accent. Palet tetap.
+        // 'new' = --semantic-info (#3b82f6).
+        // (Diracik di controller, bukan blok @php di Blade: regex storePhpBlocks
+        //  Laravel menelan @php(...) inline sebagai pembuka blok bila ada
+        //  @endphp lain di file yang sama.)
+        $statusPalette = [
+            'new' => '#3b82f6',
+            'contacted' => '#eab308',
+            'qualified' => '#a855f7',
+            'proposal' => '#f97316',
+            'won' => '#22c55e',
+            'lost' => '#ef4444',
+        ];
+        $donutMarketing = $funnel->map(fn ($s) => [
+            'label' => $s['label'],
+            'value' => $s['value'],
+            'key' => $s['key'],
+            'color' => $statusPalette[$s['key']] ?? '#64748b',
+        ])->values();
+        $funnelTotal = $donutMarketing->sum('value');
+
         // Detail lead per status (untuk tabel dinamis di dashboard)
         $leadsByStatus = Lead::with(['customer', 'partner'])
             ->whereDate('incoming_date', '>=', $dateFrom)
@@ -198,10 +226,10 @@ class LeadController extends Controller
                 'date' => $lead->incoming_date?->format('d M Y') ?? '-',
             ]));
 
-        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo', 'funnel', 'leadsByStatus'));
+        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo', 'funnel', 'donutMarketing', 'funnelTotal', 'leadsByStatus'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $this->authorize('create', Lead::class);
 
@@ -211,7 +239,58 @@ class LeadController extends Controller
         $sources = self::SOURCES;
         $ptGroups = Lead::PT_GROUPS;
 
-        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups'));
+        $prefill = $this->prefillFromWhatsapp($request);
+
+        return view('leads.create', compact('customers', 'partners', 'segments', 'sources', 'ptGroups', 'prefill'));
+    }
+
+    /**
+     * Prefill form Tambah Lead dari konteks WhatsApp Center (nomor pengirim +
+     * kebutuhan otomatis dari pesan masuk terakhir).
+     *
+     * @return array<string, mixed>
+     */
+    private function prefillFromWhatsapp(Request $request): array
+    {
+        if (! $request->filled('sender') && ! $request->filled('whatsapp_account_id')) {
+            return [];
+        }
+
+        $sender = (string) $request->input('sender', '');
+        $account = $request->filled('whatsapp_account_id')
+            ? WhatsappAccount::find($request->integer('whatsapp_account_id'))
+            : null;
+
+        $kebutuhan = $request->input('kebutuhan');
+
+        if (blank($kebutuhan) && $account && $sender !== '') {
+            $kebutuhan = app(\App\Services\WhatsappBot::class)->summarizeNeeds($account, $sender);
+
+            if (blank($kebutuhan)) {
+                $kebutuhan = WhatsappMessage::where('whatsapp_account_id', $account->id)
+                    ->where('sender_number', $sender)
+                    ->where('direction', 'inbound')
+                    ->latest('id')
+                    ->limit(10)
+                    ->get()
+                    ->sortBy('id')
+                    ->pluck('message_body')
+                    ->filter()
+                    ->implode("\n");
+
+                $kebutuhan = $kebutuhan !== '' ? Str::limit($kebutuhan, 2000, '') : null;
+            }
+        }
+
+        return array_filter([
+            'customer_mode' => 'new',
+            'customer_name' => (string) $request->input('name', ''),
+            'customer_whatsapp' => $sender,
+            'source' => 'whatsapp',
+            'pt_group' => $account ? strtoupper(substr($account->account_code, 3)) : null,
+            'whatsapp_account_id' => $account?->id,
+            'kebutuhan' => $kebutuhan,
+        ], fn ($v) => filled($v));
     }
 
     public function store(Request $request)
@@ -231,6 +310,7 @@ class LeadController extends Controller
             'partner_id' => 'nullable|exists:partners,id',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
             'assigned_to' => 'nullable|exists:users,id',
+            'whatsapp_account_id' => 'nullable|exists:whatsapp_accounts,id',
             'segment' => 'required|in:'.implode(',', self::SEGMENTS),
             'source' => 'nullable|in:'.implode(',', self::SOURCES),
             'kebutuhan' => 'nullable|string|max:2000',
@@ -253,7 +333,7 @@ class LeadController extends Controller
                 'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
         } elseif (!empty($validated['customer_contact_person'])) {
-            Customer::whereKey($validated['customer_id'])->update([
+            Customer::withTrashed()->whereKey($validated['customer_id'])->update([
                 'contact_person' => $validated['customer_contact_person'],
             ]);
         }
@@ -285,7 +365,7 @@ class LeadController extends Controller
 
         return redirect()
             ->route('leads.index')
-            ->with('success', 'Lead berhasil ditambahkan');
+            ->with('success', __('Lead berhasil ditambahkan'));
     }
 
     public function show(Lead $lead)
@@ -361,7 +441,7 @@ class LeadController extends Controller
             ], fn ($value) => $value !== null);
 
             if ($customerData) {
-                Customer::whereKey($validated['customer_id'])->update($customerData);
+                Customer::withTrashed()->whereKey($validated['customer_id'])->update($customerData);
             }
         }
 
@@ -395,7 +475,7 @@ class LeadController extends Controller
 
         return redirect()
             ->route('leads.index')
-            ->with('success', 'Lead berhasil diupdate');
+            ->with('success', __('Lead berhasil diupdate'));
     }
 
     public function destroy(Lead $lead)
@@ -407,7 +487,7 @@ class LeadController extends Controller
 
         return redirect()
             ->route('leads.index')
-            ->with('success', 'Lead berhasil dihapus');
+            ->with('success', __('Lead berhasil dihapus'));
     }
 
     public function convert(Lead $lead)
@@ -433,7 +513,7 @@ class LeadController extends Controller
 
         return redirect()
             ->route('projects.show', $project)
-            ->with('success', 'Lead berhasil dikonversi ke Project');
+            ->with('success', __('Lead berhasil dikonversi ke Project'));
     }
 
     public function activities(Request $request)
@@ -530,7 +610,7 @@ class LeadController extends Controller
             'file' => ['old' => $document->file_name, 'new' => null],
         ]);
 
-        return back()->with('success', 'Lampiran berhasil dihapus');
+        return back()->with('success', __('Lampiran berhasil dihapus'));
     }
 
     private function saveAttachments(Request $request, Lead $lead): void

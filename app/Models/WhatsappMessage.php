@@ -13,6 +13,7 @@ class WhatsappMessage extends Model
         'message_body',
         'direction',
         'status',
+        'is_bot',
         'wa_message_id',
         'gateway_message_id',
         'lead_id',
@@ -21,6 +22,7 @@ class WhatsappMessage extends Model
 
     protected $casts = [
         'read_at' => 'datetime',
+        'is_bot' => 'boolean',
     ];
 
     public function account()

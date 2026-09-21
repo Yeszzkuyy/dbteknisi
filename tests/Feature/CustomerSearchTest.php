@@ -37,7 +37,7 @@ class CustomerSearchTest extends TestCase
             ->assertOk()
             ->assertSee('Alpha Corp')
             ->assertSee('Beta Ltd')
-            ->assertSee('Cari');
+            ->assertSee(__('Cari'));
     }
 
     public function test_live_search_ajax_returns_table_partial_only()

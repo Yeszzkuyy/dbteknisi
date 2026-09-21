@@ -28,7 +28,7 @@ class AdminController extends Controller
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $projects = Project::orderBy('project_name')->get(['id', 'project_name', 'customer_id']);
-        $statuses = ['unpaid' => 'Belum Bayar', 'paid' => 'Lunas', 'cancelled' => 'Dibatalkan'];
+        $statuses = ['unpaid' => __('Belum Bayar'), 'paid' => __('Lunas'), 'cancelled' => __('Dibatalkan')];
         return view('admin.invoices.create', compact('customers', 'projects', 'statuses'));
     }
 
@@ -47,7 +47,7 @@ class AdminController extends Controller
         $this->adminService->createInvoice($validated);
 
         return redirect()->route('admin.invoices.index')
-            ->with('success', 'Invoice berhasil dibuat.');
+            ->with('success', __('Invoice berhasil dibuat.'));
     }
 
     public function invoicesShow(Invoice $invoice)
@@ -60,7 +60,7 @@ class AdminController extends Controller
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $projects = Project::orderBy('project_name')->get(['id', 'project_name', 'customer_id']);
-        $statuses = ['unpaid' => 'Belum Bayar', 'paid' => 'Lunas', 'cancelled' => 'Dibatalkan'];
+        $statuses = ['unpaid' => __('Belum Bayar'), 'paid' => __('Lunas'), 'cancelled' => __('Dibatalkan')];
         return view('admin.invoices.edit', compact('invoice', 'customers', 'projects', 'statuses'));
     }
 
@@ -79,14 +79,14 @@ class AdminController extends Controller
         $this->adminService->updateInvoice($invoice, $validated);
 
         return redirect()->route('admin.invoices.index')
-            ->with('success', 'Invoice berhasil diupdate.');
+            ->with('success', __('Invoice berhasil diupdate.'));
     }
 
     public function invoicesDestroy(Invoice $invoice)
     {
         $this->adminService->deleteInvoice($invoice);
         return redirect()->route('admin.invoices.index')
-            ->with('success', 'Invoice berhasil dihapus.');
+            ->with('success', __('Invoice berhasil dihapus.'));
     }
 
     // ========== PURCHASE ORDER ==========
@@ -101,7 +101,7 @@ class AdminController extends Controller
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $projects = Project::orderBy('project_name')->get(['id', 'project_name', 'customer_id']);
-        $statuses = ['draft' => 'Draft', 'diproses' => 'Diproses', 'selesai' => 'Selesai', 'dibatalkan' => 'Dibatalkan'];
+        $statuses = ['draft' => __('Draft'), 'diproses' => __('Diproses'), 'selesai' => __('Selesai'), 'dibatalkan' => __('Dibatalkan')];
         return view('admin.pos.create', compact('customers', 'projects', 'statuses'));
     }
 
@@ -120,7 +120,7 @@ class AdminController extends Controller
         $this->adminService->createPurchaseOrder($validated);
 
         return redirect()->route('admin.pos.index')
-            ->with('success', 'Purchase Order berhasil dibuat.');
+            ->with('success', __('Purchase Order berhasil dibuat.'));
     }
 
     public function posShow(PurchaseOrder $purchaseOrder)
@@ -133,7 +133,7 @@ class AdminController extends Controller
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $projects = Project::orderBy('project_name')->get(['id', 'project_name', 'customer_id']);
-        $statuses = ['draft' => 'Draft', 'diproses' => 'Diproses', 'selesai' => 'Selesai', 'dibatalkan' => 'Dibatalkan'];
+        $statuses = ['draft' => __('Draft'), 'diproses' => __('Diproses'), 'selesai' => __('Selesai'), 'dibatalkan' => __('Dibatalkan')];
         return view('admin.pos.edit', compact('purchaseOrder', 'customers', 'projects', 'statuses'));
     }
 
@@ -152,14 +152,14 @@ class AdminController extends Controller
         $this->adminService->updatePurchaseOrder($purchaseOrder, $validated);
 
         return redirect()->route('admin.pos.index')
-            ->with('success', 'Purchase Order berhasil diupdate.');
+            ->with('success', __('Purchase Order berhasil diupdate.'));
     }
 
     public function posDestroy(PurchaseOrder $purchaseOrder)
     {
         $this->adminService->deletePurchaseOrder($purchaseOrder);
         return redirect()->route('admin.pos.index')
-            ->with('success', 'Purchase Order berhasil dihapus.');
+            ->with('success', __('Purchase Order berhasil dihapus.'));
     }
 
     // ========== PAYMENT ==========
@@ -200,7 +200,7 @@ class AdminController extends Controller
         $this->adminService->createPayment($validated);
 
         return redirect()->route('admin.payments.index')
-            ->with('success', 'Pembayaran berhasil dicatat.');
+            ->with('success', __('Pembayaran berhasil dicatat.'));
     }
 
     public function paymentsShow(Payment $payment)
@@ -212,7 +212,7 @@ class AdminController extends Controller
     public function paymentsProof(Payment $payment)
     {
         if (!$payment->proof_file || !Storage::disk('private')->exists($payment->proof_file)) {
-            abort(404, 'File bukti tidak ditemukan.');
+            abort(404, __('File bukti tidak ditemukan.'));
         }
 
         return Storage::disk('private')->response($payment->proof_file);
@@ -225,6 +225,6 @@ class AdminController extends Controller
         }
         $this->adminService->deletePayment($payment);
         return redirect()->route('admin.payments.index')
-            ->with('success', 'Pembayaran berhasil dihapus.');
+            ->with('success', __('Pembayaran berhasil dihapus.'));
     }
 }

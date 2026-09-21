@@ -1,21 +1,25 @@
 <x-app-layout>
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-300">Data relasi</p>
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-accent-600 dark:text-accent-300">{{ __('Data relasi') }}</p>
             <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 sm:text-3xl">
-                Daftar Customer
+                {{ __('Daftar Customer') }}
             </h1>
             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Kelola seluruh data customer Tridaya App.
+                {{ __('Kelola seluruh data customer Tridaya App.') }}
             </p>
         </div>
 
         @can('manage-sales')
-            <a href="{{ route('customers.create') }}"
-               class="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 sm:self-start">
-                <span class="mr-2 text-lg leading-none" aria-hidden="true">+</span>
-                Tambah Customer
-            </a>
+            <div class="group relative sm:self-start">
+                <a href="{{ route('customers.create') }}"
+                   title="{{ __('Add Customer') }}"
+                   aria-label="{{ __('Add Customer') }}"
+                   class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-600 text-white shadow-sm transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-accent-700 hover:shadow-lg hover:shadow-accent-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M12 5v14M5 12h14" /></svg>
+                </a>
+                <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 origin-top-right -translate-y-1 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-slate-700" role="tooltip">{{ __('Add Customer') }}</span>
+            </div>
         @endcan
     </div>
 
@@ -26,16 +30,16 @@
                   x-data="{ timer: null, loading: false, error: false }"
                   :aria-busy="loading">
                 <div class="min-w-0 flex-1 sm:max-w-xl">
-                    <label for="customer-search" class="sr-only">Cari customer</label>
+                    <label for="customer-search" class="sr-only">{{ __('Cari customer') }}</label>
                     <div class="relative">
                         <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <input id="customer-search"
                                type="search"
                                name="search"
                                value="{{ request('search') }}"
-                               placeholder="Cari nama, perusahaan, atau email..."
+                               placeholder="{{ __('Cari nama, perusahaan, atau email...') }}"
                                autocomplete="off"
-                               class="h-11 w-full rounded-xl border-slate-300 pl-10 pr-4 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600"
+                               class="h-11 w-full rounded-xl border-slate-300 pl-10 pr-4 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
                                x-on:input.debounce.400ms="
                                    loading = true;
                                    error = false;
@@ -60,13 +64,16 @@
                         >
                     </div>
                     <div class="min-h-5 pt-1.5 text-xs" aria-live="polite">
-                        <span x-cloak x-show="loading" class="text-slate-400">Mencari customer...</span>
-                        <span x-cloak x-show="error" class="text-red-500">Pencarian gagal. Coba lagi.</span>
+                        <span x-cloak x-show="loading" class="text-slate-400">{{ __('Mencari customer...') }}</span>
+                        <span x-cloak x-show="error" class="text-red-500">{{ __('Pencarian gagal. Coba lagi.') }}</span>
                     </div>
                 </div>
                 <button type="submit"
-                        class="h-11 rounded-xl bg-blue-600 px-5 font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2">
-                    Cari
+                        title="{{ __('Cari') }}"
+                        aria-label="{{ __('Cari customer') }}"
+                        class="h-11 w-11 shrink-0 rounded-xl bg-accent-600 font-medium text-white transition-all duration-300 hover:scale-110 hover:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
+                    <x-icon name="search" class="mx-auto h-5 w-5" />
+                    <span class="sr-only">{{ __('Cari') }}</span>
                 </button>
             </form>
         </div>

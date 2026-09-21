@@ -2,8 +2,8 @@
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800">{{ $isSuperAdmin ? 'All Trash' : 'Trash Saya' }}</h1>
-                <p class="text-slate-500 mt-1">{{ $isSuperAdmin ? 'Seluruh data terhapus dari semua user' : 'Data yang telah kamu hapus (soft delete)' }}</p>
+                <h1 class="text-3xl font-bold text-slate-800">{{ $isSuperAdmin ? 'All Trash' : __('Trash Saya') }}</h1>
+                <p class="text-slate-500 mt-1">{{ $isSuperAdmin ? __('Seluruh data terhapus dari semua user') : __('Data yang telah kamu hapus (soft delete)') }}</p>
             </div>
 
             <div class="flex items-center gap-3">
@@ -11,7 +11,7 @@
                     <form method="GET" action="{{ route('trash.index') }}">
                         <select name="user" onchange="this.form.submit()"
                                 class="rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200">
-                            <option value="">Semua User</option>
+                            <option value="">{{ __('Semua User') }}</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" {{ request('user') == $user->id ? 'selected' : '' }}>
                                     {{ $user->name }}
@@ -22,17 +22,17 @@
                 @endif
                 @can('manage-admin')
                     <form action="{{ route('trash.clear') }}" method="POST"
-                          onsubmit="return confirm('Yakin bersihkan semua trash? Data tidak bisa dikembalikan.')">
+                          onsubmit="return confirm('{{ __('Yakin bersihkan semua trash? Data tidak bisa dikembalikan.') }}')">
                         @csrf
                         @method('DELETE')
                         <button class="px-5 py-2.5 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 font-medium transition">
-                            Bersihkan Trash
+                            {{ __('Bersihkan Trash') }}
                         </button>
                     </form>
                 @endcan
                 <a href="{{ route('customers.index') }}"
-                   class="px-5 py-2.5 rounded-xl bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium transition">
-                    ← Kembali
+                   class="px-5 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 font-medium transition">
+                    {{ __('← Kembali') }}
                 </a>
             </div>
         </div>
@@ -40,17 +40,17 @@
         {{-- Customer Trash --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden mb-6">
     <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200">Customer Terhapus</h2>
+        <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200">{{ __('Customer Terhapus') }}</h2>
     </div>
     <div class="overflow-x-auto">
         <table class="min-w-full">
             <thead class="bg-slate-50 dark:bg-slate-700">
                 <tr>
-                    <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Nama Customer</th>
+                    <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Nama Customer') }}</th>
                     <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Email</th>
-                    @if($isSuperAdmin)<th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Dihapus Oleh</th>@endif
-                    <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Dihapus Pada</th>
-                    <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
+                    @if($isSuperAdmin)<th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Dihapus Oleh') }}</th>@endif
+                    <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Dihapus Pada') }}</th>
+                    <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Aksi') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
@@ -73,7 +73,7 @@
                                                 </button>
                                             </form>
                                             <button type="button" x-data=""
-                                                    title="Hapus Permanen" aria-label="Hapus Permanen"
+                                                    title="{{ __('Hapus Permanen') }}" aria-label="{{ __('Hapus Permanen') }}"
                                                     @click="$dispatch('open-modal', 'confirm-destroy-customer-{{ $customer->id }}')"
                                                     class="inline-flex items-center justify-center shrink-0 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-500/10 hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:text-red-400 p-1.5 transition-colors duration-200">
                                                 <x-icon name="trash" class="w-4 h-4" />
@@ -85,7 +85,7 @@
                         @empty
                             <tr>
                                 <td colspan="{{ $isSuperAdmin ? 5 : 4 }}" class="py-16 text-center text-slate-400">
-                                    Tidak ada customer yang terhapus.
+                                    {{ __('Tidak ada customer yang terhapus.') }}
                                 </td>
                             </tr>
                         @endforelse
@@ -103,23 +103,23 @@
                                 <x-icon name="trash" class="w-5 h-5 text-red-600" />
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-slate-800">Hapus Permanen?</h3>
+                                <h3 class="text-lg font-bold text-slate-800">{{ __('Hapus Permanen?') }}</h3>
                                 <p class="text-sm text-slate-500 mt-1">
-                                    Customer "{{ $customer->name }}" akan dihapus <b>selamanya</b> dan tidak bisa dikembalikan.
+                                    {{ __('Customer') }} "{{ $customer->name }}" {{ __('akan dihapus') }} <b>{{ __('selamanya') }}</b> {{ __('dan tidak bisa dikembalikan.') }}
                                 </p>
                             </div>
                         </div>
                         <div class="mt-6 flex justify-end gap-2">
                             <button type="button" @click="$dispatch('close')"
                                     class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 text-sm font-medium transition-colors duration-200">
-                                Batal
+                                {{ __('Batal') }}
                             </button>
                             <form action="{{ route('trash.destroy-customer', $customer->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium transition-colors duration-200">
                                     <x-icon name="trash" class="w-4 h-4" />
-                                    Ya, Hapus Permanen
+                                    {{ __('Ya, Hapus Permanen') }}
                                 </button>
                             </form>
                         </div>
@@ -131,17 +131,17 @@
         {{-- Project Trash --}}
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700">
-                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200">Project Terhapus</h2>
+                <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200">{{ __('Project Terhapus') }}</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full">
                     <thead class="bg-slate-50 dark:bg-slate-700">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Nama Project</th>
+                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Nama Project') }}</th>
                             <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Customer</th>
-                            @if($isSuperAdmin)<th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Dihapus Oleh</th>@endif
-                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Dihapus Pada</th>
-                            <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Aksi</th>
+                            @if($isSuperAdmin)<th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Dihapus Oleh') }}</th>@endif
+                            <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Dihapus Pada') }}</th>
+                            <th class="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Aksi') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
@@ -164,7 +164,7 @@
                                                 </button>
                                             </form>
                                             <button type="button" x-data=""
-                                                    title="Hapus Permanen" aria-label="Hapus Permanen"
+                                                    title="{{ __('Hapus Permanen') }}" aria-label="{{ __('Hapus Permanen') }}"
                                                     @click="$dispatch('open-modal', 'confirm-destroy-project-{{ $project->id }}')"
                                                     class="inline-flex items-center justify-center shrink-0 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-500/10 hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:text-red-400 p-1.5 transition-colors duration-200">
                                                 <x-icon name="trash" class="w-4 h-4" />
@@ -176,7 +176,7 @@
                         @empty
                             <tr>
                                 <td colspan="{{ $isSuperAdmin ? 5 : 4 }}" class="py-16 text-center text-slate-400">
-                                    Tidak ada project yang terhapus.
+                                    {{ __('Tidak ada project yang terhapus.') }}
                                 </td>
                             </tr>
                         @endforelse
@@ -194,23 +194,23 @@
                                 <x-icon name="trash" class="w-5 h-5 text-red-600" />
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-slate-800">Hapus Permanen?</h3>
+                                <h3 class="text-lg font-bold text-slate-800">{{ __('Hapus Permanen?') }}</h3>
                                 <p class="text-sm text-slate-500 mt-1">
-                                    Project "{{ $project->project_name }}" akan dihapus <b>selamanya</b> dan tidak bisa dikembalikan.
+                                    {{ __('Project') }} "{{ $project->project_name }}" {{ __('akan dihapus') }} <b>{{ __('selamanya') }}</b> {{ __('dan tidak bisa dikembalikan.') }}
                                 </p>
                             </div>
                         </div>
                         <div class="mt-6 flex justify-end gap-2">
                             <button type="button" @click="$dispatch('close')"
                                     class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 text-sm font-medium transition-colors duration-200">
-                                Batal
+                                {{ __('Batal') }}
                             </button>
                             <form action="{{ route('trash.destroy-project', $project->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium transition-colors duration-200">
                                     <x-icon name="trash" class="w-4 h-4" />
-                                    Ya, Hapus Permanen
+                                    {{ __('Ya, Hapus Permanen') }}
                                 </button>
                             </form>
                         </div>
