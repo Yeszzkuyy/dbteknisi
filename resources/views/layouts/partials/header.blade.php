@@ -47,7 +47,28 @@
                 }
             }
             $lastCrumb = count($crumbs) - 1;
+            $sectionIcons = [
+                'dashboard' => 'grid',
+                'customers' => 'users',
+                'customer-contacts' => 'book',
+                'manage-sales' => 'briefcase',
+                'sales' => 'user',
+                'leads' => 'bolt',
+                'teknisi' => 'tools',
+                'settings' => 'settings',
+                'profile' => 'user',
+                'partners' => 'handshake',
+            ];
+            $activeSection = $section !== '' ? $section : 'dashboard';
+            $sectionIcon = $sectionIcons[$activeSection] ?? 'grid';
+            $sectionLabel = $activeSection === 'dashboard'
+                ? __('Dashboard')
+                : ($sectionLabels[$activeSection] ?? ucwords(str_replace(['-', '_'], ' ', $activeSection)));
         @endphp
+        <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-accent-500/10 px-3 py-1.5 text-xs font-semibold text-accent-700 sm:inline-flex dark:bg-accent-400/10 dark:text-accent-300">
+            <x-icon :name="$sectionIcon" class="h-3.5 w-3.5" />
+            {{ $sectionLabel }}
+        </span>
         <nav aria-label="Breadcrumb" class="min-w-0">
             <ol class="flex min-w-0 items-center gap-1.5 text-sm">
                 @foreach($crumbs as $i => $crumb)
@@ -133,9 +154,16 @@
             </div>
         @endcan
 
-        <span class="hidden text-sm font-medium text-slate-600 sm:block">
-            {{ \Illuminate\Support\Str::limit(auth()->user()->name, 16, '…') }}
-        </span>
+        <div class="hidden text-right leading-tight md:block">
+            <p class="text-sm font-medium text-slate-600 dark:text-slate-300">
+                {{ \Illuminate\Support\Str::limit(auth()->user()->name, 16, '…') }}
+            </p>
+            <p class="mt-0.5 flex items-center justify-end gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
+                <span class="rounded-full bg-accent-500/10 px-2 py-px font-semibold text-accent-700 dark:bg-accent-400/10 dark:text-accent-300">{{ ucfirst(auth()->user()->roles->first()?->name ?? '-') }}</span>
+                <span aria-hidden="true">•</span>
+                <span>{{ now()->translatedFormat('d M Y') }}</span>
+            </p>
+        </div>
 
         {{-- Dropdown Avatar --}}
         <div class="relative" x-data="{ open: false }">
@@ -192,5 +220,7 @@
         </div>
 
     </div>
+
+    <span class="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-accent-500/60 to-transparent" aria-hidden="true"></span>
 
 </header>
