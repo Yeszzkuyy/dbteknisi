@@ -1082,4 +1082,152 @@ class WhatsAppCenterTest extends TestCase
             'contact_person' => 'Sinta',
         ]);
     }
+
+    private function userWithAccounts(WhatsappAccount ...$accounts)
+    {
+        $user = User::factory()->create();
+        $user->assignRole('marketing');
+        WhatsappAccount::whereIn('id', collect($accounts)->map->id)->update(['assigned_to' => $user->id]);
+
+        return $user;
+    }
+
+    public function test_sender_with_history_only_in_other_account_returns_404(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $mgk = $this->makeAccount('wa_mgk');
+        $user = $this->userWithAccounts($wani, $mgk);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $wani->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Yeski',
+            'message_body' => 'Halo WANI',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->getJson(route('whatsapp-center.messages', [$mgk, '6281234567890']))
+            ->assertNotFound();
+
+        $this->actingAs($user)
+            ->getJson(route('whatsapp-center.messages', [$wani, '6281234567890']))
+            ->assertOk();
+    }
+
+    public function test_customer_owned_by_other_account_is_not_accessible(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $mgk = $this->makeAccount('wa_mgk');
+        $user = $this->userWithAccounts($wani, $mgk);
+
+        Customer::create([
+            'name' => 'PT Gasken',
+            'company' => 'PT Gasken',
+            'contact_person' => 'Yeski',
+            'whatsapp' => '6281234567890',
+            'whatsapp_account_id' => $mgk->id,
+        ]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $wani->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Yeski',
+            'message_body' => 'Halo',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->getJson(route('whatsapp-center.messages', [$wani, '6281234567890']))
+            ->assertNotFound();
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $wani), [
+                'name' => 'Yeski',
+                'company' => 'PT Gasken',
+                'whatsapp' => '6281234567890',
+            ])
+            ->assertForbidden();
+    }
+
+    public function test_save_contact_claims_unowned_customer_and_normalizes_number(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $user = $this->marketingUser($wani->id);
+
+        Customer::create(['name' => 'Rina', 'contact_person' => 'Rina', 'whatsapp' => '081234567890']);
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $wani), [
+                'name' => 'Rina',
+                'company' => 'PT Rina',
+                'whatsapp' => '081234567890',
+            ])
+            ->assertOk()
+            ->assertJsonPath('name', 'PT Rina');
+
+        $this->assertDatabaseHas('customers', [
+            'whatsapp' => '6281234567890',
+            'whatsapp_account_id' => $wani->id,
+        ]);
+    }
+
+    public function test_contacts_only_lists_account_related_customers(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $mgk = $this->makeAccount('wa_mgk');
+        $user = $this->userWithAccounts($wani, $mgk);
+
+        $owned = Customer::create(['name' => 'PT Wani Cust', 'whatsapp' => '628100000001', 'whatsapp_account_id' => $wani->id]);
+        $foreign = Customer::create(['name' => 'PT Mgk Cust', 'whatsapp' => '628100000002', 'whatsapp_account_id' => $mgk->id]);
+        $unrelated = Customer::create(['name' => 'PT entah', 'whatsapp' => '628100000003']);
+        $byHistory = Customer::create(['name' => 'PT History', 'whatsapp' => '628100000004']);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $wani->id,
+            'sender_number' => '628100000004',
+            'sender_name' => 'Sejarah',
+            'message_body' => 'Halo',
+            'direction' => 'inbound',
+        ]);
+
+        $ids = collect($this->actingAs($user)->getJson(route('whatsapp-center.contacts', $wani))->assertOk()->json())->pluck('id');
+
+        $this->assertTrue($ids->contains($owned->id));
+        $this->assertTrue($ids->contains($byHistory->id));
+        $this->assertFalse($ids->contains($foreign->id));
+        $this->assertFalse($ids->contains($unrelated->id));
+    }
+
+    public function test_convert_claims_customer_to_account(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $user = $this->marketingUser($wani->id);
+
+        $customer = Customer::create(['name' => 'PT Lama', 'whatsapp' => '6281234567890']);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $wani->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Pak Lama',
+            'message_body' => 'Mau perpanjang',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.convert', [$wani, '6281234567890']), [
+                'customer_name' => 'Pak Lama',
+                'segment' => 'vendor',
+            ])
+            ->assertOk();
+
+        $this->assertSame($wani->id, $customer->fresh()->whatsapp_account_id);
+    }
+
+    public function test_reply_to_brand_new_number_is_allowed(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $user = $this->marketingUser($wani->id);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.reply', [$wani, '628999888777']), ['message_body' => 'Halo baru'])
+            ->assertOk();
+    }
 }
