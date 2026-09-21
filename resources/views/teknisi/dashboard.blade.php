@@ -142,53 +142,62 @@
                     <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{{ __('Distribusi project berdasarkan status.') }}</p>
                 </div>
 
-                <div class="mt-6 flex flex-col items-center gap-6">
+                <div class="mt-6 flex flex-col items-center gap-6" x-data="{
+                    selected: null,
+                    segments: @js($donutData->values()),
+                    total: {{ $totalShown }},
+                    select(label) {
+                        this.selected = this.selected === label ? null : label;
+                        this.hl();
+                    },
+                    hl() {
+                        const key = this.selected;
+                        document.querySelectorAll('#teknisi-donut-chart .donut-seg').forEach((seg) => {
+                            if (key && seg.dataset.key === key) seg.dataset.active = 'true';
+                            else delete seg.dataset.active;
+                        });
+                    },
+                    activeSeg() { return this.segments.find((s) => (s.key || s.label) === this.selected); },
+                }"
+                x-on:donut-select.window="select($event.detail.key)"
+                >
                     {{-- Donut progress (SVG, tanpa ApexCharts) --}}
                     @if($donutData->isNotEmpty() && $totalShown > 0)
-                        <div class="relative w-full max-w-[260px]">
+                        <div class="relative w-full max-w-[320px]">
                             <div id="teknisi-donut-chart" class="w-full">
-                                <x-donut-chart :data="$donutData" :size="240" :strokeWidth="30" />
+                                <x-donut-chart :data="$donutData" :size="280" :strokeWidth="34" />
                             </div>
-                            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">{{ __('Selesai') }}</span>
-                                <span class="text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100"
-                                      x-data="counter({{ $donePct }})" x-init="start()" x-text="display + '%'">0%</span>
+                            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-10">
+                                <div x-show="!activeSeg()" class="flex flex-col items-center justify-center">
+                                    <span class="text-xs font-medium text-slate-400 dark:text-slate-500">{{ __('Selesai') }}</span>
+                                    <span class="text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100"
+                                          x-data="counter({{ $donePct }})" x-init="start()" x-text="display + '%'">0%</span>
+                                </div>
+                                <div x-show="activeSeg()" class="flex flex-col items-center justify-center">
+                                    <span class="text-xs font-medium text-slate-400 dark:text-slate-500 truncate max-w-full" x-text="activeSeg().label"></span>
+                                    <span class="mt-0.5 text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100" x-text="activeSeg().value"></span>
+                                    <span class="text-sm font-medium text-slate-400" x-text="total ? '[' + Math.round(activeSeg().value / total * 100) + '%]' : ''"></span>
+                                </div>
                             </div>
                         </div>
                     @else
                         <x-empty-state label="{{ __('data status project') }}" />
                     @endif
 
-                    <ul class="w-full space-y-1.5">
-                        @forelse($topStatuses as $status)
-                            <li class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 text-sm transition duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+                    {{-- Legenda interaktif (hover menyorot segmen, klik mengunci sorotan) --}}
+                    <div class="w-full grid grid-cols-1 gap-1 sm:grid-cols-2">
+                        @foreach($donutData as $seg)
+                            <button type="button" @click="select('{{ $seg['label'] }}')"
+                                    class="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+                                    :class="selected === '{{ $seg['label'] }}' && 'bg-slate-50 dark:bg-slate-700/40 ring-1 ring-slate-200 dark:ring-slate-600'">
                                 <span class="flex min-w-0 items-center gap-2.5">
-                                    <span data-status-color="{{ $status['name'] }}" class="h-3 w-3 shrink-0 rounded-full"
-                                          style="background-color: {{ $statusBarColors[$status['name']] ?? '#64748b' }}"></span>
-                                    <span class="truncate font-semibold text-slate-700 dark:text-slate-200">{{ $status['name'] }}</span>
+                                    <span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {{ $seg['color'] }}"></span>
+                                    <span class="truncate font-semibold text-slate-700 dark:text-slate-200">{{ $seg['label'] }}</span>
                                 </span>
-                                <span class="shrink-0 font-bold text-slate-800 tabular-nums dark:text-slate-100">
-                                    {{ $status['count'] }} Project
-                                    <span class="font-medium text-slate-400">· {{ $pct($status['count']) }}%</span>
-                                </span>
-                            </li>
-                        @empty
-                            <li><x-empty-state label="{{ __('data status project') }}" /></li>
-                        @endforelse
-
-                        @if($othersCount > 0)
-                            <li class="flex items-center justify-between gap-4 rounded-lg px-2 py-1.5 text-sm transition duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/40">
-                                <span class="flex min-w-0 items-center gap-2.5">
-                                    <span class="h-3 w-3 shrink-0 rounded-full bg-slate-400"></span>
-                                    <span class="truncate font-semibold text-slate-700 dark:text-slate-200">{{ __('Lainnya') }}</span>
-                                </span>
-                                <span class="shrink-0 font-bold text-slate-800 tabular-nums dark:text-slate-100">
-                                    {{ $othersCount }} Project
-                                    <span class="font-medium text-slate-400">· {{ $pct($othersCount) }}%</span>
-                                </span>
-                            </li>
-                        @endif
-                    </ul>
+                                <span class="shrink-0 font-bold text-slate-800 tabular-nums dark:text-slate-100">{{ $seg['value'] }}</span>
+                            </button>
+                        @endforeach
+                    </div>
 
                     <div class="w-full border-t border-slate-100 pt-4 dark:border-slate-700">
                         <p class="text-sm text-slate-500">{{ __('Total Project:') }} <span class="font-bold text-slate-800 dark:text-slate-200">{{ $totalShown }}</span></p>
