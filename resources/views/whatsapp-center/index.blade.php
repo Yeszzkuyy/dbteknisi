@@ -1037,10 +1037,12 @@
 
             goToLeadForm() {
                 if (!this.activeConv || !this.activeAccount) return;
+                const customer = this.activeConv.customer;
                 const params = new URLSearchParams({
                     whatsapp_account_id: this.activeAccount.id,
                     sender: this.activeConv.sender_number,
-                    name: this.activeConv.customer?.company || this.conversationName(this.activeConv),
+                    company: customer?.company || '',
+                    pic: customer?.contact_person || this.activeConv.sender_name || '',
                 });
                 window.location.href = '{{ route('leads.create') }}?' + params.toString();
             },
