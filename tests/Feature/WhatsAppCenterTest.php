@@ -790,12 +790,12 @@ class WhatsAppCenterTest extends TestCase
                 'whatsapp' => '6281234567890',
             ])
             ->assertOk()
-            ->assertJsonPath('name', 'Budi-PT Budi Corp')
+            ->assertJsonPath('name', 'PT Budi Corp')
             ->assertJsonPath('contact_person', 'Budi');
 
         $this->assertDatabaseHas('customers', [
             'whatsapp' => '6281234567890',
-            'name' => 'Budi-PT Budi Corp',
+            'name' => 'PT Budi Corp',
             'company' => 'PT Budi Corp',
             'contact_person' => 'Budi',
         ]);
@@ -822,7 +822,7 @@ class WhatsAppCenterTest extends TestCase
 
         $this->assertDatabaseHas('customers', [
             'id' => $customer->id,
-            'name' => 'Budi',
+            'name' => 'PT Ada Dulu',
             'company' => 'PT Ada Dulu',
             'contact_person' => 'Budi',
         ]);
@@ -1053,11 +1053,11 @@ class WhatsAppCenterTest extends TestCase
                 'whatsapp' => '6281234567890',
             ])
             ->assertOk()
-            ->assertJsonPath('name', 'Budi-PT ABC');
+            ->assertJsonPath('name', 'PT ABC');
 
         $this->assertDatabaseHas('customers', [
             'whatsapp' => '6281234567890',
-            'name' => 'Budi-PT ABC',
+            'name' => 'PT ABC',
             'company' => 'PT ABC',
             'contact_person' => 'Budi',
         ]);

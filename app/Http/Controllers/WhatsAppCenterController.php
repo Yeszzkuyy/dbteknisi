@@ -196,19 +196,20 @@ class WhatsAppCenterController extends Controller
 
         $contactName = trim($validated['name']);
         $company = trim((string) ($validated['company'] ?? ''));
-        $displayName = $company !== '' ? $contactName.'-'.$company : $contactName;
 
         if (! $customer) {
+            $dbName = $company !== '' ? $company : $contactName;
             $customer = Customer::create([
-                'name' => $displayName,
+                'name' => $dbName,
                 'company' => $company !== '' ? $company : $contactName,
                 'contact_person' => $contactName,
                 'whatsapp' => $validated['whatsapp'],
                 'notes' => $validated['notes'] ?? null,
             ]);
         } else {
+            $dbName = $company !== '' ? $company : ($customer->company ?: $contactName);
             $customer->update([
-                'name' => $displayName,
+                'name' => $dbName,
                 'company' => $company !== '' ? $company : $customer->company,
                 'contact_person' => $contactName,
                 'whatsapp' => $validated['whatsapp'],

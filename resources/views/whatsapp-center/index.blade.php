@@ -703,7 +703,9 @@
             },
 
             conversationName(conv) {
-                return conv?.customer?.name || conv?.sender_name || conv?.sender_number || '{{ __('Kontak WhatsApp') }}';
+                const cust = conv?.customer;
+                if (cust?.contact_person && cust?.company && cust.contact_person !== cust.company) return `${cust.contact_person}-${cust.company}`;
+                return cust?.name || conv?.sender_name || conv?.sender_number || '{{ __('Kontak WhatsApp') }}';
             },
 
             initials(value) {
