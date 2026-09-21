@@ -1,4 +1,69 @@
 <x-app-layout>
+    {{-- Skeleton shimmer dashboard umum — hanya tampil sesaat setelah login.
+         Konten asli tetap di-render server (SEO-safe); overlay ini sekadar veil. --}}
+    <style>
+        #dash-skeleton {
+            position: fixed; inset: 0; z-index: 60;
+            background-color: var(--bg);
+            transition: opacity 0.3s ease;
+        }
+        #dash-skeleton.skel-done { opacity: 0; }
+        .skel-block {
+            position: relative; overflow: hidden;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
+        }
+        .skel-block::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(100deg, transparent 20%, rgba(148, 163, 184, 0.28) 50%, transparent 80%);
+            background-size: 200% 100%;
+            animation: skel-sweep 1.4s ease-in-out infinite;
+        }
+        .dark .skel-block::after {
+            background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.09) 50%, transparent 80%);
+            background-size: 200% 100%;
+        }
+        @keyframes skel-sweep {
+            from { background-position: 180% 0; }
+            to { background-position: -80% 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .skel-block::after { animation: none; }
+            #dash-skeleton { display: none; }
+        }
+    </style>
+    <div id="dash-skeleton" hidden>
+        <div class="max-w-[1400px] mx-auto space-y-6 p-6">
+            <div class="skel-block h-32"></div>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="skel-block h-28"></div>
+                <div class="skel-block h-28"></div>
+                <div class="skel-block h-28"></div>
+                <div class="skel-block h-28"></div>
+            </div>
+            <div class="skel-block h-64"></div>
+        </div>
+    </div>
+    <script>
+        // ponytail: tampil hanya bila datang dari /login & belum pernah di tab ini;
+        // jalan saat parse (sebelum paint) agar tanpa kedip
+        (function () {
+            var el = document.getElementById('dash-skeleton');
+            if (!el) return;
+            var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var fromLogin = /\/login/.test(document.referrer || '');
+            var seen = false;
+            try { seen = !!sessionStorage.getItem('dash-skel'); } catch (e) {}
+            if (reduce || !fromLogin || seen) { el.remove(); return; }
+            try { sessionStorage.setItem('dash-skel', '1'); } catch (e) {}
+            el.hidden = false;
+            setTimeout(function () {
+                el.classList.add('skel-done');
+                setTimeout(function () { el.remove(); }, 350);
+            }, 1000);
+        })();
+    </script>
     @php
         $dashboardCards = [
             [
