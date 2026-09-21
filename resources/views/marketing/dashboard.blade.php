@@ -129,15 +129,15 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {{-- Tren lead masuk --}}
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6" data-reveal>
             <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Lead Masuk') }} — {{ $dateFrom }} {{ __('s/d') }} {{ $dateTo }}</h2>
             @php($maxTrend = max($trend->max('total'), 1))
             <div class="flex items-end justify-between gap-3 h-44">
                 @foreach($trend as $month)
                     <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                         <span class="text-xs font-semibold text-slate-600">{{ $month->total }}</span>
-                        <div class="w-full max-w-12 rounded-t-[4px] bg-accent-500 transition-all"
-                             style="height: {{ max(round($month->total / $maxTrend * 100), 2) }}%"></div>
+                        <div class="w-full max-w-12 rounded-t-[4px] bg-accent-500" data-grow-h
+                             style="--h: {{ max(round($month->total / $maxTrend * 100), 2) }}%; --d: {{ $loop->index * 80 }}ms"></div>
                         <span class="text-[11px] text-slate-500 whitespace-nowrap">{{ $month->label }}</span>
                     </div>
                 @endforeach
@@ -145,7 +145,7 @@
         </div>
 
         {{-- Lead per sumber --}}
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6" data-reveal>
             <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Lead per Sumber') }}</h2>
             @if($perSource->isEmpty())
                 <p class="text-sm text-slate-500 py-8 text-center">{{ __('Belum ada data lead.') }}</p>
@@ -159,8 +159,8 @@
                                 <span class="font-semibold text-slate-700">{{ $row->total }}</span>
                             </div>
                             <div class="h-2.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-                                <div class="h-full rounded-full bg-accent-500"
-                                     style="width: {{ round($row->total / $maxSource * 100) }}%"></div>
+                                <div class="h-full rounded-full bg-accent-500" data-grow-w
+                                     style="--w: {{ round($row->total / $maxSource * 100) }}%; --d: {{ $loop->index * 80 }}ms"></div>
                             </div>
                         </div>
                     @endforeach
