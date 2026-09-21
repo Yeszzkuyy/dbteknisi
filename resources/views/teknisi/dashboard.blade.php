@@ -194,7 +194,9 @@
                                     <span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {{ $seg['color'] }}"></span>
                                     <span class="truncate font-semibold text-slate-700 dark:text-slate-200">{{ $seg['label'] }}</span>
                                 </span>
-                                <span class="shrink-0 font-bold text-slate-800 tabular-nums dark:text-slate-100">{{ $seg['value'] }}</span>
+                                <span class="shrink-0 font-bold text-slate-800 tabular-nums dark:text-slate-100">{{ $seg['value'] }}
+                                    <span class="font-medium text-slate-400">· {{ $pct($seg['value']) }}%</span>
+                                </span>
                             </button>
                         @endforeach
                     </div>
