@@ -207,6 +207,7 @@ class WhatsAppCenterController extends Controller
             'name' => 'required|string|max:255',
             'company' => 'nullable|string|max:255',
             'whatsapp' => 'required|string|max:50',
+            'address' => 'nullable|string|max:1000',
             'notes' => 'nullable|string|max:2000',
         ]);
 
@@ -228,6 +229,7 @@ class WhatsAppCenterController extends Controller
                 'contact_person' => $contactName,
                 'whatsapp' => $number,
                 'whatsapp_account_id' => $account->id,
+                'address' => $validated['address'] ?? null,
                 'notes' => $validated['notes'] ?? null,
             ]);
         } else {
@@ -238,6 +240,7 @@ class WhatsAppCenterController extends Controller
                 'contact_person' => $contactName,
                 'whatsapp' => $number,
                 'whatsapp_account_id' => $customer->whatsapp_account_id ?? $account->id,
+                'address' => filled($validated['address'] ?? null) ? $validated['address'] : $customer->address,
                 'notes' => $validated['notes'] ?? $customer->notes,
             ]);
         }
@@ -368,6 +371,7 @@ class WhatsAppCenterController extends Controller
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
+            'customer_address' => 'nullable|string|max:1000',
             'segment' => 'required|in:'.implode(',', LeadController::SEGMENTS),
             'kebutuhan' => 'nullable|string|max:2000',
         ]);
@@ -386,9 +390,19 @@ class WhatsAppCenterController extends Controller
                 'whatsapp' => $number,
                 'whatsapp_account_id' => $account->id,
                 'contact_person' => $validated['customer_name'],
+                'address' => $validated['customer_address'] ?? null,
             ]);
-        } elseif (! $customer->whatsapp_account_id) {
-            $customer->update(['whatsapp_account_id' => $account->id]);
+        } else {
+            $updates = [];
+            if (! $customer->whatsapp_account_id) {
+                $updates['whatsapp_account_id'] = $account->id;
+            }
+            if (blank($customer->address) && filled($validated['customer_address'] ?? null)) {
+                $updates['address'] = $validated['customer_address'];
+            }
+            if ($updates) {
+                $customer->update($updates);
+            }
         }
 
         $ptGroup = strtoupper(substr($account->account_code, 3));
@@ -855,6 +869,7 @@ class WhatsAppCenterController extends Controller
             'contact_person' => $customer->contact_person,
             'company' => $customer->company,
             'whatsapp' => $customer->whatsapp ?? $customer->phone,
+            'address' => $customer->address,
             'notes' => $customer->notes,
             'url' => route('customers.show', $customer),
         ];

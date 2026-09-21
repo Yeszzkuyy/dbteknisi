@@ -108,6 +108,94 @@ class WhatsAppCenterTest extends TestCase
         $this->assertNotNull(WhatsappMessage::first()->lead_id);
     }
 
+    public function test_convert_stores_customer_address(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina Putri',
+            'message_body' => 'Butuh internet kantor',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.convert', [$account, '6281234567890']), [
+                'customer_name' => 'Rina Putri',
+                'customer_address' => 'Jl. Merdeka No. 10, Bandung',
+                'segment' => 'end_user',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('customers', [
+            'whatsapp' => '6281234567890',
+            'address' => 'Jl. Merdeka No. 10, Bandung',
+        ]);
+    }
+
+    public function test_convert_fills_empty_address_on_existing_customer(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        $customer = Customer::create(['name' => 'PT Lama', 'whatsapp' => '081234567890']);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Pak Lama',
+            'message_body' => 'Mau perpanjang',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.convert', [$account, '6281234567890']), [
+                'customer_name' => 'Pak Lama',
+                'customer_address' => 'Jl. Lama No. 1',
+                'segment' => 'vendor',
+            ])
+            ->assertOk();
+
+        $this->assertSame(1, Customer::count());
+        $this->assertDatabaseHas('customers', [
+            'id' => $customer->id,
+            'address' => 'Jl. Lama No. 1',
+        ]);
+    }
+
+    public function test_convert_does_not_overwrite_existing_address(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        $customer = Customer::create([
+            'name' => 'PT Punya Alamat',
+            'whatsapp' => '081234567890',
+            'address' => 'Alamat lama',
+        ]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Pak Alamat',
+            'message_body' => 'Halo',
+            'direction' => 'inbound',
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.convert', [$account, '6281234567890']), [
+                'customer_name' => 'Pak Alamat',
+                'customer_address' => 'Alamat baru',
+                'segment' => 'vendor',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('customers', [
+            'id' => $customer->id,
+            'address' => 'Alamat lama',
+        ]);
+    }
+
     public function test_convert_reuses_existing_customer(): void
     {
         $account = $this->makeAccount('wa_wani');
@@ -798,6 +886,51 @@ class WhatsAppCenterTest extends TestCase
             'name' => 'PT Budi Corp',
             'company' => 'PT Budi Corp',
             'contact_person' => 'Budi',
+        ]);
+    }
+
+    public function test_save_contact_stores_address(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $account), [
+                'name' => 'Budi',
+                'company' => 'PT Budi Corp',
+                'whatsapp' => '6281234567890',
+                'address' => 'Jl. Sudirman No. 5, Jakarta',
+            ])
+            ->assertOk()
+            ->assertJsonPath('address', 'Jl. Sudirman No. 5, Jakarta');
+
+        $this->assertDatabaseHas('customers', [
+            'whatsapp' => '6281234567890',
+            'address' => 'Jl. Sudirman No. 5, Jakarta',
+        ]);
+    }
+
+    public function test_save_contact_keeps_address_when_field_empty(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+        $customer = Customer::create([
+            'name' => 'PT Ada Alamat',
+            'whatsapp' => '6281234567890',
+            'address' => 'Alamat tersimpan',
+        ]);
+
+        $this->actingAs($user)
+            ->postJson(route('whatsapp-center.contact-save', $account), [
+                'name' => 'Budi',
+                'whatsapp' => '6281234567890',
+                'address' => '',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('customers', [
+            'id' => $customer->id,
+            'address' => 'Alamat tersimpan',
         ]);
     }
 
