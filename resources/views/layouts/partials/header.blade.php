@@ -220,7 +220,7 @@
 
     </div>
 
-    <span class="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-accent-500/60 to-transparent" aria-hidden="true"></span>
+    <span class="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-accent-400 to-transparent" aria-hidden="true"></span>
     <span class="navline-run" aria-hidden="true"></span>
 
 </header>
