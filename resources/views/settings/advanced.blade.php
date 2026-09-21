@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="mx-auto max-w-4xl space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6 tab-container">
         {{-- Header --}}
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">

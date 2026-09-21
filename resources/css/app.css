@@ -383,3 +383,21 @@ tbody tr { transition: background-color 0.2s ease; }
         animation: none;
     }
 }
+
+/* ============================================================
+   Profile/Settings tab container — anti layout shift
+   Tab adalah navigasi route penuh, jadi transition hanya
+   menghaluskan perubahan min-height di dalam halaman
+   (bukan antar-halaman). min-height menahan footer/scrollbar
+   agar tidak lompat saat Profile (pendek) ↔ Settings (panjang).
+   ============================================================ */
+.tab-container {
+    min-height: 70vh;
+    transition: min-height 0.35s var(--ease-out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .tab-container > * {
+        animation: rise 0.4s var(--ease-out) backwards;
+    }
+}
