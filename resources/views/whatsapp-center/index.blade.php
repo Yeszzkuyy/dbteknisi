@@ -625,6 +625,7 @@
             contactSearch: '',
             contacts: [],
             loadingContacts: false,
+            chatBlocked: false,
             directNumber: '',
             contactModal: false,
             contactForm: { customer_id: null, name: '', company: '', whatsapp: '', notes: '' },
@@ -681,7 +682,7 @@
             },
 
             get canSend() {
-                return this.canManage && !!this.activeConv && !!this.reply.trim() && !this.attachmentName && !this.loadingMessages;
+                return this.canManage && !!this.activeConv && !this.chatBlocked && !!this.reply.trim() && !this.attachmentName && !this.loadingMessages;
             },
 
             setAccount(account) {
@@ -689,6 +690,7 @@
                 this.accountMenu = false;
                 this.activeConv = null;
                 this.activeSender = null;
+                this.chatBlocked = false;
                 this.messages = [];
                 this.view = 'chats';
                 this.mobileChat = false;
@@ -751,13 +753,18 @@
                 try {
                     const url = '{{ route('whatsapp-center.messages', ['account' => ':id', 'sender' => ':sender']) }}'.replace(':id', this.activeAccount.id).replace(':sender', encodeURIComponent(sender)) + '?' + query;
                     const response = await fetch(url, { headers: { Accept: 'application/json' } });
-                    if (response.status === 404) throw new Error('{{ __('Chat tidak tersedia di akun ini (milik company lain).') }}');
+                    if (response.status === 404) {
+                        const blockedError = new Error('{{ __('Chat tidak tersedia di akun ini (milik company lain).') }}');
+                        blockedError.blocked = true;
+                        throw blockedError;
+                    }
                     if (!response.ok) throw new Error('{{ __('Gagal memuat pesan') }}');
                     const data = await response.json();
                     const previousLastId = this.messages.length ? this.messages[this.messages.length - 1].id : null;
                     const shouldScroll = !silent || this.isNearBottom();
                     const incomingNew = silent && previousLastId ? data.messages.filter((message) => message.id > previousLastId && message.direction === 'inbound') : [];
                     this.messages = data.messages.map((message) => ({ ...message, created_iso: message.created_iso || new Date().toISOString() }));
+                    this.chatBlocked = false;
                     this.hasMore = data.has_more;
                     this.nextBefore = data.next_before;
                     if (this.activeConv && data.customer) this.activeConv.customer = data.customer;
@@ -765,7 +772,10 @@
                     if (incomingNew.length) this.notifyIncoming(incomingNew[incomingNew.length - 1]);
                     if (!silent) this.markConversation(this.activeConv, true);
                 } catch (error) {
-                    if (!silent) this.showError(error.message || '{{ __('Pesan tidak dapat dimuat.') }}');
+                    if (!silent) {
+                        if (error.blocked) this.chatBlocked = true;
+                        this.showError(error.message || '{{ __('Pesan tidak dapat dimuat.') }}');
+                    }
                 } finally {
                     this.loadingMessages = false;
                 }
@@ -796,6 +806,7 @@
                 this.mobileChat = true;
                 this.activeConv = conv;
                 this.activeSender = conv.sender_number;
+                this.chatBlocked = false;
                 this.contactPanel = false;
                 this.chatMenu = false;
                 this.clearMessageSearch(false);
@@ -811,6 +822,7 @@
                         headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
                         body: JSON.stringify({ message_body: body }),
                     });
+                    if (response.status === 404 || response.status === 403) throw new Error('{{ __('Chat milik company lain, tidak bisa dikirim dari akun ini.') }}');
                     if (!response.ok) throw new Error('{{ __('Gagal mengirim pesan') }}');
                     const message = await response.json();
                     message.created_iso = new Date().toISOString();
@@ -820,7 +832,7 @@
                     this.$nextTick(() => { this.resizeComposer({ target: document.querySelector('.wa-composer-input') }); this.scrollToBottom(true); });
                     this.loadConversations(true);
                 } catch (error) {
-                    this.showError('{{ __('Pesan gagal dikirim. Coba lagi.') }}');
+                    this.showError(error.message || '{{ __('Pesan gagal dikirim. Coba lagi.') }}');
                 }
             },
 
