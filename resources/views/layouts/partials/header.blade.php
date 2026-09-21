@@ -154,12 +154,11 @@
             </div>
         @endcan
 
-        <span class="hidden shrink-0 whitespace-nowrap text-[11px] tabular-nums text-slate-400 md:block dark:text-slate-500">{{ now()->translatedFormat('d M Y') }}</span>
+        <span class="hidden shrink-0 whitespace-nowrap text-[11px] tabular-nums text-slate-400 md:block dark:text-slate-300">{{ now()->translatedFormat('d M Y') }}</span>
 
         <span class="hidden h-8 w-px shrink-0 bg-slate-200/80 md:block dark:bg-zinc-700/80" aria-hidden="true"></span>
 
-        <div class="hidden shrink-0 items-center gap-2 whitespace-nowrap md:flex">
-            <span class="rounded-full bg-accent-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent-700 dark:bg-accent-400/10 dark:text-accent-300">{{ auth()->user()->roles->first()?->name ?? '-' }}</span>
+        <div class="hidden shrink-0 items-center whitespace-nowrap md:flex">
             <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
                 {{ \Illuminate\Support\Str::limit(auth()->user()->name, 16, '…') }}
             </p>
@@ -222,5 +221,6 @@
     </div>
 
     <span class="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-accent-500/60 to-transparent" aria-hidden="true"></span>
+    <span class="navline-run" aria-hidden="true"></span>
 
 </header>
