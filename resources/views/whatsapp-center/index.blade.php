@@ -773,7 +773,13 @@
                     if (!silent) this.markConversation(this.activeConv, true);
                 } catch (error) {
                     if (!silent) {
-                        if (error.blocked) this.chatBlocked = true;
+                        if (error.blocked) {
+                            this.chatBlocked = true;
+                            this.activeConv = null;
+                            this.activeSender = null;
+                            this.messages = [];
+                            this.mobileChat = false;
+                        }
                         this.showError(error.message || '{{ __('Pesan tidak dapat dimuat.') }}');
                     }
                 } finally {
