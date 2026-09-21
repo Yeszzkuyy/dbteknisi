@@ -17,6 +17,7 @@ $segments = collect($data)->map(fn ($s) => [
 $total = $segments->sum('value');
 $radius = $size / 2 - $strokeWidth / 2;
 $circ = 2 * M_PI * $radius;
+$gap = 3; // celah antar-segmen (px keliling) agar warna tidak bleed
 $cum = 0.0;
 @endphp
 
@@ -39,27 +40,31 @@ $cum = 0.0;
     @foreach($segments as $i => $seg)
         @php
             $pct = $total > 0 ? ($seg['value'] / $total) * 100 : 0;
-            $dash = ($pct / 100) * $circ;
+            $dash = max(($pct / 100) * $circ - $gap, 1);
             $off = ($cum / 100) * $circ;
             $cum += $pct;
+            $valLabel = rtrim(rtrim(number_format($seg['value'], 1, '.', ''), '0'), '.');
         @endphp
         <circle
             class="donut-seg"
             data-key="{{ $seg['key'] }}"
             data-label="{{ $seg['label'] }}"
             data-value="{{ $seg['value'] }}"
+            tabindex="0"
+            role="button"
+            aria-label="{{ $seg['label'] }}: {{ $valLabel }} ({{ round($pct) }}%)"
             cx="{{ $size / 2 }}"
             cy="{{ $size / 2 }}"
             r="{{ $radius }}"
             fill="transparent"
             stroke="{{ $seg['color'] }}"
             stroke-width="{{ $strokeWidth }}"
-            stroke-linecap="round"
+            stroke-linecap="butt"
             stroke-dasharray="{{ number_format($dash, 2, '.', '') }} {{ number_format($circ, 2, '.', '') }}"
             stroke-dashoffset="{{ number_format(-$off, 2, '.', '') }}"
-            style="animation-delay: {{ $i * 70 }}ms"
+            style="--off: {{ number_format(-$off, 2, '.', '') }}; --c: {{ number_format($circ, 2, '.', '') }}; animation-delay: {{ $i * 120 }}ms"
         >
-            <title>{{ $seg['label'] }} — {{ rtrim(rtrim(number_format($seg['value'], 1, '.', ''), '0'), '.') }}</title>
+            <title>{{ $seg['label'] }} — {{ $valLabel }}</title>
         </circle>
     @endforeach
 </svg>
@@ -70,18 +75,20 @@ $cum = 0.0;
         cursor: pointer;
         transform-box: fill-box;
         transform-origin: center;
-        transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
-        animation: donut-seg-in 0.5s ease backwards;
+        transition: filter 0.2s ease, transform 0.2s ease;
+        animation: donut-seg-sweep 0.7s ease backwards;
     }
-    /* Hover dimatikan: segmen tetap diam, sorotan hanya via klik (data-active) */
-    /* Sorotan menetap (segmen diklik) — tanpa memudarkan segmen lain */
-    .donut-svg .donut-seg[data-active="true"] {
-        filter: brightness(1.12) saturate(1.2) drop-shadow(0 0 6px rgba(0, 0, 0, 0.25));
+    /* Hover dimatikan: segmen tetap diam, sorotan hanya via klik/fokus (data-active) */
+    .donut-svg .donut-seg:focus { outline: none; }
+    /* Sorotan menetap (segmen diklik / fokus keyboard) — tanpa memudarkan segmen lain */
+    .donut-svg .donut-seg[data-active="true"],
+    .donut-svg .donut-seg:focus-visible {
+        filter: brightness(1.1) saturate(1.15) drop-shadow(0 0 4px rgba(0, 0, 0, 0.22));
         transform: scale(1.03);
     }
-    @keyframes donut-seg-in {
-        from { opacity: 0; }
-        to { opacity: 1; }
+    @keyframes donut-seg-sweep {
+        from { stroke-dashoffset: var(--c); opacity: 0; }
+        to { stroke-dashoffset: var(--off); opacity: 1; }
     }
     @media (prefers-reduced-motion: reduce) {
         .donut-svg .donut-seg { animation: none; }
@@ -102,6 +109,12 @@ $cum = 0.0;
             svg.querySelectorAll('.donut-seg').forEach(function (seg) {
                 seg.addEventListener('click', function () {
                     window.dispatchEvent(new CustomEvent('donut-select', { detail: detailOf(seg) }));
+                });
+                seg.addEventListener('keydown', function (ev) {
+                    if (ev.key === 'Enter' || ev.key === ' ') {
+                        ev.preventDefault();
+                        seg.click();
+                    }
                 });
             });
         }

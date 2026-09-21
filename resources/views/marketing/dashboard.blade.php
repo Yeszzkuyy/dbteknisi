@@ -218,7 +218,9 @@
                         <span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {{ $seg['color'] }}"></span>
                         <span class="truncate font-medium text-slate-600 dark:text-slate-300">{{ $seg['label'] }}</span>
                     </span>
-                    <span class="shrink-0 font-semibold text-slate-700 tabular-nums dark:text-slate-200">{{ $seg['value'] }}</span>
+                    <span class="shrink-0 font-semibold text-slate-700 tabular-nums dark:text-slate-200">{{ $seg['value'] }}
+                        <span class="font-medium text-slate-400">· {{ $funnelTotal > 0 ? round($seg['value'] / $funnelTotal * 100) : 0 }}%</span>
+                    </span>
                 </button>
             @endforeach
         </div>
