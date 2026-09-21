@@ -15,8 +15,9 @@
                 <a href="{{ route('customers.create') }}"
                    title="{{ __('Add Customer') }}"
                    aria-label="{{ __('Add Customer') }}"
-                   class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-600 text-white shadow-sm transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-accent-700 hover:shadow-lg hover:shadow-accent-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
+                   class="relative inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-accent-600 text-white shadow-sm transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-accent-700 hover:shadow-lg hover:shadow-accent-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M12 5v14M5 12h14" /></svg>
+                    <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
                 </a>
                 <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 origin-top-right -translate-y-1 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-slate-700" role="tooltip">{{ __('Add Customer') }}</span>
             </div>
@@ -71,9 +72,10 @@
                 <button type="submit"
                         title="{{ __('Cari') }}"
                         aria-label="{{ __('Cari customer') }}"
-                        class="h-11 w-11 shrink-0 rounded-xl bg-accent-600 font-medium text-white transition-all duration-300 hover:scale-110 hover:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
+                        class="group relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-accent-600 font-medium text-white transition-all duration-300 hover:scale-110 hover:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
                     <x-icon name="search" class="mx-auto h-5 w-5" />
                     <span class="sr-only">{{ __('Cari') }}</span>
+                    <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
                 </button>
             </form>
         </div>
