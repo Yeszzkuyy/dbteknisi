@@ -169,34 +169,58 @@
         </div>
     </div>
 
-    {{-- Donut Lead per Status (ApexCharts) + tabel dinamis --}}
+    {{-- Donut Lead per Status (SVG, tanpa ApexCharts) + tabel dinamis --}}
     <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4" x-data="{
         selectedStatus: null,
+        hoveredStatus: null,
         leads: @js($leadsByStatus),
+        segments: @js($donutMarketing->values()),
+        total: {{ $funnelTotal }},
         select(status) {
             this.selectedStatus = this.selectedStatus === status ? null : status;
-            this.applyMuted();
+            this.hl();
         },
-        applyMuted() {
-            const chart = window.marketingDonutChart;
-            if (!chart) return;
-            const slices = document.querySelectorAll('#status-donut-chart .apexcharts-pie-series path');
-            const index = this.selectedStatus
-                ? chart.w.globals.labels.map(l => l.toLowerCase()).indexOf(this.selectedStatus)
-                : -1;
-            slices.forEach((slice, i) => {
-                slice.style.opacity = this.selectedStatus && i !== index ? '0.35' : '1';
+        hl() {
+            const key = this.hoveredStatus || this.selectedStatus;
+            document.querySelectorAll('#status-donut-chart .donut-seg').forEach((seg) => {
+                seg.style.opacity = key && seg.dataset.key !== key ? '0.35' : '1';
             });
-        }
-    }">
+        },
+        activeKey() { return this.hoveredStatus || this.selectedStatus; },
+        activeSeg() { return this.segments.find((s) => s.key === this.activeKey()); },
+    }"
+    x-on:donut-hover.window="hoveredStatus = $event.detail.key; hl()"
+    x-on:donut-leave.window="hoveredStatus = null; hl()"
+    x-on:donut-select.window="select($event.detail.key)"
+    >
         <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Pipeline Lead per Status') }}</h2>
         <p class="text-sm text-slate-500 dark:text-slate-400 -mt-2 mb-4">{{ __('Klik segmen untuk melihat detail lead pada status tersebut.') }}</p>
-        <div class="relative w-full max-w-[420px] mx-auto">
-            <div id="status-donut-chart" class="w-full"></div>
-            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">Total Lead</span>
-                <span class="mt-0.5 text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100">{{ $stats['total'] }}</span>
+        <div class="relative w-full max-w-[320px] mx-auto">
+            <div id="status-donut-chart" class="w-full">
+                <x-donut-chart :data="$donutMarketing" :size="280" :strokeWidth="34" />
             </div>
+            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-10">
+                <span class="text-xs font-medium text-slate-400 dark:text-slate-500 truncate max-w-full" x-text="activeSeg() ? activeSeg().label : 'Total Lead'">Total Lead</span>
+                <span class="mt-0.5 text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100" x-text="activeSeg() ? activeSeg().value : total">{{ $stats['total'] }}</span>
+                <span x-show="activeSeg() && total > 0" class="text-sm font-medium text-slate-400" x-text="activeSeg() ? '[' + Math.round(activeSeg().value / total * 100) + '%]' : ''"></span>
+            </div>
+        </div>
+
+        {{-- Legenda interaktif (hover menyorot segmen, klik membuka detail) --}}
+        <div class="mt-4 grid grid-cols-1 gap-1 sm:grid-cols-2">
+            @foreach($donutMarketing as $seg)
+                <button type="button" @click="select('{{ $seg['key'] }}')"
+                        @mouseenter="hoveredStatus = '{{ $seg['key'] }}'; hl()"
+                        @mouseleave="hoveredStatus = null; hl()"
+                        class="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
+                        :class="selectedStatus === '{{ $seg['key'] }}' && 'bg-slate-50 dark:bg-slate-700/40 ring-1 ring-slate-200 dark:ring-slate-600'">
+                    <span class="flex min-w-0 items-center gap-2.5">
+                        <span class="h-3 w-3 shrink-0 rounded-full" style="background-color: {{ $seg['color'] }}"></span>
+                        <span class="truncate font-medium text-slate-600 dark:text-slate-300">{{ $seg['label'] }}</span>
+                    </span>
+                    <span class="shrink-0 font-semibold text-slate-700 tabular-nums dark:text-slate-200">{{ $seg['value'] }}</span>
+                </button>
+            @endforeach
         </div>
 
         {{-- Tabel dinamis per status --}}
@@ -248,80 +272,5 @@
                 </div>
             </template>
         </div>
-
-        <script>
-            // Tunggu DOM siap: bundle Vite dimuat sebagai module (deferred),
-            // jadi window.ApexCharts baru tersedia setelah DOMContentLoaded.
-            document.addEventListener('DOMContentLoaded', function () {
-                // Data donut dari controller: [{ label, value, key }, ...] urut New → Lost
-                const funnelData = @json($funnel);
-
-                // Warna segmen donut — SAMAKAN dengan warna badge status di view lain.
-                // Status = SEMANTIK, tidak mengikuti accent. Palet tetap.
-                // 'new' memakai --semantic-info supaya sinkron dengan helper appearance.
-                function statusColors() {
-                    const appColors = window.getAppearanceColors();
-                    return {
-                        new:        appColors.info,   // info (blue) — semantik
-                        contacted:  '#eab308', // kuning (bg-yellow-100 text-yellow-800)
-                        qualified:  '#a855f7', // ungu   (bg-purple-100 text-purple-800)
-                        proposal:   '#f97316', // oranye (bg-orange-100 text-orange-800)
-                        won:        '#22c55e', // hijau  (bg-green-100 text-green-800)
-                        lost:       '#ef4444', // merah  (bg-red-100 text-red-800)
-                    };
-                }
-
-                function donutOptions() {
-                    const c = window.getAppearanceColors();
-                    const sc = statusColors();
-                    return {
-                        chart: {
-                            type: 'donut',
-                            height: 380,
-                            width: '100%', // responsif mengikuti container
-                            toolbar: { show: false },
-                            background: 'transparent',
-                            foreColor: c.dark ? 'rgb(var(--text-secondary) / 1)' : undefined,
-                            events: {
-                                dataPointSelection: (event, chartContext, config) => {
-                                    const status = config.w.config.labels[config.dataPointIndex].toLowerCase();
-                                    // Akses state Alpine via scope dari elemen dengan x-data yang membungkus donut
-                                    const scope = Alpine.$data(document.querySelector('#status-donut-chart').closest('[x-data]'));
-                                    scope.select(status);
-                                }
-                            },
-                        },
-                        series: funnelData.map(s => s.value),
-                        labels: funnelData.map(s => s.label),
-                        colors: funnelData.map(s => sc[s.key]),
-                        theme: { mode: c.dark ? 'dark' : 'light' },
-                        stroke: { width: 3, colors: [c.cardBg] },
-                        fill: { type: 'solid' },
-                        plotOptions: {
-                            pie: {
-                                donut: {
-                                    size: '70%', // rasio lubang tengah donut agar proporsional
-                                },
-                            },
-                        },
-                        legend: {
-                            show: true,
-                            position: 'bottom',
-                            fontSize: '13px',
-                            formatter: (label, opts) => `${label} — ${opts.w.globals.series[opts.seriesIndex]} lead`,
-                        },
-                        dataLabels: { enabled: false },
-                    };
-                }
-
-                if (window.marketingDonutChart) window.marketingDonutChart.destroy();
-                window.marketingDonutChart = new ApexCharts(document.querySelector('#status-donut-chart'), donutOptions()).render();
-
-                // Update tanpa reload saat mode/aksen berubah
-                window.addEventListener('appearance:change', () => {
-                    if (window.marketingDonutChart) window.marketingDonutChart.updateOptions(donutOptions());
-                });
-            });
-        </script>
     </div>
 </x-app-layout>

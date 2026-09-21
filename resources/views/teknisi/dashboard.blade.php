@@ -143,15 +143,21 @@
                 </div>
 
                 <div class="mt-6 flex flex-col items-center gap-6">
-                    {{-- Donut progress (ApexCharts) --}}
-                    <div class="relative w-full max-w-[260px]">
-                        <div id="teknisi-donut-chart" class="w-full"></div>
-                        <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                            <span class="text-xs font-medium text-slate-400 dark:text-slate-500">{{ __('Selesai') }}</span>
-                            <span class="text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100"
-                                  x-data="counter({{ $donePct }})" x-init="start()" x-text="display + '%'">0%</span>
+                    {{-- Donut progress (SVG, tanpa ApexCharts) --}}
+                    @if($donutData->isNotEmpty() && $totalShown > 0)
+                        <div class="relative w-full max-w-[260px]">
+                            <div id="teknisi-donut-chart" class="w-full">
+                                <x-donut-chart :data="$donutData" :size="240" :strokeWidth="30" />
+                            </div>
+                            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">{{ __('Selesai') }}</span>
+                                <span class="text-3xl font-bold text-slate-800 tabular-nums dark:text-slate-100"
+                                      x-data="counter({{ $donePct }})" x-init="start()" x-text="display + '%'">0%</span>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <x-empty-state label="{{ __('data status project') }}" />
+                    @endif
 
                     <ul class="w-full space-y-1.5">
                         @forelse($topStatuses as $status)
@@ -305,60 +311,4 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const donutData = @json($donutData);
-            if (!donutData.length || typeof window.ApexCharts === 'undefined') return;
-
-            // Status = semantik (Open-info, dst) — tidak mengikuti accent dan mode.
-            const chartColors = donutData.map((item) => item.color);
-
-            function donutOptions() {
-                const c = window.getAppearanceColors();
-                return {
-                    chart: {
-                        type: 'donut',
-                        height: 240,
-                        width: '100%',
-                        toolbar: { show: false },
-                        background: 'transparent',
-                        animations: {
-                            enabled: true,
-                            easing: 'easeout',
-                            speed: 700,
-                        },
-                    },
-                    series: donutData.map(d => d.value),
-                    labels: donutData.map(d => d.label),
-                    colors: chartColors,
-                    theme: { mode: c.dark ? 'dark' : 'light' },
-                    stroke: { width: 3, colors: [c.cardBg] },
-                    fill: { type: 'solid' },
-                    dataLabels: { enabled: false },
-                    legend: { show: false },
-                    plotOptions: {
-                        pie: {
-                            donut: {
-                                size: '75%',
-                            },
-                        },
-                    },
-                    tooltip: {
-                        enabled: true,
-                        theme: c.dark ? 'dark' : 'light',
-                        y: { formatter: (val) => val + ' project' },
-                    },
-                };
-            }
-
-            const el = document.querySelector('#teknisi-donut-chart');
-            if (window.teknisiDonutChart) window.teknisiDonutChart.destroy();
-            window.teknisiDonutChart = new ApexCharts(el, donutOptions()).render();
-
-            // Update tanpa reload saat mode/aksen berubah
-            window.addEventListener('appearance:change', () => {
-                if (window.teknisiDonutChart) window.teknisiDonutChart.updateOptions(donutOptions());
-            });
-        });
-    </script>
 </x-app-layout>

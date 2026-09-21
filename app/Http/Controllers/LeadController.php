@@ -187,6 +187,28 @@ class LeadController extends Controller
             'key'   => $status,
         ]);
 
+        // Warna segmen donut — SAMAKAN dengan warna badge status di view lain.
+        // Status = SEMANTIK, tidak mengikuti accent. Palet tetap.
+        // 'new' = --semantic-info (#3b82f6).
+        // (Diracik di controller, bukan blok @php di Blade: regex storePhpBlocks
+        //  Laravel menelan @php(...) inline sebagai pembuka blok bila ada
+        //  @endphp lain di file yang sama.)
+        $statusPalette = [
+            'new' => '#3b82f6',
+            'contacted' => '#eab308',
+            'qualified' => '#a855f7',
+            'proposal' => '#f97316',
+            'won' => '#22c55e',
+            'lost' => '#ef4444',
+        ];
+        $donutMarketing = $funnel->map(fn ($s) => [
+            'label' => $s['label'],
+            'value' => $s['value'],
+            'key' => $s['key'],
+            'color' => $statusPalette[$s['key']] ?? '#64748b',
+        ])->values();
+        $funnelTotal = $donutMarketing->sum('value');
+
         // Detail lead per status (untuk tabel dinamis di dashboard)
         $leadsByStatus = Lead::with(['customer', 'partner'])
             ->whereDate('incoming_date', '>=', $dateFrom)
@@ -204,7 +226,7 @@ class LeadController extends Controller
                 'date' => $lead->incoming_date?->format('d M Y') ?? '-',
             ]));
 
-        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo', 'funnel', 'leadsByStatus'));
+        return view('marketing.dashboard', compact('stats', 'perSource', 'trend', 'statusCounts', 'dateFrom', 'dateTo', 'funnel', 'donutMarketing', 'funnelTotal', 'leadsByStatus'));
     }
 
     public function create(Request $request)
