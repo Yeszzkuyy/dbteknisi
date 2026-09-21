@@ -172,7 +172,6 @@
     {{-- Donut Lead per Status (SVG, tanpa ApexCharts) + tabel dinamis --}}
     <div class="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mt-4" x-data="{
         selectedStatus: null,
-        hoveredStatus: null,
         leads: @js($leadsByStatus),
         segments: @js($donutMarketing->values()),
         total: {{ $funnelTotal }},
@@ -181,16 +180,19 @@
             this.hl();
         },
         hl() {
-            const key = this.hoveredStatus || this.selectedStatus;
+            const key = this.selectedStatus;
             document.querySelectorAll('#status-donut-chart .donut-seg').forEach((seg) => {
-                seg.style.opacity = key && seg.dataset.key !== key ? '0.35' : '1';
+                if (key && seg.dataset.key === key) seg.dataset.active = 'true';
+                else delete seg.dataset.active;
             });
         },
-        activeKey() { return this.hoveredStatus || this.selectedStatus; },
-        activeSeg() { return this.segments.find((s) => s.key === this.activeKey()); },
+        activeSeg() { return this.segments.find((s) => s.key === this.selectedStatus); },
+        statusLabel(key) { const s = this.segments.find((s) => s.key === key); return s ? s.label : key; },
+        filteredLeads() {
+            if (this.selectedStatus) return (this.leads[this.selectedStatus] || []).map((l) => ({ ...l, _status: this.selectedStatus }));
+            return Object.entries(this.leads).flatMap(([status, arr]) => (arr || []).map((l) => ({ ...l, _status: status })));
+        },
     }"
-    x-on:donut-hover.window="hoveredStatus = $event.detail.key; hl()"
-    x-on:donut-leave.window="hoveredStatus = null; hl()"
     x-on:donut-select.window="select($event.detail.key)"
     >
         <h2 class="font-semibold text-slate-700 dark:text-slate-200 mb-4">{{ __('Pipeline Lead per Status') }}</h2>
@@ -210,8 +212,6 @@
         <div class="mt-4 grid grid-cols-1 gap-1 sm:grid-cols-2">
             @foreach($donutMarketing as $seg)
                 <button type="button" @click="select('{{ $seg['key'] }}')"
-                        @mouseenter="hoveredStatus = '{{ $seg['key'] }}'; hl()"
-                        @mouseleave="hoveredStatus = null; hl()"
                         class="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-slate-50 dark:hover:bg-slate-700/40"
                         :class="selectedStatus === '{{ $seg['key'] }}' && 'bg-slate-50 dark:bg-slate-700/40 ring-1 ring-slate-200 dark:ring-slate-600'">
                     <span class="flex min-w-0 items-center gap-2.5">
@@ -223,39 +223,40 @@
             @endforeach
         </div>
 
-        {{-- Tabel dinamis per status --}}
-        <div x-cloak x-show="selectedStatus !== null" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
-             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-2"
-             class="mt-6 border-t border-slate-100 dark:border-slate-700 pt-5">
+        {{-- Tabel lead — selalu tampil: semua lead bila belum filter, per status bila diklik --}}
+        <div class="mt-6 border-t border-slate-100 dark:border-slate-700 pt-5">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-semibold text-slate-700 dark:text-slate-200">
-                    {{ __('Detail Lead') }} <span class="text-accent-600 dark:text-accent-400 uppercase" x-text="selectedStatus"></span>
-                    <span class="text-sm font-medium text-slate-400">(<span x-text="(leads[selectedStatus] || []).length"></span> lead)</span>
+                    <span x-show="!selectedStatus">{{ __('Semua Lead') }}</span>
+                    <span x-show="selectedStatus">{{ __('Detail Lead') }} <span class="text-accent-600 dark:text-accent-400 uppercase" x-text="selectedStatus"></span></span>
+                    <span class="text-sm font-medium text-slate-400">(<span x-text="filteredLeads().length"></span> lead)</span>
                 </h3>
-                <button type="button" @click="select(selectedStatus)"
+                <button type="button" x-show="selectedStatus" @click="select(selectedStatus)"
                         class="text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition">
-                    Tutup
+                    Tampilkan semua
                 </button>
             </div>
 
-            <template x-if="(leads[selectedStatus] || []).length > 0">
+            <template x-if="filteredLeads().length > 0">
                 <div class="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
                     <table class="min-w-full divide-y divide-slate-100 dark:divide-slate-700 text-sm">
                         <thead class="bg-slate-50 dark:bg-slate-900/40">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Lead / Customer</th>
+                                <th x-show="!selectedStatus" class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Status</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">{{ __('Sumber') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Partner</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">{{ __('Tanggal Masuk') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
-                            <template x-for="lead in leads[selectedStatus]" :key="lead.id">
+                            <template x-for="lead in filteredLeads()" :key="lead.id">
                                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
                                     <td class="px-4 py-3">
                                         <p class="font-medium text-slate-800 dark:text-slate-100" x-text="lead.name"></p>
                                         <p class="text-xs text-slate-500" x-show="lead.company" x-text="lead.company"></p>
                                     </td>
+                                    <td x-show="!selectedStatus" class="px-4 py-3 text-slate-600 dark:text-slate-300 uppercase" x-text="statusLabel(lead._status)"></td>
                                     <td class="px-4 py-3 text-slate-600 dark:text-slate-300 capitalize" x-text="lead.source"></td>
                                     <td class="px-4 py-3 text-slate-600 dark:text-slate-300" x-text="lead.partner"></td>
                                     <td class="px-4 py-3 text-right text-slate-500 whitespace-nowrap" x-text="lead.date"></td>
@@ -266,9 +267,12 @@
                 </div>
             </template>
 
-            <template x-if="(leads[selectedStatus] || []).length === 0">
+            <template x-if="filteredLeads().length === 0">
                 <div class="rounded-xl bg-slate-50 dark:bg-slate-900/40 px-5 py-8 text-center">
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ __('Tidak ada lead berstatus') }} <span class="uppercase" x-text="selectedStatus"></span> {{ __('pada rentang tanggal ini.') }}</p>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                        <span x-show="!selectedStatus">{{ __('Belum ada lead pada rentang tanggal ini.') }}</span>
+                        <span x-show="selectedStatus">{{ __('Tidak ada lead berstatus') }} <span class="uppercase" x-text="selectedStatus"></span> {{ __('pada rentang tanggal ini.') }}</span>
+                    </p>
                 </div>
             </template>
         </div>

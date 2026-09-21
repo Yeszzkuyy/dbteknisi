@@ -1,7 +1,7 @@
 {{-- Donut chart SVG murni (pengganti ApexCharts pie/donut).
     Props: :data="[{label, value, color, key?}]", :size="250", :strokeWidth="30"
-    Interaksi via CustomEvent window: donut-hover / donut-leave / donut-select
-    dengan detail {key, label, value}. Visual hover via CSS.
+    Interaksi: hover NONAKTIF (diagram diam); klik kirim CustomEvent
+    window donut-select dengan detail {key, label, value}.
 --}}
 @props(['data' => [], 'size' => 250, 'strokeWidth' => 30])
 
@@ -73,8 +73,10 @@ $cum = 0.0;
         transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
         animation: donut-seg-in 0.5s ease backwards;
     }
-    .donut-svg .donut-seg:hover {
-        filter: brightness(1.12) saturate(1.2);
+    /* Hover dimatikan: segmen tetap diam, sorotan hanya via klik (data-active) */
+    /* Sorotan menetap (segmen diklik) — tanpa memudarkan segmen lain */
+    .donut-svg .donut-seg[data-active="true"] {
+        filter: brightness(1.12) saturate(1.2) drop-shadow(0 0 6px rgba(0, 0, 0, 0.25));
         transform: scale(1.03);
     }
     @keyframes donut-seg-in {
@@ -86,7 +88,7 @@ $cum = 0.0;
     }
 </style>
 <script>
-    // ponytail: event delegation per-svg; parent (Alpine) dengarkan donut-hover/leave/select di window
+    // ponytail: hanya klik (donut-select); hover sengaja tidak dipasang agar diagram diam
     (function () {
         if (window.__donutChartInit) return;
         window.__donutChartInit = true;
@@ -98,15 +100,9 @@ $cum = 0.0;
             if (svg.dataset.bound) return;
             svg.dataset.bound = '1';
             svg.querySelectorAll('.donut-seg').forEach(function (seg) {
-                seg.addEventListener('mouseenter', function () {
-                    window.dispatchEvent(new CustomEvent('donut-hover', { detail: detailOf(seg) }));
-                });
                 seg.addEventListener('click', function () {
                     window.dispatchEvent(new CustomEvent('donut-select', { detail: detailOf(seg) }));
                 });
-            });
-            svg.addEventListener('mouseleave', function () {
-                window.dispatchEvent(new CustomEvent('donut-leave'));
             });
         }
         function bindAll() {
