@@ -154,15 +154,12 @@
             </div>
         @endcan
 
-        <div class="hidden shrink-0 text-right leading-tight md:block">
-            <p class="whitespace-nowrap text-sm font-semibold text-slate-700 dark:text-slate-200">
+        <div class="hidden shrink-0 items-center gap-2 whitespace-nowrap md:flex">
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
                 {{ \Illuminate\Support\Str::limit(auth()->user()->name, 16, '…') }}
             </p>
-            <p class="mt-1 flex items-center justify-end gap-1.5 whitespace-nowrap text-[11px] leading-none text-slate-400 dark:text-slate-500">
-                <span class="rounded-full bg-accent-500/10 px-2 py-0.5 font-semibold uppercase tracking-wide text-accent-700 dark:bg-accent-400/10 dark:text-accent-300">{{ auth()->user()->roles->first()?->name ?? '-' }}</span>
-                <span class="h-0.5 w-0.5 rounded-full bg-slate-300 dark:bg-slate-600" aria-hidden="true"></span>
-                <span class="tabular-nums">{{ now()->translatedFormat('d M Y') }}</span>
-            </p>
+            <span class="rounded-full bg-accent-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent-700 dark:bg-accent-400/10 dark:text-accent-300">{{ auth()->user()->roles->first()?->name ?? '-' }}</span>
+            <span class="text-[11px] tabular-nums text-slate-400 dark:text-slate-500">{{ now()->translatedFormat('d M Y') }}</span>
         </div>
 
         <span class="hidden h-8 w-px shrink-0 bg-slate-200/80 md:block dark:bg-zinc-700/80" aria-hidden="true"></span>
