@@ -1260,4 +1260,43 @@ class WhatsAppCenterTest extends TestCase
         $this->assertFalse($mgkSenders->contains('6281234567890'));
         $this->assertTrue($waniSenders->contains('6281234567890'));
     }
+
+    public function test_contacts_hides_foreign_owned_even_with_local_history(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $mgk = $this->makeAccount('wa_mgk');
+        $user = $this->userWithAccounts($wani, $mgk);
+
+        $owned = Customer::create(['name' => 'PT Gasken', 'whatsapp' => '6281234567890', 'whatsapp_account_id' => $wani->id]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $mgk->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Yeski',
+            'message_body' => 'Halo MGK',
+            'direction' => 'inbound',
+        ]);
+
+        $ids = collect($this->actingAs($user)->getJson(route('whatsapp-center.contacts', $mgk))->assertOk()->json())->pluck('id');
+
+        $this->assertFalse($ids->contains($owned->id));
+    }
+
+    public function test_reply_to_foreign_owned_number_returns_404(): void
+    {
+        $wani = $this->makeAccount('wa_wani');
+        $mgk = $this->makeAccount('wa_mgk');
+        $user = $this->userWithAccounts($wani, $mgk);
+
+        Customer::create(['name' => 'PT Gasken', 'whatsapp' => '6281234567890', 'whatsapp_account_id' => $wani->id]);
+
+        $this->actingAs($user)
+            ->post(route('whatsapp-center.reply', [$mgk, '6281234567890']), ['message_body' => 'Halo'])
+            ->assertNotFound();
+
+        $this->assertDatabaseMissing('whatsapp_messages', [
+            'whatsapp_account_id' => $mgk->id,
+            'sender_number' => '6281234567890',
+            'direction' => 'outbound',
+        ]);
+    }
 }

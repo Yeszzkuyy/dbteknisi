@@ -179,6 +179,9 @@ class WhatsAppCenterController extends Controller
                     $query->orWhereIn('whatsapp', $senders)->orWhereIn('phone', $senders);
                 }
             })
+            ->where(function ($query) use ($account) {
+                $query->whereNull('whatsapp_account_id')->orWhere('whatsapp_account_id', $account->id);
+            })
             ->when($term !== '', function ($query) use ($term) {
                 $query->where(function ($query) use ($term) {
                     $query->whereLike(['name', 'company', 'whatsapp', 'phone', 'email'], $term);
