@@ -159,10 +159,10 @@
         <span class="hidden h-8 w-px shrink-0 bg-slate-200/80 md:block dark:bg-zinc-700/80" aria-hidden="true"></span>
 
         <div class="hidden shrink-0 items-center gap-2 whitespace-nowrap md:flex">
+            <span class="rounded-full bg-accent-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent-700 dark:bg-accent-400/10 dark:text-accent-300">{{ auth()->user()->roles->first()?->name ?? '-' }}</span>
             <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">
                 {{ \Illuminate\Support\Str::limit(auth()->user()->name, 16, '…') }}
             </p>
-            <span class="rounded-full bg-accent-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-accent-700 dark:bg-accent-400/10 dark:text-accent-300">{{ auth()->user()->roles->first()?->name ?? '-' }}</span>
         </div>
 
         {{-- Dropdown Avatar --}}
