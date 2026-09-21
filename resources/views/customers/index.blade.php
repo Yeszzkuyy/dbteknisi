@@ -11,11 +11,15 @@
         </div>
 
         @can('manage-sales')
-            <a href="{{ route('customers.create') }}"
-               class="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 sm:self-start">
-                <span class="mr-2 text-lg leading-none" aria-hidden="true">+</span>
-                Tambah Customer
-            </a>
+            <div class="group relative sm:self-start">
+                <a href="{{ route('customers.create') }}"
+                   title="Add Customer"
+                   aria-label="Add Customer"
+                   class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 active:scale-95">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M12 5v14M5 12h14" /></svg>
+                </a>
+                <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 origin-top-right -translate-y-1 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-slate-700" role="tooltip">Add Customer</span>
+            </div>
         @endcan
     </div>
 
@@ -65,8 +69,11 @@
                     </div>
                 </div>
                 <button type="submit"
-                        class="h-11 rounded-xl bg-blue-600 px-5 font-medium text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2">
-                    Cari
+                        title="Cari"
+                        aria-label="Cari customer"
+                        class="h-11 w-11 shrink-0 rounded-xl bg-blue-600 font-medium text-white transition-all duration-300 hover:scale-110 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 active:scale-95">
+                    <x-icon name="search" class="mx-auto h-5 w-5" />
+                    <span class="sr-only">Cari</span>
                 </button>
             </form>
         </div>
