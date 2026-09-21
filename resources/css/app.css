@@ -272,6 +272,13 @@ tbody tr { transition: background-color 0.2s ease; }
     }
     html.js [data-reveal]:not(.in-view) [data-grow-h] { height: 0; }
     html.js [data-reveal]:not(.in-view) [data-grow-w] { width: 0; }
+
+    /* Parallax mouse (nilai diisi JS via --px/--py); hanya untuk dekorasi opt-in */
+    [data-parallax-mouse] {
+        transform: translate(var(--px, 0px), var(--py, 0px));
+        transition: transform 0.35s var(--ease-out);
+        will-change: transform;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

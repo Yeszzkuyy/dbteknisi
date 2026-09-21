@@ -236,6 +236,29 @@
             }else{
                 document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('in-view')});
             }
+            // Parallax mouse halus untuk [data-parallax-mouse] — nonaktif di
+            // touch / reduced-motion; kembali ke posisi awal saat mouse pergi
+            if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.matchMedia('(hover: hover)').matches){
+                var pxEls=Array.prototype.slice.call(document.querySelectorAll('[data-parallax-mouse]'));
+                var pxRaf=null;
+                pxEls.forEach(function(el){
+                    var host=el.closest('section')||document.body;
+                    var max=parseFloat(el.getAttribute('data-parallax-mouse'))||10;
+                    host.addEventListener('mousemove',function(ev){
+                        var r=host.getBoundingClientRect();
+                        var dx=(ev.clientX-r.left)/r.width-0.5,dy=(ev.clientY-r.top)/r.height-0.5;
+                        if(pxRaf)cancelAnimationFrame(pxRaf);
+                        pxRaf=requestAnimationFrame(function(){
+                            el.style.setProperty('--px',(dx*max).toFixed(1)+'px');
+                            el.style.setProperty('--py',(dy*max).toFixed(1)+'px');
+                        });
+                    });
+                    host.addEventListener('mouseleave',function(){
+                        el.style.setProperty('--px','0px');
+                        el.style.setProperty('--py','0px');
+                    });
+                });
+            }
         });
     </script>
 </body>
