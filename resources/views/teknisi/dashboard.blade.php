@@ -165,7 +165,7 @@
                     @if($donutData->isNotEmpty() && $totalShown > 0)
                         <div class="relative w-full max-w-[320px]">
                             <div id="teknisi-donut-chart" class="w-full">
-                                <x-donut-chart :data="$donutData" :size="280" :strokeWidth="34" />
+                                <x-donut-chart :data="$donutData" :size="280" :strokeWidth="34" :scroll="true" />
                             </div>
                             <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-10">
                                 <div x-show="!activeSeg()" class="flex flex-col items-center justify-center">
