@@ -137,7 +137,7 @@
                     <div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                         <span class="text-xs font-semibold text-slate-600">{{ $month->total }}</span>
                         <div class="w-full max-w-12 rounded-t-[4px] bg-accent-500" data-grow-h
-                             style="--h: {{ max(round($month->total / $maxTrend * 100), 2) }}%; --d: {{ $loop->index * 80 }}ms"></div>
+                             style="--h: {{ max(round($month->total / $maxTrend * 100), 2) }}%; --d: {{ $loop->index * 120 }}ms"></div>
                         <span class="text-[11px] text-slate-500 whitespace-nowrap">{{ $month->label }}</span>
                     </div>
                 @endforeach
@@ -160,7 +160,7 @@
                             </div>
                             <div class="h-2.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
                                 <div class="h-full rounded-full bg-accent-500" data-grow-w
-                                     style="--w: {{ round($row->total / $maxSource * 100) }}%; --d: {{ $loop->index * 80 }}ms"></div>
+                                     style="--w: {{ round($row->total / $maxSource * 100) }}%; --d: {{ $loop->index * 120 }}ms"></div>
                             </div>
                         </div>
                     @endforeach

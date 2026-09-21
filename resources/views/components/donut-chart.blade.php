@@ -63,7 +63,7 @@ $cum = 0.0;
             stroke-linecap="butt"
             stroke-dasharray="{{ number_format($dash, 2, '.', '') }} {{ number_format($circ, 2, '.', '') }}"
             stroke-dashoffset="{{ number_format(-$off, 2, '.', '') }}"
-            style="--off: {{ number_format(-$off, 2, '.', '') }}; --c: {{ number_format($circ, 2, '.', '') }}; animation-delay: {{ $i * 120 }}ms"
+            style="--off: {{ number_format(-$off, 2, '.', '') }}; --c: {{ number_format($circ, 2, '.', '') }}; animation-delay: {{ $i * 160 }}ms"
         >
             <title>{{ $seg['label'] }} — {{ $valLabel }}</title>
         </circle>
@@ -77,7 +77,7 @@ $cum = 0.0;
         transform-box: fill-box;
         transform-origin: center;
         transition: filter 0.2s ease, transform 0.2s ease;
-        animation: donut-seg-sweep 0.7s ease backwards;
+        animation: donut-seg-sweep 1.1s ease backwards;
     }
     /* Hover dimatikan: segmen tetap diam, sorotan hanya via klik/fokus (data-active) */
     .donut-svg .donut-seg:focus { outline: none; }

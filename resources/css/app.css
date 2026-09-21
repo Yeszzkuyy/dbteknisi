@@ -262,12 +262,12 @@ tbody tr { transition: background-color 0.2s ease; }
        State 0 hanya bila html.js — tanpa JS langsung tampil final. */
     [data-grow-h] {
         height: var(--h);
-        transition: height 0.8s var(--ease-out);
+        transition: height 1.2s var(--ease-out);
         transition-delay: var(--d, 0ms);
     }
     [data-grow-w] {
         width: var(--w);
-        transition: width 0.8s var(--ease-out);
+        transition: width 1.2s var(--ease-out);
         transition-delay: var(--d, 0ms);
     }
     html.js [data-reveal]:not(.in-view) [data-grow-h] { height: 0; }
