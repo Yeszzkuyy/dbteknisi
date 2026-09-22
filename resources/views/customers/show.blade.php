@@ -129,6 +129,7 @@
                             ->get();
                         $infoFields = [
                             ['icon' => 'building', 'label' => __('Nama'), 'value' => $customer->name],
+                            ['icon' => 'building', 'label' => __('Customer dari PT'), 'value' => $customer->pt_group ?? '-'],
                             ['icon' => 'user', 'label' => 'PIC', 'value' => $customer->contacts->first()?->name ?: $customer->contact_person],
                             ['icon' => 'map-pin', 'label' => __('Alamat'), 'value' => $customer->address],
                             ['icon' => 'phone', 'label' => __('Telepon'), 'value' => \App\Support\PhoneFormatter::format($customer->phone)],

@@ -13,6 +13,7 @@ class Customer extends Model
         'name',
         'contact_person',
         'company',
+        'pt_group',
         'address',
         'phone',
         'whatsapp',
