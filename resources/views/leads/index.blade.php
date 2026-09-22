@@ -14,7 +14,7 @@
 
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600">
         <div class="p-5 border-b dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-t-2xl">
-            <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 <div>
                     <label class="text-sm font-medium text-slate-500">{{ __('Cari Customer') }}</label>
                     <input type="text" name="search" value="{{ request('search') }}"
@@ -44,6 +44,17 @@
                     </select>
                 </div>
                 <div>
+                    <label class="text-sm font-medium text-slate-500">PT</label>
+                    <select name="pt_group" class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                        <option value="">{{ __('Semua PT') }}</option>
+                        @foreach($ptGroups as $group)
+                            <option value="{{ $group }}" {{ request('pt_group') == $group ? 'selected' : '' }}>
+                                {{ $group }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label class="text-sm font-medium text-slate-500">{{ __('Tanggal Mulai') }}</label>
                     <x-datepicker name="date_from" value="{{ request('date_from') }}" class="mt-1"></x-datepicker>
                 </div>
@@ -51,7 +62,7 @@
                     <label class="text-sm font-medium text-slate-500">{{ __('Tanggal Akhir') }}</label>
                     <x-datepicker name="date_to" value="{{ request('date_to') }}" class="mt-1"></x-datepicker>
                 </div>
-                <div class="sm:col-span-2 lg:col-span-5 flex items-end gap-2">
+                <div class="sm:col-span-2 lg:col-span-6 flex items-end gap-2">
                     <x-icon-button icon="filter" type="submit" title="Filter" />
                     <x-icon-button as="a" icon="reset" href="{{ route('leads.index') }}" title="Reset" />
                 </div>
