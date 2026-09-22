@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\TechnicianSchedule;
 use App\Notifications\Concerns\SendsWebPush;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /** Pengingat otomatis sebelum jadwal dimulai. */
@@ -16,7 +17,16 @@ class TechnicianScheduleReminderNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return $this->withWebPush($notifiable, ['database']);
+        return $this->withWebPush($notifiable, $this->withMail($notifiable, ['database']));
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject('Pengingat jadwal teknisi')
+            ->line($this->schedule->title . ' dimulai ' . $this->schedule->start_at->format('d M Y H:i'))
+            ->action('Lihat Jadwal', url(route('teknisi.jadwal')))
+            ->line('Terima kasih.');
     }
 
     public function toDatabase(object $notifiable): array

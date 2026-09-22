@@ -22,9 +22,8 @@ class LeadAssignedNotification extends Notification
         if ($notifiable->preference('notify_system', true)) {
             $channels[] = 'database';
         }
-        if ($notifiable->preference('notify_email', false)) {
-            $channels[] = 'mail';
-        }
+
+        $channels = $this->withMail($notifiable, $channels);
 
         return $this->withWebPush($notifiable, $channels);
     }

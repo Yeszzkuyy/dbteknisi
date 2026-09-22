@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Notifications\Concerns\SendsWebPush;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class WhatsappHandoffNotification extends Notification
@@ -27,7 +28,19 @@ class WhatsappHandoffNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return $this->withWebPush($notifiable, ['database']);
+        return $this->withWebPush($notifiable, $this->withMail($notifiable, ['database']));
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $reason = $this->reason === 'limit' ? 'Bot mencapai batas balasan' : 'Bot menunggu ambil alih';
+
+        return (new MailMessage)
+            ->subject('Butuh handoff WhatsApp')
+            ->line($reason . ' dan membutuhkan penanganan:')
+            ->line(trim($this->accountName . ' • ' . $this->sender, ' •'))
+            ->action('Buka WhatsApp Center', url(route('whatsapp-center.index')))
+            ->line('Terima kasih.');
     }
 
     /**

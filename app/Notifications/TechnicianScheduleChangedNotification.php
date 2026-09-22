@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\TechnicianSchedule;
 use App\Notifications\Concerns\SendsWebPush;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /** Dikirim saat jadwal diubah atau dibatalkan. */
@@ -22,7 +23,18 @@ class TechnicianScheduleChangedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return $this->withWebPush($notifiable, ['database']);
+        return $this->withWebPush($notifiable, $this->withMail($notifiable, ['database']));
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $cancelled = $this->change === 'cancelled' || $this->change === 'deleted';
+
+        return (new MailMessage)
+            ->subject($cancelled ? 'Jadwal teknisi dibatalkan' : 'Jadwal teknisi berubah')
+            ->line($this->schedule->title . ' — ' . $this->describe())
+            ->action('Lihat Jadwal', url(route('teknisi.jadwal')))
+            ->line('Terima kasih.');
     }
 
     public function toDatabase(object $notifiable): array

@@ -6,11 +6,12 @@ use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 
 /**
- * Tambahkan channel Web Push (VAPID) ke notifikasi.
+ * Channel database/push/email mengikuti preferensi pengguna
+ * (Profil > Setting > Notifikasi).
  *
  * Kelas memakai trait ini cukup mengimplementasikan pushContent()
  * ['title', 'body', 'url']. Channel aktif bila preferensi
- * notify_push user menyala (default: true).
+ * notify_push / notify_email user menyala (default: true).
  */
 trait SendsWebPush
 {
@@ -18,6 +19,15 @@ trait SendsWebPush
     {
         if ($notifiable->preference('notify_push', true)) {
             $channels[] = WebPushChannel::class;
+        }
+
+        return $channels;
+    }
+
+    protected function withMail(object $notifiable, array $channels): array
+    {
+        if ($notifiable->preference('notify_email', true)) {
+            $channels[] = 'mail';
         }
 
         return $channels;

@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Notifications\Concerns\SendsWebPush;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class WhatsappInboundNotification extends Notification
@@ -23,7 +24,17 @@ class WhatsappInboundNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return $this->withWebPush($notifiable, ['database']);
+        return $this->withWebPush($notifiable, $this->withMail($notifiable, ['database']));
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject('Pesan WhatsApp baru')
+            ->line('Pesan masuk baru membutuhkan penanganan:')
+            ->line(trim($this->accountName . ' • ' . $this->sender, ' •') . ': ' . $this->preview)
+            ->action('Buka WhatsApp Center', url(route('whatsapp-center.index')))
+            ->line('Terima kasih.');
     }
 
     /**

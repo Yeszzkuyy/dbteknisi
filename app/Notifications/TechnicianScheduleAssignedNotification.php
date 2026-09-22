@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\TechnicianSchedule;
 use App\Notifications\Concerns\SendsWebPush;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /** Dikirim ke teknisi saat jadwal baru di-assign kepadanya. */
@@ -16,7 +17,17 @@ class TechnicianScheduleAssignedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return $this->withWebPush($notifiable, ['database']);
+        return $this->withWebPush($notifiable, $this->withMail($notifiable, ['database']));
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject('Jadwal teknisi baru')
+            ->line('Jadwal berikut di-assign ke Anda:')
+            ->line($this->schedule->title . ' — ' . $this->schedule->start_at->format('d M Y H:i'))
+            ->action('Lihat Jadwal', url(route('teknisi.jadwal')))
+            ->line('Terima kasih.');
     }
 
     public function toDatabase(object $notifiable): array
