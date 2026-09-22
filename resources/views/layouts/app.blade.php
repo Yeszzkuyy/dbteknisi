@@ -177,6 +177,10 @@
                 @isset($header)<div class="mb-6">{{ $header }}</div>@endisset
                 {{ $slot }}
             </main>
+
+            <footer class="px-4 sm:px-6 lg:px-8 pb-4 text-center text-[11px] text-slate-400 dark:text-slate-500">
+                {{ __('Animated icons by') }} <a href="https://lordicon.com/" target="_blank" rel="noopener" class="hover:underline">Lordicon.com</a>
+            </footer>
         </div>
     </div>
 
