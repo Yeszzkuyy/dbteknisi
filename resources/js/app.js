@@ -95,6 +95,12 @@ window.WebPush = {
     async enable() {
         if (!this.supported || !window.vapidPublicKey) return 'unsupported';
         if (Notification.permission === 'denied') return 'blocked';
+        // Minta izin eksplisit dulu (wajib user gesture; sebagian browser
+        // mengabaikan prompt implisit dari subscribe()).
+        if (Notification.permission === 'default') {
+            const perm = await Notification.requestPermission();
+            if (perm !== 'granted') return perm;
+        }
         const reg = await swRegistration();
         if (!reg) return 'unsupported';
         let sub = await reg.pushManager.getSubscription();

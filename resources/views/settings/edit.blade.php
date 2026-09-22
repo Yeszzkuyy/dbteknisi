@@ -159,13 +159,14 @@
                         <span x-show="pushState === 'checking'">{{ __('Memeriksa status push browser ini…') }}</span>
                         <span x-show="pushState === 'subscribed'">{{ __('Push aktif di browser ini.') }}</span>
                         <span x-show="pushState === 'default'">{{ __('Browser ini belum mengizinkan notifikasi.') }}</span>
+                        <span x-show="pushState === 'granted'">{{ __('Izin diberikan, tapi browser ini belum terdaftar — tekan Aktifkan.') }}</span>
                         <span x-show="pushState === 'blocked'">{{ __('Notifikasi diblokir di browser — izinkan lewat ikon gembok di address bar.') }}</span>
                         <span x-show="pushState === 'unsupported'">{{ __('Browser ini tidak mendukung Web Push.') }}</span>
                         <span x-show="pushState === 'unsubscribed'">{{ __('Push nonaktif di browser ini.') }}</span>
                         <span class="text-red-500" x-show="pushMsg" x-text="pushMsg"></span>
                     </p>
                     <div class="flex gap-2">
-                        <button type="button" x-show="pushState === 'default' || pushState === 'unsubscribed'"
+                        <button type="button" x-show="pushState === 'default' || pushState === 'granted' || pushState === 'unsubscribed'"
                                 @click="pushMsg = ''; window.WebPush.enable().then(s => pushState = s).catch(() => pushMsg = '{{ __('Gagal mengaktifkan push.') }}')"
                                 class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">{{ __('Aktifkan di browser ini') }}</button>
                         <button type="button" x-show="pushState === 'subscribed'"
