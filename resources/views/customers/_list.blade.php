@@ -66,16 +66,24 @@
                             <a href="{{ route('customers.show', $customer) }}"
                                title="{{ __('Lihat customer') }}"
                                aria-label="{{ __('Lihat customer') }} {{ $customer->name }}"
-                               class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-50 text-accent-700 transition hover:bg-accent-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
-                                <x-icon name="eye" class="h-4 w-4" />
+                               class="group/btn relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-accent-50 text-accent-700 transition-all duration-300 hover:scale-110 hover:bg-accent-100 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 active:scale-95 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
+                                <img src="{{ asset('icons/lead-view.svg') }}" alt="" loading="lazy"
+                                     class="block h-5 w-5 group-hover/btn:hidden" />
+                                <img src="{{ asset('icons/lead-view.gif') }}" alt="" loading="lazy"
+                                     class="hidden h-5 w-5 group-hover/btn:block" />
+                                <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                             </a>
 
                             @can('manage-sales')
                                 <a href="{{ route('customers.edit', $customer) }}"
                                    title="{{ __('Edit customer') }}"
                                    aria-label="{{ __('Edit customer') }} {{ $customer->name }}"
-                                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-100 text-accent-700 transition hover:bg-accent-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
-                                    <x-icon name="edit" class="h-4 w-4" />
+                                   class="group/btn relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-accent-100 text-accent-700 transition-all duration-300 hover:scale-110 hover:bg-accent-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 active:scale-95 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
+                                    <img src="{{ asset('icons/lead-edit.svg') }}" alt="" loading="lazy"
+                                         class="block h-5 w-5 group-hover/btn:hidden" />
+                                    <img src="{{ asset('icons/lead-edit.gif') }}" alt="" loading="lazy"
+                                         class="hidden h-5 w-5 group-hover/btn:block" />
+                                    <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                 </a>
                             @endcan
 
@@ -86,8 +94,12 @@
                                     <button type="submit"
                                             title="{{ __('Hapus customer') }}"
                                             aria-label="{{ __('Hapus customer') }} {{ $customer->name }}"
-                                            class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 text-red-700 transition hover:bg-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20">
-                                        <x-icon name="trash" class="h-4 w-4" />
+                                            class="group/btn relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-red-100 text-red-700 transition-all duration-300 hover:scale-110 hover:bg-red-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 active:scale-95 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20">
+                                        <img src="{{ asset('icons/lead-delete.svg') }}" alt="" loading="lazy"
+                                             class="block h-5 w-5 group-hover/btn:hidden" />
+                                        <img src="{{ asset('icons/lead-delete.gif') }}" alt="" loading="lazy"
+                                             class="hidden h-5 w-5 group-hover/btn:block" />
+                                        <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                     </button>
                                 </form>
                             @endcan
