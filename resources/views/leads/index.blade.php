@@ -133,29 +133,32 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                     @can('view-marketing')
-                                        <a href="{{ route('leads.show', $lead) }}" title="{{ __('Lihat detail lead') }}" id="lead-view-{{ $lead->id }}"
+                                        <a href="{{ route('leads.show', $lead) }}" title="{{ __('Lihat detail lead') }}"
                                            class="group/btn relative overflow-hidden p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
-                                            <lord-icon src="{{ asset('icons/lead-view.li') }}" trigger="hover" target="#lead-view-{{ $lead->id }}" class="current-color block h-5 w-5" aria-hidden="true">
-                                                <img src="{{ asset('icons/lead-view.svg') }}" alt="" class="h-5 w-5" loading="lazy" />
-                                            </lord-icon>
+                                            <img src="{{ asset('icons/lead-view.svg') }}" alt="" loading="lazy"
+                                                 class="block h-5 w-5 group-hover/btn:hidden" />
+                                            <img src="{{ asset('icons/lead-view.gif') }}" alt="" loading="lazy"
+                                                 class="hidden h-5 w-5 group-hover/btn:block" />
                                             <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                         </a>
                                     @endcan
                                     @can('manage-marketing')
-                                        <a href="{{ route('leads.edit', $lead) }}" title="Edit lead" id="lead-edit-{{ $lead->id }}"
+                                        <a href="{{ route('leads.edit', $lead) }}" title="Edit lead"
                                            class="group/btn relative overflow-hidden p-2 rounded-lg bg-accent-100 hover:bg-accent-200 text-accent-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
-                                            <lord-icon src="{{ asset('icons/lead-edit.li') }}" trigger="hover" target="#lead-edit-{{ $lead->id }}" class="current-color block h-5 w-5" aria-hidden="true">
-                                                <img src="{{ asset('icons/lead-edit.svg') }}" alt="" class="h-5 w-5" loading="lazy" />
-                                            </lord-icon>
+                                            <img src="{{ asset('icons/lead-edit.svg') }}" alt="" loading="lazy"
+                                                 class="block h-5 w-5 group-hover/btn:hidden" />
+                                            <img src="{{ asset('icons/lead-edit.gif') }}" alt="" loading="lazy"
+                                                 class="hidden h-5 w-5 group-hover/btn:block" />
                                             <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                         </a>
                                         <form action="{{ route('leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('{{ __('Hapus lead ini?') }}')" class="inline">
                                             @csrf @method('DELETE')
-                                            <button type="submit" title="{{ __('Hapus lead') }}" id="lead-delete-{{ $lead->id }}"
+                                            <button type="submit" title="{{ __('Hapus lead') }}"
                                                     class="group/btn relative overflow-hidden p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
-                                                <lord-icon src="{{ asset('icons/lead-delete.li') }}" trigger="hover" target="#lead-delete-{{ $lead->id }}" class="current-color block h-5 w-5" aria-hidden="true">
-                                                    <img src="{{ asset('icons/lead-delete.svg') }}" alt="" class="h-5 w-5" loading="lazy" />
-                                                </lord-icon>
+                                                <img src="{{ asset('icons/lead-delete.svg') }}" alt="" loading="lazy"
+                                                     class="block h-5 w-5 group-hover/btn:hidden" />
+                                                <img src="{{ asset('icons/lead-delete.gif') }}" alt="" loading="lazy"
+                                                     class="hidden h-5 w-5 group-hover/btn:block" />
                                                 <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                             </button>
                                         </form>
