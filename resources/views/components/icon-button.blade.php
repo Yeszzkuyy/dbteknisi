@@ -12,7 +12,9 @@
        href    : url, wajib bila as=a
        type    : submit | button ...    (default: button)
        icon    : filter | reset | leads | add | import | back
-                                       (bawaan; kosongkan + isi slot untuk ikon sendiri)
+                                       (filter & reset = GIF animasi putih;
+                                        lainnya SVG statis; kosongkan + isi slot
+                                        untuk ikon sendiri)
        variant : filter | reset         (default: ngikut icon; atur manual bila pakai slot)
        size    : md (= h-10 w-10) | lg (= h-11 w-11, ala tombol Cari customer)
        title   : tooltip + title/aria-label
@@ -50,13 +52,14 @@ $sizeClass = $sizes[$size] ?? $sizes['md'];
 $btnClass = "relative inline-flex {$sizeClass} items-center justify-center overflow-hidden rounded-xl text-white shadow-sm transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-accent-500/40 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95 {$colors}";
 
 $paths = [
-    'filter' => '<path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16l-6.5 7.5V19l-3 1.5v-8L4 5z" />',
-    'reset' => '<path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />',
     'leads' => '<path stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" />',
     'add' => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />',
     'import' => '<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />',
     'back' => '<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />',
 ];
+
+// filter & reset = GIF animasi (putih, untuk bg solid) + PNG statis saat tidak hover
+$gifIcons = ['filter' => 'filter', 'reset' => 'reset'];
 @endphp
 
 <div class="group relative">
@@ -65,6 +68,11 @@ $paths = [
            {{ $attributes->merge(['class' => $btnClass]) }}>
             @if($slot->isNotEmpty())
                 {{ $slot }}
+            @elseif(isset($gifIcons[$icon]))
+                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.png') }}" alt="" loading="lazy"
+                     class="block h-5 w-5 group-hover:hidden" />
+                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.gif') }}" alt="" loading="lazy"
+                     class="hidden h-5 w-5 group-hover:block" />
             @elseif(isset($paths[$icon]))
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true">{!! $paths[$icon] !!}</svg>
             @endif
@@ -75,6 +83,11 @@ $paths = [
                 {{ $attributes->merge(['class' => $btnClass]) }}>
             @if($slot->isNotEmpty())
                 {{ $slot }}
+            @elseif(isset($gifIcons[$icon]))
+                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.png') }}" alt="" loading="lazy"
+                     class="block h-5 w-5 group-hover:hidden" />
+                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.gif') }}" alt="" loading="lazy"
+                     class="hidden h-5 w-5 group-hover:block" />
             @elseif(isset($paths[$icon]))
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true">{!! $paths[$icon] !!}</svg>
             @endif
