@@ -37,11 +37,11 @@
 
         <div>
             <label for="pt_group" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
-                {{ __('Customer dari PT') }} <span class="text-red-500">*</span>
+                {{ __('Customer dari Company') }} <span class="text-red-500">*</span>
             </label>
             <select id="pt_group" name="pt_group" required
                    class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                <option value="">{{ __('Pilih PT') }}</option>
+                <option value="">{{ __('Pilih Company') }}</option>
                 @foreach($ptGroups as $group)
                     <option value="{{ $group }}" {{ old('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
                 @endforeach
