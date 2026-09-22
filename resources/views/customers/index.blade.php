@@ -11,11 +11,16 @@
         </div>
 
         @can('manage-sales')
-            <a href="{{ route('customers.create') }}"
-               class="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-accent-600 px-5 py-2.5 font-medium text-white transition hover:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 sm:self-start">
-                <span class="mr-2 text-lg leading-none" aria-hidden="true">+</span>
-                {{ __('Tambah Customer') }}
-            </a>
+            <div class="group relative sm:self-start">
+                <a href="{{ route('customers.create') }}"
+                   title="{{ __('Add Customer') }}"
+                   aria-label="{{ __('Add Customer') }}"
+                   class="relative inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-accent-600 text-white shadow-sm transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-accent-700 hover:shadow-lg hover:shadow-accent-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M12 5v14M5 12h14" /></svg>
+                    <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
+                </a>
+                <span class="pointer-events-none absolute right-0 top-full z-10 mt-2 origin-top-right -translate-y-1 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 dark:bg-slate-700" role="tooltip">{{ __('Add Customer') }}</span>
+            </div>
         @endcan
     </div>
 
@@ -35,24 +40,28 @@
                                value="{{ request('search') }}"
                                placeholder="{{ __('Cari nama, perusahaan, atau email...') }}"
                                autocomplete="off"
-                               class="h-11 w-full rounded-xl border-slate-300 pl-10 pr-4 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
+                               class="h-11 w-full rounded-xl border border-slate-300 pl-10 pr-4 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
                                x-on:input.debounce.400ms="
                                    loading = true;
                                    error = false;
                                    clearTimeout(timer);
-                                   timer = setTimeout(() => {
-                                       fetch('{{ route('customers.index') }}?search=' + encodeURIComponent($el.value.trim()), {
-                                           headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                                       })
-                                       .then(response => {
-                                           if (!response.ok) throw new Error('Search failed');
-                                           return response.text();
-                                       })
-                                       .then(html => {
-                                           document.getElementById('customer-table').innerHTML = html;
-                                           const url = $el.value.trim() ? '{{ url('customers') }}?search=' + encodeURIComponent($el.value.trim()) : '{{ url('customers') }}';
-                                           history.replaceState(null, '', url);
-                                       })
+                                    timer = setTimeout(() => {
+                                        const pt = document.getElementById('customer-pt')?.value.trim() ?? '';
+                                        const params = new URLSearchParams();
+                                        if ($el.value.trim()) params.set('search', $el.value.trim());
+                                        if (pt) params.set('pt_group', pt);
+                                        fetch('{{ route('customers.index') }}?' + params.toString(), {
+                                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                        })
+                                        .then(response => {
+                                            if (!response.ok) throw new Error('Search failed');
+                                            return response.text();
+                                        })
+                                        .then(html => {
+                                            document.getElementById('customer-table').innerHTML = html;
+                                            const url = params.toString() ? '{{ url('customers') }}?' + params.toString() : '{{ url('customers') }}';
+                                            history.replaceState(null, '', url);
+                                        })
                                        .catch(() => { error = true; })
                                        .finally(() => { loading = false; });
                                    }, 100);
@@ -64,9 +73,24 @@
                         <span x-cloak x-show="error" class="text-red-500">{{ __('Pencarian gagal. Coba lagi.') }}</span>
                     </div>
                 </div>
+                <div class="w-full sm:w-44 sm:shrink-0">
+                    <label for="customer-pt" class="sr-only">{{ __('Filter Company') }}</label>
+                    <select id="customer-pt" name="pt_group"
+                            class="h-11 w-full rounded-xl border border-slate-300 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
+                            onchange="this.form.submit()">
+                        <option value="">{{ __('Semua Company') }}</option>
+                        @foreach($ptGroups as $group)
+                            <option value="{{ $group }}" {{ request('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <button type="submit"
-                        class="h-11 rounded-xl bg-accent-600 px-5 font-medium text-white transition hover:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2">
-                    {{ __('Cari') }}
+                        title="{{ __('Cari') }}"
+                        aria-label="{{ __('Cari customer') }}"
+                        class="group relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-accent-600 font-medium text-white transition-all duration-300 hover:scale-110 hover:bg-accent-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
+                    <x-icon name="search" class="mx-auto h-5 w-5" />
+                    <span class="sr-only">{{ __('Cari') }}</span>
+                    <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
                 </button>
             </form>
         </div>

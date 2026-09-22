@@ -32,8 +32,7 @@
             <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
                  class="hidden h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03] dark:block">
             <div class="sidebar-hide min-w-0">
-                <h1 class="truncate text-xl font-bold text-accent-300">3DY App</h1>
-                <p class="mt-0.5 text-xs text-slate-400">3DY Group</p>
+                <h1 class="truncate font-display text-4xl font-bold leading-none text-accent-300">3DY App</h1>
             </div>
         </a>
     </div>
@@ -470,7 +469,7 @@
     {{-- User widget --}}
     <div class="relative z-10 flex-shrink-0 border-t border-white/10 p-3">
         <a href="{{ route('profile.edit') }}"
-           class="sidebar-user group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 transition-all duration-300 hover:border-blue-400/30 hover:bg-white/10">
+           class="sidebar-user group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 transition-all duration-300 hover:border-accent-400/30 hover:bg-white/10">
             <x-user-avatar :user="auth()->user()" size="w-9 h-9" text="text-xs" :clickable="false" />
             <span class="sidebar-hide min-w-0 flex-1">
                 <span class="block truncate text-sm font-semibold text-slate-200">{{ auth()->user()->name }}</span>

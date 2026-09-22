@@ -31,6 +31,7 @@ class SettingsController extends Controller
             'locale' => ['required', 'in:id,en'],
             'notify_email' => ['sometimes', 'boolean'],
             'notify_system' => ['sometimes', 'boolean'],
+            'notify_push' => ['sometimes', 'boolean'],
         ]);
 
         $user = $request->user();
@@ -39,6 +40,7 @@ class SettingsController extends Controller
             'locale' => $data['locale'],
             'notify_email' => $request->boolean('notify_email'),
             'notify_system' => $request->boolean('notify_system'),
+            'notify_push' => $request->boolean('notify_push'),
             'accent' => $data['accent'] ?? $user->preference('accent', 'ocean'),
         ]);
         $user->save();

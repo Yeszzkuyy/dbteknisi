@@ -26,6 +26,7 @@ export default {
             },
             fontFamily: {
                 sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
+                display: ['Exo 2', 'Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
             },
         },
     },

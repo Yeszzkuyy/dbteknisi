@@ -15,7 +15,7 @@
     <link rel="apple-touch-icon" href="{{ asset('images/logo/logo.png') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|exo-2:500,600,700,800&display=swap" rel="stylesheet" />
 
     <script>
         (function () {
@@ -58,6 +58,9 @@
         }
     @endphp
     <script>window.notifInit = @json($notifInit);</script>
+    @auth
+    <script>window.vapidPublicKey = @json(config('webpush.vapid.public_key'));</script>
+    @endauth
     {{-- Penanda JS aktif sepagi mungkin (sebelum CSS) agar animasi appear
          sempat mulai dari state awal, bukan langsung final --}}
     <script>document.documentElement.classList.add('js');</script>
@@ -132,6 +135,7 @@
         html.dark body{background-color:var(--bg)!important;color:var(--text-primary)}
         .dark th.text-slate-500,.dark th.text-slate-600{color:var(--text-secondary)!important}
         input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]):not([type=range]):not([type=hidden]),select,textarea{background-color:var(--input-bg)!important;border-color:var(--input-border)!important;color:var(--input-text)!important}
+        input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=color]):not([type=range]):not([type=hidden]):hover,select:hover,textarea:hover{background-color:var(--input-bg-hover)!important}
         input:focus,select:focus,textarea:focus{border-color:var(--input-border-focus)!important}
         input::placeholder,textarea::placeholder{color:var(--text-muted)!important}
         .dark input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]){color-scheme:dark}

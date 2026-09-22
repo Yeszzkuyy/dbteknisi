@@ -47,12 +47,13 @@ class NotificationController extends Controller
 
                 return [
                     'id' => $n->id,
-                    'url' => $isWhatsapp
-                        ? ($data['url'] ?? route('whatsapp-center.index'))
-                        : route('manage-sales.edit', $data['lead_id'] ?? 0),
+                    'url' => $data['url']
+                        ?? ($isWhatsapp
+                            ? route('whatsapp-center.index')
+                            : route('manage-sales.edit', $data['lead_id'] ?? 0)),
                     'customer' => $data['customer'] ?? 'Lead baru',
-                    'preview' => $isWhatsapp ? ($data['preview'] ?? '') : null,
-                    'type' => $isWhatsapp ? 'whatsapp' : 'lead',
+                    'preview' => $data['preview'] ?? null,
+                    'type' => $data['type'] ?? ($isWhatsapp ? 'whatsapp' : 'lead'),
                     'read' => (bool) $n->read_at,
                     'ago' => $n->created_at->diffForHumans(),
                 ];

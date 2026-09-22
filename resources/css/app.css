@@ -82,32 +82,33 @@
     --shadow-lift: 0 12px 32px -12px rgba(0, 0, 0, 0.55), 0 4px 12px -6px rgba(0, 0, 0, 0.35);
 
     /* Surface (dark) — fixed, tidak berubah per accent */
-    --bg: #171010;
-    --sidebar-bg: #171010;
-    --sidebar-border: #423f3e;
+    --bg: #111111;
+    --sidebar-bg: #111111;
+    --sidebar-border: #3f3f46;
     --card-bg: #2b2b2b;
-    --card-border: #423f3e;
-    --card-bg-hover: #362222;
-    --input-bg: #362222;
-    --input-bg-hover: #423f3e;
-    --input-border: #5a5451;
+    --card-border: #3f3f46;
+    --card-bg-hover: #333333;
+    --input-bg: #2b2b2b;
+    --input-bg-hover: #333333;
+    --input-border: #4b5563;
     --input-border-focus: rgb(var(--accent-400) / 1);
     --input-text: #f1f5f9;
     --text-primary: #f1f5f9;
     --text-secondary: #cbd5e1;
-    --text-muted: #a8a29e;
-    --nav-text: #e7e5e4;
-    --nav-muted: #a8a29e;
-    --nav-hover-bg: rgba(54, 34, 34, 0.65);
+    --text-muted: #a1a1aa;
+    --nav-text: #e5e5e5;
+    --nav-muted: #a1a1aa;
+    --nav-hover-bg: rgba(255, 255, 255, 0.06);
     --nav-hover-text: #fff;
     --nav-active-bg: rgb(var(--accent-500) / 0.18);
     --nav-active-text: rgb(var(--accent-300) / 1);
     --sidebar-logo-text: rgb(var(--accent-300) / 1);
-    --sidebar-border-soft: #423f3e;
-    --sidebar-panel-bg: rgba(54, 34, 34, 0.55);
+    --sidebar-border-soft: #3f3f46;
+    --sidebar-panel-bg: rgba(255, 255, 255, 0.04);
 }
 
 html {
+    font-size: 90%; /* ponytail: hanya men-scale satuan rem; px hardcoded & breakpoint tidak ikut */
     scrollbar-width: thin;
     scrollbar-color: rgba(100, 116, 139, 0.4) transparent;
 }
@@ -161,7 +162,7 @@ button:active, [role="button"]:active { transform: scale(0.97); }
 
 /* Fokus ring lembut & konsisten */
 input:focus, select:focus, textarea:focus {
-    box-shadow: 0 0 0 3px rgb(var(--accent-500) / 0.14);
+    box-shadow: 0 0 0 3px rgb(var(--accent-500) / 0.25);
 }
 
 .dark .app-header {
@@ -308,7 +309,7 @@ tbody tr { transition: background-color 0.2s ease; }
 
 .info-row { transition: background-color .2s ease; }
 .info-row:hover { background-color: rgba(241, 245, 249, .9); }
-.dark .info-row:hover { background-color: rgba(54, 34, 34, .6); }
+.dark .info-row:hover { background-color: rgba(255, 255, 255, .05); }
 
 @media (prefers-reduced-motion: no-preference) {
     [data-rise] { animation: rise .5s var(--ease-out) backwards; }
@@ -499,5 +500,50 @@ tbody tr { transition: background-color 0.2s ease; }
 @media (prefers-reduced-motion: reduce) {
     .beam-notif.beam-on::before {
         animation: none;
+    }
+}
+
+/* ============================================================
+   Profile/Settings tab container — anti layout shift
+   Tab adalah navigasi route penuh, jadi transition hanya
+   menghaluskan perubahan min-height di dalam halaman
+   (bukan antar-halaman). min-height menahan footer/scrollbar
+   agar tidak lompat saat Profile (pendek) ↔ Settings (panjang).
+   ============================================================ */
+.tab-container {
+    min-height: 70vh;
+    transition: min-height 0.35s var(--ease-out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .tab-container > * {
+        animation: rise 0.4s var(--ease-out) backwards;
+    }
+}
+
+/* ============================================================
+   Navbar: cahaya berjalan tengah → samping tiap pindah menu
+   (halaman dimuat ulang = animasi diputar sekali, hormati
+   reduced motion)
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+    .navline-run {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        pointer-events: none;
+        background: linear-gradient(to right, transparent 0%, rgb(var(--accent-200)) 50%, transparent 100%);
+        filter: blur(1px);
+        box-shadow: 0 0 12px 2px rgb(var(--accent-400) / 0.8);
+        transform: scaleX(0);
+        animation: navline-run 1.1s ease-out 0.1s 1 forwards;
+    }
+
+    @keyframes navline-run {
+        0% { transform: scaleX(0); opacity: 0; }
+        20% { opacity: 1; }
+        100% { transform: scaleX(1); opacity: 0; }
     }
 }

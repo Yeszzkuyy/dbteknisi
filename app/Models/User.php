@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable; // ← Tambahkan ini
 use Laravel\Ai\Concerns\HasConversations;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasConversations, HasFactory, HasRoles, Notifiable, SoftDeletes; // ← Tambahkan SoftDeletes
+    use HasConversations, HasFactory, HasPushSubscriptions, HasRoles, Notifiable, SoftDeletes; // ← Tambahkan SoftDeletes
 
     protected $fillable = [
         'name',

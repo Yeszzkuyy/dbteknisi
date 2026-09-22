@@ -36,6 +36,56 @@ class LeadFormTest extends TestCase
             ->assertDontSee('Nilai Opportunity');
     }
 
+    public function test_create_prefills_company_and_pic_separately_from_whatsapp(): void
+    {
+        $account = \App\Models\WhatsappAccount::create([
+            'name' => 'WA wa_nti',
+            'phone_number' => '6281111111101',
+            'account_code' => 'wa_nti',
+            'gateway_type' => \App\Models\WhatsappAccount::GATEWAY_GREEN,
+            'assigned_to' => null,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($this->marketingUser())
+            ->get(route('leads.create', [
+                'whatsapp_account_id' => $account->id,
+                'sender' => '6281234567890',
+                'company' => 'PT Maju Jaya',
+                'pic' => 'Rina Putri',
+            ]))
+            ->assertOk()
+            ->assertSee('value="PT Maju Jaya"', false)
+            ->assertSee('value="Rina Putri"', false)
+            ->assertSee('value="6281234567890"', false);
+    }
+
+    public function test_create_prefill_leaves_company_empty_for_unknown_sender(): void
+    {
+        $account = \App\Models\WhatsappAccount::create([
+            'name' => 'WA wa_nti',
+            'phone_number' => '6281111111101',
+            'account_code' => 'wa_nti',
+            'gateway_type' => \App\Models\WhatsappAccount::GATEWAY_GREEN,
+            'assigned_to' => null,
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($this->marketingUser())
+            ->get(route('leads.create', [
+                'whatsapp_account_id' => $account->id,
+                'sender' => '6281234567890',
+                'company' => '',
+                'pic' => 'Rina Putri',
+                'kebutuhan' => 'Tanya harga',
+            ]))
+            ->assertOk()
+            ->assertSee('value="Rina Putri"', false);
+
+        // Kolom Perusahaan harus kosong — nama orang tidak boleh jadi nama company.
+        $this->assertStringContainsString('name="customer_name" id="customer_name" value=""', $response->getContent());
+    }
+
     public function test_store_creates_lead_with_customer_details(): void
     {
         $this->seed(RoleAndPermissionSeeder::class);

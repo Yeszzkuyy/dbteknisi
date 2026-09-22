@@ -31,9 +31,9 @@ Token dideklarasikan di `resources/css/app.css` + `resources/css/themes/accent/*
 
 ```css
 .dark {
-  --bg:#171010; --sidebar-bg:#171010; --sidebar-border:#423F3E;
-  --card-bg:#2B2B2B; --card-border:#423F3E; --card-bg-hover:#362222;
-  --input-bg:#362222; --input-bg-hover:#423F3E; --input-border:#5A5451;
+  --bg:#111111; --sidebar-bg:#111111; --sidebar-border:#3F3F46;
+  --card-bg:#2B2B2B; --card-border:#3F3F46; --card-bg-hover:#333333;
+  --input-bg:#2B2B2B; --input-bg-hover:#333333; --input-border:#4B5563;
   --input-border-focus:rgb(var(--accent-400)/1);
   --nav-active-bg:rgb(var(--accent-500)/.18); --nav-active-text:rgb(var(--accent-300)/1);
 }

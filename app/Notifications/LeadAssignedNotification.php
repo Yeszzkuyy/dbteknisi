@@ -8,16 +8,13 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewLeadNotification extends Notification
+/** Dikirim ke sales saat lead di-assign kepadanya. */
+class LeadAssignedNotification extends Notification
 {
     use Queueable, SendsWebPush;
 
     public function __construct(public Lead $lead) {}
 
-    /**
-     * Channel mengikuti preferensi notifikasi pengguna
-     * (Profil > Setting > Notifikasi).
-     */
     public function via(object $notifiable): array
     {
         $channels = [];
@@ -34,27 +31,29 @@ class NewLeadNotification extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
+            'type' => 'assigned',
             'lead_id' => $this->lead->id,
             'customer' => $this->lead->customer?->name ?? 'Lead baru',
+            'url' => route('leads.show', $this->lead->id),
         ];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Lead Baru Diterima')
-            ->line('Lead baru masuk dan membutuhkan penanganan:')
+            ->subject('Lead Di-assign ke Anda')
+            ->line('Lead berikut di-assign ke Anda dan membutuhkan penanganan:')
             ->line('Customer: ' . ($this->lead->customer?->name ?? 'Lead baru'))
-            ->action('Kelola Lead', url(route('manage-sales.edit', $this->lead->id)))
+            ->action('Lihat Lead', url(route('leads.show', $this->lead->id)))
             ->line('Terima kasih.');
     }
 
     protected function pushContent(): array
     {
         return [
-            'title' => 'Lead baru diterima',
+            'title' => 'Lead di-assign ke Anda',
             'body' => 'Customer: ' . ($this->lead->customer?->name ?? 'Lead baru'),
-            'url' => route('manage-sales.edit', $this->lead->id),
+            'url' => route('leads.show', $this->lead->id),
         ];
     }
 }

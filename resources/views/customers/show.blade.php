@@ -129,10 +129,12 @@
                             ->get();
                         $infoFields = [
                             ['icon' => 'building', 'label' => __('Nama'), 'value' => $customer->name],
+                            ['icon' => 'building', 'label' => __('Customer dari Company'), 'value' => $customer->pt_group ?? '-'],
                             ['icon' => 'user', 'label' => 'PIC', 'value' => $customer->contacts->first()?->name ?: $customer->contact_person],
                             ['icon' => 'map-pin', 'label' => __('Alamat'), 'value' => $customer->address],
                             ['icon' => 'phone', 'label' => __('Telepon'), 'value' => \App\Support\PhoneFormatter::format($customer->phone)],
-                            ['icon' => 'chat', 'label' => __('No WA'), 'value' => \App\Support\PhoneFormatter::format($customer->whatsapp)],
+                            ['icon' => 'chat', 'label' => __('WA Perusahaan'), 'value' => \App\Support\PhoneFormatter::format($customer->whatsapp), 'badge' => __('Perusahaan'), 'badgeColor' => 'blue'],
+                            ['icon' => 'chat', 'label' => __('WA PIC'), 'value' => \App\Support\PhoneFormatter::format($customer->contacts->first()?->whatsapp), 'badge' => __('PIC'), 'badgeColor' => 'emerald'],
                             ['icon' => 'mail', 'label' => 'Email', 'value' => $customer->email],
                         ];
                         $stats = [
@@ -153,7 +155,7 @@
                                         <x-icon name="{{ $field['icon'] }}" class="w-4 h-4 mt-1 text-indigo-400 shrink-0" />
                                         <div class="min-w-0">
                                             <p class="text-xs text-slate-400">{{ $field['label'] }}</p>
-                                            <p class="font-medium text-slate-800 dark:text-slate-100">{{ $field['value'] ?? '-' }}</p>
+                                            <p class="flex flex-wrap items-center gap-2 font-medium text-slate-800 dark:text-slate-100">{{ $field['value'] ?? '-' }}@if(!empty($field['badge']))<x-status-badge :color="$field['badgeColor'] ?? 'slate'">{{ $field['badge'] }}</x-status-badge>@endif</p>
                                         </div>
                                     </div>
                                 @endforeach

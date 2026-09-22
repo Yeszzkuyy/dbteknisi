@@ -581,7 +581,7 @@
     </div>
 
     <div x-show="contactModal" class="wa-modal-backdrop" @keydown.escape.window="contactModal = false" x-transition>
-        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)" x-text="contactForm.customer_id ? '{{ __('Edit kontak') }}' : '{{ __('Simpan nomor') }}'"></h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Data disimpan ke Customer CRM yang sudah ada.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactModal = false" aria-label="{{ __('Tutup') }}">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="saveContact()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama kontak') }}</span><input x-model="contactForm.name" required class="wa-field" maxlength="255" placeholder="{{ __('Nama orang / PIC') }}"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama Perusahaan (opsional)') }}</span><input x-model="contactForm.company" class="wa-field" maxlength="255" placeholder="{{ __('Nama perusahaan / PT') }}"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nomor WhatsApp') }}</span><input x-model="contactForm.whatsapp" required class="wa-field" placeholder="628xxxxxxxxxx" maxlength="50"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Catatan') }}</span><textarea x-model="contactForm.notes" class="wa-field wa-textarea" maxlength="2000" placeholder="{{ __('Catatan internal') }}"></textarea></label><p x-show="contactError" class="text-xs text-red-600" x-text="contactError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="contactModal = false">{{ __('Batal') }}</button><button type="submit" class="wa-primary" :disabled="savingContact" x-text="savingContact ? '{{ __('Menyimpan...') }}' : '{{ __('Simpan kontak') }}'"></button></div></form></div>
+        <div class="wa-modal" @click.stop><div class="wa-modal-head"><div><h2 class="text-base font-semibold" style="color:var(--wa-ink)" x-text="contactForm.customer_id ? '{{ __('Edit kontak') }}' : '{{ __('Simpan nomor') }}'"></h2><p class="mt-1 text-xs" style="color:var(--wa-muted)">{{ __('Data disimpan ke Customer CRM yang sudah ada.') }}</p></div><button type="button" class="wa-icon-button !h-8 !w-8" @click="contactModal = false" aria-label="{{ __('Tutup') }}">×</button></div><form class="wa-modal-body space-y-3" @submit.prevent="saveContact()"><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama kontak') }}</span><input x-model="contactForm.name" required class="wa-field" maxlength="255" placeholder="{{ __('Nama orang / PIC') }}"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nama Perusahaan (opsional)') }}</span><input x-model="contactForm.company" class="wa-field" maxlength="255" placeholder="{{ __('Nama perusahaan / PT') }}"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Nomor WhatsApp') }}</span><input x-model="contactForm.whatsapp" required class="wa-field" placeholder="628xxxxxxxxxx" maxlength="50"></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Alamat (opsional)') }}</span><textarea x-model="contactForm.address" class="wa-field wa-textarea" maxlength="1000" placeholder="{{ __('Alamat perusahaan') }}"></textarea></label><label class="block"><span class="mb-1 block text-xs font-semibold" style="color:var(--wa-ink)">{{ __('Catatan') }}</span><textarea x-model="contactForm.notes" class="wa-field wa-textarea" maxlength="2000" placeholder="{{ __('Catatan internal') }}"></textarea></label><p x-show="contactError" class="text-xs text-red-600" x-text="contactError"></p><div class="flex justify-end gap-2 pt-2"><button type="button" class="wa-secondary" @click="contactModal = false">{{ __('Batal') }}</button><button type="submit" class="wa-primary" :disabled="savingContact" x-text="savingContact ? '{{ __('Menyimpan...') }}' : '{{ __('Simpan kontak') }}'"></button></div></form></div>
     </div>
 
 </div>
@@ -628,7 +628,7 @@
             chatBlocked: false,
             directNumber: '',
             contactModal: false,
-            contactForm: { customer_id: null, name: '', company: '', whatsapp: '', notes: '' },
+            contactForm: { customer_id: null, name: '', company: '', whatsapp: '', address: '', notes: '' },
             savingContact: false,
             contactError: '',
             settings: { enterToSend: true, mediaVisibility: true, notificationSound: true },
@@ -1015,7 +1015,7 @@
 
             openContactModal() {
                 const customer = this.activeConv?.customer;
-                this.contactForm = { customer_id: customer?.id || null, name: customer?.contact_person || customer?.name || this.activeConv?.sender_name || '', company: customer?.company || '', whatsapp: customer?.whatsapp || this.activeConv?.sender_number || '', notes: customer?.notes || '' };
+                this.contactForm = { customer_id: customer?.id || null, name: customer?.contact_person || customer?.name || this.activeConv?.sender_name || '', company: customer?.company || '', whatsapp: customer?.whatsapp || this.activeConv?.sender_number || '', address: customer?.address || '', notes: customer?.notes || '' };
                 this.contactError = '';
                 this.contactModal = true;
             },
@@ -1037,10 +1037,12 @@
 
             goToLeadForm() {
                 if (!this.activeConv || !this.activeAccount) return;
+                const customer = this.activeConv.customer;
                 const params = new URLSearchParams({
                     whatsapp_account_id: this.activeAccount.id,
                     sender: this.activeConv.sender_number,
-                    name: this.activeConv.customer?.company || this.conversationName(this.activeConv),
+                    company: customer?.company || '',
+                    pic: customer?.contact_person || this.activeConv.sender_name || '',
                 });
                 window.location.href = '{{ route('leads.create') }}?' + params.toString();
             },

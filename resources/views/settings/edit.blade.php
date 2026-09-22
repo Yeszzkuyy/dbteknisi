@@ -3,8 +3,9 @@
         $currentTheme = $user->preference('theme', 'system');
         $currentAccent = $user->preference('accent', 'ocean');
         $currentLocale = $user->preference('locale', 'en');
-        $notifyEmail = (bool) $user->preference('notify_email', false);
+        $notifyEmail = (bool) $user->preference('notify_email', true);
         $notifySystem = (bool) $user->preference('notify_system', true);
+        $notifyPush = (bool) $user->preference('notify_push', true);
 
         $themeOptions = [
             ['value' => 'light', 'label' => __('Terang'), 'icon' => 'sun'],
@@ -20,7 +21,7 @@
         ];
     @endphp
 
-    <div class="mx-auto max-w-4xl space-y-6">
+    <div class="mx-auto max-w-4xl space-y-6 tab-container">
         {{-- Header --}}
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -116,7 +117,7 @@
                     <label class="flex cursor-pointer items-center justify-between gap-4 py-4 first:pt-0">
                         <span class="min-w-0">
                             <span class="block text-sm font-semibold text-slate-700 dark:text-slate-200">{{ __('Notifikasi Email') }}</span>
-                            <span class="mt-0.5 block text-xs text-slate-500">{{ __('Kirim pemberitahuan lead baru ke email Anda.') }}</span>
+                            <span class="mt-0.5 block text-xs text-slate-500">{{ __('Kirim semua pemberitahuan ke email Anda.') }}</span>
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_email" value="1" class="peer sr-only" @checked($notifyEmail)>
@@ -136,6 +137,42 @@
                             <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
+
+                    <label class="flex cursor-pointer items-center justify-between gap-4 py-4 last:pb-0">
+                        <span class="min-w-0">
+                            <span class="block text-sm font-semibold text-slate-700 dark:text-slate-200">{{ __('Web Push') }}</span>
+                            <span class="mt-0.5 block text-xs text-slate-500">{{ __('Kirim notifikasi ke browser, tetap tiba walau tab ditutup.') }}</span>
+                        </span>
+                        <span class="relative inline-flex shrink-0 items-center">
+                            <input type="checkbox" name="notify_push" value="1" class="peer sr-only" @checked($notifyPush)>
+                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-accent-600 dark:bg-slate-600"></span>
+                            <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
+                        </span>
+                    </label>
+                </div>
+
+                {{-- Status push browser ini --}}
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-600 dark:bg-slate-900/40"
+                     x-data="{ pushState: 'checking', pushMsg: '' }"
+                     x-init="(async () => { pushState = await window.WebPush.status() })()">
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        <span x-show="pushState === 'checking'">{{ __('Memeriksa status push browser ini…') }}</span>
+                        <span x-show="pushState === 'subscribed'">{{ __('Push aktif di browser ini.') }}</span>
+                        <span x-show="pushState === 'default'">{{ __('Browser ini belum mengizinkan notifikasi.') }}</span>
+                        <span x-show="pushState === 'granted'">{{ __('Izin diberikan, tapi browser ini belum terdaftar — tekan Aktifkan.') }}</span>
+                        <span x-show="pushState === 'blocked'">{{ __('Notifikasi diblokir di browser — izinkan lewat ikon gembok di address bar.') }}</span>
+                        <span x-show="pushState === 'unsupported'">{{ __('Browser ini tidak mendukung Web Push.') }}</span>
+                        <span x-show="pushState === 'unsubscribed'">{{ __('Push nonaktif di browser ini.') }}</span>
+                        <span class="text-red-500" x-show="pushMsg" x-text="pushMsg"></span>
+                    </p>
+                    <div class="flex gap-2">
+                        <button type="button" x-show="pushState === 'default' || pushState === 'granted' || pushState === 'unsubscribed'"
+                                @click="pushMsg = ''; window.WebPush.enable().then(s => pushState = s).catch((e) => pushMsg = '{{ __('Gagal mengaktifkan push:') }} ' + (e && e.message ? e.message : e))"
+                                class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">{{ __('Aktifkan di browser ini') }}</button>
+                        <button type="button" x-show="pushState === 'subscribed'"
+                                @click="window.WebPush.disable().then(s => pushState = s)"
+                                class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200">{{ __('Nonaktifkan') }}</button>
+                    </div>
                 </div>
             </section>
 

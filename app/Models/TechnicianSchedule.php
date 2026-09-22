@@ -20,6 +20,7 @@ class TechnicianSchedule extends Model
         'end_at',
         'status',
         'reminder_minutes',
+        'reminder_sent_at',
         'google_event_id',
         'google_calendar_id',
         'google_sync_status',
@@ -30,6 +31,7 @@ class TechnicianSchedule extends Model
         'start_at' => 'datetime',
         'end_at' => 'datetime',
         'reminder_minutes' => 'integer',
+        'reminder_sent_at' => 'datetime',
     ];
 
     public const STATUSES = [
