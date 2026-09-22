@@ -167,7 +167,7 @@
                     </p>
                     <div class="flex gap-2">
                         <button type="button" x-show="pushState === 'default' || pushState === 'granted' || pushState === 'unsubscribed'"
-                                @click="pushMsg = ''; window.WebPush.enable().then(s => pushState = s).catch(() => pushMsg = '{{ __('Gagal mengaktifkan push.') }}')"
+                                @click="pushMsg = ''; window.WebPush.enable().then(s => pushState = s).catch((e) => pushMsg = '{{ __('Gagal mengaktifkan push:') }} ' + (e && e.message ? e.message : e))"
                                 class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700">{{ __('Aktifkan di browser ini') }}</button>
                         <button type="button" x-show="pushState === 'subscribed'"
                                 @click="window.WebPush.disable().then(s => pushState = s)"
