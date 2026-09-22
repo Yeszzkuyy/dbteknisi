@@ -4,10 +4,7 @@
             <h1 class="text-3xl font-bold text-slate-800">Import Lead / Opportunity</h1>
             <p class="text-slate-500 mt-1">{{ __('Import data dari file Excel (.xlsx) atau CSV') }}</p>
         </div>
-        <a href="{{ route('leads.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition">
-            {{ __('Kembali') }}
-        </a>
+        <x-icon-button as="a" icon="back" href="{{ route('leads.index') }}" title="Kembali" />
     </div>
 
     {{-- Hasil Import --}}
@@ -66,11 +63,13 @@
 
             <div class="flex justify-end gap-3 mt-6">
                 <a href="{{ route('leads.index') }}"
-                   class="px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition">
+                   class="group relative overflow-hidden px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent-500/30 active:scale-95">
+                    <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
                     {{ __('Batal') }}
                 </a>
                 <button type="submit" id="submitBtn"
-                        class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="group relative overflow-hidden px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-500 text-white text-sm font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent-500/40 hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
                     {{ __('Import Sekarang') }}
                 </button>
             </div>
