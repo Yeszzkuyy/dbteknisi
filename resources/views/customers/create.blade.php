@@ -36,6 +36,20 @@
         </div>
 
         <div>
+            <label for="pt_group" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+                {{ __('Customer dari PT') }} <span class="text-red-500">*</span>
+            </label>
+            <select id="pt_group" name="pt_group" required
+                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                <option value="">{{ __('Pilih PT') }}</option>
+                @foreach($ptGroups as $group)
+                    <option value="{{ $group }}" {{ old('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
+                @endforeach
+            </select>
+            @error('pt_group') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div>
             <label for="address" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                 Address
             </label>

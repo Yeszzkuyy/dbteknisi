@@ -40,24 +40,28 @@
                                value="{{ request('search') }}"
                                placeholder="{{ __('Cari nama, perusahaan, atau email...') }}"
                                autocomplete="off"
-                               class="h-11 w-full rounded-xl border-slate-300 pl-10 pr-4 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
+                               class="h-11 w-full rounded-xl border border-slate-300 pl-10 pr-4 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
                                x-on:input.debounce.400ms="
                                    loading = true;
                                    error = false;
                                    clearTimeout(timer);
-                                   timer = setTimeout(() => {
-                                       fetch('{{ route('customers.index') }}?search=' + encodeURIComponent($el.value.trim()), {
-                                           headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                                       })
-                                       .then(response => {
-                                           if (!response.ok) throw new Error('Search failed');
-                                           return response.text();
-                                       })
-                                       .then(html => {
-                                           document.getElementById('customer-table').innerHTML = html;
-                                           const url = $el.value.trim() ? '{{ url('customers') }}?search=' + encodeURIComponent($el.value.trim()) : '{{ url('customers') }}';
-                                           history.replaceState(null, '', url);
-                                       })
+                                    timer = setTimeout(() => {
+                                        const pt = document.getElementById('customer-pt')?.value.trim() ?? '';
+                                        const params = new URLSearchParams();
+                                        if ($el.value.trim()) params.set('search', $el.value.trim());
+                                        if (pt) params.set('pt_group', pt);
+                                        fetch('{{ route('customers.index') }}?' + params.toString(), {
+                                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                        })
+                                        .then(response => {
+                                            if (!response.ok) throw new Error('Search failed');
+                                            return response.text();
+                                        })
+                                        .then(html => {
+                                            document.getElementById('customer-table').innerHTML = html;
+                                            const url = params.toString() ? '{{ url('customers') }}?' + params.toString() : '{{ url('customers') }}';
+                                            history.replaceState(null, '', url);
+                                        })
                                        .catch(() => { error = true; })
                                        .finally(() => { loading = false; });
                                    }, 100);
@@ -68,6 +72,17 @@
                         <span x-cloak x-show="loading" class="text-slate-400">{{ __('Mencari customer...') }}</span>
                         <span x-cloak x-show="error" class="text-red-500">{{ __('Pencarian gagal. Coba lagi.') }}</span>
                     </div>
+                </div>
+                <div class="w-full sm:w-44 sm:shrink-0">
+                    <label for="customer-pt" class="sr-only">{{ __('Filter PT') }}</label>
+                    <select id="customer-pt" name="pt_group"
+                            class="h-11 w-full rounded-xl border border-slate-300 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
+                            onchange="this.form.submit()">
+                        <option value="">{{ __('Semua PT') }}</option>
+                        @foreach($ptGroups as $group)
+                            <option value="{{ $group }}" {{ request('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <button type="submit"
                         title="{{ __('Cari') }}"

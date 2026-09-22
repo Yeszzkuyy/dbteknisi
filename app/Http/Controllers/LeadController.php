@@ -335,16 +335,19 @@ class LeadController extends Controller
             $validated['customer_id'] = Customer::create([
                 'name' => $validated['customer_name'],
                 'company' => $validated['customer_company'] ?? $validated['customer_name'],
+                'pt_group' => $validated['pt_group'],
                 'email' => $validated['customer_email'] ?? null,
                 'phone' => $validated['customer_phone'] ?? null,
                 'whatsapp' => $validated['customer_whatsapp'] ?? null,
                 'address' => $validated['customer_address'] ?? null,
                 'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
-        } elseif (!empty($validated['customer_contact_person'])) {
-            Customer::withTrashed()->whereKey($validated['customer_id'])->update([
-                'contact_person' => $validated['customer_contact_person'],
-            ]);
+        } else {
+            $customerSync = ['pt_group' => $validated['pt_group']];
+            if (!empty($validated['customer_contact_person'])) {
+                $customerSync['contact_person'] = $validated['customer_contact_person'];
+            }
+            Customer::withTrashed()->whereKey($validated['customer_id'])->update($customerSync);
         }
 
         unset(
@@ -433,6 +436,7 @@ class LeadController extends Controller
             $validated['customer_id'] = Customer::create([
                 'name' => $validated['customer_name'],
                 'company' => $validated['customer_company'] ?? $validated['customer_name'],
+                'pt_group' => $validated['pt_group'],
                 'email' => $validated['customer_email'] ?? null,
                 'phone' => $validated['customer_phone'] ?? null,
                 'whatsapp' => $validated['customer_whatsapp'] ?? null,
@@ -447,6 +451,7 @@ class LeadController extends Controller
                 'phone' => $validated['customer_phone'] ?? null,
                 'whatsapp' => $validated['customer_whatsapp'] ?? null,
                 'email' => $validated['customer_email'] ?? null,
+                'pt_group' => $validated['pt_group'] ?? null,
             ], fn ($value) => $value !== null);
 
             if ($customerData) {
@@ -761,10 +766,13 @@ class LeadController extends Controller
                         throw new \Exception('Nama perusahaan kosong');
                     }
 
+                    $ptGroup = $data['pt'] ?? $data['pt_group'] ?? 'NTI';
+
                     $customer = Customer::firstOrCreate(
                         ['name' => trim($companyName)],
                         [
                             'company' => trim($companyName),
+                            'pt_group' => $ptGroup,
                             'address' => $data['alamat'] ?? $data['address'] ?? null,
                             'phone' => $data['telp'] ?? $data['phone'] ?? $data['telepon'] ?? null,
                             'whatsapp' => $data['wa'] ?? $data['whatsapp'] ?? null,
@@ -772,6 +780,10 @@ class LeadController extends Controller
                             'contact_person' => $data['pic'] ?? $data['contact_person'] ?? null,
                         ]
                     );
+
+                    if (empty($customer->pt_group)) {
+                        $customer->update(['pt_group' => $ptGroup]);
+                    }
 
                     $incomingDate = $data['tanggal'] ?? $data['date'] ?? $data['incoming_date'] ?? now()->toDateString();
                     if (!strtotime($incomingDate)) $incomingDate = now()->toDateString();
@@ -786,7 +798,7 @@ class LeadController extends Controller
 
                     Lead::create([
                         'customer_id' => $customer->id,
-                        'pt_group' => $data['pt'] ?? $data['pt_group'] ?? 'NTI',
+                        'pt_group' => $ptGroup,
                         'segment' => $data['segment'] ?? 'other',
                         'source' => $data['source'] ?? $data['masuk_by'] ?? null,
                         'kebutuhan' => $data['kebutuhan'] ?? null,

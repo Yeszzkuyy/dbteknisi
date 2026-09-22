@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Lead;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -21,13 +22,17 @@ class CustomerController extends Controller
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->whereLike(['name', 'company', 'email'], $request->string('search'));
             })
+            ->when($request->filled('pt_group'), fn ($query) => $query->where('pt_group', $request->string('pt_group')))
             ->latest()
             ->get();
 
+        $ptGroups = Lead::PT_GROUPS;
+
         return $request->ajax()
             ? view('customers._list', compact('customers'))->render()
-            : view('customers.index', compact('customers'))
-                ->with('search', $request->string('search'));
+            : view('customers.index', compact('customers', 'ptGroups'))
+                ->with('search', $request->string('search'))
+                ->with('ptGroup', $request->string('pt_group'));
     }
 
     /**
@@ -37,7 +42,7 @@ class CustomerController extends Controller
     {
         $this->authorize('create', Customer::class);
 
-        return view('customers.create');
+        return view('customers.create', ['ptGroups' => Lead::PT_GROUPS]);
     }
 
     /**
@@ -51,6 +56,7 @@ class CustomerController extends Controller
             'name' => 'required',
             'contact_person' => 'nullable',
             'company' => 'nullable',
+            'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
             'address' => 'nullable',
             'phone' => 'nullable',
             'whatsapp' => 'nullable',
@@ -95,7 +101,7 @@ class CustomerController extends Controller
     {
         $this->authorize('update', $customer);
 
-        return view('customers.edit', compact('customer'));
+        return view('customers.edit', ['customer' => $customer, 'ptGroups' => Lead::PT_GROUPS]);
     }
 
     /**
@@ -109,6 +115,7 @@ class CustomerController extends Controller
             'name' => 'required',
             'contact_person' => 'nullable',
             'company' => 'nullable',
+            'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
             'address' => 'nullable',
             'phone' => 'nullable',
             'whatsapp' => 'nullable',
