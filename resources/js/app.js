@@ -5,10 +5,6 @@ import Sortable from 'sortablejs';
 import ApexCharts from 'apexcharts';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
-import { defineElement } from '@lordicon/element';
-
-// Ikon animasi Lordicon (<lord-icon>) — file .li di-self-host di public/icons/
-defineElement();
 
 window.Alpine = Alpine;
 window.Sortable = Sortable;
