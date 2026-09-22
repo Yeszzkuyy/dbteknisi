@@ -51,6 +51,7 @@ class LeadController extends Controller
                 fn ($c) => $c->whereLike('name', $request->search)))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->when($request->filled('source'), fn ($q) => $q->where('source', $request->source))
+            ->when($request->filled('pt_group'), fn ($q) => $q->where('pt_group', $request->pt_group))
             ->when($request->filled('date_from'), fn ($q) => $q->whereDate('incoming_date', '>=', $request->date_from))
             ->when($request->filled('date_to'), fn ($q) => $q->whereDate('incoming_date', '<=', $request->date_to));
 
@@ -58,8 +59,9 @@ class LeadController extends Controller
 
         $statuses = self::STATUSES;
         $sources = self::SOURCES;
+        $ptGroups = Lead::PT_GROUPS;
 
-        return view('leads.index', compact('leads', 'statuses', 'sources'));
+        return view('leads.index', compact('leads', 'statuses', 'sources', 'ptGroups'));
     }
 
     public function pipeline()
