@@ -38,6 +38,7 @@ class LeadActivity extends Model
         'kebutuhan' => 'Kebutuhan',
         'notes' => 'Catatan',
         'incoming_date' => 'Tanggal Masuk',
+        'sender' => 'Pengirim WA',
     ];
 
     public function actionLabel(): string

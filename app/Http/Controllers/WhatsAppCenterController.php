@@ -411,7 +411,10 @@ class WhatsAppCenterController extends Controller
             'lead_id' => $lead->id,
             'user_id' => auth()->id(),
             'action' => 'created',
-            'changes' => ['source' => 'whatsapp', 'sender' => $sender],
+            'changes' => [
+                'source' => ['old' => null, 'new' => 'whatsapp'],
+                'sender' => ['old' => null, 'new' => $sender],
+            ],
         ]);
 
         WhatsappMessage::where('whatsapp_account_id', $account->id)

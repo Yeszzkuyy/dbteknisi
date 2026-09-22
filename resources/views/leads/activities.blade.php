@@ -79,9 +79,10 @@
                             <div class="mt-2 space-y-1">
                                 @foreach($activity->changes as $field => $change)
                                     @php
-                                        $hasOld = $change['old'] !== null && $change['old'] !== '';
-                                        $old = ($formatLogValue)($field, $change['old']);
-                                        $new = ($formatLogValue)($field, $change['new']);
+                                        $change = is_array($change) ? $change : ['old' => null, 'new' => $change];
+                                        $hasOld = ($change['old'] ?? null) !== null && ($change['old'] ?? null) !== '';
+                                        $old = ($formatLogValue)($field, $change['old'] ?? null);
+                                        $new = ($formatLogValue)($field, $change['new'] ?? null);
                                     @endphp
                                     <div class="text-xs bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2 inline-block mr-2">
                                         <span class="font-semibold text-slate-700 dark:text-slate-200">
