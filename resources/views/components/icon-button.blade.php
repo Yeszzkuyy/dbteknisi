@@ -3,12 +3,13 @@
 
      <x-icon-button icon="filter" type="submit" title="Filter" />
      <x-icon-button as="a" icon="reset" href="{{ route('marketing.dashboard') }}" title="Reset" />
+     <x-icon-button as="a" icon="leads" href="{{ route('leads.index') }}" title="Lihat Lead" />
 
      Props:
        as      : button | a            (default: button)
        href    : url, wajib bila as=a
        type    : submit | button ...    (default: button)
-       icon    : filter | reset         (bawaan; kosongkan + isi slot untuk ikon sendiri)
+       icon    : filter | reset | leads (bawaan; kosongkan + isi slot untuk ikon sendiri)
        variant : filter | reset         (default: ngikut icon; atur manual bila pakai slot)
        size    : md (= h-10 w-10) | lg (= h-11 w-11, ala tombol Cari customer)
        title   : tooltip + title/aria-label
@@ -45,6 +46,7 @@ $btnClass = "relative inline-flex {$sizeClass} items-center justify-center overf
 $paths = [
     'filter' => '<path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16l-6.5 7.5V19l-3 1.5v-8L4 5z" />',
     'reset' => '<path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />',
+    'leads' => '<path stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" />',
 ];
 @endphp
 
