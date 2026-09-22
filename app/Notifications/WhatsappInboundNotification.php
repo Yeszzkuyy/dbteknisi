@@ -2,12 +2,13 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Concerns\SendsWebPush;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
 class WhatsappInboundNotification extends Notification
 {
-    use Queueable;
+    use Queueable, SendsWebPush;
 
     public function __construct(
         public int $accountId,
@@ -22,7 +23,7 @@ class WhatsappInboundNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return $this->withWebPush($notifiable, ['database']);
     }
 
     /**
@@ -36,6 +37,15 @@ class WhatsappInboundNotification extends Notification
             'sender' => $this->sender,
             'customer' => trim($this->accountName.' • '.$this->sender, ' •'),
             'preview' => $this->preview,
+            'url' => route('whatsapp-center.index'),
+        ];
+    }
+
+    protected function pushContent(): array
+    {
+        return [
+            'title' => 'Pesan WhatsApp baru',
+            'body' => trim($this->accountName . ' • ' . $this->sender, ' •') . ': ' . $this->preview,
             'url' => route('whatsapp-center.index'),
         ];
     }

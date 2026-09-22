@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\User;
+use App\Notifications\LeadAssignedNotification;
 use App\Notifications\NewLeadNotification;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
@@ -68,7 +69,10 @@ class ManageSalesController extends Controller
             }
         }
 
+        $previousAssignee = $lead->getOriginal('assigned_to');
         $lead->save();
+
+        $this->notifyAssignee($lead, $previousAssignee);
 
         if ($changes) {
             $this->logActivity($lead, 'updated', $changes);
@@ -94,9 +98,12 @@ class ManageSalesController extends Controller
             abort(422, 'Target assignment harus user dengan role Sales.');
         }
 
+        $previousAssignee = $lead->getOriginal('assigned_to');
         $lead->assigned_to = $salesUser->id;
         $this->trackAssignment($lead, $salesUser->id);
         $lead->save();
+
+        $this->notifyAssignee($lead, $previousAssignee);
 
         $this->logActivity($lead, 'assigned', [
             'assigned_to' => ['old' => $lead->getOriginal('assigned_to'), 'new' => $salesUser->id],
@@ -149,6 +156,25 @@ class ManageSalesController extends Controller
         $lead->assigned_to = $assignedTo;
         $lead->assigned_by = $assignedTo ? auth()->id() : null;
         $lead->assigned_at = $assignedTo ? now() : null;
+    }
+
+    /**
+     * Notifikasi ke sales yang baru di-assign (hanya bila ganti orang,
+     * bukan assign ulang ke orang yang sama atau ke diri sendiri).
+     */
+    private function notifyAssignee(Lead $lead, mixed $previousAssignee): void
+    {
+        if (empty($lead->assigned_to)
+            || (int) $lead->assigned_to === (int) $previousAssignee
+            || (int) $lead->assigned_to === (int) auth()->id()) {
+            return;
+        }
+
+        try {
+            User::find($lead->assigned_to)?->notify(new LeadAssignedNotification($lead));
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     private function clearLeadNotifications(Lead $lead): void

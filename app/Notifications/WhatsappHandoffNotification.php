@@ -2,12 +2,13 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Concerns\SendsWebPush;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
 class WhatsappHandoffNotification extends Notification
 {
-    use Queueable;
+    use Queueable, SendsWebPush;
 
     /**
      * @param  'limit'|'waiting'  $reason
@@ -26,7 +27,7 @@ class WhatsappHandoffNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return $this->withWebPush($notifiable, ['database']);
     }
 
     /**
@@ -41,6 +42,17 @@ class WhatsappHandoffNotification extends Notification
             'sender' => $this->sender,
             'customer' => trim($this->accountName.' • '.$this->sender, ' •'),
             'preview' => $this->preview,
+            'url' => route('whatsapp-center.index'),
+        ];
+    }
+
+    protected function pushContent(): array
+    {
+        $reason = $this->reason === 'limit' ? 'Bot mencapai batas balasan' : 'Bot menunggu ambil alih';
+
+        return [
+            'title' => 'Butuh handoff WhatsApp',
+            'body' => $reason . ' — ' . trim($this->accountName . ' • ' . $this->sender, ' •'),
             'url' => route('whatsapp-center.index'),
         ];
     }

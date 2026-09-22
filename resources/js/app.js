@@ -56,6 +56,91 @@ window.getAppearanceColors = function () {
     };
 };
 
+/* ============================================================
+   Web Push (VAPID) — daftar SW diam-diam, subscribe hanya
+   saat user menekan "Aktifkan" (Settings > Notifikasi).
+   Dipakai lewat window.WebPush: status(), enable(), disable().
+   ============================================================ */
+function urlBase64ToUint8Array(base64) {
+    const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+    const raw = window.atob((base64 + padding).replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
+}
+
+async function swRegistration() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+    try {
+        return await navigator.serviceWorker.register('/sw.js');
+    } catch (e) {
+        return null;
+    }
+}
+
+function csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content;
+}
+
+window.WebPush = {
+    supported: 'serviceWorker' in navigator && 'PushManager' in window,
+
+    async status() {
+        if (!this.supported || !window.vapidPublicKey) return 'unsupported';
+        if (Notification.permission === 'denied') return 'blocked';
+        const reg = await swRegistration();
+        if (!reg) return 'unsupported';
+        const sub = await reg.pushManager.getSubscription();
+        return sub ? 'subscribed' : Notification.permission;
+    },
+
+    async enable() {
+        if (!this.supported || !window.vapidPublicKey) return 'unsupported';
+        if (Notification.permission === 'denied') return 'blocked';
+        const reg = await swRegistration();
+        if (!reg) return 'unsupported';
+        let sub = await reg.pushManager.getSubscription();
+        if (!sub) {
+            sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(window.vapidPublicKey),
+            });
+        }
+        const json = sub.toJSON();
+        await fetch('/push-subscriptions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken(), Accept: 'application/json' },
+            body: JSON.stringify({
+                endpoint: sub.endpoint,
+                keys: json.keys,
+                contentEncoding: (PushManager.supportedContentEncodings || ['aes128gcm'])[0],
+            }),
+        });
+        return 'subscribed';
+    },
+
+    async disable() {
+        const reg = await swRegistration();
+        const sub = reg ? await reg.pushManager.getSubscription() : null;
+        if (sub) {
+            try {
+                await fetch('/push-subscriptions', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken(), Accept: 'application/json' },
+                    body: JSON.stringify({ endpoint: sub.endpoint }),
+                });
+            } catch (e) {}
+            await sub.unsubscribe();
+        }
+        return 'unsubscribed';
+    },
+
+    init() {
+        // Daftarkan SW lebih awal agar push bisa tiba walau tab ditutup.
+        if (this.supported && window.vapidPublicKey) swRegistration();
+    },
+};
+
+window.WebPush.init();
+
 document.addEventListener('alpine:init', () => {
     Alpine.store('appearance', {
         mode: window.__appearanceMode || 'system',

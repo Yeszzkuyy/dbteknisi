@@ -23,6 +23,7 @@ use App\Http\Controllers\ProjectDocumentController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectSupportController;
 use App\Http\Controllers\ProjectTaskController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TechnicianDashboardController;
 use App\Http\Controllers\TechnicianScheduleController;
@@ -59,6 +60,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications/status', [NotificationController::class, 'status'])->name('notifications.status');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Web Push (VAPID) — simpan/hapus subscription browser per user.
+    Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store'])->name('push-subscriptions.store');
+    Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy'])->name('push-subscriptions.destroy');
 
     // ============================================
     // AI ASSISTANT (OfficeAssistant)

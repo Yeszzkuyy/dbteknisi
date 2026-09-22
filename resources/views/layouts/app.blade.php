@@ -58,6 +58,9 @@
         }
     @endphp
     <script>window.notifInit = @json($notifInit);</script>
+    @auth
+    <script>window.vapidPublicKey = @json(config('webpush.vapid.public_key'));</script>
+    @endauth
     {{-- Penanda JS aktif sepagi mungkin (sebelum CSS) agar animasi appear
          sempat mulai dari state awal, bukan langsung final --}}
     <script>document.documentElement.classList.add('js');</script>

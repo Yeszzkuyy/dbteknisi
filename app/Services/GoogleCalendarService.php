@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\GoogleCredential;
 use App\Models\TechnicianSchedule;
 use App\Models\User;
+use App\Notifications\TechnicianScheduleAssignedNotification;
+use App\Notifications\TechnicianScheduleChangedNotification;
 use Google\Client;
 use Google\Service\Calendar;
 use Google\Service\Calendar\Event;
@@ -272,6 +274,9 @@ class GoogleCalendarService
             $this->pushEvent($schedule);
         }
 
+        $this->notifyTechnician($schedule->technician, $user,
+            new TechnicianScheduleAssignedNotification($schedule));
+
         return $schedule;
     }
 
@@ -281,21 +286,57 @@ class GoogleCalendarService
      */
     public function updateSchedule(TechnicianSchedule $schedule, array $data): TechnicianSchedule
     {
+        $editor = auth()->user();
+        $oldTechnicianId = $schedule->technician_user_id;
+        $change = ($data['status'] ?? $schedule->status) === 'cancelled' ? 'cancelled' : 'updated';
+        // Waktu berubah → reminder perlu dikirim ulang.
+        $startChanged = isset($data['start_at']) && ! $schedule->start_at->equalTo($data['start_at']);
+
         $schedule->update(array_merge($data, [
             'google_sync_status' => $schedule->google_sync_status === 'not_connected'
                 ? 'not_connected'
                 : 'syncing',
+            'reminder_sent_at' => $startChanged ? null : $schedule->reminder_sent_at,
         ]));
 
         if ($schedule->google_sync_status !== 'not_connected') {
             $this->pushEvent($schedule);
         }
 
+        $schedule->refresh();
+        $notified = [];
+
+        // Teknisi baru → notif assign; teknisi lama yang diganti → notif perubahan.
+        if ($schedule->technician_user_id && $schedule->technician_user_id !== $oldTechnicianId) {
+            $this->notifyTechnician($schedule->technician, $editor,
+                new TechnicianScheduleAssignedNotification($schedule), $notified);
+        }
+        if ($oldTechnicianId && $oldTechnicianId !== $schedule->technician_user_id) {
+            $this->notifyTechnician(User::find($oldTechnicianId), $editor,
+                new TechnicianScheduleChangedNotification($schedule, $change), $notified);
+        }
+
+        // Teknisi saat ini + owner (selain editor & yang sudah dinotifikasi).
+        $this->notifyTechnician($schedule->technician, $editor,
+            new TechnicianScheduleChangedNotification($schedule, $change), $notified);
+        $this->notifyTechnician($schedule->owner, $editor,
+            new TechnicianScheduleChangedNotification($schedule, $change), $notified);
+
         return $schedule;
     }
 
     public function deleteSchedule(TechnicianSchedule $schedule): void
     {
+        $deleter = auth()->user();
+        $technician = $schedule->technician;
+        $owner = $schedule->owner;
+        // Notifikasi dikirim sebelum hapus agar relasi masih tersedia.
+        $notified = [];
+        $this->notifyTechnician($technician, $deleter,
+            new TechnicianScheduleChangedNotification($schedule, 'deleted'), $notified);
+        $this->notifyTechnician($owner, $deleter,
+            new TechnicianScheduleChangedNotification($schedule, 'deleted'), $notified);
+
         if ($schedule->google_event_id && $schedule->google_sync_status !== 'not_connected') {
             try {
                 $calendar = $this->calendarService($schedule->owner);
@@ -306,6 +347,25 @@ class GoogleCalendarService
         }
 
         $schedule->delete();
+    }
+
+    /**
+     * Kirim notifikasi ke teknisi/owner, lewati bila null, sama dengan
+     * pengirim aksi, atau sudah dinotifikasi. Kegagalan push tidak
+     * boleh menggagalkan simpan jadwal.
+     */
+    private function notifyTechnician(?User $target, ?User $actor, object $notification, array &$notified = []): void
+    {
+        if (! $target || ($actor && $target->is($actor)) || in_array($target->id, $notified, true)) {
+            return;
+        }
+
+        try {
+            $target->notify($notification);
+            $notified[] = $target->id;
+        } catch (\Throwable $e) {
+            Log::warning('Notifikasi jadwal teknisi gagal: '.$e->getMessage());
+        }
     }
 
     /**
