@@ -5,16 +5,9 @@
             <p class="text-slate-500 mt-1">{{ __('Kelola lead marketing dan opportunity sales') }}</p>
         </div>
         @can('manage-marketing')
-            <div class="flex gap-3">
-                <a href="{{ route('leads.import') }}"
-                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:border-slate-600 font-medium transition">
-                    <span class="text-base leading-none">📥</span>
-                    Import
-                </a>
-                <a href="{{ route('leads.create') }}"
-                   class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
-                    {{ __('+ Tambah Lead') }}
-                </a>
+            <div class="flex items-center gap-2">
+                <x-icon-button as="a" icon="import" href="{{ route('leads.import') }}" title="Import" />
+                <x-icon-button as="a" icon="add" href="{{ route('leads.create') }}" title="Tambah Lead" />
             </div>
         @endcan
     </div>
@@ -59,12 +52,8 @@
                     <x-datepicker name="date_to" value="{{ request('date_to') }}" class="mt-1"></x-datepicker>
                 </div>
                 <div class="sm:col-span-2 lg:col-span-5 flex items-end gap-2">
-                    <button type="submit" class="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
-                        Filter
-                    </button>
-                    <a href="{{ route('leads.index') }}" class="px-4 py-2 rounded-xl bg-accent-500 hover:bg-accent-600 text-white font-medium transition">
-                        Reset
-                    </a>
+                    <x-icon-button icon="filter" type="submit" title="Filter" />
+                    <x-icon-button as="a" icon="reset" href="{{ route('leads.index') }}" title="Reset" />
                 </div>
             </form>
         </div>
