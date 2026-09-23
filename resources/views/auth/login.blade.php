@@ -263,14 +263,15 @@
         .login-form-panel::after {
             position: absolute;
             top: 0;
-            left: -13rem;
+            left: -18rem;
             bottom: 0;
-            width: 16rem;
+            width: 22rem;
             z-index: 0;
             background:
-                linear-gradient(68deg, transparent 0 31%, rgb(var(--accent-600) / .07) 31.2% 31.4%, transparent 31.6% 100%),
-                linear-gradient(16deg, transparent 0 58%, rgb(var(--accent-500) / .05) 58.2% 58.4%, transparent 58.6% 100%),
-                linear-gradient(270deg, var(--login-surface) 0%, var(--login-surface) 28%, rgb(var(--accent-950) / .07) 58%, rgb(var(--accent-950) / .03) 76%, transparent 100%);
+                linear-gradient(68deg, transparent 0 31%, rgb(var(--accent-600) / .05) 31.2% 31.4%, transparent 31.6% 100%),
+                linear-gradient(16deg, transparent 0 58%, rgb(var(--accent-500) / .035) 58.2% 58.4%, transparent 58.6% 100%),
+                radial-gradient(ellipse 75% 60% at 0% 50%, rgb(var(--accent-950) / .08) 0%, transparent 70%),
+                linear-gradient(270deg, var(--login-surface) 0%, var(--login-surface) 32%, rgb(var(--accent-950) / .05) 58%, rgb(var(--accent-950) / .02) 79%, transparent 100%);
             content: "";
             pointer-events: none;
         }
