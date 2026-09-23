@@ -27,6 +27,21 @@
         [x-cloak] { display: none !important; }
 
         :root {
+            --bg: #f1f5f9;
+            --card-bg: #fff;
+            --input-border: #cbd5e1;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --nav-hover-bg: rgba(15, 23, 42, .05);
+            --accent-500: 59 130 246;
+            --accent-600: 37 99 235;
+            --accent-700: 29 78 216;
+            --accent-800: 30 64 175;
+            --accent-900: 30 58 138;
+            --accent-950: 23 37 84;
+            --semantic-success: 34 197 94;
+            --semantic-danger: 239 68 68;
             --login-panel: rgb(var(--accent-800) / 1);
             --login-accent: rgb(var(--accent-600) / 1);
             --login-accent-hover: rgb(var(--accent-700) / 1);
