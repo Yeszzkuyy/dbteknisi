@@ -249,17 +249,7 @@
             mask-image: linear-gradient(to bottom, #000 0%, #000 26%, transparent 96%);
         }
 
-        .login-wave {
-            position: absolute;
-            top: 0;
-            left: -10rem;
-            bottom: 0;
-            width: 20rem;
-            height: 100%;
-            z-index: 0;
-            display: block;
-            pointer-events: none;
-        }
+        .login-cloud path { fill: var(--login-surface); }
 
         .login-form-inner {
             position: relative;
@@ -491,7 +481,7 @@
             .login-topology-wrap { position: absolute; right: -4rem; bottom: -1.3rem; width: 19rem; margin: 0; opacity: .72; }
             .login-visual-footer { margin-top: auto; font-size: .6rem; }
             .login-form-panel { min-height: 0; order: 1; align-items: flex-start; padding: 2.5rem 1.25rem 2rem; }
-            .login-wave { display: none; }
+            .login-cloud { display: none; }
             .login-header { margin-bottom: 1.9rem; }
         }
 
@@ -578,21 +568,12 @@
                 <span>Tridaya Group</span>
                 <span>3DY App</span>
             </footer>
+            <svg class="login-cloud absolute inset-y-0 right-0 h-full w-16 z-10" viewBox="0 0 64 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                <path d="M0,0 L64,0 L64,400 C64,400 44,370 64,340 C84,310 44,280 64,250 C84,220 44,190 64,160 C84,130 44,100 64,70 C84,40 64,10 64,0 Z" />
+            </svg>
         </section>
 
         <section class="login-form-panel" aria-labelledby="login-title">
-            <svg class="login-wave" viewBox="0 0 200 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <defs>
-                    <linearGradient id="loginWaveFill" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" style="stop-color: rgb(var(--accent-950))" />
-                        <stop offset="1" style="stop-color: rgb(var(--accent-900) / .93)" />
-                    </linearGradient>
-                </defs>
-                <g transform="translate(16,0)">
-                    <path d="M0,0 L120,0 C158,18 172,68 172,124 C172,180 158,230 120,250 C162,270 176,320 176,376 C176,432 162,480 122,500 C160,520 174,570 174,626 C174,682 160,730 118,750 C160,770 174,820 174,876 C174,932 158,980 124,1000 L0,1000 Z" style="fill: rgb(var(--accent-500) / .30)" />
-                </g>
-                <path d="M0,0 L120,0 C158,18 172,68 172,124 C172,180 158,230 120,250 C162,270 176,320 176,376 C176,432 162,480 122,500 C160,520 174,570 174,626 C174,682 160,730 118,750 C160,770 174,820 174,876 C174,932 158,980 124,1000 L0,1000 Z" fill="url(#loginWaveFill)" />
-            </svg>
             <div class="login-form-inner">
                 <header class="login-header">
                     <h1 id="login-title">Welcome back</h1>
