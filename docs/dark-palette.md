@@ -1,5 +1,9 @@
 # Palet Dark Mode Global (Catatan Sesi)
 
+> SUPERSEDED — digantikan referensi resmi `docs/3DY_Dark_Theme_Palette.md`
+> (Unified Dark Theme). Tabel di bawah versi percobaan awal, dipertahankan
+> sebagai riwayat. Implementasi berlaku memakai nilai unified.
+
 Disetujui user pada sesi login redesign v2, 23 Sep 2026.
 Status: **UJI COBA di dashboard dulu** (`feature/general-dashboard`).
 Kalau cocok, apply ke seluruh halaman (ganti blok `.dark` di `resources/css/app.css`).
