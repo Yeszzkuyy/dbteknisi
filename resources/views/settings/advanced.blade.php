@@ -1,21 +1,12 @@
 <x-app-layout>
-    <div class="mx-auto max-w-4xl space-y-6 tab-container">
+    <div class="w-full space-y-6 tab-container">
         {{-- Header --}}
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('settings.edit') }}"
-                   title="{{ __('Kembali ke Setting') }}"
-                   class="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-white">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    {{ __('Kembali') }}
-                </a>
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-800 sm:text-3xl">{{ __('Pengaturan Lanjutan') }}</h1>
-                    <p class="mt-0.5 text-sm text-slate-500">{{ __('Keamanan akun Anda') }}</p>
-                </div>
+        <div class="mb-6 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">{{ __('Pengaturan Lanjutan') }}</h1>
+                <p class="mt-1 text-slate-500">{{ __('Keamanan akun Anda') }}</p>
             </div>
+            <x-icon-button as="a" icon="back" href="{{ route('settings.edit') }}" title="{{ __('Kembali') }}" />
         </div>
 
         <x-profile-tabs />
