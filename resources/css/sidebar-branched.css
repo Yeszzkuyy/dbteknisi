@@ -1,0 +1,86 @@
+/* ============================================================
+   Branched sidebar — port gaya React Bits BranchedMenu ke Blade/Alpine.
+   - Trunk + branch digambar sebagai SVG per grup (server-rendered).
+   - Garis aktif (reach) memakai --accent-* sehingga ikut data-theme
+     (ocean/terracotta/purple/emerald). Dot warna-warni anak menu tetap.
+   - Lipat/buka pakai grid 0fr<->1fr (fold 300ms), dikontrol Alpine
+     lewat :data-open pada wrapper .branched (pengganti x-show).
+   ============================================================ */
+.sidebar .branched {
+    --bm-fold: 300ms;
+    --bm-draw: 400ms;
+    --bm-ease: cubic-bezier(0.23, 1, 0.32, 1);
+    --bm-row: 36px;
+    --bm-indent: 40px;
+}
+
+/* Lipatan: 0fr (tutup) <-> 1fr (buka) */
+.sidebar .branched-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--bm-fold) var(--bm-ease);
+}
+.sidebar .branched[data-open] .branched-body {
+    grid-template-rows: 1fr;
+}
+.sidebar .branched-fold {
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Pohon: baris fix 36px agar cabang SVG sejajar dengan label */
+.sidebar .branched-tree {
+    position: relative;
+    padding: 6px 0;
+    box-sizing: border-box;
+}
+.sidebar .branched-tree > a {
+    height: var(--bm-row);
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: var(--bm-indent);
+    white-space: nowrap;
+}
+
+/* Garis: base = border lembut tema, reach = accent tema */
+.sidebar .branched-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: visible;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+}
+.sidebar .branched[data-open] .branched-lines {
+    opacity: 1;
+    transition: opacity 250ms ease 100ms;
+}
+.sidebar .branched-base,
+.sidebar .branched-reach {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.sidebar .branched-base {
+    stroke: var(--sidebar-border-soft);
+}
+.sidebar .branched-reach {
+    stroke: rgb(var(--accent-500) / 1);
+    transition: stroke-dashoffset var(--bm-draw) var(--bm-ease);
+}
+
+/* Mode minimized: submenu disembunyikan via .sidebar-hide (bawaan) */
+html.sidebar-collapsed .sidebar .branched-lines {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar .branched-body {
+        transition: none;
+    }
+    .sidebar .branched-reach {
+        transition: none;
+    }
+}

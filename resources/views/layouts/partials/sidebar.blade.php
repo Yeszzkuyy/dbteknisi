@@ -14,6 +14,23 @@
     $adminPanelActive = request()->routeIs('admin-panel*');
 
     $roleName = auth()->user()->roles->first()?->name ?? 'User';
+
+    // Geometri pohon branched (port BranchedMenu React Bits, px).
+    $bmTrunk = 14; $bmIndent = 40; $bmRowH = 36; $bmPad = 6; $bmR = 10; $bmEndX = $bmIndent - 8;
+    $bmRowY = fn($k) => $bmPad + $k * $bmRowH + $bmRowH / 2;
+    $bmBranch = fn($k) => 'M '.$bmTrunk.' '.($bmRowY($k) - $bmR).' A '.$bmR.' '.$bmR.' 0 0 0 '.($bmTrunk + $bmR).' '.$bmRowY($k).' H '.$bmEndX;
+    $bmReach = fn($k) => 'M '.$bmTrunk.' 0 V '.($bmRowY($k) - $bmR).' A '.$bmR.' '.$bmR.' 0 0 0 '.($bmTrunk + $bmR).' '.$bmRowY($k).' H '.$bmEndX;
+    $bmLen = fn($k) => round(($bmRowY($k) - $bmR) + (M_PI * $bmR / 2) + ($bmEndX - $bmTrunk - $bmR), 1);
+
+    // Indeks anak aktif per grup (-1 = tidak ada) untuk garis reach accent.
+    $managementIdx = request()->routeIs('manage-sales.activity-log') ? 4 : (request()->routeIs('manage-sales*') ? 0 : (request()->routeIs('manage.marketing*') ? 1 : (request()->routeIs('manage.technical*') ? 2 : (request()->routeIs('manage.admin*') ? 3 : -1))));
+    $teknisiIdx = request()->routeIs('teknisi.dashboard*') ? 0 : (request()->routeIs('projects*') ? 1 : (request()->routeIs('teknisi.jadwal*') ? 2 : (request()->routeIs('teknisi.surveys*') ? 3 : (request()->routeIs('teknisi.sizing-projects*') ? 4 : (request()->routeIs('teknisi.request-hargas*') ? 5 : (request()->routeIs('teknisi.instalasis*') ? 6 : (request()->routeIs('teknisi.documents*') ? 7 : -1)))))));
+    $marketingIdx = request()->routeIs('marketing.dashboard') ? 0 : (request()->routeIs('whatsapp-center*') ? 1 : (request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 2 : (request()->routeIs('leads.pipeline') ? 3 : (request()->routeIs('partners*') ? 4 : (request()->routeIs('leads.activities') ? 5 : (request()->routeIs('leads.monitoring') ? 6 : -1))))));
+    $salesIdx = request()->routeIs('sales.my-leads') ? 0 : (request()->routeIs('sales.meetings.*') ? 1 : (request()->routeIs('sales.follow-ups.*') ? 2 : (request()->routeIs('projects*') ? 3 : -1)));
+    $adminIdx = request()->routeIs('admin.invoices.*') ? 0 : (request()->routeIs('admin.pos.*') ? 1 : (request()->routeIs('admin.payments.*') ? 2 : -1));
+    $adminPanelIdx = request()->routeIs('admin-panel.index') ? 0 : (request()->routeIs('admin-panel.account-managers.*') ? 1 : (request()->routeIs('admin-panel.work-types.*') ? 2 : (request()->routeIs('admin-panel.document-categories.*') ? 3 : (request()->routeIs('admin-panel.project-statuses.*') ? 4 : (request()->routeIs('admin-panel.audit-log') ? 5 : -1)))));
+    $hasMarketingMonitoring = auth()->user()->can('monitor-marketing');
+    $hasSalesProject = auth()->user()->can('view-teknisi') || auth()->user()->can('view-sales');
 @endphp
 
 <aside class="relative flex h-full w-full flex-col overflow-hidden">
@@ -78,7 +95,7 @@
                     <div class="space-y-1">
                         {{-- Management (Management Hub) --}}
                         @can('manage-sales-leads')
-                            <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }">
+                            <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }" class="branched" :data-open="open ? '' : null">
                                 <button type="button" @click="open = !open"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-management-menu"
@@ -95,14 +112,16 @@
                                         </svg>
                                     </span>
                                 </button>
-                                <div id="sidebar-management-menu" x-cloak x-show="open"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="-translate-y-1 opacity-0"
-                                     x-transition:enter-end="translate-y-0 opacity-100"
-                                     x-transition:leave="transition ease-in duration-150"
-                                     x-transition:leave-start="translate-y-0 opacity-100"
-                                     x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
+                                <div id="sidebar-management-menu" x-cloak class="branched-body sidebar-hide mt-1">
+                                    <div class="branched-fold">
+                                        <div class="branched-tree" style="height: 192px">
+                                            <svg class="branched-lines" width="40" height="192" aria-hidden="true">
+                                                <path class="branched-base" d="M 14 0 V 158" />
+                                                @for ($k = 0; $k < 5; $k++)
+                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $managementIdx ? 0 : $bmLen($k) }}" />
+                                                @endfor
+                                            </svg>
                                     <a href="{{ route('manage-sales.index') }}"
                                        aria-current="{{ request()->routeIs('manage-sales*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('manage-sales*') ? $navActive : $navInactive }}">
@@ -136,13 +155,15 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" aria-hidden="true"></span>
                                         <span>Activity Log</span>
                                     </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @endcan
 
                         {{-- Teknisi --}}
                         @can('view-teknisi')
-                            <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }">
+                            <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="branched" :data-open="open ? '' : null">
                                 <button type="button" @click="open = !open"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-technician-menu"
@@ -154,14 +175,16 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
-                                <div id="sidebar-technician-menu" x-cloak x-show="open"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="-translate-y-1 opacity-0"
-                                     x-transition:enter-end="translate-y-0 opacity-100"
-                                     x-transition:leave="transition ease-in duration-150"
-                                     x-transition:leave-start="translate-y-0 opacity-100"
-                                     x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
+                                <div id="sidebar-technician-menu" x-cloak class="branched-body sidebar-hide mt-1">
+                                    <div class="branched-fold">
+                                        <div class="branched-tree" style="height: 300px">
+                                            <svg class="branched-lines" width="40" height="300" aria-hidden="true">
+                                                <path class="branched-base" d="M 14 0 V 266" />
+                                                @for ($k = 0; $k < 8; $k++)
+                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $teknisiIdx ? 0 : $bmLen($k) }}" />
+                                                @endfor
+                                            </svg>
                                     <a href="{{ route('teknisi.dashboard') }}"
                                        aria-current="{{ request()->routeIs('teknisi.dashboard*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('teknisi.dashboard*') ? $navActive : $navInactive }}">
@@ -210,13 +233,15 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true"></span>
                                         <span>Document</span>
                                     </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @endcan
 
                         {{-- Marketing --}}
                         @can('view-marketing')
-                            <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }">
+                            <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="branched" :data-open="open ? '' : null">
                                 <button type="button" @click="open = !open"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-marketing-menu"
@@ -228,14 +253,17 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
-                                <div id="sidebar-marketing-menu" x-cloak x-show="open"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="-translate-y-1 opacity-0"
-                                     x-transition:enter-end="translate-y-0 opacity-100"
-                                     x-transition:leave="transition ease-in duration-150"
-                                     x-transition:leave-start="translate-y-0 opacity-100"
-                                     x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
+                                @php($mktCount = 6 + ($hasMarketingMonitoring ? 1 : 0))
+                                <div id="sidebar-marketing-menu" x-cloak class="branched-body sidebar-hide mt-1">
+                                    <div class="branched-fold">
+                                        <div class="branched-tree" style="height: {{ 12 + $mktCount * 36 }}px">
+                                            <svg class="branched-lines" width="40" height="{{ 12 + $mktCount * 36 }}" aria-hidden="true">
+                                                <path class="branched-base" d="M 14 0 V {{ 24 + 36 * ($mktCount - 1) - 10 }}" />
+                                                @for ($k = 0; $k < $mktCount; $k++)
+                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $marketingIdx ? 0 : $bmLen($k) }}" />
+                                                @endfor
+                                            </svg>
                                     <a href="{{ route('marketing.dashboard') }}"
                                        aria-current="{{ request()->routeIs('marketing.dashboard') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('marketing.dashboard') ? $navActive : $navInactive }}">
@@ -280,13 +308,15 @@
                                             <span>Monitoring</span>
                                         </a>
                                     @endcan
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @endcan
 
                         {{-- Sales --}}
                         @can('view-sales')
-                            <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }">
+                            <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched" :data-open="open ? '' : null">
                                 <button type="button" @click="open = !open"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-sales-menu"
@@ -298,14 +328,17 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
-                                <div id="sidebar-sales-menu" x-cloak x-show="open"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="-translate-y-1 opacity-0"
-                                     x-transition:enter-end="translate-y-0 opacity-100"
-                                     x-transition:leave="transition ease-in duration-150"
-                                     x-transition:leave-start="translate-y-0 opacity-100"
-                                     x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
+                                @php($salesCount = 3 + ($hasSalesProject ? 1 : 0))
+                                <div id="sidebar-sales-menu" x-cloak class="branched-body sidebar-hide mt-1">
+                                    <div class="branched-fold">
+                                        <div class="branched-tree" style="height: {{ 12 + $salesCount * 36 }}px">
+                                            <svg class="branched-lines" width="40" height="{{ 12 + $salesCount * 36 }}" aria-hidden="true">
+                                                <path class="branched-base" d="M 14 0 V {{ 24 + 36 * ($salesCount - 1) - 10 }}" />
+                                                @for ($k = 0; $k < $salesCount; $k++)
+                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $salesIdx ? 0 : $bmLen($k) }}" />
+                                                @endfor
+                                            </svg>
                                     <a href="{{ route('sales.my-leads') }}"
                                        aria-current="{{ request()->routeIs('sales.my-leads') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('sales.my-leads') ? $navActive : $navInactive }}">
@@ -332,13 +365,15 @@
                                             <span>Project</span>
                                         </a>
                                     @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @endcan
 
                         {{-- Admin: Invoice, PO, Payment --}}
                         @can('view-admin')
-                            <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }">
+                            <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }" class="branched" :data-open="open ? '' : null">
                                 <button type="button" @click="open = !open"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-admin-menu"
@@ -350,14 +385,16 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
-                                <div id="sidebar-admin-menu" x-cloak x-show="open"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="-translate-y-1 opacity-0"
-                                     x-transition:enter-end="translate-y-0 opacity-100"
-                                     x-transition:leave="transition ease-in duration-150"
-                                     x-transition:leave-start="translate-y-0 opacity-100"
-                                     x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
+                                <div id="sidebar-admin-menu" x-cloak class="branched-body sidebar-hide mt-1">
+                                    <div class="branched-fold">
+                                        <div class="branched-tree" style="height: 120px">
+                                            <svg class="branched-lines" width="40" height="120" aria-hidden="true">
+                                                <path class="branched-base" d="M 14 0 V 86" />
+                                                @for ($k = 0; $k < 3; $k++)
+                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $adminIdx ? 0 : $bmLen($k) }}" />
+                                                @endfor
+                                            </svg>
                                     <a href="{{ route('admin.invoices.index') }}"
                                        aria-current="{{ request()->routeIs('admin.invoices.*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('admin.invoices.*') ? $navActive : $navInactive }}">
@@ -376,6 +413,8 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
                                         <span>Payment</span>
                                     </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @endcan
@@ -409,7 +448,7 @@
 
                         {{-- Admin Panel (Super Admin only) --}}
                         @can('manage-monitoring')
-                            <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }">
+                            <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }" class="branched" :data-open="open ? '' : null">
                                 <button type="button" @click="open = !open"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-admin-panel-menu"
@@ -421,14 +460,16 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
-                                <div id="sidebar-admin-panel-menu" x-cloak x-show="open"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="-translate-y-1 opacity-0"
-                                     x-transition:enter-end="translate-y-0 opacity-100"
-                                     x-transition:leave="transition ease-in duration-150"
-                                     x-transition:leave-start="translate-y-0 opacity-100"
-                                     x-transition:leave-end="-translate-y-1 opacity-0"
-                                     class="sidebar-hide mt-1 ml-4 space-y-1 border-l border-white/10 pl-3">
+                                <div id="sidebar-admin-panel-menu" x-cloak class="branched-body sidebar-hide mt-1">
+                                    <div class="branched-fold">
+                                        <div class="branched-tree" style="height: 228px">
+                                            <svg class="branched-lines" width="40" height="228" aria-hidden="true">
+                                                <path class="branched-base" d="M 14 0 V 194" />
+                                                @for ($k = 0; $k < 6; $k++)
+                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $adminPanelIdx ? 0 : $bmLen($k) }}" />
+                                                @endfor
+                                            </svg>
                                     <a href="{{ route('admin-panel.index') }}"
                                        aria-current="{{ request()->routeIs('admin-panel.index') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.index') ? $navActive : $navInactive }}">
@@ -465,6 +506,8 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
                                         <span>Audit Log</span>
                                     </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @endcan

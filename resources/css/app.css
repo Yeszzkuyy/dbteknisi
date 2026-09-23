@@ -2,6 +2,7 @@
 @import './themes/accent/terracotta.css';
 @import './themes/accent/purple.css';
 @import './themes/accent/emerald.css';
+@import './sidebar-branched.css';
 
 @tailwind base;
 @tailwind components;
