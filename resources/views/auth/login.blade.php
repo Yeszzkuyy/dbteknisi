@@ -317,8 +317,11 @@
             box-shadow: 0 0 14px rgb(var(--accent-500) / .18);
         }
 
-        .login-input:focus {
+        .login-form .login-input:focus {
             border-color: transparent;
+            outline: none;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-ring-offset-shadow: 0 0 #0000;
             background:
                 linear-gradient(var(--login-field), var(--login-field)) padding-box,
                 conic-gradient(from var(--beam-angle, 0deg), #ff2d78, #ffb800, #00e5ff, #7c5cff, #ff2d78) border-box;
@@ -461,7 +464,7 @@
             }
 
             .login-page { animation: beam-spin 10s linear infinite, beam-spin-chase 16s linear infinite; }
-            .login-input:focus { animation: beam-spin 6s linear infinite; }
+            .login-form .login-input:focus { animation: beam-spin 6s linear infinite; }
 
             .login-brand { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) backwards; }
             .login-visual h2 { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .08s backwards; }
