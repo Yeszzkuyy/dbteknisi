@@ -44,6 +44,10 @@
         html, body { min-height: 100%; margin: 0; }
 
         body {
+            display: grid;
+            min-height: 100dvh;
+            padding: 2rem 1.25rem;
+            place-items: center;
             background: var(--login-surface);
             color: var(--login-text);
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -51,45 +55,54 @@
             text-rendering: optimizeLegibility;
         }
 
-        .login-page {
-            display: grid;
-            grid-template-columns: minmax(0, 55%) minmax(22rem, 45%);
-            min-height: 100dvh;
-            overflow: hidden;
-            background: var(--login-surface);
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(ellipse 60% 45% at 50% 42%, rgb(var(--accent-500) / .14), transparent 70%);
+            content: "";
+            pointer-events: none;
         }
+
+        .dark body::before { opacity: .5; }
+
+        .login-particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .login-page {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            width: min(72rem, 100%);
+            overflow: hidden;
+            grid-template-columns: minmax(0, 45%) minmax(0, 55%);
+            border-radius: 1.75rem;
+            background: var(--login-surface);
+            box-shadow: 0 24px 80px -24px rgb(var(--accent-950) / .35), 0 4px 16px rgb(var(--accent-950) / .12);
+        }
+
+        .dark .login-page { box-shadow: 0 24px 80px -24px rgb(0 0 0 / .6); }
 
         .login-visual {
             position: relative;
             display: flex;
-            min-height: 100dvh;
+            min-height: 100%;
             order: 1;
             flex-direction: column;
             overflow: hidden;
-            padding: clamp(2rem, 5vw, 5.5rem) clamp(1.5rem, 6vw, 6rem) clamp(1.75rem, 4vw, 3.5rem);
+            padding: clamp(2rem, 4vw, 3.5rem);
             isolation: isolate;
             color: #f8fafc;
             background:
                 linear-gradient(135deg, rgb(var(--accent-950) / 1), rgb(var(--accent-900) / .93)),
                 var(--login-panel);
         }
-
-        .login-visual::before {
-            position: absolute;
-            inset: 0;
-            z-index: -2;
-            background:
-                linear-gradient(33deg, transparent 0 47%, rgb(var(--accent-300) / .055) 47.15% 47.3%, transparent 47.45% 100%),
-                linear-gradient(147deg, transparent 0 53%, rgb(var(--accent-300) / .045) 53.15% 53.3%, transparent 53.45% 100%),
-                repeating-linear-gradient(90deg, transparent 0 4.5rem, rgb(var(--accent-300) / .035) 4.55rem 4.6rem, transparent 4.65rem 9rem);
-            content: "";
-            opacity: .9;
-            -webkit-mask-image: linear-gradient(to right, #000 0%, #000 58%, transparent 92%);
-            mask-image: linear-gradient(to right, #000 0%, #000 58%, transparent 92%);
-        }
-
-        .login-visual-content,
-        .login-visual-footer { position: relative; z-index: 1; }
 
         .login-brand {
             display: inline-flex;
@@ -129,132 +142,41 @@
             text-transform: uppercase;
         }
 
-        .login-visual-copy { max-width: 30rem; margin-top: clamp(4rem, 11vh, 8rem); }
-
-        .login-kicker {
-            margin: 0;
-            color: rgb(147 197 253 / .82);
-            font-size: .68rem;
-            font-weight: 700;
-            letter-spacing: .16em;
-            line-height: 1.4;
-            text-transform: uppercase;
-        }
-
-        .login-visual-copy h2 {
-            max-width: 24rem;
-            margin: .85rem 0 0;
+        .login-visual h2 {
+            max-width: 22rem;
+            margin: clamp(2rem, 6vh, 4rem) 0 0;
             color: #f8fafc;
-            font-size: clamp(1.8rem, 3.5vw, 3.2rem);
+            font-size: clamp(1.6rem, 2.6vw, 2.4rem);
             font-weight: 700;
-            letter-spacing: -.055em;
-            line-height: 1.06;
+            letter-spacing: -.05em;
+            line-height: 1.12;
         }
 
-        .login-visual-copy p:last-child {
-            max-width: 25rem;
-            margin: 1.1rem 0 0;
-            color: rgb(226 232 240 / .7);
-            font-size: .9rem;
-            line-height: 1.7;
-        }
-
-        .login-topology-wrap {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: min(92%, 42rem);
-            margin: auto auto 0;
-            padding: 1rem 0 0;
-        }
-
-        .login-topology {
+        .login-illustration {
             display: block;
-            width: 100%;
+            width: min(100%, 26rem);
             height: auto;
-            max-height: 34vh;
-            color: rgb(147 197 253 / .78);
-            object-fit: contain;
+            margin: auto auto 0;
+            padding-top: clamp(1.5rem, 4vh, 3rem);
+            filter: drop-shadow(0 18px 32px rgb(2 6 23 / .35));
         }
-
-        .topology-grid { color: rgb(191 219 254 / .12); }
-        .topology-structure { color: rgb(191 219 254 / .5); }
-        .topology-node { fill: rgb(147 197 253 / .9); stroke: var(--login-panel); stroke-width: 5; }
-        .topology-node.is-primary { fill: rgb(var(--accent-400) / 1); }
-        .topology-module { fill: rgb(var(--accent-950) / .4); stroke: rgb(191 219 254 / .48); }
-        .topology-flow {
-            stroke: rgb(147 197 253 / .85);
-            stroke-dasharray: 3 13;
-            animation: topology-flow 12s linear infinite;
-        }
-
-        .topology-node { transition: fill .5s ease; }
-        .topology-labels { font-family: 'Plus Jakarta Sans', sans-serif; }
-
-        .login-topology-wrap {
-            transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
-            transition: transform .7s cubic-bezier(.16, 1, .3, 1);
-        }
-
-        .login-page.is-typing .topology-flow { animation-duration: 4s; }
-        .login-page.is-typing .topology-node { fill: rgb(191 219 254 / 1); }
-        .login-page.is-typing .topology-node.is-primary { fill: rgb(var(--accent-300) / 1); }
-
-        .login-visual-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-top: 1.25rem;
-            padding-right: clamp(1.25rem, 4vw, 3rem);
-            color: rgb(191 219 254 / .58);
-            font-size: .68rem;
-            font-weight: 600;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-        }
-
-        .login-visual-footer span:last-child { color: rgb(226 232 240 / .38); }
 
         .login-form-panel {
             position: relative;
             display: flex;
             min-width: 0;
-            min-height: 100dvh;
-            z-index: 2;
             order: 2;
             align-items: center;
             justify-content: center;
-            padding: clamp(2rem, 6vw, 6rem);
+            padding: clamp(2.5rem, 5vw, 4.5rem) clamp(2rem, 5vw, 4rem);
             isolation: isolate;
             background: var(--login-surface);
         }
 
-        .login-form-panel::before {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: min(58%, 34rem);
-            z-index: 0;
-            background:
-                linear-gradient(120deg, transparent 0 35%, rgb(var(--accent-600) / .08) 35.2% 35.35%, transparent 35.55% 100%),
-                linear-gradient(28deg, transparent 0 58%, rgb(var(--accent-500) / .055) 58.2% 58.35%, transparent 58.55% 100%),
-                repeating-linear-gradient(135deg, transparent 0 2.7rem, rgb(var(--accent-600) / .035) 2.75rem 2.8rem, transparent 2.85rem 5.6rem);
-            content: "";
-            opacity: .75;
-            pointer-events: none;
-            -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 26%, transparent 96%);
-            mask-image: linear-gradient(to bottom, #000 0%, #000 26%, transparent 96%);
-        }
-
-        .login-cloud path { fill: var(--login-surface); }
-
         .login-form-inner {
             position: relative;
             z-index: 1;
-            width: min(100%, 25rem);
+            width: min(100%, 26rem);
         }
 
         .login-header { margin-bottom: 2.2rem; }
@@ -271,7 +193,7 @@
         .login-header p {
             margin: .7rem 0 0;
             color: var(--login-muted);
-            font-size: .9rem;
+            font-size: .95rem;
             line-height: 1.6;
         }
 
@@ -302,7 +224,7 @@
 
         .login-label {
             color: var(--login-text);
-            font-size: .78rem;
+            font-size: .85rem;
             font-weight: 700;
             letter-spacing: -.01em;
         }
@@ -312,15 +234,15 @@
         .login-input {
             display: block;
             width: 100%;
-            min-height: 3rem;
-            padding: .72rem .85rem;
+            min-height: 3.4rem;
+            padding: .85rem 1rem;
             border: 1px solid var(--login-border);
             border-radius: .55rem;
             outline: none;
             color: var(--login-text);
             background: var(--login-field);
             font: inherit;
-            font-size: .87rem;
+            font-size: 1rem;
             line-height: 1.5;
             transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
         }
@@ -351,7 +273,7 @@
             background: transparent;
             cursor: pointer;
             font: inherit;
-            font-size: .72rem;
+            font-size: .8rem;
             font-weight: 700;
         }
 
@@ -359,7 +281,7 @@
 
         .login-link {
             color: var(--login-accent);
-            font-size: .76rem;
+            font-size: .82rem;
             font-weight: 700;
             text-decoration: none;
             text-underline-offset: 3px;
@@ -371,7 +293,7 @@
             margin: 0;
             padding: 0;
             color: rgb(var(--semantic-danger) / 1);
-            font-size: .75rem;
+            font-size: .8rem;
             line-height: 1.45;
             list-style: none;
         }
@@ -390,7 +312,7 @@
             align-items: center;
             gap: .55rem;
             color: var(--login-muted);
-            font-size: .78rem;
+            font-size: .82rem;
             cursor: pointer;
             user-select: none;
         }
@@ -406,17 +328,17 @@
         .login-submit {
             display: inline-flex;
             width: 100%;
-            min-height: 3rem;
+            min-height: 3.4rem;
             align-items: center;
             justify-content: center;
-            padding: .72rem 1rem;
+            padding: .85rem 1rem;
             border: 1px solid var(--login-accent);
             border-radius: .55rem;
             color: #f8fafc;
             background: var(--login-accent);
             cursor: pointer;
             font: inherit;
-            font-size: .83rem;
+            font-size: .95rem;
             font-weight: 700;
             letter-spacing: .01em;
             transition: background-color 180ms ease, border-color 180ms ease, transform 120ms ease, box-shadow 180ms ease;
@@ -434,7 +356,7 @@
         .login-register {
             margin: 1.35rem 0 0;
             color: var(--login-muted);
-            font-size: .78rem;
+            font-size: .82rem;
             line-height: 1.5;
             text-align: center;
         }
@@ -446,10 +368,6 @@
             outline-offset: 2px;
         }
 
-        @keyframes topology-flow {
-            to { stroke-dashoffset: -192; }
-        }
-
         @media (prefers-reduced-motion: no-preference) {
             @keyframes login-rise {
                 from { opacity: 0; transform: translateY(14px); }
@@ -457,31 +375,25 @@
             }
 
             .login-brand { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) backwards; }
-            .login-visual-copy { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .08s backwards; }
+            .login-visual h2 { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .08s backwards; }
+            .login-illustration { animation: login-rise .6s cubic-bezier(.16, 1, .3, 1) .16s backwards; }
             .login-form-inner { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .1s backwards; }
-            .login-topology-wrap { animation: login-rise .6s cubic-bezier(.16, 1, .3, 1) .16s backwards; }
         }
 
         @media (max-width: 1023px) {
-            .login-page { grid-template-columns: minmax(18rem, 55%) minmax(18rem, 45%); }
-            .login-visual { padding-inline: clamp(1.5rem, 4vw, 3rem); }
-            .login-visual-copy { margin-top: clamp(3rem, 8vh, 5rem); }
-            .login-visual-copy h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
-            .login-topology-wrap { margin-top: 2rem; }
-            .login-form-panel { padding-inline: clamp(1.5rem, 5vw, 4rem); }
+            .login-visual { padding: clamp(1.75rem, 4vw, 2.75rem); }
+            .login-form-panel { padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 3rem); }
         }
 
         @media (max-width: 767px) {
-            .login-page { display: flex; flex-direction: column; min-height: 100dvh; }
-            .login-visual { min-height: 13.5rem; order: 2; padding: 1.5rem 1.25rem 1.2rem; }
+            body { padding: 1.25rem .9rem; }
+
+            .login-page { grid-template-columns: 1fr; border-radius: 1.25rem; }
+            .login-visual { min-height: 0; order: 2; padding: 1.75rem 1.5rem 1.5rem; }
+            .login-visual h2 { margin-top: 1.4rem; font-size: 1.5rem; }
             .login-brand-mark { width: 3.5rem; height: 2.35rem; }
-            .login-visual-copy { max-width: 19rem; margin-top: 2.1rem; }
-            .login-visual-copy h2 { margin-top: .55rem; font-size: 1.65rem; }
-            .login-visual-copy p:last-child { display: none; }
-            .login-topology-wrap { position: absolute; right: -4rem; bottom: -1.3rem; width: 19rem; margin: 0; opacity: .72; }
-            .login-visual-footer { margin-top: auto; font-size: .6rem; }
-            .login-form-panel { min-height: 0; order: 1; align-items: flex-start; padding: 2.5rem 1.25rem 2rem; }
-            .login-cloud { display: none; }
+            .login-illustration { width: min(100%, 20rem); padding-top: 1.25rem; }
+            .login-form-panel { min-height: 0; order: 1; align-items: flex-start; padding: 2.25rem 1.5rem 2rem; }
             .login-header { margin-bottom: 1.9rem; }
         }
 
@@ -496,81 +408,30 @@
     </style>
 </head>
 <body>
+    <canvas class="login-particles" aria-hidden="true"></canvas>
     <main class="login-page">
         <section class="login-visual" aria-labelledby="visual-title">
-            <div class="login-visual-content">
-                <div class="login-brand">
-                    <picture>
-                        <source srcset="{{ asset('images/logo/logo-256.webp') }}" type="image/webp">
-                        <img class="login-brand-mark" src="{{ asset('images/logo/logo.png') }}" alt="">
-                    </picture>
-                    <div class="login-brand-copy">
-                        <span class="login-brand-name">3DY App</span>
-                        <span class="login-brand-group">Tridaya Group</span>
-                    </div>
-                </div>
-
-                <div class="login-visual-copy">
-                    <p class="login-kicker">Operational intelligence platform</p>
-                    <h2 id="visual-title">Technical operations, connected.</h2>
-                    <p>One workspace for teams across sales, projects, finance, and field operations.</p>
+            <div class="login-brand">
+                <picture>
+                    <source srcset="{{ asset('images/logo/logo-256.webp') }}" type="image/webp">
+                    <img class="login-brand-mark" src="{{ asset('images/logo/logo.png') }}" alt="">
+                </picture>
+                <div class="login-brand-copy">
+                    <span class="login-brand-name">3DY App</span>
+                    <span class="login-brand-group">Tridaya Group</span>
                 </div>
             </div>
 
-            <div class="login-topology-wrap" aria-hidden="true">
-                <svg class="login-topology" viewBox="0 0 680 460" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g class="topology-grid" stroke="currentColor" stroke-width="1">
-                        <path d="M40 64H640M40 128H640M40 192H640M40 256H640M40 320H640M40 384H640" />
-                        <path d="M104 24V424M168 24V424M232 24V424M296 24V424M360 24V424M424 24V424M488 24V424M552 24V424M616 24V424" />
-                    </g>
-                    <g class="topology-structure" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M74 332L194 332L270 252L360 252L448 158L590 158" />
-                        <path d="M120 118L218 118L284 188L360 188L432 274L560 274" />
-                        <path d="M194 332L194 382M270 252V336M360 188V252M448 158V84M560 274V354" />
-                        <path d="M74 332V284H148M590 158V108H536" />
-                    </g>
-                    <path class="topology-flow" d="M74 332L194 332L270 252L360 252L448 158L590 158" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                    <g class="topology-module" stroke-width="2">
-                        <rect x="44" y="262" width="92" height="44" rx="6" />
-                        <rect x="152" y="356" width="84" height="42" rx="6" />
-                        <rect x="230" y="210" width="80" height="44" rx="6" />
-                        <rect x="320" y="156" width="80" height="44" rx="6" />
-                        <rect x="416" y="62" width="82" height="44" rx="6" />
-                        <rect x="524" y="326" width="92" height="44" rx="6" />
-                        <rect x="540" y="136" width="92" height="44" rx="6" />
-                    </g>
-                    <g class="topology-node">
-                        <circle cx="74" cy="332" r="7" />
-                        <circle cx="194" cy="332" r="7" />
-                        <circle cx="270" cy="252" r="7" />
-                        <circle cx="360" cy="252" r="8" class="is-primary" />
-                        <circle cx="448" cy="158" r="7" />
-                        <circle cx="590" cy="158" r="7" />
-                    </g>
-                    <g fill="currentColor" opacity=".5">
-                        <circle cx="148" cy="118" r="3" />
-                        <circle cx="560" cy="274" r="3" />
-                        <circle cx="360" cy="188" r="3" />
-                        <circle cx="448" cy="84" r="3" />
-                    </g>
-                    <g class="topology-labels" fill="rgb(191 219 254 / .6)" font-size="13" font-weight="600" letter-spacing="2">
-                        <text x="74" y="357" text-anchor="middle">LEAD</text>
-                        <text x="194" y="315" text-anchor="middle">PROJECT</text>
-                        <text x="282" y="272" text-anchor="start">INSTALASI</text>
-                        <text x="348" y="240" text-anchor="end">INVOICE</text>
-                        <text x="436" y="162" text-anchor="end">PAYMENT</text>
-                        <text x="590" y="198" text-anchor="middle">LUNAS</text>
-                    </g>
-                </svg>
-            </div>
+            <h2 id="visual-title">Technical operations, connected.</h2>
 
-            <footer class="login-visual-footer">
-                <span>Tridaya Group</span>
-                <span>3DY App</span>
-            </footer>
-            <svg class="login-cloud absolute inset-y-0 right-0 h-full w-16 z-10" viewBox="0 0 64 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                <path d="M0,0 L64,0 L64,400 C64,400 44,370 64,340 C84,310 44,280 64,250 C84,220 44,190 64,160 C84,130 44,100 64,70 C84,40 64,10 64,0 Z" />
-            </svg>
+            <img
+                class="login-illustration"
+                src="{{ asset('images/Login-Page/AssetIlustrasi.png') }}"
+                alt=""
+                aria-hidden="true"
+                loading="eager"
+                decoding="async"
+            >
         </section>
 
         <section class="login-form-panel" aria-labelledby="login-title">
@@ -680,32 +541,53 @@
     </main>
     <script>
         (() => {
-            const page = document.querySelector('.login-page');
-            const wrap = document.querySelector('.login-topology-wrap');
-            if (!page) return;
+            const canvas = document.querySelector('.login-particles');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
             const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            if (!reduce && wrap && window.matchMedia('(pointer: fine)').matches) {
-                let raf = 0;
-                page.addEventListener('mousemove', (e) => {
-                    if (raf) return;
-                    raf = requestAnimationFrame(() => {
-                        raf = 0;
-                        const r = page.getBoundingClientRect();
-                        const x = (e.clientX - r.left) / r.width - 0.5;
-                        const y = (e.clientY - r.top) / r.height - 0.5;
-                        wrap.style.setProperty('--px', (x * 12).toFixed(2) + 'px');
-                        wrap.style.setProperty('--py', (y * 10).toFixed(2) + 'px');
-                    });
-                });
-                page.addEventListener('mouseleave', () => {
-                    wrap.style.setProperty('--px', '0px');
-                    wrap.style.setProperty('--py', '0px');
-                });
-            }
-            page.querySelectorAll('.login-input').forEach((el) => {
-                el.addEventListener('focus', () => page.classList.add('is-typing'));
-                el.addEventListener('blur', () => page.classList.remove('is-typing'));
-            });
+            const accent = (getComputedStyle(document.documentElement).getPropertyValue('--accent-500').trim() || '59 130 246').split(/\s+/).join(',');
+
+            let W = 0, H = 0, dots = [], raf = 0;
+
+            const seed = () => {
+                const count = Math.min(90, Math.floor((W * H) / 22000));
+                dots = Array.from({ length: count }, () => ({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    r: .8 + Math.random() * 1.4,
+                    vx: (Math.random() - .5) * .22,
+                    vy: (Math.random() - .5) * .22,
+                    a: .15 + Math.random() * .35,
+                }));
+            };
+
+            const size = () => {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                W = window.innerWidth;
+                H = window.innerHeight;
+                canvas.width = Math.round(W * dpr);
+                canvas.height = Math.round(H * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                seed();
+            };
+
+            const frame = () => {
+                ctx.clearRect(0, 0, W, H);
+                for (const d of dots) {
+                    d.x = (d.x + d.vx + W) % W;
+                    d.y = (d.y + d.vy + H) % H;
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${accent},${d.a.toFixed(2)})`;
+                    ctx.fill();
+                }
+                if (!reduce && !document.hidden) raf = requestAnimationFrame(frame);
+            };
+
+            size();
+            frame();
+            window.addEventListener('resize', () => { size(); if (reduce) frame(); });
         })();
     </script>
 </body>
