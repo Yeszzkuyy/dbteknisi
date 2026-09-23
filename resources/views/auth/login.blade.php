@@ -142,9 +142,9 @@
             padding: clamp(.9rem, 2vw, 1.5rem);
             background:
                 linear-gradient(var(--login-surface), var(--login-surface)) padding-box,
-                conic-gradient(from var(--beam-angle, 0deg), transparent 0 70%, var(--aurora-glow) 82%, transparent 94%) border-box,
-                conic-gradient(from var(--beam-angle-2, 180deg), transparent 0 70%, var(--aurora-glow) 82%, transparent 94%) border-box;
-            box-shadow: 0 24px 80px -24px rgb(var(--accent-950) / .35), 0 4px 16px rgb(var(--accent-950) / .12);
+                conic-gradient(from var(--beam-angle, 0deg), transparent 0 55%, var(--aurora-glow) 70%, #fff 82%, transparent 95%) border-box,
+                conic-gradient(from var(--beam-angle-2, 180deg), transparent 0 55%, var(--aurora-glow) 70%, #fff 82%, transparent 95%) border-box;
+            box-shadow: 0 24px 80px -24px rgb(var(--accent-950) / .35), 0 4px 16px rgb(var(--accent-950) / .12), 0 0 70px -18px var(--aurora-glow);
         }
 
         .dark .login-page { box-shadow: 0 24px 80px -24px rgb(0 0 0 / .6); }
@@ -313,6 +313,14 @@
 
         .login-input::placeholder { color: var(--login-placeholder); opacity: .9; }
 
+        .login-input:-webkit-autofill,
+        .login-input:-webkit-autofill:hover,
+        .login-input:-webkit-autofill:focus {
+            -webkit-text-fill-color: var(--login-text);
+            caret-color: var(--login-text);
+            transition: background-color 9999s ease-in-out 0s;
+        }
+
         .login-input:hover {
             box-shadow: 0 0 14px rgb(var(--accent-500) / .18);
         }
@@ -338,8 +346,11 @@
             position: absolute;
             top: 50%;
             right: .55rem;
-            min-width: 3.3rem;
-            padding: .35rem .45rem;
+            display: inline-flex;
+            width: 2.5rem;
+            height: 2.5rem;
+            align-items: center;
+            justify-content: center;
             transform: translateY(-50%);
             border: 0;
             border-radius: .4rem;
@@ -347,8 +358,6 @@
             background: transparent;
             cursor: pointer;
             font: inherit;
-            font-size: .8rem;
-            font-weight: 700;
         }
 
         .login-password-toggle:hover { color: var(--login-text); background: var(--nav-hover-bg); }
@@ -592,7 +601,8 @@
                                 aria-controls="password"
                                 class="login-password-toggle"
                             >
-                                <span x-text="showPassword ? 'Hide' : 'Show'"></span>
+                                <svg x-show="!showPassword" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.3-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.3 5.5-9.5 5.5S2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="2.5" /></svg>
+                                <svg x-show="showPassword" x-cloak width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.4 10.4 0 0 1 12 5c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M6.61 6.61A13.5 13.5 0 0 0 1 13s3 6 9 6a9.7 9.7 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></svg>
                             </button>
                         </div>
                         <p id="caps-lock-warning" x-show="capsLock" x-cloak role="alert" class="login-caps-lock">Caps Lock is on</p>
