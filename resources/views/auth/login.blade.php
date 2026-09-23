@@ -46,18 +46,19 @@
         }
 
         .dark {
-            --aurora-base: #0a0f1e;
+            --aurora-base: #0f1623;
             --aurora-1: #0d2b5e;
             --aurora-2: #0e4d6e;
             --aurora-3: #0a7a6e;
             --aurora-4: #1a56db;
             --aurora-glow: #00d4ff;
-            --login-surface: #222840;
-            --login-field: #2d3454;
-            --login-border: #363d5c;
+            --login-surface: #252b40;
+            --login-field: #1e2438;
+            --login-border: #3d4870;
             --login-text: #e2e8f8;
             --login-muted: #8d96b8;
             --login-placeholder: #545d7e;
+            --login-accent: #3b82f6;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -107,6 +108,12 @@
             inherits: false;
         }
 
+        @property --beam-angle-2 {
+            syntax: '<angle>';
+            initial-value: 180deg;
+            inherits: false;
+        }
+
         .login-page {
             position: relative;
             z-index: 1;
@@ -120,7 +127,8 @@
             padding: clamp(.9rem, 2vw, 1.5rem);
             background:
                 linear-gradient(var(--login-surface), var(--login-surface)) padding-box,
-                conic-gradient(from var(--beam-angle, 0deg), transparent 0 70%, var(--aurora-glow) 82%, transparent 94%) border-box;
+                conic-gradient(from var(--beam-angle, 0deg), transparent 0 70%, var(--aurora-glow) 82%, transparent 94%) border-box,
+                conic-gradient(from var(--beam-angle-2, 180deg), transparent 0 70%, var(--aurora-glow) 82%, transparent 94%) border-box;
             box-shadow: 0 24px 80px -24px rgb(var(--accent-950) / .35), 0 4px 16px rgb(var(--accent-950) / .12);
         }
 
@@ -139,7 +147,7 @@
             isolation: isolate;
             color: #f8fafc;
             background:
-                linear-gradient(135deg, rgb(var(--accent-700) / 1), rgb(var(--accent-800) / 1)),
+                linear-gradient(135deg, #2563eb 0%, rgb(var(--accent-700) / 1) 100%),
                 var(--login-panel);
             box-shadow: inset 0 1px 0 rgb(255 255 255 / .12);
         }
@@ -277,13 +285,11 @@
             width: 100%;
             min-height: 3.4rem;
             padding: .85rem 1rem;
-            border: 1.5px solid transparent;
+            border: 1.5px solid var(--login-border);
             border-radius: .55rem;
             outline: none;
             color: var(--login-text);
-            background:
-                linear-gradient(var(--login-field), var(--login-field)) padding-box,
-                conic-gradient(from var(--beam-angle, 0deg), #ff2d78, #ffb800, #00e5ff, #7c5cff, #ff2d78) border-box;
+            background: var(--login-field);
             font: inherit;
             font-size: 1rem;
             line-height: 1.5;
@@ -293,7 +299,11 @@
         .login-input::placeholder { color: var(--login-placeholder); opacity: .9; }
 
         .login-input:focus {
-            box-shadow: 0 0 0 3px var(--login-focus), 0 0 18px rgb(var(--accent-500) / .35);
+            border-color: transparent;
+            background:
+                linear-gradient(var(--login-field), var(--login-field)) padding-box,
+                conic-gradient(from var(--beam-angle, 0deg), #ff2d78, #ffb800, #00e5ff, #7c5cff, #ff2d78) border-box;
+            box-shadow: 0 0 18px rgb(var(--accent-500) / .35);
         }
 
         .login-input[aria-invalid="true"] {
@@ -427,8 +437,12 @@
                 to { --beam-angle: 360deg; }
             }
 
-            .login-page { animation: beam-spin 10s linear infinite; }
-            .login-input { animation: beam-spin 6s linear infinite; }
+            @keyframes beam-spin-reverse {
+                to { --beam-angle-2: -180deg; }
+            }
+
+            .login-page { animation: beam-spin 10s linear infinite, beam-spin-reverse 14s linear infinite; }
+            .login-input:focus { animation: beam-spin 6s linear infinite; }
 
             .login-brand { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) backwards; }
             .login-visual h2 { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .08s backwards; }
@@ -631,9 +645,14 @@
 
             const frame = () => {
                 ctx.clearRect(0, 0, W, H);
-                for (const d of dots) {
+                for (let i = dots.length - 1; i >= 0; i--) {
+                    const d = dots[i];
                     d.x = (d.x + d.vx + W) % W;
                     d.y = (d.y + d.vy + H) % H;
+                    if (d.burst) {
+                        d.a -= .008;
+                        if (d.a <= 0) dots.splice(i, 1);
+                    }
                 }
                 ctx.lineWidth = 1;
                 for (let i = 0; i < dots.length; i++) {
@@ -662,6 +681,23 @@
             size();
             frame();
             window.addEventListener('resize', () => { size(); if (reduce) frame(); });
+            window.addEventListener('click', (e) => {
+                if (reduce || e.target.closest('.login-page')) return;
+                for (let i = 0; i < 8 && dots.length < 140; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 1 + Math.random() * 2.5;
+                    dots.push({
+                        x: e.clientX,
+                        y: e.clientY,
+                        r: .8 + Math.random() * 1.4,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        a: .3 + Math.random() * .4,
+                        burst: true,
+                    });
+                }
+                if (!raf) frame();
+            });
         })();
     </script>
 </body>
