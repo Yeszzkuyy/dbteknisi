@@ -254,7 +254,10 @@
             bottom: 0;
             width: 9rem;
             z-index: 0;
-            background: linear-gradient(90deg, var(--login-surface) 0%, var(--login-surface) 38%, transparent 100%);
+            background:
+                linear-gradient(112deg, transparent 0 31%, rgb(var(--accent-600) / .09) 31.2% 31.4%, transparent 31.6% 100%),
+                linear-gradient(164deg, transparent 0 58%, rgb(var(--accent-500) / .06) 58.2% 58.4%, transparent 58.6% 100%),
+                linear-gradient(90deg, var(--login-surface) 0%, var(--login-surface) 38%, transparent 100%);
             content: "";
             pointer-events: none;
         }
