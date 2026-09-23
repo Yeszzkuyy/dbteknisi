@@ -52,6 +52,12 @@
             --aurora-3: #0a7a6e;
             --aurora-4: #1a56db;
             --aurora-glow: #00d4ff;
+            --login-surface: #222840;
+            --login-field: #2d3454;
+            --login-border: #363d5c;
+            --login-text: #e2e8f8;
+            --login-muted: #8d96b8;
+            --login-placeholder: #545d7e;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -219,7 +225,7 @@
         .login-header h1 {
             margin: 0;
             color: var(--login-text);
-            font-size: clamp(1.75rem, 3vw, 2.35rem);
+            font-size: clamp(2.2rem, 4vw, 3rem);
             font-weight: 700;
             letter-spacing: -.05em;
             line-height: 1.12;
@@ -271,11 +277,13 @@
             width: 100%;
             min-height: 3.4rem;
             padding: .85rem 1rem;
-            border: 1px solid var(--login-border);
+            border: 1.5px solid transparent;
             border-radius: .55rem;
             outline: none;
             color: var(--login-text);
-            background: var(--login-field);
+            background:
+                linear-gradient(var(--login-field), var(--login-field)) padding-box,
+                conic-gradient(from var(--beam-angle, 0deg), #ff2d78, #ffb800, #00e5ff, #7c5cff, #ff2d78) border-box;
             font: inherit;
             font-size: 1rem;
             line-height: 1.5;
@@ -285,8 +293,7 @@
         .login-input::placeholder { color: var(--login-placeholder); opacity: .9; }
 
         .login-input:focus {
-            border-color: var(--login-accent);
-            box-shadow: 0 0 0 3px var(--login-focus);
+            box-shadow: 0 0 0 3px var(--login-focus), 0 0 18px rgb(var(--accent-500) / .35);
         }
 
         .login-input[aria-invalid="true"] {
@@ -421,6 +428,7 @@
             }
 
             .login-page { animation: beam-spin 10s linear infinite; }
+            .login-input { animation: beam-spin 6s linear infinite; }
 
             .login-brand { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) backwards; }
             .login-visual h2 { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .08s backwards; }
