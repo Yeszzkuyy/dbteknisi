@@ -200,6 +200,18 @@
             animation: topology-flow 12s linear infinite;
         }
 
+        .topology-node { transition: fill .5s ease; }
+        .topology-labels { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        .login-topology-wrap {
+            transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+            transition: transform .7s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .login-page.is-typing .topology-flow { animation-duration: 4s; }
+        .login-page.is-typing .topology-node { fill: rgb(191 219 254 / 1); }
+        .login-page.is-typing .topology-node.is-primary { fill: rgb(var(--accent-300) / 1); }
+
         .login-visual-footer {
             display: flex;
             align-items: center;
@@ -462,6 +474,18 @@
             to { stroke-dashoffset: -192; }
         }
 
+        @media (prefers-reduced-motion: no-preference) {
+            @keyframes login-rise {
+                from { opacity: 0; transform: translateY(14px); }
+                to { opacity: 1; transform: none; }
+            }
+
+            .login-brand { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) backwards; }
+            .login-visual-copy { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .08s backwards; }
+            .login-form-inner { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .1s backwards; }
+            .login-topology-wrap { animation: login-rise .6s cubic-bezier(.16, 1, .3, 1) .16s backwards; }
+        }
+
         @media (max-width: 1023px) {
             .login-page { grid-template-columns: minmax(18rem, 55%) minmax(18rem, 45%); }
             .login-visual { padding-inline: clamp(1.5rem, 4vw, 3rem); }
@@ -553,6 +577,14 @@
                         <circle cx="560" cy="274" r="3" />
                         <circle cx="360" cy="188" r="3" />
                         <circle cx="448" cy="84" r="3" />
+                    </g>
+                    <g class="topology-labels" fill="rgb(191 219 254 / .6)" font-size="13" font-weight="600" letter-spacing="2">
+                        <text x="74" y="357" text-anchor="middle">LEAD</text>
+                        <text x="194" y="315" text-anchor="middle">PROJECT</text>
+                        <text x="282" y="272" text-anchor="start">INSTALASI</text>
+                        <text x="348" y="240" text-anchor="end">INVOICE</text>
+                        <text x="436" y="162" text-anchor="end">PAYMENT</text>
+                        <text x="590" y="198" text-anchor="middle">LUNAS</text>
                     </g>
                 </svg>
             </div>
@@ -668,5 +700,35 @@
             </div>
         </section>
     </main>
+    <script>
+        (() => {
+            const page = document.querySelector('.login-page');
+            const wrap = document.querySelector('.login-topology-wrap');
+            if (!page) return;
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (!reduce && wrap && window.matchMedia('(pointer: fine)').matches) {
+                let raf = 0;
+                page.addEventListener('mousemove', (e) => {
+                    if (raf) return;
+                    raf = requestAnimationFrame(() => {
+                        raf = 0;
+                        const r = page.getBoundingClientRect();
+                        const x = (e.clientX - r.left) / r.width - 0.5;
+                        const y = (e.clientY - r.top) / r.height - 0.5;
+                        wrap.style.setProperty('--px', (x * 12).toFixed(2) + 'px');
+                        wrap.style.setProperty('--py', (y * 10).toFixed(2) + 'px');
+                    });
+                });
+                page.addEventListener('mouseleave', () => {
+                    wrap.style.setProperty('--px', '0px');
+                    wrap.style.setProperty('--py', '0px');
+                });
+            }
+            page.querySelectorAll('.login-input').forEach((el) => {
+                el.addEventListener('focus', () => page.classList.add('is-typing'));
+                el.addEventListener('blur', () => page.classList.remove('is-typing'));
+            });
+        })();
+    </script>
 </body>
 </html>
