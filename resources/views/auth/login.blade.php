@@ -249,16 +249,17 @@
             mask-image: linear-gradient(to bottom, #000 0%, #000 26%, transparent 96%);
         }
 
-        .login-form-panel::after {
+        .login-wave {
             position: absolute;
             top: 0;
-            left: -12rem;
+            left: -10rem;
             bottom: 0;
-            width: 24rem;
+            width: 20rem;
+            height: 100%;
             z-index: 0;
-            background: linear-gradient(270deg, var(--login-surface) 0%, transparent 100%);
-            content: "";
+            display: block;
             pointer-events: none;
+            filter: blur(14px);
         }
 
         .login-form-inner {
@@ -491,7 +492,7 @@
             .login-topology-wrap { position: absolute; right: -4rem; bottom: -1.3rem; width: 19rem; margin: 0; opacity: .72; }
             .login-visual-footer { margin-top: auto; font-size: .6rem; }
             .login-form-panel { min-height: 0; order: 1; align-items: flex-start; padding: 2.5rem 1.25rem 2rem; }
-            .login-form-panel::after { display: none; }
+            .login-wave { display: none; }
             .login-header { margin-bottom: 1.9rem; }
         }
 
@@ -581,6 +582,15 @@
         </section>
 
         <section class="login-form-panel" aria-labelledby="login-title">
+            <svg class="login-wave" viewBox="0 0 200 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <defs>
+                    <linearGradient id="loginWaveFill" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" style="stop-color: rgb(var(--accent-950))" />
+                        <stop offset="1" style="stop-color: rgb(var(--accent-900) / .93)" />
+                    </linearGradient>
+                </defs>
+                <path d="M0,0 L145,0 C115,170 175,330 140,500 C105,670 170,830 150,1000 L0,1000 Z" fill="url(#loginWaveFill)" />
+            </svg>
             <div class="login-form-inner">
                 <header class="login-header">
                     <h1 id="login-title">Welcome back</h1>
