@@ -84,19 +84,8 @@
                 repeating-linear-gradient(90deg, transparent 0 4.5rem, rgb(var(--accent-300) / .035) 4.55rem 4.6rem, transparent 4.65rem 9rem);
             content: "";
             opacity: .9;
-        }
-
-        .login-visual::after {
-            position: absolute;
-            right: -13rem;
-            bottom: -14rem;
-            z-index: -1;
-            width: 34rem;
-            height: 34rem;
-            border: 1px solid rgb(var(--accent-300) / .14);
-            border-radius: 50%;
-            box-shadow: 0 0 0 3rem rgb(var(--accent-300) / .025), 0 0 0 7rem rgb(var(--accent-300) / .02);
-            content: "";
+            -webkit-mask-image: linear-gradient(to right, #000 0%, #000 58%, transparent 92%);
+            mask-image: linear-gradient(to right, #000 0%, #000 58%, transparent 92%);
         }
 
         .login-visual-content,
@@ -263,13 +252,11 @@
         .login-form-panel::after {
             position: absolute;
             top: 0;
-            left: -18rem;
+            left: -12rem;
             bottom: 0;
-            width: 22rem;
+            width: 24rem;
             z-index: 0;
-            background:
-                radial-gradient(ellipse 90% 75% at 0% 50%, rgb(var(--accent-950) / .06) 0%, transparent 75%),
-                linear-gradient(270deg, var(--login-surface) 0%, var(--login-surface) 38%, transparent 100%);
+            background: linear-gradient(270deg, var(--login-surface) 0%, transparent 100%);
             content: "";
             pointer-events: none;
         }
@@ -497,7 +484,6 @@
         @media (max-width: 767px) {
             .login-page { display: flex; flex-direction: column; min-height: 100dvh; }
             .login-visual { min-height: 13.5rem; order: 2; padding: 1.5rem 1.25rem 1.2rem; }
-            .login-visual::after { right: -14rem; bottom: -20rem; }
             .login-brand-mark { width: 3.5rem; height: 2.35rem; }
             .login-visual-copy { max-width: 19rem; margin-top: 2.1rem; }
             .login-visual-copy h2 { margin-top: .55rem; font-size: 1.65rem; }
