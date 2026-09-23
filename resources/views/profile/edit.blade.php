@@ -1,19 +1,12 @@
 <x-app-layout>
-    <div class="mx-auto max-w-4xl space-y-6 tab-container">
+    <div class="w-full space-y-6 tab-container">
         {{-- Header --}}
-        <div class="flex items-center gap-4">
-            <a href="{{ route('dashboard') }}"
-               title="{{ __('Kembali ke dashboard') }}"
-               class="group inline-flex shrink-0 items-center gap-1.5 rounded-xl p-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">
-                <svg class="h-4 w-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-                {{ __('Kembali') }}
-            </a>
+        <div class="mb-6 flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-slate-800 sm:text-3xl dark:text-white">{{ __('Profil') }}</h1>
-                <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{{ __('Informasi akun Anda') }}</p>
+                <h1 class="text-3xl font-bold text-slate-800 dark:text-white">{{ __('Profil') }}</h1>
+                <p class="mt-1 text-slate-500 dark:text-slate-400">{{ __('Informasi akun Anda') }}</p>
             </div>
+            <x-icon-button as="a" icon="back" href="{{ route('dashboard') }}" title="{{ __('Kembali') }}" />
         </div>
 
         <x-profile-tabs />
