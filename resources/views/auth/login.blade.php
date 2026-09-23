@@ -175,8 +175,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: min(100%, 48rem);
-            margin: auto 0 0 auto;
+            width: min(92%, 42rem);
+            margin: auto auto 0;
             padding: 1rem 0 0;
         }
 
@@ -206,6 +206,7 @@
             justify-content: space-between;
             gap: 1rem;
             margin-top: 1.25rem;
+            padding-right: clamp(1.25rem, 4vw, 3rem);
             color: rgb(191 219 254 / .58);
             font-size: .68rem;
             font-weight: 600;
@@ -250,14 +251,14 @@
         .login-form-panel::after {
             position: absolute;
             top: 0;
-            left: -7rem;
+            left: -13rem;
             bottom: 0;
-            width: 9rem;
+            width: 16rem;
             z-index: 0;
             background:
-                linear-gradient(68deg, transparent 0 31%, rgb(var(--accent-600) / .09) 31.2% 31.4%, transparent 31.6% 100%),
-                linear-gradient(16deg, transparent 0 58%, rgb(var(--accent-500) / .06) 58.2% 58.4%, transparent 58.6% 100%),
-                linear-gradient(270deg, var(--login-surface) 0%, var(--login-surface) 38%, transparent 100%);
+                linear-gradient(68deg, transparent 0 31%, rgb(var(--accent-600) / .07) 31.2% 31.4%, transparent 31.6% 100%),
+                linear-gradient(16deg, transparent 0 58%, rgb(var(--accent-500) / .05) 58.2% 58.4%, transparent 58.6% 100%),
+                linear-gradient(270deg, var(--login-surface) 0%, var(--login-surface) 28%, rgb(var(--accent-950) / .07) 58%, rgb(var(--accent-950) / .03) 76%, transparent 100%);
             content: "";
             pointer-events: none;
         }
