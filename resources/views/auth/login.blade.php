@@ -27,7 +27,7 @@
         [x-cloak] { display: none !important; }
 
         :root {
-            --login-panel: rgb(var(--accent-950) / 1);
+            --login-panel: rgb(var(--accent-800) / 1);
             --login-accent: rgb(var(--accent-600) / 1);
             --login-accent-hover: rgb(var(--accent-700) / 1);
             --login-surface: var(--bg);
@@ -79,7 +79,8 @@
             position: relative;
             z-index: 1;
             display: grid;
-            width: min(72rem, 100%);
+            width: min(80rem, 100%);
+            min-height: min(40rem, calc(100dvh - 4rem));
             overflow: hidden;
             grid-template-columns: minmax(0, 45%) minmax(0, 55%);
             border-radius: 1.75rem;
@@ -100,7 +101,7 @@
             isolation: isolate;
             color: #f8fafc;
             background:
-                linear-gradient(135deg, rgb(var(--accent-950) / 1), rgb(var(--accent-900) / .93)),
+                linear-gradient(135deg, rgb(var(--accent-700) / 1), rgb(var(--accent-800) / 1)),
                 var(--login-panel);
         }
 
@@ -158,6 +159,7 @@
             height: auto;
             margin: auto auto 0;
             padding-top: clamp(1.5rem, 4vh, 3rem);
+            border-radius: 1.25rem;
             filter: drop-shadow(0 18px 32px rgb(2 6 23 / .35));
         }
 
@@ -388,7 +390,7 @@
         @media (max-width: 767px) {
             body { padding: 1.25rem .9rem; }
 
-            .login-page { grid-template-columns: 1fr; border-radius: 1.25rem; }
+            .login-page { grid-template-columns: 1fr; border-radius: 1.25rem; min-height: 0; }
             .login-visual { min-height: 0; order: 2; padding: 1.75rem 1.5rem 1.5rem; }
             .login-visual h2 { margin-top: 1.4rem; font-size: 1.5rem; }
             .login-brand-mark { width: 3.5rem; height: 2.35rem; }
