@@ -57,9 +57,13 @@
 
         body::before {
             position: fixed;
-            inset: 0;
+            inset: -5%;
             z-index: 0;
-            background: radial-gradient(ellipse 60% 45% at 50% 42%, rgb(var(--accent-500) / .14), transparent 70%);
+            background:
+                radial-gradient(ellipse 45% 35% at 15% 20%, rgb(var(--accent-400) / .20), transparent 70%),
+                radial-gradient(ellipse 50% 40% at 85% 15%, rgb(var(--accent-300) / .16), transparent 70%),
+                radial-gradient(ellipse 55% 45% at 50% 90%, rgb(var(--accent-600) / .14), transparent 70%),
+                radial-gradient(ellipse 60% 45% at 50% 42%, rgb(var(--accent-500) / .10), transparent 70%);
             content: "";
             pointer-events: none;
         }
@@ -376,6 +380,13 @@
                 to { opacity: 1; transform: none; }
             }
 
+            @keyframes aurora-drift {
+                from { transform: translate3d(-1.5%, -1%, 0) scale(1); }
+                to { transform: translate3d(1.5%, 1%, 0) scale(1.04); }
+            }
+
+            body::before { animation: aurora-drift 26s ease-in-out infinite alternate; }
+
             .login-brand { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) backwards; }
             .login-visual h2 { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .08s backwards; }
             .login-illustration { animation: login-rise .6s cubic-bezier(.16, 1, .3, 1) .16s backwards; }
@@ -553,14 +564,14 @@
             let W = 0, H = 0, dots = [], raf = 0;
 
             const seed = () => {
-                const count = Math.min(90, Math.floor((W * H) / 22000));
+                const count = Math.min(80, Math.floor((W * H) / 26000));
                 dots = Array.from({ length: count }, () => ({
                     x: Math.random() * W,
                     y: Math.random() * H,
-                    r: .8 + Math.random() * 1.4,
+                    r: .6 + Math.random() * 1,
                     vx: (Math.random() - .5) * .22,
                     vy: (Math.random() - .5) * .22,
-                    a: .15 + Math.random() * .35,
+                    a: .12 + Math.random() * .28,
                 }));
             };
 
@@ -579,6 +590,23 @@
                 for (const d of dots) {
                     d.x = (d.x + d.vx + W) % W;
                     d.y = (d.y + d.vy + H) % H;
+                }
+                ctx.lineWidth = 1;
+                for (let i = 0; i < dots.length; i++) {
+                    for (let j = i + 1; j < dots.length; j++) {
+                        const dx = dots[i].x - dots[j].x;
+                        const dy = dots[i].y - dots[j].y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < 140) {
+                            ctx.strokeStyle = `rgba(${accent},${((1 - dist / 140) * .22).toFixed(2)})`;
+                            ctx.beginPath();
+                            ctx.moveTo(dots[i].x, dots[i].y);
+                            ctx.lineTo(dots[j].x, dots[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                for (const d of dots) {
                     ctx.beginPath();
                     ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(${accent},${d.a.toFixed(2)})`;
