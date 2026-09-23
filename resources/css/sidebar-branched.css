@@ -12,6 +12,12 @@
     --bm-ease: cubic-bezier(0.23, 1, 0.32, 1);
     --bm-row: 36px;
     --bm-indent: 40px;
+    /* Garis dicampur dari warna teks nav → kontras terjamin di light & dark.
+       (Pakai --sidebar-border-soft terlalu samar, nyaris tak terlihat.) */
+    --bm-line: color-mix(in srgb, var(--nav-muted) 65%, var(--sidebar-bg));
+}
+.dark .sidebar .branched {
+    --bm-line: color-mix(in srgb, var(--nav-muted) 75%, var(--sidebar-bg));
 }
 
 /* Lipatan: 0fr (tutup) <-> 1fr (buka) */
@@ -64,7 +70,7 @@
     stroke-linejoin: round;
 }
 .sidebar .branched-base {
-    stroke: var(--sidebar-border-soft);
+    stroke: var(--bm-line);
 }
 .sidebar .branched-reach {
     stroke: rgb(var(--accent-500) / 1);
