@@ -12,535 +12,670 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet">
 
+    <script>
+        (() => {
+            let mode = 'system';
+            try { mode = localStorage.getItem('appearance-mode') || 'system'; } catch (error) {}
+            const dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', dark);
+        })();
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         [x-cloak] { display: none !important; }
 
         :root {
-            --login-blue:     #2563eb;
-            --login-blue-mid: #3b52d9;
-            --login-ink:      #111827;
-            --login-muted:    #6b7280;
-            --login-border:   #d1d5db;
-            --panel-from:     #1a1464;
-            --panel-mid:      #2d27b8;
-            --panel-to:       #4338ca;
+            --login-panel: rgb(var(--accent-950) / 1);
+            --login-accent: rgb(var(--accent-600) / 1);
+            --login-accent-hover: rgb(var(--accent-700) / 1);
+            --login-surface: var(--bg);
+            --login-field: var(--card-bg);
+            --login-border: var(--input-border);
+            --login-text: var(--text-primary);
+            --login-muted: var(--text-secondary);
+            --login-placeholder: var(--text-muted);
+            --login-focus: rgb(var(--accent-500) / .28);
         }
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body { min-height: 100%; margin: 0; }
 
         body {
+            background: var(--login-surface);
+            color: var(--login-text);
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
-        /* ================= LAYOUT ================= */
-        .login-page { min-height: 100dvh; display: flex; }
-
-        .login-shell {
+        .login-page {
             display: grid;
-            width: 100%;
+            grid-template-columns: minmax(22rem, 45%) minmax(0, 55%);
             min-height: 100dvh;
-            grid-template-columns: 40% 60%;
             overflow: hidden;
-            background: #ffffff;
+            background: var(--login-surface);
         }
 
-        /* ================= PANEL KIRI — FORM ================= */
-        .login-form-panel {
+        .login-visual {
+            position: relative;
+            display: flex;
+            min-height: 100dvh;
+            order: 2;
+            flex-direction: column;
+            overflow: hidden;
+            padding: clamp(2rem, 5vw, 5.5rem) clamp(1.5rem, 6vw, 6rem) clamp(1.75rem, 4vw, 3.5rem);
+            isolation: isolate;
+            color: #f8fafc;
+            background:
+                linear-gradient(135deg, rgb(var(--accent-950) / 1), rgb(var(--accent-900) / .93)),
+                var(--login-panel);
+        }
+
+        .login-visual::before {
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            background:
+                linear-gradient(33deg, transparent 0 47%, rgb(var(--accent-300) / .055) 47.15% 47.3%, transparent 47.45% 100%),
+                linear-gradient(147deg, transparent 0 53%, rgb(var(--accent-300) / .045) 53.15% 53.3%, transparent 53.45% 100%),
+                repeating-linear-gradient(90deg, transparent 0 4.5rem, rgb(var(--accent-300) / .035) 4.55rem 4.6rem, transparent 4.65rem 9rem);
+            content: "";
+            opacity: .9;
+        }
+
+        .login-visual::after {
+            position: absolute;
+            right: -13rem;
+            bottom: -14rem;
+            z-index: -1;
+            width: 34rem;
+            height: 34rem;
+            border: 1px solid rgb(var(--accent-300) / .14);
+            border-radius: 50%;
+            box-shadow: 0 0 0 3rem rgb(var(--accent-300) / .025), 0 0 0 7rem rgb(var(--accent-300) / .02);
+            content: "";
+        }
+
+        .login-visual-content,
+        .login-visual-footer { position: relative; z-index: 1; }
+
+        .login-brand {
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            gap: .8rem;
+        }
+
+        .login-brand-mark {
+            display: block;
+            width: 4.1rem;
+            height: 2.8rem;
+            object-fit: contain;
+            object-position: left center;
+        }
+
+        .login-brand-copy {
+            display: flex;
+            flex-direction: column;
+            gap: .16rem;
+        }
+
+        .login-brand-name {
+            color: #f8fafc;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: -.025em;
+            line-height: 1.1;
+        }
+
+        .login-brand-group {
+            color: rgb(191 219 254 / .7);
+            font-size: .65rem;
+            font-weight: 600;
+            letter-spacing: .1em;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .login-visual-copy { max-width: 30rem; margin-top: clamp(4rem, 11vh, 8rem); }
+
+        .login-kicker {
+            margin: 0;
+            color: rgb(147 197 253 / .82);
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .16em;
+            line-height: 1.4;
+            text-transform: uppercase;
+        }
+
+        .login-visual-copy h2 {
+            max-width: 24rem;
+            margin: .85rem 0 0;
+            color: #f8fafc;
+            font-size: clamp(1.8rem, 3.5vw, 3.2rem);
+            font-weight: 700;
+            letter-spacing: -.055em;
+            line-height: 1.06;
+        }
+
+        .login-visual-copy p:last-child {
+            max-width: 25rem;
+            margin: 1.1rem 0 0;
+            color: rgb(226 232 240 / .7);
+            font-size: .9rem;
+            line-height: 1.7;
+        }
+
+        .login-topology-wrap {
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2.5rem clamp(1.5rem, 6vw, 3.5rem);
-            background: #ffffff;
+            width: min(100%, 48rem);
+            margin: auto 0 0 auto;
+            padding: 1rem 0 0;
+        }
+
+        .login-topology {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 34vh;
+            color: rgb(147 197 253 / .78);
+            object-fit: contain;
+        }
+
+        .topology-grid { color: rgb(191 219 254 / .12); }
+        .topology-structure { color: rgb(191 219 254 / .5); }
+        .topology-node { fill: rgb(147 197 253 / .9); stroke: var(--login-panel); stroke-width: 5; }
+        .topology-node.is-primary { fill: rgb(var(--accent-400) / 1); }
+        .topology-module { fill: rgb(var(--accent-950) / .4); stroke: rgb(191 219 254 / .48); }
+        .topology-flow {
+            stroke: rgb(147 197 253 / .85);
+            stroke-dasharray: 3 13;
+            animation: topology-flow 12s linear infinite;
+        }
+
+        .login-visual-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.25rem;
+            color: rgb(191 219 254 / .58);
+            font-size: .68rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .login-visual-footer span:last-child { color: rgb(226 232 240 / .38); }
+
+        .login-form-panel {
+            position: relative;
+            display: flex;
+            min-width: 0;
+            min-height: 100dvh;
+            z-index: 2;
+            order: 1;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(2rem, 6vw, 6rem);
+            isolation: isolate;
+            background: var(--login-surface);
+        }
+
+        .login-form-panel::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: min(58%, 34rem);
+            z-index: 0;
+            background:
+                linear-gradient(120deg, transparent 0 35%, rgb(var(--accent-600) / .08) 35.2% 35.35%, transparent 35.55% 100%),
+                linear-gradient(28deg, transparent 0 58%, rgb(var(--accent-500) / .055) 58.2% 58.35%, transparent 58.55% 100%),
+                repeating-linear-gradient(135deg, transparent 0 2.7rem, rgb(var(--accent-600) / .035) 2.75rem 2.8rem, transparent 2.85rem 5.6rem);
+            content: "";
+            opacity: .75;
+            pointer-events: none;
+            -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 26%, transparent 96%);
+            mask-image: linear-gradient(to bottom, #000 0%, #000 26%, transparent 96%);
+        }
+
+        .login-form-panel::after {
+            position: absolute;
+            top: 0;
+            right: -7rem;
+            bottom: 0;
+            width: 9rem;
+            z-index: 0;
+            background:
+                linear-gradient(112deg, transparent 0 31%, rgb(var(--accent-600) / .09) 31.2% 31.4%, transparent 31.6% 100%),
+                linear-gradient(164deg, transparent 0 58%, rgb(var(--accent-500) / .06) 58.2% 58.4%, transparent 58.6% 100%),
+                linear-gradient(90deg, var(--login-surface) 0%, var(--login-surface) 38%, transparent 100%);
+            content: "";
+            pointer-events: none;
         }
 
         .login-form-inner {
-            width: min(100%, 22rem);
-            animation: login-fade-in 400ms ease-out;
+            position: relative;
+            z-index: 1;
+            width: min(100%, 25rem);
         }
 
-        .login-brand {
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            margin-bottom: 2rem;
-        }
-
-        .login-brand-mark {
-            width: 2rem;
-            height: 2rem;
-            border-radius: .45rem;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--login-blue);
-            flex-shrink: 0;
-        }
-
-        .login-brand-mark img { width: 100%; height: 100%; object-fit: contain; }
-
-        .login-brand-fallback {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .login-header { margin-bottom: 1.75rem; }
+        .login-header { margin-bottom: 2.2rem; }
 
         .login-header h1 {
-            font-size: clamp(1.25rem, 2.5vw, 1.55rem);
+            margin: 0;
+            color: var(--login-text);
+            font-size: clamp(1.75rem, 3vw, 2.35rem);
             font-weight: 700;
-            color: var(--login-ink);
-            line-height: 1.25;
-            margin-bottom: .35rem;
+            letter-spacing: -.05em;
+            line-height: 1.12;
         }
 
         .login-header p {
-            font-size: .875rem;
+            margin: .7rem 0 0;
             color: var(--login-muted);
+            font-size: .9rem;
+            line-height: 1.6;
+        }
+
+        .login-status {
+            margin: 0 0 1.1rem;
+            padding: .8rem .9rem;
+            border: 1px solid rgb(var(--semantic-success) / .3);
+            border-radius: .55rem;
+            color: rgb(21 128 61 / 1);
+            background: rgb(var(--semantic-success) / .08);
+            font-size: .8rem;
             line-height: 1.5;
         }
 
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.1rem;
-        }
+        .dark .login-status { color: rgb(134 239 172 / 1); }
 
-        .login-field {
-            display: flex;
-            flex-direction: column;
-            gap: .4rem;
-        }
+        .login-form { display: flex; flex-direction: column; gap: 1.2rem; }
 
-        .login-label-row {
+        .login-field { display: flex; flex-direction: column; gap: .48rem; }
+
+        .login-label-row,
+        .login-options {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
         }
 
         .login-label {
-            font-size: .8125rem;
-            font-weight: 600;
-            color: var(--login-ink);
-        }
-
-        .login-link {
-            font-size: .8rem;
-            font-weight: 500;
-            color: var(--login-blue);
-            text-decoration: none;
-        }
-
-        .login-link:hover { text-decoration: underline; }
-
-        .login-input {
-            width: 100%;
-            min-height: 2.75rem;
-            padding: .625rem .875rem;
-            font-size: .875rem;
-            font-family: inherit;
-            color: var(--login-ink);
-            background: #fff;
-            border: 1px solid var(--login-border);
-            border-radius: .5rem;
-            outline: none;
-            transition: border-color 200ms, box-shadow 200ms;
-        }
-
-        .login-input::placeholder { color: #9ca3af; }
-
-        .login-input:focus {
-            border-color: var(--login-blue);
-            box-shadow: 0 0 0 3px rgba(37,99,235,.14);
+            color: var(--login-text);
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: -.01em;
         }
 
         .login-input-wrap { position: relative; }
 
-        .login-input-password { padding-right: 2.75rem; }
+        .login-input {
+            display: block;
+            width: 100%;
+            min-height: 3rem;
+            padding: .72rem .85rem;
+            border: 1px solid var(--login-border);
+            border-radius: .55rem;
+            outline: none;
+            color: var(--login-text);
+            background: var(--login-field);
+            font: inherit;
+            font-size: .87rem;
+            line-height: 1.5;
+            transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+        }
+
+        .login-input::placeholder { color: var(--login-placeholder); opacity: .9; }
+
+        .login-input:focus {
+            border-color: var(--login-accent);
+            box-shadow: 0 0 0 3px var(--login-focus);
+        }
+
+        .login-input[aria-invalid="true"] {
+            border-color: rgb(var(--semantic-danger) / .8);
+        }
+
+        .login-input-password { padding-right: 4.4rem; }
 
         .login-password-toggle {
             position: absolute;
-            right: .75rem;
             top: 50%;
+            right: .55rem;
+            min-width: 3.3rem;
+            padding: .35rem .45rem;
             transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
+            border: 0;
+            border-radius: .4rem;
             color: var(--login-muted);
-            padding: .15rem;
-            display: flex;
-            align-items: center;
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+            font-size: .72rem;
+            font-weight: 700;
         }
 
-        .login-password-toggle:hover { color: var(--login-ink); }
+        .login-password-toggle:hover { color: var(--login-text); background: var(--nav-hover-bg); }
+
+        .login-link {
+            color: var(--login-accent);
+            font-size: .76rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-underline-offset: 3px;
+        }
+
+        .login-link:hover { color: var(--login-accent-hover); text-decoration: underline; }
+
+        .login-error {
+            margin: 0;
+            padding: 0;
+            color: rgb(var(--semantic-danger) / 1);
+            font-size: .75rem;
+            line-height: 1.45;
+            list-style: none;
+        }
+
+        .login-caps-lock {
+            margin: 0;
+            color: rgb(180 83 9 / 1);
+            font-size: .75rem;
+            line-height: 1.45;
+        }
+
+        .dark .login-caps-lock { color: rgb(253 186 116 / 1); }
 
         .login-remember {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: .5rem;
-            font-size: .8125rem;
-            color: var(--login-ink);
+            gap: .55rem;
+            color: var(--login-muted);
+            font-size: .78rem;
             cursor: pointer;
             user-select: none;
         }
 
-        .login-remember input[type="checkbox"] {
+        .login-remember input {
             width: 1rem;
             height: 1rem;
-            accent-color: var(--login-blue);
+            margin: 0;
+            accent-color: var(--login-accent);
             cursor: pointer;
-            flex-shrink: 0;
         }
 
         .login-submit {
-            display: flex;
+            display: inline-flex;
+            width: 100%;
+            min-height: 3rem;
             align-items: center;
             justify-content: center;
-            gap: .5rem;
-            width: 100%;
-            min-height: 2.85rem;
-            padding: .65rem 1.25rem;
-            font-size: .9rem;
-            font-weight: 600;
-            font-family: inherit;
-            color: #fff;
-            background: linear-gradient(135deg, var(--login-blue), #4f46e5);
-            border: none;
+            padding: .72rem 1rem;
+            border: 1px solid var(--login-accent);
             border-radius: .55rem;
+            color: #f8fafc;
+            background: var(--login-accent);
             cursor: pointer;
-            letter-spacing: .015em;
-            transition: box-shadow 180ms, transform 100ms, filter 180ms;
+            font: inherit;
+            font-size: .83rem;
+            font-weight: 700;
+            letter-spacing: .01em;
+            transition: background-color 180ms ease, border-color 180ms ease, transform 120ms ease, box-shadow 180ms ease;
         }
 
         .login-submit:hover:not(:disabled) {
-            filter: brightness(1.06);
-            box-shadow: 0 4px 14px rgba(37,99,235,.35);
+            border-color: var(--login-accent-hover);
+            background: var(--login-accent-hover);
+            box-shadow: 0 7px 16px rgb(var(--accent-900) / .16);
         }
 
         .login-submit:active:not(:disabled) { transform: translateY(1px); }
-
-        .login-submit:disabled { opacity: .7; cursor: not-allowed; }
+        .login-submit:disabled { cursor: not-allowed; opacity: .7; }
 
         .login-register {
-            margin-top: 1.1rem;
-            font-size: .8125rem;
+            margin: 1.35rem 0 0;
             color: var(--login-muted);
+            font-size: .78rem;
+            line-height: 1.5;
             text-align: center;
         }
 
-        .login-status { margin-bottom: .75rem; }
-
-        @keyframes login-fade-in {
-            from { opacity: 0; transform: translateY(8px); }
-            to   { opacity: 1; transform: translateY(0); }
+        .login-footer {
+            margin-top: clamp(3rem, 10vh, 7rem);
+            color: var(--login-placeholder);
+            font-size: .7rem;
+            line-height: 1.5;
         }
 
-        /* ================= PANEL KANAN — ILUSTRASI MINIMALIS ================= */
-        .login-brand-panel {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: clamp(1rem, 3vh, 2rem);
-            overflow: hidden;
-            padding: clamp(1.5rem, 4vw, 3rem);
-            background:
-                radial-gradient(circle at 85% 12%, rgba(129,140,248,.35) 0%, transparent 42%),
-                radial-gradient(circle at 8% 88%, rgba(59,82,217,.5) 0%, transparent 46%),
-                linear-gradient(145deg, var(--panel-from) 0%, var(--panel-mid) 50%, var(--panel-to) 100%);
-            border-radius: 2.5rem 0 0 2.5rem;
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible {
+            outline: 3px solid var(--login-focus);
+            outline-offset: 2px;
         }
 
-        .login-brand-content {
-            color: #ffffff;
-            text-align: center;
-            max-width: 26rem;
+        @keyframes topology-flow {
+            to { stroke-dashoffset: -192; }
         }
 
-        .login-brand-content h2 {
-            font-size: clamp(1rem, 2vw, 1.35rem);
-            font-weight: 700;
-            line-height: 1.3;
-        }
-
-        .login-brand-content p {
-            font-size: .82rem;
-            opacity: .75;
-            margin-top: .35rem;
-        }
-
-        /* Satu-satunya ilustrasi: inline SVG flat, tanpa request gambar */
-        .login-illustration {
-            width: min(78%, 24rem);
-            height: auto;
-            animation: float-y 6s ease-in-out infinite;
-        }
-
-        @keyframes float-y {
-            0%, 100% { transform: translateY(0); }
-            50%      { transform: translateY(-.6rem); }
-        }
-
-        .login-badges {
-            display: flex;
-            gap: .6rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .login-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: .4rem;
-            font-size: .72rem;
-            font-weight: 600;
-            color: #e0e7ff;
-            background: rgba(255,255,255,.1);
-            border: 1px solid rgba(255,255,255,.18);
-            border-radius: 999px;
-            padding: .35rem .8rem;
-            backdrop-filter: blur(4px);
-        }
-
-        .login-badge svg { width: .85rem; height: .85rem; }
-
-        /* ================= RESPONSIVE ================= */
         @media (max-width: 1023px) {
-            .login-shell {
-                display: flex;
-                flex-direction: column;
-                min-height: 100dvh;
-            }
+            .login-page { grid-template-columns: minmax(18rem, 45%) minmax(0, 55%); }
+            .login-visual { padding-inline: clamp(1.5rem, 4vw, 3rem); }
+            .login-visual-copy { margin-top: clamp(3rem, 8vh, 5rem); }
+            .login-visual-copy h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+            .login-topology-wrap { margin-top: 2rem; }
+            .login-form-panel { padding-inline: clamp(1.5rem, 5vw, 4rem); }
+        }
 
-            .login-form-panel {
-                order: 2;
-                padding: 2rem clamp(1.25rem, 7vw, 3rem) 2.25rem;
-            }
-
-            .login-brand-panel {
-                order: 1;
-                min-height: clamp(14rem, 52vw, 19rem);
-                border-radius: 0 0 2.5rem 2.5rem;
-                gap: .8rem;
-            }
-
-            .login-brand-content p { display: none; }
-
-            .login-illustration { width: min(64%, 15rem); }
-            .login-badges { display: none; }
+        @media (max-width: 767px) {
+            .login-page { display: flex; flex-direction: column; min-height: 100dvh; }
+            .login-visual { min-height: 13.5rem; order: 2; padding: 1.5rem 1.25rem 1.2rem; }
+            .login-visual::after { right: -14rem; bottom: -20rem; }
+            .login-brand-mark { width: 3.5rem; height: 2.35rem; }
+            .login-visual-copy { max-width: 19rem; margin-top: 2.1rem; }
+            .login-visual-copy h2 { margin-top: .55rem; font-size: 1.65rem; }
+            .login-visual-copy p:last-child { display: none; }
+            .login-topology-wrap { position: absolute; right: -4rem; bottom: -1.3rem; width: 19rem; margin: 0; opacity: .72; }
+            .login-visual-footer { margin-top: auto; font-size: .6rem; }
+            .login-form-panel { min-height: 0; order: 1; align-items: flex-start; padding: 2.5rem 1.25rem 2rem; }
+            .login-form-panel::after { display: none; }
+            .login-header { margin-bottom: 1.9rem; }
+            .login-footer { margin-top: 3rem; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .login-illustration,
-            .login-form-inner { animation: none !important; }
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+            }
         }
     </style>
 </head>
 <body>
     <main class="login-page">
-        <div class="login-shell">
-
-            {{-- PANEL KIRI — FORM --}}
-            <section class="login-form-panel" aria-labelledby="login-title">
-                <div class="login-form-inner">
-
-                    <div class="login-brand">
-                        <div x-data="{ logoFailed: false }" class="login-brand-mark">
-                            <img
-                                x-show="!logoFailed"
-                                x-on:error="logoFailed = true"
-                                src="{{ asset('images/logo/logo-lightmode.png') }}"
-                                alt="Tridaya App"
-                            >
-                            <span x-show="logoFailed" x-cloak class="login-brand-fallback">T</span>
-                        </div>
-                        <span class="text-xl font-semibold tracking-tight text-gray-900">Tridaya App</span>
+        <section class="login-visual" aria-labelledby="visual-title">
+            <div class="login-visual-content">
+                <div class="login-brand">
+                    <picture>
+                        <source srcset="{{ asset('images/logo/logo-256.webp') }}" type="image/webp">
+                        <img class="login-brand-mark" src="{{ asset('images/logo/logo.png') }}" alt="">
+                    </picture>
+                    <div class="login-brand-copy">
+                        <span class="login-brand-name">3DY App</span>
+                        <span class="login-brand-group">Tridaya Group</span>
                     </div>
-
-                    <div class="login-header">
-                        <h1 id="login-title">Sign In to your Account</h1>
-                        <p>Access your workspace and keep your work connected.</p>
-                    </div>
-
-                    <x-auth-session-status
-                        class="login-status rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
-                        :status="session('status')"
-                    />
-
-                    <form
-                        method="POST"
-                        action="{{ route('login') }}"
-                        x-data="{ isSubmitting: false }"
-                        x-on:submit="isSubmitting = true"
-                        class="login-form"
-                    >
-                        @csrf
-
-                        <div class="login-field">
-                            <label for="email" class="login-label-row">
-                                <span class="login-label">Email</span>
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                name="email"
-                                value="{{ old('email') }}"
-                                placeholder="Enter Email"
-                                required
-                                autofocus
-                                autocomplete="username"
-                                aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
-                                class="login-input"
-                            >
-                            <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
-                        </div>
-
-                        <div x-data="{ showPassword: false, capsLock: false }" class="login-field">
-                            <div class="login-label-row">
-                                <label for="password" class="login-label">Password</label>
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}" class="login-link">Forgot password?</a>
-                                @endif
-                            </div>
-                            <div class="login-input-wrap">
-                                <input
-                                    id="password"
-                                    :type="showPassword ? 'text' : 'password'"
-                                    name="password"
-                                    placeholder="Enter Password"
-                                    required
-                                    autocomplete="current-password"
-                                    aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
-                                    x-on:keyup="capsLock = $event.getModifierState('CapsLock')"
-                                    x-on:keydown="capsLock = $event.getModifierState('CapsLock')"
-                                    class="login-input login-input-password"
-                                >
-                                <button
-                                    type="button"
-                                    x-on:click="showPassword = !showPassword"
-                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                                    :aria-pressed="showPassword"
-                                    aria-controls="password"
-                                    class="login-password-toggle"
-                                >
-                                    <svg x-show="!showPassword" class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    <svg x-show="showPassword" x-cloak class="h-4 w-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <p x-show="capsLock" x-cloak role="alert" class="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
-                                Caps Lock is on
-                            </p>
-                            <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
-                        </div>
-
-                        <label for="remember" class="login-remember">
-                            <input id="remember" type="checkbox" name="remember">
-                            Remember me
-                        </label>
-
-                        <button
-                            type="submit"
-                            x-bind:disabled="isSubmitting"
-                            x-bind:aria-busy="isSubmitting"
-                            class="login-submit"
-                        >
-                            <span x-show="!isSubmitting">SIGN IN</span>
-                            <span x-show="isSubmitting" x-cloak class="inline-flex items-center gap-2">
-                                <svg class="h-4 w-4 animate-spin" aria-hidden="true" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                                </svg>
-                                Signing in...
-                            </span>
-                        </button>
-                    </form>
-
-                    @if (Route::has('register'))
-                        <p class="login-register">
-                            Not registered yet?
-                            <a href="{{ route('register') }}" class="login-link">Create an account</a>
-                        </p>
-                    @endif
-
-                </div>
-            </section>
-
-            {{-- PANEL KANAN — ILUSTRASI MINIMALIS (1 inline SVG, tanpa JS/canvas) --}}
-            <aside class="login-brand-panel" aria-label="Tridaya App">
-                <div class="login-brand-content">
-                    <h2>Connecting People, Empowering Business</h2>
-                    <p>Technology and communication that keeps your team connected.</p>
                 </div>
 
-                <svg class="login-illustration" viewBox="0 0 400 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Secure login illustration">
-                    <!-- lingkaran latar -->
-                    <circle cx="200" cy="160" r="130" fill="#ffffff" opacity="0.08"/>
-                    <circle cx="200" cy="160" r="100" fill="#ffffff" opacity="0.08"/>
-                    <!-- kartu browser -->
-                    <rect x="90" y="80" width="220" height="160" rx="16" fill="#ffffff" opacity="0.97"/>
-                    <rect x="90" y="80" width="220" height="34" rx="16" fill="#EEF2FF"/>
-                    <rect x="90" y="98" width="220" height="16" fill="#EEF2FF"/>
-                    <circle cx="108" cy="97" r="5" fill="#F87171"/>
-                    <circle cx="122" cy="97" r="5" fill="#FBBF24"/>
-                    <circle cx="136" cy="97" r="5" fill="#34D399"/>
-                    <!-- baris form semu -->
-                    <rect x="112" y="132" width="120" height="12" rx="6" fill="#E0E7FF"/>
-                    <rect x="112" y="152" width="176" height="12" rx="6" fill="#E0E7FF"/>
-                    <rect x="112" y="172" width="150" height="12" rx="6" fill="#E0E7FF"/>
-                    <rect x="112" y="196" width="90" height="24" rx="12" fill="#2563EB"/>
-                    <rect x="212" y="196" width="76" height="24" rx="12" fill="#E0E7FF"/>
-                    <!-- lencana perisai -->
-                    <circle cx="296" cy="216" r="40" fill="#FBBF24"/>
-                    <circle cx="296" cy="216" r="40" fill="#000000" opacity="0.06"/>
-                    <path d="M296 190l18 7v12c0 12-7.5 21-18 25-10.5-4-18-13-18-25v-12l18-7z" fill="#1E1B4B"/>
-                    <path d="M289 215l5 5 9-11" stroke="#FBBF24" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                    <!-- kartu user melayang -->
-                    <rect x="52" y="196" width="96" height="52" rx="12" fill="#ffffff" opacity="0.95"/>
-                    <circle cx="72" cy="216" r="10" fill="#C7D2FE"/>
-                    <circle cx="72" cy="213" r="4" fill="#4F46E5"/>
-                    <path d="M63 226c1.5-5 5-7 9-7s7.5 2 9 7" fill="#4F46E5"/>
-                    <rect x="88" y="208" width="48" height="8" rx="4" fill="#E0E7FF"/>
-                    <rect x="88" y="220" width="32" height="8" rx="4" fill="#EEF2FF"/>
-                    <!-- gelembung chat -->
-                    <rect x="276" y="66" width="84" height="44" rx="12" fill="#ffffff" opacity="0.95"/>
-                    <path d="M292 110l-4 12 14-12h-10z" fill="#ffffff" opacity="0.95"/>
-                    <circle cx="292" cy="88" r="4" fill="#4F46E5"/>
-                    <circle cx="306" cy="88" r="4" fill="#C7D2FE"/>
-                    <circle cx="320" cy="88" r="4" fill="#C7D2FE"/>
-                    <!-- titik aksen -->
-                    <circle cx="66" cy="96" r="6" fill="#F472B6" opacity="0.9"/>
-                    <circle cx="340" cy="140" r="5" fill="#38BDF8" opacity="0.9"/>
-                    <circle cx="330" cy="256" r="7" fill="#34D399" opacity="0.85"/>
+                <div class="login-visual-copy">
+                    <p class="login-kicker">Operational intelligence platform</p>
+                    <h2 id="visual-title">Technical operations, connected.</h2>
+                    <p>One workspace for teams across sales, projects, finance, and field operations.</p>
+                </div>
+            </div>
+
+            <div class="login-topology-wrap" aria-hidden="true">
+                <svg class="login-topology" viewBox="0 0 680 460" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g class="topology-grid" stroke="currentColor" stroke-width="1">
+                        <path d="M40 64H640M40 128H640M40 192H640M40 256H640M40 320H640M40 384H640" />
+                        <path d="M104 24V424M168 24V424M232 24V424M296 24V424M360 24V424M424 24V424M488 24V424M552 24V424M616 24V424" />
+                    </g>
+                    <g class="topology-structure" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M74 332L194 332L270 252L360 252L448 158L590 158" />
+                        <path d="M120 118L218 118L284 188L360 188L432 274L560 274" />
+                        <path d="M194 332L194 382M270 252V336M360 188V252M448 158V84M560 274V354" />
+                        <path d="M74 332V284H148M590 158V108H536" />
+                    </g>
+                    <path class="topology-flow" d="M74 332L194 332L270 252L360 252L448 158L590 158" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    <g class="topology-module" stroke-width="2">
+                        <rect x="44" y="262" width="92" height="44" rx="6" />
+                        <rect x="152" y="356" width="84" height="42" rx="6" />
+                        <rect x="230" y="210" width="80" height="44" rx="6" />
+                        <rect x="320" y="156" width="80" height="44" rx="6" />
+                        <rect x="416" y="62" width="82" height="44" rx="6" />
+                        <rect x="524" y="326" width="92" height="44" rx="6" />
+                        <rect x="540" y="136" width="92" height="44" rx="6" />
+                    </g>
+                    <g class="topology-node">
+                        <circle cx="74" cy="332" r="7" />
+                        <circle cx="194" cy="332" r="7" />
+                        <circle cx="270" cy="252" r="7" />
+                        <circle cx="360" cy="252" r="8" class="is-primary" />
+                        <circle cx="448" cy="158" r="7" />
+                        <circle cx="590" cy="158" r="7" />
+                    </g>
+                    <g fill="currentColor" opacity=".5">
+                        <circle cx="148" cy="118" r="3" />
+                        <circle cx="560" cy="274" r="3" />
+                        <circle cx="360" cy="188" r="3" />
+                        <circle cx="448" cy="84" r="3" />
+                    </g>
                 </svg>
+            </div>
 
-                <div class="login-badges">
-                    <span class="login-badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.6 2A9 9 0 1112 3a9 9 0 018.6 9z"/></svg>
-                        Secure Access
-                    </span>
-                    <span class="login-badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        Fast Workspace
-                    </span>
-                    <span class="login-badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6-4a3 3 0 11-3-3"/></svg>
-                        Team Connected
-                    </span>
-                </div>
-            </aside>
+            <footer class="login-visual-footer">
+                <span>Tridaya Group</span>
+                <span>3DY App</span>
+            </footer>
+        </section>
 
-        </div>
+        <section class="login-form-panel" aria-labelledby="login-title">
+            <div class="login-form-inner">
+                <header class="login-header">
+                    <h1 id="login-title">Welcome back</h1>
+                    <p>Sign in to your 3DY account</p>
+                </header>
+
+                <x-auth-session-status
+                    class="login-status"
+                    role="status"
+                    aria-live="polite"
+                    :status="session('status')"
+                />
+
+                <form
+                    method="POST"
+                    action="{{ route('login') }}"
+                    x-data="{ isSubmitting: false }"
+                    x-on:submit="isSubmitting = true"
+                    class="login-form"
+                >
+                    @csrf
+
+                    <div class="login-field">
+                        <label for="email" class="login-label">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            placeholder="name@company.com"
+                            required
+                            autofocus
+                            autocomplete="username"
+                            aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
+                            aria-describedby="email-error"
+                            class="login-input"
+                        >
+                        <div id="email-error" aria-live="polite">
+                            <x-input-error :messages="$errors->get('email')" class="login-error" />
+                        </div>
+                    </div>
+
+                    <div x-data="{ showPassword: false, capsLock: false }" class="login-field">
+                        <label for="password" class="login-label">Password</label>
+                        <div class="login-input-wrap">
+                            <input
+                                id="password"
+                                :type="showPassword ? 'text' : 'password'"
+                                name="password"
+                                required
+                                autocomplete="current-password"
+                                aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
+                                aria-describedby="password-error caps-lock-warning"
+                                x-on:keyup="capsLock = $event.getModifierState('CapsLock')"
+                                x-on:keydown="capsLock = $event.getModifierState('CapsLock')"
+                                class="login-input login-input-password"
+                            >
+                            <button
+                                type="button"
+                                x-on:click="showPassword = !showPassword"
+                                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                :aria-pressed="showPassword"
+                                aria-controls="password"
+                                class="login-password-toggle"
+                            >
+                                <span x-text="showPassword ? 'Hide' : 'Show'"></span>
+                            </button>
+                        </div>
+                        <p id="caps-lock-warning" x-show="capsLock" x-cloak role="alert" class="login-caps-lock">Caps Lock is on</p>
+                        <div id="password-error" aria-live="polite">
+                            <x-input-error :messages="$errors->get('password')" class="login-error" />
+                        </div>
+                    </div>
+
+                    <div class="login-options">
+                        <label for="remember" class="login-remember">
+                            <input id="remember" type="checkbox" name="remember" value="1" @checked(old('remember'))>
+                            <span>Remember me</span>
+                        </label>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="login-link">Forgot password?</a>
+                        @endif
+                    </div>
+
+                    <button
+                        type="submit"
+                        x-bind:disabled="isSubmitting"
+                        x-bind:aria-busy="isSubmitting"
+                        class="login-submit"
+                    >
+                        <span x-show="!isSubmitting">Sign in</span>
+                        <span x-show="isSubmitting" x-cloak>Signing in...</span>
+                    </button>
+                </form>
+
+                @if (Route::has('register'))
+                    <p class="login-register">
+                        Not registered yet?
+                        <a href="{{ route('register') }}" class="login-link">Create an account</a>
+                    </p>
+                @endif
+
+                <p class="login-footer">Tridaya Group / 3DY App</p>
+            </div>
+        </section>
     </main>
 </body>
 </html>
