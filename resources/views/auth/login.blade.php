@@ -259,7 +259,6 @@
             z-index: 0;
             display: block;
             pointer-events: none;
-            filter: blur(14px);
         }
 
         .login-form-inner {
@@ -589,7 +588,10 @@
                         <stop offset="1" style="stop-color: rgb(var(--accent-900) / .93)" />
                     </linearGradient>
                 </defs>
-                <path d="M0,0 L145,0 C115,170 175,330 140,500 C105,670 170,830 150,1000 L0,1000 Z" fill="url(#loginWaveFill)" />
+                <g transform="translate(16,0)">
+                    <path d="M0,0 L120,0 C158,18 172,68 172,124 C172,180 158,230 120,250 C162,270 176,320 176,376 C176,432 162,480 122,500 C160,520 174,570 174,626 C174,682 160,730 118,750 C160,770 174,820 174,876 C174,932 158,980 124,1000 L0,1000 Z" style="fill: rgb(var(--accent-500) / .30)" />
+                </g>
+                <path d="M0,0 L120,0 C158,18 172,68 172,124 C172,180 158,230 120,250 C162,270 176,320 176,376 C176,432 162,480 122,500 C160,520 174,570 174,626 C174,682 160,730 118,750 C160,770 174,820 174,876 C174,932 158,980 124,1000 L0,1000 Z" fill="url(#loginWaveFill)" />
             </svg>
             <div class="login-form-inner">
                 <header class="login-header">
