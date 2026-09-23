@@ -34,7 +34,21 @@
                     </div>
                     <div>
                         <dt class="text-xs text-slate-400">{{ __('Peserta') }}</dt>
-                        <dd class="font-medium text-slate-800">{{ $meeting->participants ?? '-' }}</dd>
+                        <dd class="font-medium text-slate-800">
+                            @php
+                                $attendees = collect(preg_split('/[\r\n,;]+/', $meeting->participants ?? ''))
+                                    ->map(fn ($n) => trim($n))->filter()->values();
+                            @endphp
+                            @if($attendees->isEmpty())
+                                -
+                            @else
+                                <ol class="list-decimal list-inside space-y-1">
+                                    @foreach($attendees as $name)
+                                        <li>{{ $name }}</li>
+                                    @endforeach
+                                </ol>
+                            @endif
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-xs text-slate-400">{{ __('Dicatat oleh') }}</dt>

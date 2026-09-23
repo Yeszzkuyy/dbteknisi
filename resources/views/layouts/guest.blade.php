@@ -21,8 +21,12 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
-                    <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="{{ config('app.name') }}"
-                         class="h-16 w-auto object-contain">
+                    <picture>
+                        <source srcset="{{ asset('images/logo/logo-lightmode-256.webp') }}" type="image/webp">
+                        <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="{{ config('app.name') }}" width="256" height="179"
+                             fetchpriority="high" decoding="async"
+                             class="h-16 w-auto aspect-[256/179] object-contain">
+                    </picture>
                 </a>
             </div>
 

@@ -13,14 +13,14 @@
 @endphp
 
 @if ($canZoom)
-    <img src="{{ $photoUrl }}" alt="{{ $user->name }}"
+    <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="80" height="80" loading="lazy" decoding="async"
          x-on:click="$dispatch('view-avatar', { src: @js($photoUrl), name: @js($user->name ?? '') })"
-         class="{{ $size }} rounded-full object-cover shrink-0 cursor-zoom-in transition hover:ring-2 hover:ring-accent-300 {{ $class }}"
+         class="{{ $size }} rounded-full aspect-square object-cover shrink-0 cursor-zoom-in transition hover:ring-2 hover:ring-accent-300 {{ $class }}"
          title="Lihat foto profil" role="button" tabindex="0"
          x-on:keydown.enter="$dispatch('view-avatar', { src: @js($photoUrl), name: @js($user->name ?? '') })">
 @elseif($photoUrl)
-    <img src="{{ $photoUrl }}" alt="{{ $user->name }}"
-         class="{{ $size }} rounded-full object-cover shrink-0 {{ $class }}">
+    <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="80" height="80" loading="lazy" decoding="async"
+         class="{{ $size }} rounded-full aspect-square object-cover shrink-0 {{ $class }}">
 @else
     <div class="{{ $size }} rounded-full {{ $colors[$color] }} flex items-center justify-center shrink-0 {{ $class }}">
         <span class="{{ $text }} font-semibold">{{ strtoupper(substr($user?->name ?? '?', 0, 1)) }}</span>

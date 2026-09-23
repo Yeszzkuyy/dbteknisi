@@ -38,16 +38,13 @@
                     </div>
 
                     <div x-show="mode === 'existing'" x-cloak>
-                        <label for="customer_id" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Pilih Customer') }} <span class="text-red-500">*</span></label>
-                        <select name="customer_id" id="customer_id"
-                                class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                            <option value="">{{ __('-- Pilih Customer --') }}</option>
-                            @foreach($customers as $customer)
-                                <option value="{{ $customer->id }}" {{ old('customer_id', $meeting->customer_id) == $customer->id ? 'selected' : '' }}>
-                                    {{ $customer->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Pilih Customer') }} <span class="text-red-500">*</span></label>
+                        <x-searchable-select
+                            name="customer_id"
+                            :options="$customers->mapWithKeys(fn ($c) => [$c->id => $c->name])->all()"
+                            :selected="old('customer_id', $meeting->customer_id)"
+                            placeholder="{{ __('Ketik nama customer untuk mencari...') }}"
+                        />
                         @error('customer_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
@@ -57,10 +54,44 @@
                     <x-datepicker name="meeting_date" required value="{{ old('meeting_date', $meeting->meeting_date->format('Y-m-d')) }}"></x-datepicker>
                 </div>
 
-                <div>
+                <div data-attendees>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Peserta') }}</label>
-                    <input type="text" name="participants" value="{{ old('participants', $meeting->participants) }}"
-                           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    @php
+                        $attendeeLines = array_pad(array_values(collect(preg_split('/[\r\n,;]+/', old('participants', $meeting->participants ?? '')))->map(fn ($n) => trim($n))->filter()->all()), 5, '');
+                    @endphp
+                    <div class="space-y-2" data-attendee-rows>
+                        @for($i = 0; $i < 5; $i++)
+                            <div class="flex items-center gap-3">
+                                <span class="w-5 shrink-0 text-sm text-slate-500">{{ $i + 1 }}.</span>
+                                <input type="text" data-attendee value="{{ $attendeeLines[$i] }}"
+                                       placeholder="{{ __('Nama peserta...') }}"
+                                       class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                            </div>
+                        @endfor
+                    </div>
+                    <button type="button" data-attendees-add
+                            class="mt-2 px-4 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white text-sm font-medium transition">
+                        {{ __('+ Tambah Peserta') }}
+                    </button>
+                    <input type="hidden" name="participants" data-attendees-value value="{{ old('participants', $meeting->participants) }}">
+                    <script>
+                        document.querySelectorAll('[data-attendees]').forEach(function (box) {
+                            var rows = box.querySelector('[data-attendee-rows]');
+                            box.querySelector('[data-attendees-add]').addEventListener('click', function () {
+                                var n = rows.children.length + 1;
+                                var row = document.createElement('div');
+                                row.className = 'flex items-center gap-3';
+                                row.innerHTML = '<span class="w-5 shrink-0 text-sm text-slate-500">' + n + '.</span>' +
+                                    '<input type="text" data-attendee placeholder="{{ __('Nama peserta...') }}" class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">';
+                                rows.appendChild(row);
+                                row.querySelector('input').focus();
+                            });
+                            box.closest('form').addEventListener('submit', function () {
+                                var names = Array.prototype.map.call(box.querySelectorAll('[data-attendee]'), function (el) { return el.value.trim(); }).filter(Boolean);
+                                box.querySelector('[data-attendees-value]').value = names.join('\n');
+                            });
+                        });
+                    </script>
                 </div>
 
                 <div>

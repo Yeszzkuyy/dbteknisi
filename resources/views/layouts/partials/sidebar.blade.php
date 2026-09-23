@@ -25,12 +25,20 @@
     </div>
 
     {{-- Logo --}}
-    <div class="sidebar-logo relative z-10 flex flex-shrink-0 items-center border-b border-white/10 p-4">
+    <div class="sidebar-logo relative z-10 flex h-16 sm:h-20 flex-shrink-0 items-center border-b border-white/10 px-4">
         <a href="{{ route('dashboard') }}" class="group flex items-center gap-3">
-            <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App"
-                 class="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03] dark:hidden">
-            <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App"
-                 class="hidden h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03] dark:block">
+            <picture class="shrink-0 dark:hidden">
+                <source srcset="{{ asset('images/logo/logo-lightmode-256.webp') }}" type="image/webp">
+                <img src="{{ asset('images/logo/logo-lightmode.png') }}" alt="Tridaya App" width="256" height="179"
+                     fetchpriority="high" decoding="async"
+                     class="h-9 sm:h-11 w-auto aspect-[256/179] object-contain transition-transform duration-300 group-hover:scale-[1.03]">
+            </picture>
+            <picture class="hidden shrink-0 dark:block">
+                <source srcset="{{ asset('images/logo/logo-256.webp') }}" type="image/webp">
+                <img src="{{ asset('images/logo/logo.png') }}" alt="Tridaya App" width="256" height="181"
+                     fetchpriority="high" decoding="async"
+                     class="h-9 sm:h-11 w-auto aspect-[256/181] object-contain transition-transform duration-300 group-hover:scale-[1.03]">
+            </picture>
             <div class="sidebar-hide min-w-0">
                 <h1 class="truncate font-display text-4xl font-bold leading-none text-accent-300">3DY App</h1>
             </div>

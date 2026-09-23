@@ -55,7 +55,7 @@
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Peserta') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Kebutuhan (ringkas)') }}</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Follow Up</th>
-                        <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Aksi') }}</th>
+                        <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
@@ -81,16 +81,29 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="flex justify-end gap-3">
+                                <div class="flex justify-center gap-2">
                                     <a href="{{ route('sales.meetings.show', $meeting) }}"
-                                       class="text-accent-600 hover:text-accent-800">Detail</a>
+                                       title="{{ __('Lihat detail meeting') }}"
+                                       aria-label="{{ __('Lihat detail meeting') }} {{ $meeting->customer?->name }}"
+                                       class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-50 text-accent-700 transition hover:bg-accent-100 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
+                                        <x-icon name="eye" class="h-4 w-4" />
+                                    </a>
                                     @can('manage-sales')
                                         <a href="{{ route('sales.meetings.edit', $meeting) }}"
-                                           class="text-amber-600 hover:text-amber-800">Edit</a>
+                                           title="{{ __('Edit meeting') }}"
+                                           aria-label="{{ __('Edit meeting') }} {{ $meeting->customer?->name }}"
+                                           class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-100 text-accent-700 transition hover:bg-accent-200 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
+                                            <x-icon name="edit" class="h-4 w-4" />
+                                        </a>
                                         <form action="{{ route('sales.meetings.destroy', $meeting) }}"
-                                              method="POST" onsubmit="return confirm('{{ __('Hapus meeting ini?') }}')">
+                                              method="POST" class="inline-flex" onsubmit="return confirm('{{ __('Hapus meeting ini?') }}')">
                                             @csrf @method('DELETE')
-                                            <button class="text-red-600 hover:text-red-800">Hapus</button>
+                                            <button type="submit"
+                                                    title="{{ __('Hapus meeting') }}"
+                                                    aria-label="{{ __('Hapus meeting') }} {{ $meeting->customer?->name }}"
+                                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 text-red-700 transition hover:bg-red-200 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20">
+                                                <x-icon name="trash" class="h-4 w-4" />
+                                            </button>
                                         </form>
                                     @endcan
                                 </div>

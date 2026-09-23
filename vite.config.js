@@ -8,4 +8,24 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        // minify default (oxc) — sudah minify + tree-shake tanpa paket tambahan
+        cssMinify: true,
+        cssCodeSplit: true,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        rollupOptions: {
+            output: {
+                codeSplitting: {
+                    groups: [
+                        { name: 'alpine', test: /node_modules[\\/]alpinejs/ },
+                        { name: 'charts', test: /node_modules[\\/]apexcharts/ },
+                        { name: 'markdown', test: /node_modules[\\/](marked|dompurify)/ },
+                        { name: 'dnd', test: /node_modules[\\/]sortablejs/ },
+                        { name: 'calendar', test: /node_modules[\\/]@fullcalendar/ },
+                    ],
+                },
+            },
+        },
+    },
 });

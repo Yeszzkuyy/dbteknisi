@@ -43,7 +43,7 @@
         class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500"
     >
     <div x-show="open" x-cloak x-transition
-         class="absolute z-20 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+         class="absolute z-20 mt-1 w-full bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700">
         <template x-for="[id, label] in filtered" :key="id">
             <button type="button"
                     @mousedown.prevent="select(id, label)"
