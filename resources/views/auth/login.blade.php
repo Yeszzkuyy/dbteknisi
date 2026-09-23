@@ -70,9 +70,9 @@
             --login-surface: #252b40;
             --login-field: #1e2438;
             --login-border: #3d4870;
-            --login-text: #e2e8f8;
-            --login-muted: #8d96b8;
-            --login-placeholder: #545d7e;
+            --login-text: #f2f6ff;
+            --login-muted: #a6b1d4;
+            --login-placeholder: #6e789e;
             --login-accent: #3b82f6;
         }
 
