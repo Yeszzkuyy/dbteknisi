@@ -53,7 +53,7 @@
 
         .login-page {
             display: grid;
-            grid-template-columns: minmax(22rem, 45%) minmax(0, 55%);
+            grid-template-columns: minmax(0, 55%) minmax(22rem, 45%);
             min-height: 100dvh;
             overflow: hidden;
             background: var(--login-surface);
@@ -63,7 +63,7 @@
             position: relative;
             display: flex;
             min-height: 100dvh;
-            order: 2;
+            order: 1;
             flex-direction: column;
             overflow: hidden;
             padding: clamp(2rem, 5vw, 5.5rem) clamp(1.5rem, 6vw, 6rem) clamp(1.75rem, 4vw, 3.5rem);
@@ -221,7 +221,7 @@
             min-width: 0;
             min-height: 100dvh;
             z-index: 2;
-            order: 1;
+            order: 2;
             align-items: center;
             justify-content: center;
             padding: clamp(2rem, 6vw, 6rem);
@@ -250,14 +250,14 @@
         .login-form-panel::after {
             position: absolute;
             top: 0;
-            right: -7rem;
+            left: -7rem;
             bottom: 0;
             width: 9rem;
             z-index: 0;
             background:
-                linear-gradient(112deg, transparent 0 31%, rgb(var(--accent-600) / .09) 31.2% 31.4%, transparent 31.6% 100%),
-                linear-gradient(164deg, transparent 0 58%, rgb(var(--accent-500) / .06) 58.2% 58.4%, transparent 58.6% 100%),
-                linear-gradient(90deg, var(--login-surface) 0%, var(--login-surface) 38%, transparent 100%);
+                linear-gradient(68deg, transparent 0 31%, rgb(var(--accent-600) / .09) 31.2% 31.4%, transparent 31.6% 100%),
+                linear-gradient(16deg, transparent 0 58%, rgb(var(--accent-500) / .06) 58.2% 58.4%, transparent 58.6% 100%),
+                linear-gradient(270deg, var(--login-surface) 0%, var(--login-surface) 38%, transparent 100%);
             content: "";
             pointer-events: none;
         }
@@ -450,13 +450,6 @@
             text-align: center;
         }
 
-        .login-footer {
-            margin-top: clamp(3rem, 10vh, 7rem);
-            color: var(--login-placeholder);
-            font-size: .7rem;
-            line-height: 1.5;
-        }
-
         a:focus-visible,
         button:focus-visible,
         input:focus-visible {
@@ -469,7 +462,7 @@
         }
 
         @media (max-width: 1023px) {
-            .login-page { grid-template-columns: minmax(18rem, 45%) minmax(0, 55%); }
+            .login-page { grid-template-columns: minmax(18rem, 55%) minmax(18rem, 45%); }
             .login-visual { padding-inline: clamp(1.5rem, 4vw, 3rem); }
             .login-visual-copy { margin-top: clamp(3rem, 8vh, 5rem); }
             .login-visual-copy h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
@@ -490,7 +483,6 @@
             .login-form-panel { min-height: 0; order: 1; align-items: flex-start; padding: 2.5rem 1.25rem 2rem; }
             .login-form-panel::after { display: none; }
             .login-header { margin-bottom: 1.9rem; }
-            .login-footer { margin-top: 3rem; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -672,8 +664,6 @@
                         <a href="{{ route('register') }}" class="login-link">Create an account</a>
                     </p>
                 @endif
-
-                <p class="login-footer">Tridaya Group / 3DY App</p>
             </div>
         </section>
     </main>
