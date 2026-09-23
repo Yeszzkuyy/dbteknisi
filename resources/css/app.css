@@ -107,6 +107,15 @@
     --sidebar-panel-bg: rgba(255, 255, 255, 0.04);
 }
 
+/* Scope percobaan palet dark dashboard (docs/dark-palette.md).
+   Hanya berlaku di dalam .dash-scope; .dark global tidak diubah. */
+.dark .dash-scope {
+    --bg: #1a1f2e;
+    --card-bg: #222840;
+    --card-border: #363d5c;
+    --card-bg-hover: #2a3150;
+}
+
 html {
     font-size: 90%; /* ponytail: hanya men-scale satuan rem; px hardcoded & breakpoint tidak ikut */
     scrollbar-width: thin;
