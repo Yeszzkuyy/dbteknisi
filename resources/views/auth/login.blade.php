@@ -298,12 +298,16 @@
 
         .login-input::placeholder { color: var(--login-placeholder); opacity: .9; }
 
+        .login-input:hover {
+            box-shadow: 0 0 14px rgb(var(--accent-500) / .18);
+        }
+
         .login-input:focus {
             border-color: transparent;
             background:
                 linear-gradient(var(--login-field), var(--login-field)) padding-box,
                 conic-gradient(from var(--beam-angle, 0deg), #ff2d78, #ffb800, #00e5ff, #7c5cff, #ff2d78) border-box;
-            box-shadow: 0 0 18px rgb(var(--accent-500) / .35);
+            box-shadow: 0 0 22px rgb(var(--accent-500) / .30);
         }
 
         .login-input[aria-invalid="true"] {
@@ -437,11 +441,11 @@
                 to { --beam-angle: 360deg; }
             }
 
-            @keyframes beam-spin-reverse {
-                to { --beam-angle-2: -180deg; }
+            @keyframes beam-spin-chase {
+                to { --beam-angle-2: 540deg; }
             }
 
-            .login-page { animation: beam-spin 10s linear infinite, beam-spin-reverse 14s linear infinite; }
+            .login-page { animation: beam-spin 10s linear infinite, beam-spin-chase 16s linear infinite; }
             .login-input:focus { animation: beam-spin 6s linear infinite; }
 
             .login-brand { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) backwards; }
@@ -650,7 +654,10 @@
                     d.x = (d.x + d.vx + W) % W;
                     d.y = (d.y + d.vy + H) % H;
                     if (d.burst) {
-                        d.a -= .008;
+                        d.a -= .003;
+                        if (d.a <= 0) dots.splice(i, 1);
+                    } else if (d.spawned) {
+                        d.a -= .002;
                         if (d.a <= 0) dots.splice(i, 1);
                     }
                 }
@@ -681,6 +688,22 @@
             size();
             frame();
             window.addEventListener('resize', () => { size(); if (reduce) frame(); });
+            if (!reduce) {
+                setInterval(() => {
+                    if (document.hidden || dots.length >= 120) return;
+                    for (let i = 0; i < 2; i++) {
+                        dots.push({
+                            x: Math.random() * W,
+                            y: Math.random() * H,
+                            r: .6 + Math.random() * 1,
+                            vx: (Math.random() - .5) * .22,
+                            vy: (Math.random() - .5) * .22,
+                            a: .12 + Math.random() * .28,
+                            spawned: true,
+                        });
+                    }
+                }, 1200);
+            }
             window.addEventListener('click', (e) => {
                 if (reduce || e.target.closest('.login-page')) return;
                 for (let i = 0; i < 8 && dots.length < 140; i++) {
