@@ -37,6 +37,21 @@
             --login-muted: var(--text-secondary);
             --login-placeholder: var(--text-muted);
             --login-focus: rgb(var(--accent-500) / .28);
+            --aurora-base: #f0f7ff;
+            --aurora-1: #bfdbfe;
+            --aurora-2: #7dd3fc;
+            --aurora-3: #a5f3fc;
+            --aurora-4: #1a56db;
+            --aurora-glow: #0ea5e9;
+        }
+
+        .dark {
+            --aurora-base: #0a0f1e;
+            --aurora-1: #0d2b5e;
+            --aurora-2: #0e4d6e;
+            --aurora-3: #0a7a6e;
+            --aurora-4: #1a56db;
+            --aurora-glow: #00d4ff;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -48,7 +63,7 @@
             min-height: 100dvh;
             padding: 2rem 1.25rem;
             place-items: center;
-            background: var(--login-surface);
+            background: var(--aurora-base);
             color: var(--login-text);
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-font-smoothing: antialiased;
@@ -60,15 +75,16 @@
             inset: -5%;
             z-index: 0;
             background:
-                radial-gradient(ellipse 45% 35% at 15% 20%, rgb(var(--accent-400) / .20), transparent 70%),
-                radial-gradient(ellipse 50% 40% at 85% 15%, rgb(var(--accent-300) / .16), transparent 70%),
-                radial-gradient(ellipse 55% 45% at 50% 90%, rgb(var(--accent-600) / .14), transparent 70%),
-                radial-gradient(ellipse 60% 45% at 50% 42%, rgb(var(--accent-500) / .10), transparent 70%);
+                radial-gradient(ellipse 45% 35% at 15% 20%, var(--aurora-1), transparent 70%),
+                radial-gradient(ellipse 50% 40% at 85% 15%, var(--aurora-2), transparent 70%),
+                radial-gradient(ellipse 55% 45% at 50% 90%, var(--aurora-3), transparent 70%),
+                radial-gradient(ellipse 60% 45% at 50% 42%, var(--aurora-4), transparent 70%);
             content: "";
             pointer-events: none;
+            opacity: .6;
         }
 
-        .dark body::before { opacity: .5; }
+        .dark body::before { opacity: .8; }
 
         .login-particles {
             position: fixed;
@@ -79,6 +95,12 @@
             pointer-events: none;
         }
 
+        @property --beam-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
         .login-page {
             position: relative;
             z-index: 1;
@@ -86,9 +108,13 @@
             width: min(80rem, 100%);
             min-height: min(40rem, calc(100dvh - 4rem));
             overflow: hidden;
-            grid-template-columns: minmax(0, 45%) minmax(0, 55%);
+            grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+            border: 1.5px solid transparent;
             border-radius: 1.75rem;
-            background: var(--login-surface);
+            padding: clamp(.9rem, 2vw, 1.5rem);
+            background:
+                linear-gradient(var(--login-surface), var(--login-surface)) padding-box,
+                conic-gradient(from var(--beam-angle, 0deg), transparent 0 70%, var(--aurora-glow) 82%, transparent 94%) border-box;
             box-shadow: 0 24px 80px -24px rgb(var(--accent-950) / .35), 0 4px 16px rgb(var(--accent-950) / .12);
         }
 
@@ -102,11 +128,14 @@
             flex-direction: column;
             overflow: hidden;
             padding: clamp(2rem, 4vw, 3.5rem);
+            border: 1px solid rgb(255 255 255 / .16);
+            border-radius: 1.25rem;
             isolation: isolate;
             color: #f8fafc;
             background:
                 linear-gradient(135deg, rgb(var(--accent-700) / 1), rgb(var(--accent-800) / 1)),
                 var(--login-panel);
+            box-shadow: inset 0 1px 0 rgb(255 255 255 / .12);
         }
 
         .login-brand {
@@ -387,6 +416,12 @@
 
             body::before { animation: aurora-drift 26s ease-in-out infinite alternate; }
 
+            @keyframes beam-spin {
+                to { --beam-angle: 360deg; }
+            }
+
+            .login-page { animation: beam-spin 10s linear infinite; }
+
             .login-brand { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) backwards; }
             .login-visual h2 { animation: login-rise .5s cubic-bezier(.16, 1, .3, 1) .08s backwards; }
             .login-illustration { animation: login-rise .6s cubic-bezier(.16, 1, .3, 1) .16s backwards; }
@@ -559,7 +594,8 @@
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
             const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const accent = (getComputedStyle(document.documentElement).getPropertyValue('--accent-500').trim() || '59 130 246').split(/\s+/).join(',');
+            const glowHex = (getComputedStyle(document.documentElement).getPropertyValue('--aurora-glow').trim() || '#0ea5e9').replace('#', '');
+            const accent = [0, 2, 4].map((i) => parseInt(glowHex.substr(i, 2), 16)).join(',');
 
             let W = 0, H = 0, dots = [], raf = 0;
 
