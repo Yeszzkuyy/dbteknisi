@@ -268,10 +268,8 @@
             width: 22rem;
             z-index: 0;
             background:
-                linear-gradient(68deg, transparent 0 31%, rgb(var(--accent-600) / .05) 31.2% 31.4%, transparent 31.6% 100%),
-                linear-gradient(16deg, transparent 0 58%, rgb(var(--accent-500) / .035) 58.2% 58.4%, transparent 58.6% 100%),
-                radial-gradient(ellipse 75% 60% at 0% 50%, rgb(var(--accent-950) / .08) 0%, transparent 70%),
-                linear-gradient(270deg, var(--login-surface) 0%, var(--login-surface) 32%, rgb(var(--accent-950) / .05) 58%, rgb(var(--accent-950) / .02) 79%, transparent 100%);
+                radial-gradient(ellipse 90% 75% at 0% 50%, rgb(var(--accent-950) / .06) 0%, transparent 75%),
+                linear-gradient(270deg, var(--login-surface) 0%, var(--login-surface) 38%, transparent 100%);
             content: "";
             pointer-events: none;
         }
