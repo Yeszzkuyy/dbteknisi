@@ -113,13 +113,13 @@
                         <p class="text-xs font-bold uppercase tracking-[0.18em] text-accent-600 dark:text-accent-300">
                             {{ \Carbon\Carbon::now()->locale(app()->getLocale())->translatedFormat('l, d F Y') }}
                         </p>
-                        <span class="hidden h-1 w-1 rounded-full bg-slate-300 sm:block dark:bg-[#4f5b7e]"></span>
+                        <span class="hidden h-1 w-1 rounded-full bg-slate-300 sm:block dark:bg-[#6e789e]"></span>
                         <span class="text-xs font-medium text-slate-400">{{ __('Ringkasan operasional') }}</span>
                     </div>
-                    <h1 class="mt-3 max-w-3xl text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-[#e8edf8]">
+                    <h1 class="mt-3 max-w-3xl text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-[#f2f6ff]">
                         {{ __('Selamat datang kembali,') }} {{ auth()->user()->name }}
                     </h1>
-                    <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 dark:text-[#8e99bf]">
+                    <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 dark:text-[#a6b1d4]">
                         {{ __('Pantau kondisi customer, project, dan dokumentasi 3DY Group dari satu tempat.') }}
                     </p>
                 </div>
@@ -130,7 +130,7 @@
                     </span>
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">{{ __('Dashboard umum') }}</p>
-                        <p class="mt-0.5 text-sm font-bold text-slate-700 dark:text-[#e8edf8]">Overview 3DY Group</p>
+                        <p class="mt-0.5 text-sm font-bold text-slate-700 dark:text-[#f2f6ff]">Overview 3DY Group</p>
                     </div>
                 </div>
             </div>
@@ -140,8 +140,8 @@
         <section aria-labelledby="dashboard-summary-heading" data-reveal data-reveal-delay="1">
             <div class="mb-3 flex flex-wrap items-end justify-between gap-2 px-1">
                 <div>
-                    <h2 id="dashboard-summary-heading" class="text-lg font-bold text-slate-900 dark:text-[#e8edf8]">{{ __('Ringkasan utama') }}</h2>
-                    <p class="mt-0.5 text-sm text-slate-500 dark:text-[#8e99bf]">{{ __('Angka terbaru dari data operasional yang tersedia.') }}</p>
+                    <h2 id="dashboard-summary-heading" class="text-lg font-bold text-slate-900 dark:text-[#f2f6ff]">{{ __('Ringkasan utama') }}</h2>
+                    <p class="mt-0.5 text-sm text-slate-500 dark:text-[#a6b1d4]">{{ __('Angka terbaru dari data operasional yang tersedia.') }}</p>
                 </div>
                 <span class="text-xs font-semibold text-slate-400">{{ count($dashboardCards) }} {{ __('indikator') }}</span>
             </div>
@@ -153,9 +153,9 @@
                         <div class="relative flex items-start justify-between gap-4">
                             <div class="min-w-0">
                                 <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{{ $card['label'] }}</p>
-                                <p class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 tabular-nums dark:text-[#e8edf8]"
+                                <p class="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 tabular-nums dark:text-[#f2f6ff]"
                                    x-data="counter({{ $card['value'] }})" x-init="start()" x-text="display">{{ $card['value'] }}</p>
-                                <p class="mt-1 text-xs font-medium text-slate-500 dark:text-[#8e99bf]">{{ $card['description'] }}</p>
+                                <p class="mt-1 text-xs font-medium text-slate-500 dark:text-[#a6b1d4]">{{ $card['description'] }}</p>
                             </div>
                             <span class="shrink-0 rounded-xl p-3 {{ $card['iconClass'] }}">
                                 <x-icon name="{{ $card['icon'] }}" class="h-5 w-5" />
@@ -170,10 +170,10 @@
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7 dark:border-[#334070] dark:bg-[#232b3e]" data-reveal data-reveal-delay="2" aria-labelledby="recent-activities-heading">
             <div class="flex flex-wrap items-end justify-between gap-3 border-b border-slate-100 pb-4 dark:border-[#334070]">
                 <div>
-                    <h2 id="recent-activities-heading" class="text-lg font-bold text-slate-900 dark:text-[#e8edf8]">{{ __('Aktivitas terbaru') }}</h2>
-                    <p class="mt-0.5 text-sm text-slate-500 dark:text-[#8e99bf]">{{ __('Perubahan terakhir yang tercatat pada project.') }}</p>
+                    <h2 id="recent-activities-heading" class="text-lg font-bold text-slate-900 dark:text-[#f2f6ff]">{{ __('Aktivitas terbaru') }}</h2>
+                    <p class="mt-0.5 text-sm text-slate-500 dark:text-[#a6b1d4]">{{ __('Perubahan terakhir yang tercatat pada project.') }}</p>
                 </div>
-                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500 dark:bg-[#334070] dark:text-[#8e99bf]">
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500 dark:bg-[#334070] dark:text-[#a6b1d4]">
                     {{ $activities->count() }} {{ __('aktivitas') }}
                 </span>
             </div>
@@ -185,26 +185,26 @@
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                            <p class="min-w-0 text-sm leading-snug text-slate-700 dark:text-[#e8edf8]">
-                                <span class="font-bold text-slate-900 dark:text-[#e8edf8]">{{ $activity->user?->name ?? 'System' }}</span>
-                                <span class="text-slate-600 dark:text-[#8e99bf]">{{ $activity->title ?? __('Aktivitas') }}</span>
+                            <p class="min-w-0 text-sm leading-snug text-slate-700 dark:text-[#f2f6ff]">
+                                <span class="font-bold text-slate-900 dark:text-[#f2f6ff]">{{ $activity->user?->name ?? 'System' }}</span>
+                                <span class="text-slate-600 dark:text-[#a6b1d4]">{{ $activity->title ?? __('Aktivitas') }}</span>
                             </p>
                             <time class="shrink-0 text-xs font-medium text-slate-400" datetime="{{ $activity->activity_date?->toIso8601String() }}">
                                 {{ $activity->activity_date?->setTimezone('Asia/Jakarta')->diffForHumans() ?? __('Waktu tidak tersedia') }}
                             </time>
                         </div>
-                        <p class="mt-1 truncate text-xs text-slate-400 dark:text-[#4f5b7e]">
+                        <p class="mt-1 truncate text-xs text-slate-400 dark:text-[#6e789e]">
                             {{ $activity->project?->project_name ?? __('Project tidak tersedia') }}
                         </p>
                     </div>
                 </article>
             @empty
                 <div class="rounded-xl bg-slate-50 px-5 py-12 text-center dark:bg-[#2a3150]/60">
-                    <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-slate-300 shadow-sm dark:bg-[#334070] dark:text-[#4f5b7e]">
+                    <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white text-slate-300 shadow-sm dark:bg-[#334070] dark:text-[#6e789e]">
                         <x-icon name="activity" class="h-6 w-6" />
                     </span>
-                    <p class="mt-4 text-sm font-medium text-slate-500 dark:text-[#8e99bf]">{{ __('Belum ada aktivitas yang tercatat.') }}</p>
-                    <p class="mt-1 text-xs text-slate-400 dark:text-[#4f5b7e]">{{ __('Aktivitas project akan muncul di sini.') }}</p>
+                    <p class="mt-4 text-sm font-medium text-slate-500 dark:text-[#a6b1d4]">{{ __('Belum ada aktivitas yang tercatat.') }}</p>
+                    <p class="mt-1 text-xs text-slate-400 dark:text-[#6e789e]">{{ __('Aktivitas project akan muncul di sini.') }}</p>
                 </div>
             @endforelse
         </section>
