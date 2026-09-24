@@ -10,6 +10,8 @@
     'emptyLabel' => null,
     'required' => false,
     'error' => null,
+    'id' => null,
+    'size' => 'md',
 ])
 
 @php
@@ -26,12 +28,13 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => 'glide-select-root']) }}>
-    <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+    <input type="hidden" name="{{ $name }}" @if($id) id="{{ $id }}" @endif value="{{ $value }}">
     <div data-glide-mount
          data-options='@json($items)'
          data-value="{{ $value }}"
          data-placeholder="{{ $placeholder }}"
          data-label="{{ $label }}"
+         data-size="{{ $size }}"
          @if($tags) data-tags="1" @endif
          @if($autosubmit) data-autosubmit="1" @endif
          @if($full) data-full="1" @endif

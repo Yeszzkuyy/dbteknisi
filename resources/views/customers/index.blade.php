@@ -1,4 +1,7 @@
 <x-app-layout>
+    @if(session('success') && session('success_card'))
+        <x-status-card :message="session('success')" />
+    @endif
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
             <p class="text-xs font-bold uppercase tracking-[0.18em] text-accent-600 dark:text-accent-300">{{ __('Data relasi') }}</p>
@@ -75,14 +78,9 @@
                 </div>
                 <div class="w-full sm:w-44 sm:shrink-0">
                     <label for="customer-pt" class="sr-only">{{ __('Filter Company') }}</label>
-                    <select id="customer-pt" name="pt_group"
-                            class="h-11 w-full rounded-xl border border-slate-300 text-sm focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600"
-                            onchange="this.form.submit()">
-                        <option value="">{{ __('Semua Company') }}</option>
-                        @foreach($ptGroups as $group)
-                            <option value="{{ $group }}" {{ request('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
-                        @endforeach
-                    </select>
+                    <x-glide-select id="customer-pt" name="pt_group" size="lg" :label="__('Filter Company')"
+                        :options="collect($ptGroups)->all()"
+                        :value="request('pt_group', '')" :empty-label="__('Semua Company')" autosubmit />
                 </div>
                 <button type="submit"
                         title="{{ __('Cari') }}"

@@ -39,7 +39,7 @@ function mountAll() {
                 defaultValue={node.dataset.value ?? ''}
                 placeholder={node.dataset.placeholder || 'Pilih…'}
                 showTags={node.dataset.tags === '1'}
-                size="md"
+                size={node.dataset.size || 'md'}
                 radius={10}
                 ariaLabel={node.dataset.label || 'Pilih'}
                 className={node.dataset.full === '1' ? 'glide-select--full' : ''}

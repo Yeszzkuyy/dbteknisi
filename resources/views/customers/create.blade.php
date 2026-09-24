@@ -23,6 +23,7 @@
     </div>
 
     <form action="{{ route('customers.store') }}" method="POST"
+          data-loading-text="{{ __('Menyimpan…') }}"
           class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 space-y-4 w-full">
         @csrf
 
@@ -39,14 +40,10 @@
             <label for="pt_group" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
                 {{ __('Customer dari Company') }} <span class="text-red-500">*</span>
             </label>
-            <select id="pt_group" name="pt_group" required
-                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                <option value="">{{ __('Pilih Company') }}</option>
-                @foreach($ptGroups as $group)
-                    <option value="{{ $group }}" {{ old('pt_group') == $group ? 'selected' : '' }}>{{ $group }}</option>
-                @endforeach
-            </select>
-            @error('pt_group') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+            <x-glide-select name="pt_group" :label="__('Customer dari Company')" required
+                :options="collect($ptGroups)->all()"
+                :value="old('pt_group', '')"
+                :placeholder="__('Pilih Company')" :error="$errors->first('pt_group')" />
         </div>
 
         <div>
