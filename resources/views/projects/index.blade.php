@@ -69,9 +69,9 @@
                                        title="{{ __('Lihat customer') }}"
                                        aria-label="{{ __('Lihat customer') }}"
                                        class="group/btn relative overflow-hidden p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
-                                        <img src="{{ asset('icons/lead-view.svg') }}" alt="" loading="lazy"
+                                        <img src="{{ asset('icons/cust-view.png') }}" alt="" loading="lazy"
                                              class="block h-5 w-5 group-hover/btn:hidden" />
-                                        <img src="{{ asset('icons/lead-view.gif') }}" alt="" loading="lazy"
+                                        <img src="{{ asset('icons/cust-view.gif') }}" alt="" loading="lazy"
                                              class="hidden h-5 w-5 group-hover/btn:block" />
                                         <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                     </a>
