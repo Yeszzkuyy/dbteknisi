@@ -252,6 +252,53 @@ document.addEventListener('alpine:init', () => {
 Alpine.start();
 
 /* ============================================================
+   Sidebar grup — buka/tutup mengikuti halaman AKTIF, bukan klik.
+   Header grup adalah link navigasi; lipatan dibuka/ditutup dengan
+   animasi setiap wire:navigate selesai (livewire:navigated).
+   Cocokkan prefix path link anak terhadap URL saat ini.
+   ============================================================ */
+function sidebarGroupMatches(group) {
+    const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    const links = group.querySelectorAll('a[href]');
+    for (const a of links) {
+        let p = '';
+        try {
+            p = new URL(a.href).pathname.replace(/\/+$/, '') || '/';
+        } catch (e) {
+            continue;
+        }
+        if (p !== '/' && (path === p || path.startsWith(p + '/'))) return true;
+    }
+    return false;
+}
+
+function syncSidebarGroups() {
+    document.querySelectorAll('#sidebar-navigation .branched').forEach((group) => {
+        const want = sidebarGroupMatches(group);
+        const has = group.hasAttribute('data-open');
+        let scope = null;
+        try {
+            scope = window.Alpine ? Alpine.$data(group) : null;
+        } catch (e) {
+            scope = null;
+        }
+        if (scope && typeof scope.open === 'boolean') {
+            if (scope.open !== want) scope.open = want; // flip → transisi lipat beranimasi
+            else if (want && !has) group.setAttribute('data-open', '');
+            else if (!want && has) group.removeAttribute('data-open');
+        } else if (want !== has) {
+            // Tanpa scope Alpine: mainkan atribut langsung (transisi tetap jalan).
+            // Buka: pastikan tertutup dulu + reflow agar animasi unfold replay.
+            if (want) group.removeAttribute('data-open');
+            void group.offsetHeight;
+            if (want) group.setAttribute('data-open', '');
+            else group.removeAttribute('data-open');
+        }
+    });
+}
+document.addEventListener('livewire:navigated', () => syncSidebarGroups());
+
+/* ============================================================
    Toast global + form AJAX (tanpa refresh).
    - <form data-ajax data-ajax-target="#tabel"> (GET): ganti target
      dengan partial `html` + pushState URL.

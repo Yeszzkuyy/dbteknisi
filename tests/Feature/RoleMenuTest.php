@@ -20,10 +20,39 @@ class RoleMenuTest extends TestCase
     }
 
     /**
-     * Matriks: tiap divisi melihat Dashboard + divisinya +
-     * Customer + Trash, tapi TIDAK menu/halaman divisi lain.
-     * Monitoring hanya untuk manager & super-admin.
+     * Header grup sidebar adalah link navigasi (tanpa toggle klik):
+     * lipatan dibuka/ditutup via JS mengikuti halaman aktif.
      */
+    public function test_sidebar_group_headers_are_navigation_links()
+    {
+        $u = $this->loginAs('super-admin');
+        $html = $this->actingAs($u)->get('/dashboard')->assertOk()->getContent();
+
+        // Potong hanya navigasi sidebar (dropdown avatar/notif boleh punya toggle sendiri).
+        $navHtml = str_contains($html, 'id="sidebar-navigation"')
+            ? substr($html, strpos($html, 'id="sidebar-navigation"'))
+            : $html;
+        $navHtml = substr($navHtml, 0, strpos($navHtml, '</nav>') ?: null);
+
+        foreach ( [
+            'sidebar-management-menu' => 'manage-sales',
+            'sidebar-technician-menu' => 'teknisi/dashboard',
+            'sidebar-marketing-menu' => 'marketing/dashboard',
+            'sidebar-sales-menu' => 'sales/my-leads',
+            'sidebar-admin-menu' => 'admin/invoices',
+            'sidebar-admin-panel-menu' => 'admin-panel',
+        ] as $controls => $path) {
+            $this->assertMatchesRegularExpression(
+                '/<a[^>]*aria-controls="' . $controls . '"/',
+                $navHtml,
+                "header $controls harus berupa link"
+            );
+            $this->assertStringContainsString($path, $navHtml);
+        }
+
+        $this->assertStringNotContainsString('@click="open = !open"', $navHtml);
+    }
+
     public function test_teknisi_menu_and_access()
     {
         $u = $this->loginAs('teknisi');

@@ -219,8 +219,9 @@
                 if(window.innerWidth<1024){close();return}
                 setCollapsed(!root.classList.contains('sidebar-collapsed'));
             });}
-            // Klik menu grup saat minimized → lebarkan sidebar dulu
-            s.querySelectorAll('nav button[type="button"]').forEach(function(b){
+            // Klik header grup saat minimized → lebarkan sidebar dulu
+            // (header grup kini link navigasi: tetap lebarkan + lanjut pindah halaman)
+            s.querySelectorAll('nav button[type="button"], nav a[aria-controls]').forEach(function(b){
                 if(b.dataset.bound)return;b.dataset.bound='1';
                 b.addEventListener('click',function(){if(window.innerWidth>=1024&&root.classList.contains('sidebar-collapsed'))setCollapsed(false)});
             });
