@@ -133,8 +133,8 @@
             position: relative;
             z-index: 1;
             display: grid;
-            width: min(80rem, 100%);
-            min-height: min(40rem, calc(100dvh - 4rem));
+            width: min(72rem, 100%);
+            min-height: min(36rem, calc(100dvh - 4rem));
             overflow: hidden;
             grid-template-columns: minmax(0, 50%) minmax(0, 50%);
             border: 1.5px solid transparent;
@@ -490,11 +490,11 @@
             body { padding: 1.25rem .9rem; }
 
             .login-page { grid-template-columns: 1fr; border-radius: 1.25rem; min-height: 0; }
-            .login-visual { min-height: 0; order: 2; padding: 1.75rem 1.5rem 1.5rem; }
+            .login-visual { min-height: 0; order: 1; padding: 1.75rem 1.5rem 1.5rem; }
             .login-visual h2 { margin-top: 1.4rem; font-size: 1.5rem; }
             .login-brand-mark { width: 3.5rem; height: 2.35rem; }
             .login-illustration { width: min(100%, 20rem); padding-top: 1.25rem; }
-            .login-form-panel { min-height: 0; order: 1; align-items: flex-start; padding: 2.25rem 1.5rem 2rem; }
+            .login-form-panel { min-height: 0; order: 2; align-items: flex-start; padding: 2.25rem 1.5rem 2rem; }
             .login-header { margin-bottom: 1.9rem; }
         }
 
