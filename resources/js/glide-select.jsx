@@ -61,7 +61,15 @@ function mountAll() {
 }
 
 const SUBMIT_BTN = 'button[type="submit"], input[type="submit"]';
-const SPIN_SVG = '<svg class="gs-submit-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" opacity=".3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+
+// Snippet loader milik user (size-8 diganti width/height 32 karena kelas itu belum ada di build).
+const LOADER_HTML = `<div class="text-center" role="status">
+  <svg class="mx-auto animate-spin text-indigo-600" width="32" height="32" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+  <p class="mt-4 font-medium text-gray-700" data-text>Loading...</p>
+</div>`;
 
 function setSubmitLocked(form, locked) {
     form.querySelectorAll(SUBMIT_BTN).forEach((b) => {
@@ -71,20 +79,15 @@ function setSubmitLocked(form, locked) {
     showSubmitOverlay(locked ? form : null);
 }
 
-// Overlay loading full-layar (inline style saja, tanpa kelas Tailwind).
-// Dibuat sekali, dipakai ulang; warna fix gelap agar terbaca di light/dark mode.
+// Loader submit: overlay disamakan dengan rect FORM (tengah form, bukan tengah layar).
+// Dibuat sekali, dipakai ulang; teks ikut locale via <html lang>, scrim ikut dark mode.
 function showSubmitOverlay(form) {
     let el = document.getElementById('gs-submit-overlay');
     if (!el) {
         el = document.createElement('div');
         el.id = 'gs-submit-overlay';
-        el.setAttribute('role', 'status');
-        Object.assign(el.style, {
-            position: 'fixed', inset: '0', zIndex: '100', display: 'none',
-            alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(2, 6, 23, .55)', backdropFilter: 'blur(2px)'
-        });
-        el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;background:#0f172a;color:#f1f5f9;font-size:14px;font-weight:500;padding:14px 20px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)">${SPIN_SVG}<span></span></div>`;
+        el.style.display = 'none';
+        el.innerHTML = LOADER_HTML;
         document.body.appendChild(el);
     }
     // ponytail: jangan pakai atribut hidden — display inline menimpanya sehingga overlay abadi
@@ -92,8 +95,23 @@ function showSubmitOverlay(form) {
         el.style.display = 'none';
         return;
     }
-    el.querySelector('span').textContent = form.dataset.loadingText || 'Menyimpan…';
-    el.style.display = 'flex';
+    const rect = form.getBoundingClientRect();
+    const dark = document.documentElement.classList.contains('dark');
+    Object.assign(el.style, {
+        position: 'fixed',
+        left: `${rect.left}px`,
+        top: `${rect.top}px`,
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: dark ? 'rgba(2, 6, 23, .55)' : 'rgba(255, 255, 255, .65)',
+        borderRadius: getComputedStyle(form).borderRadius || '0px',
+        zIndex: '60'
+    });
+    const fallback = (document.documentElement.lang || 'en').startsWith('id') ? 'Memuat…' : 'Loading...';
+    el.querySelector('[data-text]').textContent = form.dataset.loadingText || fallback;
 }
 
 // Anti-duplikat: kunci tombol saat submit benar-benar jalan.

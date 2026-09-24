@@ -256,21 +256,3 @@
   width: 100%;
   justify-content: space-between;
 }
-
-/* Spinner kunci double-submit (disisipkan JS, bukan bagian template). */
-.gs-submit-spin {
-  flex-shrink: 0;
-  animation: gs-spin 0.9s linear infinite;
-}
-
-@keyframes gs-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gs-submit-spin {
-    animation: none;
-  }
-}
