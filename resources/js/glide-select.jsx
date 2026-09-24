@@ -79,15 +79,15 @@ function setSubmitLocked(form, locked) {
     showSubmitOverlay(locked ? form : null);
 }
 
-// Loader submit: overlay disamakan dengan rect FORM (tengah form, bukan tengah layar).
-// Dibuat sekali, dipakai ulang; teks ikut locale via <html lang>, scrim ikut dark mode.
+// Loader submit: kartu tengah layar berisi snippet loader (satu bentuk dengan kartu sukses).
+// Dibuat sekali, dipakai ulang; shell kartu inline style (dark-aware), isi pakai kelas Tailwind.
 function showSubmitOverlay(form) {
     let el = document.getElementById('gs-submit-overlay');
     if (!el) {
         el = document.createElement('div');
         el.id = 'gs-submit-overlay';
         el.style.display = 'none';
-        el.innerHTML = LOADER_HTML;
+        el.innerHTML = `<div data-card>${LOADER_HTML}</div>`;
         document.body.appendChild(el);
     }
     // ponytail: jangan pakai atribut hidden — display inline menimpanya sehingga overlay abadi
@@ -95,23 +95,33 @@ function showSubmitOverlay(form) {
         el.style.display = 'none';
         return;
     }
-    const rect = form.getBoundingClientRect();
     const dark = document.documentElement.classList.contains('dark');
     Object.assign(el.style, {
         position: 'fixed',
-        left: `${rect.left}px`,
-        top: `${rect.top}px`,
-        width: `${rect.width}px`,
-        height: `${rect.height}px`,
+        inset: '0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: dark ? 'rgba(2, 6, 23, .55)' : 'rgba(255, 255, 255, .65)',
-        borderRadius: getComputedStyle(form).borderRadius || '0px',
+        padding: '16px',
+        background: dark ? 'rgba(2, 6, 23, .55)' : 'rgba(15, 23, 42, .4)',
         zIndex: '60'
     });
-    const fallback = (document.documentElement.lang || 'en').startsWith('id') ? 'Memuat…' : 'Loading...';
-    el.querySelector('[data-text]').textContent = form.dataset.loadingText || fallback;
+    const card = el.querySelector('[data-card]');
+    Object.assign(card.style, {
+        width: '100%',
+        maxWidth: '320px',
+        borderRadius: '16px',
+        padding: '28px 32px',
+        background: dark ? '#1e293b' : '#ffffff',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, .35)'
+    });
+    const text = el.querySelector('[data-text]');
+    text.textContent = form.dataset.loadingText || fallbackLoadingText();
+    if (dark) text.style.color = '#f1f5f9';
+}
+
+function fallbackLoadingText() {
+    return (document.documentElement.lang || 'en').startsWith('id') ? 'Memuat…' : 'Loading...';
 }
 
 // Anti-duplikat: kunci tombol saat submit benar-benar jalan.
