@@ -56,6 +56,21 @@
 .sidebar .branched-tree > a:hover {
     background: transparent;
 }
+/* Pil background menu AKTIF juga menutupi garis (animasi draw berjalan
+   tepat di baris aktif). Untuk anak pohon: tanpa pil, aktif ditandai
+   teks accent + garis reach + marker — seperti template.
+   (0,3,1) menang atas aturan aktif global (0,2,2) dan utility bg. */
+.sidebar .branched-tree > a[aria-current='page'] {
+    background: transparent;
+    color: rgb(var(--accent-500) / 1);
+}
+/* Header grup (Management, Teknisi, ...): tanpa background hover juga,
+   supaya konsisten — pil aktif header dipertahankan (tidak ada garis
+   di belakangnya). Daun top-level (Dashboard, Customer, ...) tetap
+   memakai hover/pil bawaan. */
+.sidebar .branched > button:hover {
+    background: transparent;
+}
 /* :not(.ml-auto) ikut dihitung → (0,4,3), menang atas aturan geser
    bawaan (0,3,3). Tanpa ini label masih bergeser 2px saat hover. */
 .sidebar nav .branched-tree > a:hover > span:not(.ml-auto),
