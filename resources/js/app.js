@@ -251,34 +251,6 @@ document.addEventListener('alpine:init', () => {
 
 Alpine.start();
 
-/* ============================================================
-   Branched sidebar paket B — garis reach aktif "menggambar"
-   tiap halaman dimuat (ala React Bits drawDuration).
-   Server me-render garis dalam keadaan jadi; di sini sembunyikan
-   dulu sebelum paint pertama, lalu kembalikan ke 0 sehingga
-   transisi stroke-dashoffset di CSS yang menganimasikannya.
-   Dipanggil saat load awal dan setiap livewire:navigated.
-   Tanpa JS / reduced-motion: garis langsung tampil (fallback aman).
-   ============================================================ */
-window.animateBranchedDraw = function () {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    requestAnimationFrame(function () {
-        const active = [];
-        document.querySelectorAll('.sidebar .branched-reach').forEach(function (p) {
-            if (p.style.strokeDashoffset !== '0' && p.style.strokeDashoffset !== '0px') return;
-            if (!p.style.strokeDasharray) return;
-            p.style.strokeDashoffset = p.style.strokeDasharray;
-            active.push(p);
-        });
-        if (!active.length) return;
-        requestAnimationFrame(function () {
-            active.forEach(function (p) {
-                p.style.strokeDashoffset = '0';
-            });
-        });
-    });
-};
-
-window.animateBranchedDraw();
-document.addEventListener('livewire:navigated', window.animateBranchedDraw);
+/* Branched draw kini murni CSS keyframes ([data-bm-draw]) — berjalan
+   otomatis tiap konten masuk tanpa flicker. Tidak perlu JS. */
 
