@@ -155,7 +155,7 @@
             @include('partials.avatar-lightbox')
 
             <div class="px-4 sm:px-6 lg:px-8 pt-5">
-                @if(session('success'))
+                @if(session('success') && !session('success_card'))
                     <div class="rounded-xl bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-400 px-5 py-3 mb-4">{{ session('success') }}</div>
                 @endif
                 @if(session('error'))
