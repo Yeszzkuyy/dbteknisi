@@ -268,3 +268,9 @@
     transform: rotate(360deg);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .gs-submit-spin {
+    animation: none;
+  }
+}

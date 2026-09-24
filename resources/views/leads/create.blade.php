@@ -9,6 +9,7 @@
     </div>
 
     <form action="{{ route('leads.store') }}" method="POST" enctype="multipart/form-data"
+          data-loading-text="{{ __('Menyimpan…') }}"
           class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
         @csrf
         @if(!empty($prefill['whatsapp_account_id']))

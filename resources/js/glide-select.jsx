@@ -61,16 +61,38 @@ function mountAll() {
 }
 
 const SUBMIT_BTN = 'button[type="submit"], input[type="submit"]';
-const SPIN_SVG = '<svg class="gs-submit-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" opacity=".3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+const SPIN_SVG = '<svg class="gs-submit-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" opacity=".3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
 
 function setSubmitLocked(form, locked) {
     form.querySelectorAll(SUBMIT_BTN).forEach((b) => {
         b.disabled = locked;
         b.style.opacity = locked ? '.65' : '';
-        const spin = b.querySelector(':scope > .gs-submit-spin');
-        if (locked && !spin) b.insertAdjacentHTML('afterbegin', SPIN_SVG);
-        if (!locked) spin?.remove();
     });
+    showSubmitOverlay(locked ? form : null);
+}
+
+// Overlay loading full-layar (inline style saja, tanpa kelas Tailwind).
+// Dibuat sekali, dipakai ulang; warna fix gelap agar terbaca di light/dark mode.
+function showSubmitOverlay(form) {
+    let el = document.getElementById('gs-submit-overlay');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'gs-submit-overlay';
+        el.setAttribute('role', 'status');
+        Object.assign(el.style, {
+            position: 'fixed', inset: '0', zIndex: '100', display: 'flex',
+            alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(2, 6, 23, .55)', backdropFilter: 'blur(2px)'
+        });
+        el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;background:#0f172a;color:#f1f5f9;font-size:14px;font-weight:500;padding:14px 20px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)">${SPIN_SVG}<span></span></div>`;
+        document.body.appendChild(el);
+    }
+    if (!form) {
+        el.hidden = true;
+        return;
+    }
+    el.querySelector('span').textContent = form.dataset.loadingText || 'Menyimpan…';
+    el.hidden = false;
 }
 
 // Anti-duplikat: kunci tombol saat submit benar-benar jalan.
@@ -83,6 +105,13 @@ function wireSubmitGuard() {
         form.addEventListener('invalid', () => setSubmitLocked(form, false), true);
         form.addEventListener('submit', () => setSubmitLocked(form, true));
     });
+    // Kembali via tombol back (bfcache): pastikan overlay hilang + tombol aktif lagi.
+    if (!document.body.dataset.gsPageshow) {
+        document.body.dataset.gsPageshow = 'true';
+        window.addEventListener('pageshow', () => {
+            document.querySelectorAll('form[data-submit-guarded]').forEach((form) => setSubmitLocked(form, false));
+        });
+    }
 }
 
 // Opsi A: hidden input lolos validasi browser, jadi cegat submit manual.
