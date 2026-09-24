@@ -80,12 +80,11 @@
 .sidebar .branched > button[data-sidebar-active='true'] {
     background: transparent;
 }
-/* Hover mode gelap mengikuti warna tema (accent-300), bukan putih/
-   abu bawaan. :not() mengecualikan baris aktif. Light mode tak diubah. */
-.dark .sidebar .branched-tree > a:hover:not([aria-current='page']) {
-    color: rgb(var(--accent-300) / 1);
-}
-.dark .sidebar .branched > button:hover:not([data-sidebar-active='true']) {
+/* Hover mode gelap mengikuti warna tema (accent-300) untuk SELURUH
+   link sidebar — daun biasa maupun grup; bukan putih/abu bawaan.
+   :not() mengecualikan baris aktif. Light mode tak diubah. */
+.dark .sidebar nav a:hover:not([aria-current='page']),
+.dark .sidebar nav button:hover:not([data-sidebar-active='true']) {
     color: rgb(var(--accent-300) / 1);
 }
 /* Geseran ikon/label header grup saat hover ikut dimatikan

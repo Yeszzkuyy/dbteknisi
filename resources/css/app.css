@@ -101,8 +101,11 @@
     --nav-muted: #6e789e;
     --nav-hover-bg: #2a3150;
     --nav-hover-text: #f2f6ff;
-    --nav-active-bg: #0a3d30;
-    --nav-active-text: #0fd4a0;
+    /* Aktif dark ikut accent tema (dulu hijau hardcode #0a3d30/#0fd4a0,
+       sehingga tema ungu/oren tetap tampil hijau). Pola sama seperti
+       light mode di atas (accent-500/0.10 + accent-700). */
+    --nav-active-bg: rgb(var(--accent-500) / 0.18);
+    --nav-active-text: rgb(var(--accent-300) / 1);
     --sidebar-logo-text: rgb(var(--accent-300) / 1);
     --sidebar-border-soft: #2a3352;
     --sidebar-panel-bg: rgba(255, 255, 255, 0.04);
