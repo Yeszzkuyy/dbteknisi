@@ -897,5 +897,8 @@
     "Ambil alih": "Take over",
     "Kembalikan ke bot": "Return to bot",
     "Gagal mengambil alih percakapan.": "Failed to take over the conversation.",
-    "Gagal mengembalikan ke bot.": "Failed to return to bot."
+    "Gagal mengembalikan ke bot.": "Failed to return to bot.",
+    "Bidang ini wajib diisi.": "This field is required.",
+    "Semua PT": "All Companies",
+    "Pilih…": "Select…"
 }

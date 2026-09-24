@@ -7,8 +7,10 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Notifications\NewLeadNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class LeadNotificationTest extends TestCase
@@ -36,6 +38,31 @@ class LeadNotificationTest extends TestCase
             'kebutuhan' => 'CCTV',
             'incoming_date' => now()->toDateString(),
         ], $overrides))->assertRedirect(route('leads.index'));
+    }
+
+    public function test_store_queues_notification_and_redirects_with_flash(): void
+    {
+        Queue::fake();
+        $this->actingAs($this->loginAs('marketing'));
+
+        $managementUser = User::factory()->create();
+        $managementUser->assignRole('management');
+
+        $customer = Customer::create(['name' => 'PT Antre']);
+
+        $this->post(route('leads.store'), [
+            'customer_mode' => 'existing',
+            'customer_id' => $customer->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'incoming_date' => now()->toDateString(),
+        ])
+            ->assertRedirect(route('leads.index'))
+            ->assertSessionHas('success');
+
+        $this->assertSame(1, Lead::count());
+        // Notifikasi wajib antre (tidak dikirim inline agar submit tetap cepat).
+        Queue::assertPushed(SendQueuedNotifications::class);
     }
 
     public function test_unassigned_new_lead_notifies_management_users_only(): void

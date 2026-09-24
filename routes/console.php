@@ -9,3 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('schedules:remind')->everyMinute();
+
+// ponytail: worker ringan tiap menit agar notifikasi antre (mis. NewLeadNotification) terkirim
+// tanpa proses supervisor; database driver atomic sehingga overlap antar worker aman
+Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute();

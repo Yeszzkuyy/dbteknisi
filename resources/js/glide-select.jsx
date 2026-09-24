@@ -56,7 +56,33 @@ function mountAll() {
             />
         );
     });
+    wireSubmitGuard();
     wireRequiredValidation();
+}
+
+const SUBMIT_BTN = 'button[type="submit"], input[type="submit"]';
+const SPIN_SVG = '<svg class="gs-submit-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" opacity=".3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+
+function setSubmitLocked(form, locked) {
+    form.querySelectorAll(SUBMIT_BTN).forEach((b) => {
+        b.disabled = locked;
+        b.style.opacity = locked ? '.65' : '';
+        const spin = b.querySelector(':scope > .gs-submit-spin');
+        if (locked && !spin) b.insertAdjacentHTML('afterbegin', SPIN_SVG);
+        if (!locked) spin?.remove();
+    });
+}
+
+// Anti-duplikat: kunci tombol saat submit benar-benar jalan.
+// Dibuka lagi bila digagalkan (native 'invalid', atau required di bawah).
+// Didaftarkan duluan agar wireRequiredValidation bisa membukanya lagi.
+function wireSubmitGuard() {
+    document.querySelectorAll('form:not([data-submit-guarded])').forEach((form) => {
+        if (!form.querySelector('[data-glide-mount]')) return;
+        form.dataset.submitGuarded = 'true';
+        form.addEventListener('invalid', () => setSubmitLocked(form, false), true);
+        form.addEventListener('submit', () => setSubmitLocked(form, true));
+    });
 }
 
 // Opsi A: hidden input lolos validasi browser, jadi cegat submit manual.
@@ -74,6 +100,7 @@ function wireRequiredValidation() {
                 const err = scope?.querySelector('.glide-select-error');
                 if (hidden && !hidden.value) {
                     e.preventDefault();
+                    setSubmitLocked(form, false);
                     if (err) {
                         if (node.dataset.requiredMessage) err.textContent = node.dataset.requiredMessage;
                         err.removeAttribute('hidden');
