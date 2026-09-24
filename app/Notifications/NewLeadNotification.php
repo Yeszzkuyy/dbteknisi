@@ -21,6 +21,10 @@ class NewLeadNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
+        if ($this->muted($notifiable)) {
+            return [];
+        }
+
         $channels = [];
 
         if ($notifiable->preference('notify_system', true)) {

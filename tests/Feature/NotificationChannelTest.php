@@ -43,13 +43,13 @@ class NotificationChannelTest extends TestCase
         $this->assertSame([], $this->notification()->via($user));
     }
 
-    public function test_webpush_only_when_system_and_email_disabled(): void
+    public function test_email_disabled_mutes_all_channels(): void
     {
         $user = User::factory()->create();
-        $user->preferences = ['notify_system' => false, 'notify_email' => false];
+        $user->preferences = ['notify_system' => true, 'notify_email' => false, 'notify_push' => true];
         $user->save();
 
-        $this->assertSame([WebPushChannel::class], $this->notification()->via($user));
+        $this->assertSame([], $this->notification()->via($user));
     }
 
     public function test_all_notifications_include_mail_by_default(): void
@@ -93,7 +93,7 @@ class NotificationChannelTest extends TestCase
             'status' => 'scheduled',
         ]);
 
-        $this->assertNotContains('mail', (new \App\Notifications\WhatsappInboundNotification(1, 'WA', '6281', 'halo'))->via($user));
-        $this->assertNotContains('mail', (new \App\Notifications\TechnicianScheduleReminderNotification($schedule))->via($user));
+        $this->assertSame([], (new \App\Notifications\WhatsappInboundNotification(1, 'WA', '6281', 'halo'))->via($user));
+        $this->assertSame([], (new \App\Notifications\TechnicianScheduleReminderNotification($schedule))->via($user));
     }
 }

@@ -17,6 +17,10 @@ class TechnicianScheduleAssignedNotification extends Notification
 
     public function via(object $notifiable): array
     {
+        if ($this->muted($notifiable)) {
+            return [];
+        }
+
         return $this->withWebPush($notifiable, $this->withMail($notifiable, ['database']));
     }
 
