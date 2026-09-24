@@ -68,7 +68,7 @@
                                     <a href="{{ route('customers.show', $project->customer_id) }}"
                                        title="{{ __('Lihat customer') }}"
                                        aria-label="{{ __('Lihat customer') }}"
-                                       class="group/btn relative overflow-hidden p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
+                                       class="group/btn relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-accent-600 text-white shadow-sm transition-all duration-300 hover:scale-110 hover:bg-accent-500 hover:shadow-lg hover:shadow-accent-500/40 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
                                         <img src="{{ asset('icons/cust-view.png') }}" alt="" loading="lazy"
                                              class="block h-5 w-5 group-hover/btn:hidden" />
                                         <img src="{{ asset('icons/cust-view.gif') }}" alt="" loading="lazy"
