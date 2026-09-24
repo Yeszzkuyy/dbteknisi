@@ -12,7 +12,7 @@
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <form action="{{ route('sales.meetings.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('sales.meetings.store') }}" method="POST" data-ajax class="space-y-6">
                 @csrf
 
                 <div x-data="{ mode: '{{ old('customer_mode', $preselectedCustomerId ? 'existing' : 'new') }}' }">

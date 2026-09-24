@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\RespondsAjax;
 use App\Models\Customer;
 use App\Models\Meeting;
 use App\Services\SalesService;
@@ -9,6 +10,8 @@ use Illuminate\Http\Request;
 
 class MeetingController extends Controller
 {
+    use RespondsAjax;
+
     public function __construct(private SalesService $salesService) {}
 
     public function index(Request $request)
@@ -16,7 +19,7 @@ class MeetingController extends Controller
         $meetings = $this->salesService->getMeetings($request->only(['search', 'date_from', 'date_to', 'customer_id']));
         $customers = Customer::orderBy('name')->get(['id', 'name']);
 
-        return view('sales.meetings.index', compact('meetings', 'customers'));
+        return $this->ajaxPartial($request, 'sales.meetings._table', compact('meetings'), 'sales.meetings.index');
     }
 
     public function create(Request $request)
@@ -48,8 +51,8 @@ class MeetingController extends Controller
 
         $this->salesService->createMeeting($validated);
 
-        return redirect()->route('sales.meetings.index')
-            ->with('success', __('Meeting berhasil dicatat.'));
+        return $this->ajaxOrRedirect($request, 'sales.meetings.index',
+            __('Meeting berhasil dicatat.'), ['redirect' => route('sales.meetings.index')]);
     }
 
     public function show(Meeting $meeting)
@@ -86,15 +89,14 @@ class MeetingController extends Controller
 
         $this->salesService->updateMeeting($meeting, $validated);
 
-        return redirect()->route('sales.meetings.index')
-            ->with('success', __('Meeting berhasil diupdate.'));
+        return $this->ajaxOrRedirect($request, 'sales.meetings.index',
+            __('Meeting berhasil diupdate.'), ['redirect' => route('sales.meetings.index')]);
     }
 
-    public function destroy(Meeting $meeting)
+    public function destroy(Request $request, Meeting $meeting)
     {
         $this->salesService->deleteMeeting($meeting);
 
-        return redirect()->route('sales.meetings.index')
-            ->with('success', __('Meeting berhasil dihapus.'));
+        return $this->ajaxOrRedirect($request, 'sales.meetings.index', __('Meeting berhasil dihapus.'));
     }
 }

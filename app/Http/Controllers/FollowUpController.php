@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\RespondsAjax;
 use App\Models\Customer;
 use App\Models\FollowUp;
 use App\Models\Meeting;
@@ -10,6 +11,8 @@ use Illuminate\Http\Request;
 
 class FollowUpController extends Controller
 {
+    use RespondsAjax;
+
     public function __construct(private SalesService $salesService) {}
 
     public function index(Request $request)
@@ -17,7 +20,7 @@ class FollowUpController extends Controller
         $followUps = $this->salesService->getFollowUps($request->only(['search', 'customer_id']));
         $customers = Customer::orderBy('name')->get(['id', 'name']);
 
-        return view('sales.follow-ups.index', compact('followUps', 'customers'));
+        return $this->ajaxPartial($request, 'sales.follow-ups._table', compact('followUps'), 'sales.follow-ups.index');
     }
 
     public function create(Request $request)
@@ -47,8 +50,8 @@ class FollowUpController extends Controller
 
         $this->salesService->createFollowUp($validated);
 
-        return redirect()->route('sales.follow-ups.index')
-            ->with('success', __('Follow up berhasil dicatat.'));
+        return $this->ajaxOrRedirect($request, 'sales.follow-ups.index',
+            __('Follow up berhasil dicatat.'), ['redirect' => route('sales.follow-ups.index')]);
     }
 
     public function show(FollowUp $followUp)
@@ -77,15 +80,14 @@ class FollowUpController extends Controller
 
         $this->salesService->updateFollowUp($followUp, $validated);
 
-        return redirect()->route('sales.follow-ups.index')
-            ->with('success', __('Follow up berhasil diupdate.'));
+        return $this->ajaxOrRedirect($request, 'sales.follow-ups.index',
+            __('Follow up berhasil diupdate.'), ['redirect' => route('sales.follow-ups.index')]);
     }
 
-    public function destroy(FollowUp $followUp)
+    public function destroy(Request $request, FollowUp $followUp)
     {
         $this->salesService->deleteFollowUp($followUp);
 
-        return redirect()->route('sales.follow-ups.index')
-            ->with('success', __('Follow up berhasil dihapus.'));
+        return $this->ajaxOrRedirect($request, 'sales.follow-ups.index', __('Follow up berhasil dihapus.'));
     }
 }
