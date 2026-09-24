@@ -193,9 +193,13 @@
                                                 <div class="mt-1.5 space-y-1">
                                                     @foreach($activity->changes as $field => $change)
                                                         @php
-                                                            $hasOld = $change['old'] !== null && $change['old'] !== '';
-                                                            $old = ($formatLogValue)($field, $change['old']);
-                                                            $new = ($formatLogValue)($field, $change['new']);
+                                                            // changes umumnya ['old' => .., 'new' => ..],
+                                                            // tapi data lama (mis. dari WhatsApp Center) bisa bernilai skalar.
+                                                            $isPair = is_array($change) && array_key_exists('old', $change) && array_key_exists('new', $change);
+                                                            $hasOld = $isPair && $change['old'] !== null && $change['old'] !== '';
+                                                            $old = $hasOld ? ($formatLogValue)($field, $change['old']) : null;
+                                                            $rawNew = $isPair ? $change['new'] : $change;
+                                                            $new = is_array($rawNew) ? json_encode($rawNew) : ($formatLogValue)($field, $rawNew);
                                                         @endphp
                                                         <div class="flex flex-wrap items-start gap-x-2 gap-y-1 text-xs">
                                                             <span class="font-semibold text-slate-600 dark:text-slate-300 min-w-[110px]">
@@ -204,7 +208,7 @@
                                                             @if($hasOld)
                                                                 <span class="text-red-500 line-through">{{ $old }}</span>
                                                             @endif
-                                                            <span class="text-green-600 dark:text-green-400">→ {{ $new }}</span>
+                                                            <span class="text-green-600 dark:text-green-400">@if($isPair)→ @endif{{ $new }}</span>
                                                         </div>
                                                     @endforeach
                                                 </div>
