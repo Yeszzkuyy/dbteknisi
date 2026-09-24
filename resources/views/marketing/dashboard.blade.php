@@ -33,17 +33,40 @@
                         __('6 Bulan') => [now()->subMonths(5)->startOfMonth()->toDateString(), now()->toDateString()],
                     ];
                     $activeRange = $dateFrom . '|' . $dateTo;
+                    $presetItems = [];
+                    $activeIndex = -1;
+                    foreach ($presets as $label => [$from, $to]) {
+                        $presetItems[] = ['label' => $label, 'url' => route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to])];
+                        if ($activeRange === $from . '|' . $to) $activeIndex = count($presetItems) - 1;
+                    }
                 @endphp
-                <div class="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-600 overflow-hidden divide-x divide-slate-200 dark:divide-slate-600">
-                    @foreach($presets as $label => [$from, $to])
-                        @php($active = $activeRange === $from . '|' . $to)
-                        <a href="{{ route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to]) }}"
-                           class="group relative overflow-hidden px-4 py-2.5 text-sm font-medium transition {{ $active ? 'bg-accent-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">
-                            <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
-                            {{ $label }}
-                        </a>
-                    @endforeach
-                </div>
+                @if($activeIndex >= 0)
+                    <div id="marketing-range-segment" data-items='@json($presetItems)' data-active="{{ $activeIndex }}"></div>
+                    @vite('resources/js/rubber-segment.jsx')
+                    <noscript>
+                        <div class="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-600 overflow-hidden divide-x divide-slate-200 dark:divide-slate-600">
+                            @foreach($presets as $label => [$from, $to])
+                                @php($active = $activeRange === $from . '|' . $to)
+                                <a href="{{ route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to]) }}"
+                                   class="group relative overflow-hidden px-4 py-2.5 text-sm font-medium transition {{ $active ? 'bg-accent-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">
+                                    <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
+                                    {{ $label }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </noscript>
+                @else
+                    <div class="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-600 overflow-hidden divide-x divide-slate-200 dark:divide-slate-600">
+                        @foreach($presets as $label => [$from, $to])
+                            @php($active = $activeRange === $from . '|' . $to)
+                            <a href="{{ route('marketing.dashboard', ['date_from' => $from, 'date_to' => $to]) }}"
+                               class="group relative overflow-hidden px-4 py-2.5 text-sm font-medium transition {{ $active ? 'bg-accent-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700' }}">
+                                <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
+                                {{ $label }}
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </form>
     </div>
