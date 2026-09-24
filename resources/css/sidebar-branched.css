@@ -61,12 +61,22 @@
    Aturan aktif global di app.css yang berlaku (blok override di sini
    sengaja dihapus). Garis reach tetap terlihat di atas pil via
    z-index .branched-lines di bawah. */
-/* Header grup (Management, Teknisi, ...): tanpa background hover juga,
-   supaya konsisten — pil aktif header dipertahankan (tidak ada garis
-   di belakangnya). Daun top-level (Dashboard, Customer, ...) tetap
-   memakai hover/pil bawaan. */
+/* Header grup (Management, Teknisi, ...): TANPA efek hover sama sekali —
+   warna & posisi diam (tetap bisa diklik untuk buka/tutup). Pil aktif
+   header dipertahankan. Daun top-level (Dashboard, Customer, ...)
+   tetap memakai hover/pil bawaan. */
 .sidebar .branched > button:hover {
     background: transparent;
+    color: var(--nav-text);
+}
+.sidebar .branched > button[data-sidebar-active='true']:hover {
+    color: var(--nav-active-text);
+}
+/* Geseran ikon/label header grup saat hover ikut dimatikan
+   (seperti aturan anak pohon di bawah). */
+.sidebar .branched > button:hover > span:not(.ml-auto),
+.sidebar .branched > button:hover svg {
+    transform: none;
 }
 /* Opsi 1: marker ::before kiri dicabut khusus grup branched (anak +
    header) — penanda aktif sudah ada: pil theme + garis reach.
