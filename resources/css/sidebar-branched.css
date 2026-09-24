@@ -56,8 +56,10 @@
 .sidebar .branched-tree > a:hover {
     background: transparent;
 }
-.sidebar .branched-tree > a:hover svg,
-.sidebar .branched-tree > a:hover > span {
+/* :not(.ml-auto) ikut dihitung → (0,4,3), menang atas aturan geser
+   bawaan (0,3,3). Tanpa ini label masih bergeser 2px saat hover. */
+.sidebar nav .branched-tree > a:hover > span:not(.ml-auto),
+.sidebar .branched-tree > a:hover svg {
     transform: none;
 }
 
