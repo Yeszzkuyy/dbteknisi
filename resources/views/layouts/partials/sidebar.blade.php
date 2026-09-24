@@ -96,7 +96,7 @@
                         {{-- Management (Management Hub) --}}
                         @can('manage-sales-leads')
                             <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }" class="branched"{{ $managementActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <button type="button" @click="open = !open"
+                                <a wire:navigate.hover href="{{ route('manage-sales.index') }}"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-management-menu"
                                         data-sidebar-active="{{ $managementActive ? 'true' : 'false' }}"
@@ -111,7 +111,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                         </svg>
                                     </span>
-                                </button>
+                                </a>
                                 <div id="sidebar-management-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: 192px">
@@ -164,7 +164,7 @@
                         {{-- Teknisi --}}
                         @can('view-teknisi')
                             <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="branched"{{ $technicianActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <button type="button" @click="open = !open"
+                                <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-technician-menu"
                                         data-sidebar-active="{{ $technicianActive ? 'true' : 'false' }}"
@@ -174,7 +174,7 @@
                                     <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
-                                </button>
+                                </a>
                                 <div id="sidebar-technician-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: 300px">
@@ -242,7 +242,7 @@
                         {{-- Marketing --}}
                         @can('view-marketing')
                             <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="branched"{{ $marketingActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <button type="button" @click="open = !open"
+                                <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-marketing-menu"
                                         data-sidebar-active="{{ $marketingActive ? 'true' : 'false' }}"
@@ -252,7 +252,7 @@
                                     <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
-                                </button>
+                                </a>
                                 @php($mktCount = 6 + ($hasMarketingMonitoring ? 1 : 0))
                                 <div id="sidebar-marketing-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
@@ -317,7 +317,7 @@
                         {{-- Sales --}}
                         @can('view-sales')
                             <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <button type="button" @click="open = !open"
+                                <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-sales-menu"
                                         data-sidebar-active="{{ $salesActive ? 'true' : 'false' }}"
@@ -327,7 +327,7 @@
                                     <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
-                                </button>
+                                </a>
                                 @php($salesCount = 3 + ($hasSalesProject ? 1 : 0))
                                 <div id="sidebar-sales-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
@@ -374,7 +374,7 @@
                         {{-- Admin: Invoice, PO, Payment --}}
                         @can('view-admin')
                             <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }" class="branched"{{ $adminActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <button type="button" @click="open = !open"
+                                <a wire:navigate.hover href="{{ route('admin.invoices.index') }}"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-admin-menu"
                                         data-sidebar-active="{{ $adminActive ? 'true' : 'false' }}"
@@ -384,7 +384,7 @@
                                     <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
-                                </button>
+                                </a>
                                 <div id="sidebar-admin-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: 120px">
@@ -449,7 +449,7 @@
                         {{-- Admin Panel (Super Admin only) --}}
                         @can('manage-monitoring')
                             <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }" class="branched"{{ $adminPanelActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <button type="button" @click="open = !open"
+                                <a wire:navigate.hover href="{{ route('admin-panel.index') }}"
                                         :aria-expanded="open"
                                         aria-controls="sidebar-admin-panel-menu"
                                         data-sidebar-active="{{ $adminPanelActive ? 'true' : 'false' }}"
@@ -459,7 +459,7 @@
                                     <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
-                                </button>
+                                </a>
                                 <div id="sidebar-admin-panel-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: 228px">
