@@ -185,12 +185,18 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded',function(){
+        // Idempoten: dipanggil saat load awal DAN setiap livewire:navigated
+        // (navigasi tanpa refresh me-morph ulang konten; elemen yang
+        // diganti morph kehilangan listener, jadi binding diulang di sini
+        // dengan pengaman dataset.bound agar tidak ganda).
+        function initChrome(){
             var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay'),h=document.getElementById('hamburgerBtn');
+            if(!s||!o)return;
             function open(){s.classList.add('open');o.classList.add('active')}
             function close(){s.classList.remove('open');o.classList.remove('active')}
-            h&&h.addEventListener('click',function(){s.classList.contains('open')?close():open()});
-            o.addEventListener('click',close);
+            close();
+            if(h&&!h.dataset.bound){h.dataset.bound='1';h.addEventListener('click',function(){s.classList.contains('open')?close():open()});}
+            if(!o.dataset.bound){o.dataset.bound='1';o.addEventListener('click',close);}
 
             var root=document.documentElement;
             var cb=document.getElementById('sidebarCollapseBtn');
@@ -204,24 +210,29 @@
             function setCollapsed(v){
                 root.classList.toggle('sidebar-collapsed',v);
                 try{localStorage.setItem('sidebar-collapsed',v?'1':'0')}catch(e){}
-                if(cb){cb.setAttribute('aria-expanded',String(!v));cb.setAttribute('aria-label',v?@json(__('Perluas sidebar')):@json(__('Perkecil sidebar')))}
+                var btn=document.getElementById('sidebarCollapseBtn');
+                if(btn){btn.setAttribute('aria-expanded',String(!v));btn.setAttribute('aria-label',v?@json(__('Perluas sidebar')):@json(__('Perkecil sidebar')))}
                 syncTitles();
             }
             syncTitles();
-            cb&&cb.addEventListener('click',function(){
+            if(cb&&!cb.dataset.bound){cb.dataset.bound='1';cb.addEventListener('click',function(){
                 if(window.innerWidth<1024){close();return}
                 setCollapsed(!root.classList.contains('sidebar-collapsed'));
-            });
+            });}
             // Klik menu grup saat minimized → lebarkan sidebar dulu
             s.querySelectorAll('nav button[type="button"]').forEach(function(b){
+                if(b.dataset.bound)return;b.dataset.bound='1';
                 b.addEventListener('click',function(){if(window.innerWidth>=1024&&root.classList.contains('sidebar-collapsed'))setCollapsed(false)});
             });
 
-            s.querySelectorAll('a,button[type="submit"]').forEach(function(e){e.addEventListener('click',function(){window.innerWidth<1024&&close()})});
-            window.addEventListener('resize',function(){window.innerWidth>=1024&&close()});
-            document.addEventListener('keydown',function(e){e.key==='Escape'&&s.classList.contains('open')&&close()});
+            s.querySelectorAll('a,button[type="submit"]').forEach(function(e){if(e.dataset.bound)return;e.dataset.bound='1';e.addEventListener('click',function(){window.innerWidth<1024&&close()})});
+            if(!window.__chromeGlobals){
+                window.__chromeGlobals=true;
+                window.addEventListener('resize',function(){var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');if(window.innerWidth>=1024&&sb){sb.classList.remove('open');ov&&ov.classList.remove('active')}});
+                document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;var sb=document.getElementById('sidebar');if(sb&&sb.classList.contains('open')){sb.classList.remove('open');var ov=document.getElementById('sidebarOverlay');ov&&ov.classList.remove('active')}});
+            }
             var t=document.getElementById('darkToggle');
-            t&&t.addEventListener('click',function(){
+            if(t&&!t.dataset.bound){t.dataset.bound='1';t.addEventListener('click',function(){
                 var root=document.documentElement;
                 var dark=!root.classList.contains('dark');
                 root.classList.toggle('dark',dark);
@@ -229,18 +240,20 @@
                 root.setAttribute('data-mode',mode);
                 try{localStorage.setItem('appearance-mode',mode);localStorage.setItem('dark-mode',dark)}catch(e){}
                 window.dispatchEvent(new CustomEvent('appearance:change'));
-            });
+            });}
             var nav=document.getElementById('sidebar-navigation');
             if(nav){
                 nav.scrollTop=+(sessionStorage.getItem('sidebar-scroll')||0);
-                nav.addEventListener('scroll',function(){sessionStorage.setItem('sidebar-scroll',nav.scrollTop)});
+                if(!nav.dataset.bound){nav.dataset.bound='1';nav.addEventListener('scroll',function(){sessionStorage.setItem('sidebar-scroll',nav.scrollTop)});}
             }
             // Reveal saat scroll — hormati prefers-reduced-motion
             if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){
-                var io=new IntersectionObserver(function(entries){
-                    entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in-view');io.unobserve(en.target)}});
-                },{threshold:0.12});
-                document.querySelectorAll('[data-reveal]').forEach(function(el){io.observe(el)});
+                if(!window.__revealIO){
+                    window.__revealIO=new IntersectionObserver(function(entries){
+                        entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in-view');window.__revealIO.unobserve(en.target)}});
+                    },{threshold:0.12});
+                }
+                document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function(el){window.__revealIO.observe(el)});
             }else{
                 document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('in-view')});
             }
@@ -248,10 +261,11 @@
             // touch / reduced-motion; kembali ke posisi awal saat mouse pergi
             if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.matchMedia('(hover: hover)').matches){
                 var pxEls=Array.prototype.slice.call(document.querySelectorAll('[data-parallax-mouse]'));
-                var pxRaf=null;
                 pxEls.forEach(function(el){
+                    if(el.dataset.pxInit)return;el.dataset.pxInit='1';
                     var host=el.closest('section')||document.body;
                     var max=parseFloat(el.getAttribute('data-parallax-mouse'))||10;
+                    var pxRaf=null;
                     host.addEventListener('mousemove',function(ev){
                         var r=host.getBoundingClientRect();
                         var dx=(ev.clientX-r.left)/r.width-0.5,dy=(ev.clientY-r.top)/r.height-0.5;
@@ -267,7 +281,9 @@
                     });
                 });
             }
-        });
+        }
+        document.addEventListener('DOMContentLoaded',initChrome);
+        document.addEventListener('livewire:navigated',initChrome);
     </script>
 </body>
 </html>

@@ -257,12 +257,13 @@ Alpine.start();
    Server me-render garis dalam keadaan jadi; di sini sembunyikan
    dulu sebelum paint pertama, lalu kembalikan ke 0 sehingga
    transisi stroke-dashoffset di CSS yang menganimasikannya.
+   Dipanggil saat load awal dan setiap livewire:navigated.
    Tanpa JS / reduced-motion: garis langsung tampil (fallback aman).
    ============================================================ */
-(function () {
+window.animateBranchedDraw = function () {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     requestAnimationFrame(function () {
-        var active = [];
+        const active = [];
         document.querySelectorAll('.sidebar .branched-reach').forEach(function (p) {
             if (p.style.strokeDashoffset !== '0' && p.style.strokeDashoffset !== '0px') return;
             if (!p.style.strokeDasharray) return;
@@ -276,5 +277,8 @@ Alpine.start();
             });
         });
     });
-})();
+};
+
+window.animateBranchedDraw();
+document.addEventListener('livewire:navigated', window.animateBranchedDraw);
 

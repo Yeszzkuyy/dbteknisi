@@ -652,14 +652,26 @@
                     this.loadConversations(true);
                     if (this.activeConv && this.view === 'chats') this.loadMessages(this.activeConv.sender_number, true);
                 }, 5000);
-                window.addEventListener('keydown', (event) => {
+                // ponytail: simpan ref handler agar bisa dilepas saat destroy;
+                // tanpa ini listener bocor tiap navigasi tanpa refresh.
+                this._escHandler = (event) => {
                     if (event.key === 'Escape') {
                         this.contextMenu.open = false;
                         this.messageMenu.open = false;
                         this.chatMenu = false;
                         this.accountMenu = false;
                     }
-                });
+                };
+                window.addEventListener('keydown', this._escHandler);
+            },
+
+            // Dipanggil otomatis Alpine saat komponen dihapus dari DOM
+            // (mis. navigasi wire:navigate) — hentikan polling.
+            destroy() {
+                if (this.pollTimer) clearInterval(this.pollTimer);
+                if (this.toastTimer) clearTimeout(this.toastTimer);
+                if (this._escHandler) window.removeEventListener('keydown', this._escHandler);
+                this.pollTimer = null;
             },
 
             get filteredConversations() {
