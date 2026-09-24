@@ -23,36 +23,21 @@
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">Status</label>
-                    <select name="status" class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        <option value="">{{ __('Semua Status') }}</option>
-                        @foreach($statuses as $status)
-                            <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
-                                {{ ucfirst($status) }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-glide-select name="status" class="mt-1" label="Status"
+                        :options="collect($statuses)->map(fn ($s) => ['value' => $s, 'label' => ucfirst($s)])->all()"
+                        :value="request('status', '')" :empty-label="__('Semua Status')" autosubmit />
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">{{ __('Sumber') }}</label>
-                    <select name="source" class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        <option value="">{{ __('Semua Sumber') }}</option>
-                        @foreach($sources as $source)
-                            <option value="{{ $source }}" {{ request('source') == $source ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_', ' ', $source)) }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-glide-select name="source" class="mt-1" :label="__('Sumber')"
+                        :options="collect($sources)->map(fn ($s) => ['value' => $s, 'label' => ucfirst(str_replace('_', ' ', $s))])->all()"
+                        :value="request('source', '')" :empty-label="__('Semua Sumber')" autosubmit />
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">PT</label>
-                    <select name="pt_group" class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        <option value="">{{ __('Semua PT') }}</option>
-                        @foreach($ptGroups as $group)
-                            <option value="{{ $group }}" {{ request('pt_group') == $group ? 'selected' : '' }}>
-                                {{ $group }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-glide-select name="pt_group" class="mt-1" label="PT"
+                        :options="collect($ptGroups)->map(fn ($g) => ['value' => $g, 'label' => $g])->all()"
+                        :value="request('pt_group', '')" :empty-label="__('Semua PT')" autosubmit />
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">{{ __('Tanggal Mulai') }}</label>

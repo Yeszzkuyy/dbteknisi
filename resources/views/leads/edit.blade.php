@@ -47,15 +47,9 @@
                     {{ __('Masuk by') }}
                     <x-info-tip tip="{{ __('Dari mana lead ini berasal: WhatsApp, email, telepon, canvasing, event, dll.') }}" />
                 </label>
-                <select name="source" id="source"
-                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                    <option value="">{{ __('Pilih') }}</option>
-                    @foreach($sources as $source)
-                        <option value="{{ $source }}" {{ old('source', $lead->source) == $source ? 'selected' : '' }}>
-                            {{ \App\Http\Controllers\LeadController::label($source) }}
-                        </option>
-                    @endforeach
-                </select>
+                <x-glide-select name="source" :label="__('Masuk by')"
+                    :options="collect($sources)->map(fn ($s) => ['value' => $s, 'label' => \App\Http\Controllers\LeadController::label($s)])->all()"
+                    :value="old('source', $lead->source ?? '')" :placeholder="__('Pilih')" />
             </div>
 
             <div>
@@ -165,15 +159,9 @@
                         {{ __('Partner Terkait') }}
                         <x-info-tip tip="{{ __('Pilih partner jika lead ini melibatkan vendor/supplier/kontraktor tertentu. Opsional.') }}" />
                     </label>
-                    <select name="partner_id" id="partner_id"
-                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        <option value="">{{ __('Tidak Ada Partner') }}</option>
-                        @foreach($partners as $partner)
-                            <option value="{{ $partner->id }}" {{ old('partner_id', $lead->partner_id) == $partner->id ? 'selected' : '' }}>
-                                {{ $partner->name }} ({{ __(\App\Models\Partner::TYPES[$partner->type] ?? $partner->type) }})
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-glide-select name="partner_id" :label="__('Partner Terkait')" tags
+                        :options="collect($partners)->map(fn ($p) => ['value' => $p->id, 'label' => $p->name, 'tag' => __(\App\Models\Partner::TYPES[$p->type] ?? $p->type)])->all()"
+                        :value="old('partner_id', $lead->partner_id ?? '')" :placeholder="__('Pilih')" :empty-label="__('Tidak Ada Partner')" />
                 </div>
             </div>
         </section>
