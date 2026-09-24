@@ -901,5 +901,8 @@
     "Bidang ini wajib diisi.": "This field is required.",
     "Semua PT": "All Companies",
     "Pilih…": "Select…",
-    "Menyimpan…": "Saving…"
+    "Menyimpan…": "Saving…",
+    "Pilih Company": "Select Company",
+    "Semua Company": "All Companies",
+    "Filter Company": "Filter by Company"
 }

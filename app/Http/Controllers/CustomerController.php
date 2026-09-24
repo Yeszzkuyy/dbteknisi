@@ -72,7 +72,8 @@ class CustomerController extends Controller
 
         return redirect()
             ->route('customers.index')
-            ->with('success', __('Customer berhasil ditambahkan'));
+            ->with('success', __('Customer berhasil ditambahkan'))
+            ->with('success_card', true);
     }
 
     /**
@@ -130,7 +131,8 @@ class CustomerController extends Controller
 
         return redirect()
             ->route('customers.index')
-            ->with('success', __('Customer berhasil diupdate'));
+            ->with('success', __('Customer berhasil diupdate'))
+            ->with('success_card', true);
     }
 
     /**
