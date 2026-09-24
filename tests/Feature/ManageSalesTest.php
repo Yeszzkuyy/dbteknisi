@@ -203,6 +203,24 @@ class ManageSalesTest extends TestCase
             ->assertSee($management->name);
     }
 
+    public function test_activity_log_tolerates_legacy_scalar_changes(): void
+    {
+        $management = $this->loginAs('management');
+        $lead = $this->makeLead();
+
+        LeadActivity::create([
+            'lead_id' => $lead->id,
+            'user_id' => $management->id,
+            'action' => 'created',
+            'changes' => ['source' => 'whatsapp', 'sender' => '6281998880921'],
+        ]);
+
+        $this->actingAs($management)
+            ->get(route('manage-sales.activity-log'))
+            ->assertOk()
+            ->assertSee('6281998880921');
+    }
+
     public function test_sales_cannot_open_activity_log(): void
     {
         $this->actingAs($this->loginAs('sales'))
