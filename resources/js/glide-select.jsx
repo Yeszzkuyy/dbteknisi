@@ -86,6 +86,7 @@ function showSubmitOverlay(form) {
     if (!el) {
         el = document.createElement('div');
         el.id = 'gs-submit-overlay';
+        el.className = 'status-card-backdrop';
         el.style.display = 'none';
         el.innerHTML = `<div data-card>${LOADER_HTML}</div>`;
         document.body.appendChild(el);
@@ -96,9 +97,12 @@ function showSubmitOverlay(form) {
         return;
     }
     const dark = document.documentElement.classList.contains('dark');
+    // ponytail: left TIDAK di-set inline agar offset sidebar dari CSS (.status-card-backdrop) berlaku
     Object.assign(el.style, {
         position: 'fixed',
-        inset: '0',
+        top: '0',
+        right: '0',
+        bottom: '0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -109,9 +113,9 @@ function showSubmitOverlay(form) {
     const card = el.querySelector('[data-card]');
     Object.assign(card.style, {
         width: '100%',
-        maxWidth: '320px',
+        maxWidth: '384px',
         borderRadius: '16px',
-        padding: '28px 32px',
+        padding: '32px 40px',
         background: dark ? '#1e293b' : '#ffffff',
         boxShadow: '0 10px 30px rgba(0, 0, 0, .35)'
     });
