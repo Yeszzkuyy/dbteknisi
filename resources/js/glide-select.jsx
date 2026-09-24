@@ -48,11 +48,47 @@ function mountAll() {
                         hidden.value = value;
                         hidden.dispatchEvent(new Event('change', { bubbles: true }));
                     }
+                    // Pilihan berubah = error required basi; sembunyikan.
+                    scope?.querySelector('.glide-select-error')?.setAttribute('hidden', '');
                     if (node.dataset.autosubmit === '1') scope?.closest('form')?.submit();
                 }}
                 {...themeProps()}
             />
         );
+    });
+    wireRequiredValidation();
+}
+
+// Opsi A: hidden input lolos validasi browser, jadi cegat submit manual.
+// Native required lain tetap jalan duluan (browser memblokir sebelum event submit).
+function wireRequiredValidation() {
+    document.querySelectorAll('form:not([data-glide-validated])').forEach((form) => {
+        const nodes = [...form.querySelectorAll('[data-glide-mount][data-required="1"]')];
+        if (!nodes.length) return;
+        form.dataset.glideValidated = 'true';
+        form.addEventListener('submit', (e) => {
+            let firstBad = null;
+            nodes.forEach((node) => {
+                const scope = node.closest('.glide-select-root');
+                const hidden = scope?.querySelector('input[type="hidden"]');
+                const err = scope?.querySelector('.glide-select-error');
+                if (hidden && !hidden.value) {
+                    e.preventDefault();
+                    if (err) {
+                        if (node.dataset.requiredMessage) err.textContent = node.dataset.requiredMessage;
+                        err.removeAttribute('hidden');
+                    }
+                    if (!firstBad) firstBad = node;
+                } else if (err) {
+                    err.setAttribute('hidden', '');
+                }
+            });
+            if (firstBad) {
+                const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                firstBad.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+                firstBad.querySelector('.glide-select__trigger')?.focus({ preventScroll: true });
+            }
+        });
     });
 }
 

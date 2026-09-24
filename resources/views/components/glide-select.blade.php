@@ -8,6 +8,8 @@
     'label' => null,
     'full' => true,
     'emptyLabel' => null,
+    'required' => false,
+    'error' => null,
 ])
 
 @php
@@ -32,10 +34,14 @@
          data-label="{{ $label }}"
          @if($tags) data-tags="1" @endif
          @if($autosubmit) data-autosubmit="1" @endif
-         @if($full) data-full="1" @endif></div>
+         @if($full) data-full="1" @endif
+         @if($required) data-required="1" data-required-message="{{ __('Bidang ini wajib diisi.') }}" @endif></div>
+    @if($required || $error)
+        <p class="glide-select-error mt-1 text-sm text-red-600" @if(!$error) hidden @endif>{{ $error ?? __('Bidang ini wajib diisi.') }}</p>
+    @endif
     @vite('resources/js/glide-select.jsx')
     <noscript>
-        <select name="{{ $name }}" class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+        <select name="{{ $name }}" @if($required) required @endif class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             @foreach($items as $item)
                 <option value="{{ $item['value'] }}" {{ (string) $value === (string) $item['value'] ? 'selected' : '' }}>{{ $item['label'] }}</option>
             @endforeach
