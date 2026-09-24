@@ -8,7 +8,7 @@
    ============================================================ */
 .sidebar .branched {
     --bm-fold: 300ms;
-    --bm-draw: 400ms;
+    --bm-draw: 1000ms;
     --bm-ease: cubic-bezier(0.23, 1, 0.32, 1);
     --bm-row: 36px;
     --bm-indent: 40px;
