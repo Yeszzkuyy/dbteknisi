@@ -80,19 +80,20 @@ function showSubmitOverlay(form) {
         el.id = 'gs-submit-overlay';
         el.setAttribute('role', 'status');
         Object.assign(el.style, {
-            position: 'fixed', inset: '0', zIndex: '100', display: 'flex',
+            position: 'fixed', inset: '0', zIndex: '100', display: 'none',
             alignItems: 'center', justifyContent: 'center',
             background: 'rgba(2, 6, 23, .55)', backdropFilter: 'blur(2px)'
         });
         el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;background:#0f172a;color:#f1f5f9;font-size:14px;font-weight:500;padding:14px 20px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)">${SPIN_SVG}<span></span></div>`;
         document.body.appendChild(el);
     }
+    // ponytail: jangan pakai atribut hidden — display inline menimpanya sehingga overlay abadi
     if (!form) {
-        el.hidden = true;
+        el.style.display = 'none';
         return;
     }
     el.querySelector('span').textContent = form.dataset.loadingText || 'Menyimpan…';
-    el.hidden = false;
+    el.style.display = 'flex';
 }
 
 // Anti-duplikat: kunci tombol saat submit benar-benar jalan.
