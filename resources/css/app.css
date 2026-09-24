@@ -625,3 +625,21 @@ tbody tr { transition: background-color 0.2s ease; }
         }
     }
 }
+
+/* ============================================================
+   Kartu status: center terhadap AREA KONTEN (bukan viewport),
+   kompensasi sidebar 280px (76px saat collapse) di desktop.
+   ============================================================ */
+.status-card-backdrop {
+    left: 0;
+}
+
+@media (min-width: 1024px) {
+    .status-card-backdrop {
+        left: 280px;
+    }
+
+    html.sidebar-collapsed .status-card-backdrop {
+        left: 76px;
+    }
+}
