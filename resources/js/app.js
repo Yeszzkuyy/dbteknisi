@@ -304,7 +304,13 @@ document.addEventListener('livewire:navigated', () => syncSidebarGroups());
    - Posisi lama per grup disimpan di sessionStorage.
    - Kunjungan pertama / reload halaman yang sama: draw klasik.
    - Berjalan saat load awal DAN setiap livewire:navigated.
+   - Pakai WAAPI (bukan transisi CSS + rAF) agar tidak berpacu
+     dengan first paint / morph — animasi dijamin jalan.
    ============================================================ */
+const BM_GLIDE_MS = 380;
+const BM_GLIDE_DELAY_MS = 120;
+const BM_GLIDE_EASE = 'cubic-bezier(0.23, 1, 0.32, 1)';
+
 function glideBranchLines() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelectorAll('#sidebar-navigation .branched[data-bm-group]').forEach((root) => {
@@ -326,16 +332,31 @@ function glideBranchLines() {
             el.dataset.bmDraw = ''; // draw klasik dari nol
             return;
         }
-        // Mulai dari titik cabang lama lalu transisi ke 0: garis meluncur
-        // turun trunk baru berbelok ke baris. Geometri = cermin Blade:
+        // Mulai dari titik cabang lama lalu meluncur ke 0: garis turun
+        // trunk baru berbelok ke baris. Geometri = cermin Blade:
         // pad 6, rowH 36, setengah baris 18, R 10.
         const start = Math.max(0, Math.min(full, 6 + prev * 36 + 18 - 10));
+        // Matikan transisi CSS selama glide agar tidak beradu dengan WAAPI.
+        el.style.transition = 'none';
         el.style.strokeDashoffset = String(start);
-        requestAnimationFrame(() =>
-            requestAnimationFrame(() => {
-                el.style.strokeDashoffset = '0';
-            })
-        );
+        if (typeof el.animate !== 'function') {
+            el.style.strokeDashoffset = '0';
+            el.style.transition = '';
+            return;
+        }
+        const anim = el.animate([{ strokeDashoffset: String(start) }, { strokeDashoffset: '0' }], {
+            duration: BM_GLIDE_MS,
+            delay: BM_GLIDE_DELAY_MS,
+            easing: BM_GLIDE_EASE,
+            fill: 'backwards'
+        });
+        anim.onfinish = () => {
+            el.style.strokeDashoffset = '0';
+            el.style.transition = '';
+            try {
+                anim.cancel();
+            } catch {}
+        };
     });
 }
 document.addEventListener('DOMContentLoaded', glideBranchLines);
