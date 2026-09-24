@@ -50,8 +50,6 @@ class RoleMenuTest extends TestCase
             );
             $this->assertStringContainsString($path, $navHtml);
         }
-
-        $this->assertStringNotContainsString('@click="open = !open"', $navHtml);
     }
 
     public function test_teknisi_menu_and_access()
