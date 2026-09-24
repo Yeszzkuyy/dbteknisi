@@ -22,16 +22,10 @@
                         {{ __('Lead dari PT') }} <span class="text-red-500">*</span>
                         <x-info-tip tip="{{ __('Entitas perusahaan grup yang menangani lead ini: NTI, MGK, TPS, atau WANI.') }}" />
                     </label>
-                <select name="pt_group" id="pt_group" required
-                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                    <option value="">{{ __('Pilih PT') }}</option>
-                    @foreach($ptGroups as $group)
-                        <option value="{{ $group }}" {{ old('pt_group', $prefill['pt_group'] ?? null) == $group ? 'selected' : '' }}>{{ $group }}</option>
-                    @endforeach
-                </select>
-                @error('pt_group')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+                <x-glide-select name="pt_group" :label="__('Lead dari PT')" required
+                    :options="collect($ptGroups)->all()"
+                    :value="old('pt_group', $prefill['pt_group'] ?? '')"
+                    :placeholder="__('Pilih PT')" :error="$errors->first('pt_group')" />
             </div>
 
             <div>
@@ -57,18 +51,10 @@
                     {{ __('Segmentasi') }} <span class="text-red-500">*</span>
                     <x-info-tip tip="{{ __('Jenis calon client: End User, Vendor, System Integrator, Kontraktor, Gov, Principle, Distributor, atau lainnya.') }}" />
                 </label>
-                <select name="segment" id="segment" required
-                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                    <option value="">{{ __('Pilih Segmentasi') }}</option>
-                    @foreach($segments as $segment)
-                        <option value="{{ $segment }}" {{ old('segment') == $segment ? 'selected' : '' }}>
-                            {{ \App\Http\Controllers\LeadController::label($segment) }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('segment')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+                <x-glide-select name="segment" :label="__('Segmentasi')" required
+                    :options="collect($segments)->map(fn ($s) => ['value' => $s, 'label' => \App\Http\Controllers\LeadController::label($s)])->all()"
+                    :value="old('segment', '')"
+                    :placeholder="__('Pilih Segmentasi')" :error="$errors->first('segment')" />
             </div>
         </section>
 
