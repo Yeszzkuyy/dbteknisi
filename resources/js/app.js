@@ -299,6 +299,49 @@ function syncSidebarGroups() {
 document.addEventListener('livewire:navigated', () => syncSidebarGroups());
 
 /* ============================================================
+   BranchedMenu glide: garis reach meluncur dari posisi lama ke
+   aktif (ala template), bukan draw ulang dari nol.
+   - Posisi lama per grup disimpan di sessionStorage.
+   - Kunjungan pertama / reload halaman yang sama: draw klasik.
+   - Berjalan saat load awal DAN setiap livewire:navigated.
+   ============================================================ */
+function glideBranchLines() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('#sidebar-navigation .branched[data-bm-group]').forEach((root) => {
+        const key = 'bm-pos-' + root.dataset.bmGroup;
+        const active = parseInt(root.dataset.bmActive ?? '-1', 10);
+        const paths = [...root.querySelectorAll('.branched-reach')];
+        let prev = null;
+        try {
+            prev = JSON.parse(sessionStorage.getItem(key) ?? 'null');
+        } catch {}
+        try {
+            sessionStorage.setItem(key, JSON.stringify(active));
+        } catch {}
+        if (reduce || active < 0 || active >= paths.length) return;
+        const el = paths[active];
+        const full = parseFloat(el.style.strokeDasharray) || 0;
+        if (!full) return;
+        if (prev === null || prev === active || prev < 0 || prev >= paths.length) {
+            el.dataset.bmDraw = ''; // draw klasik dari nol
+            return;
+        }
+        // Mulai dari titik cabang lama lalu transisi ke 0: garis meluncur
+        // turun trunk baru berbelok ke baris. Geometri = cermin Blade:
+        // pad 6, rowH 36, setengah baris 18, R 10.
+        const start = Math.max(0, Math.min(full, 6 + prev * 36 + 18 - 10));
+        el.style.strokeDashoffset = String(start);
+        requestAnimationFrame(() =>
+            requestAnimationFrame(() => {
+                el.style.strokeDashoffset = '0';
+            })
+        );
+    });
+}
+document.addEventListener('DOMContentLoaded', glideBranchLines);
+document.addEventListener('livewire:navigated', glideBranchLines);
+
+/* ============================================================
    Toast global + form AJAX (tanpa refresh).
    - <form data-ajax data-ajax-target="#tabel"> (GET): ganti target
      dengan partial `html` + pushState URL.
@@ -400,6 +443,7 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-/* Branched draw kini murni CSS keyframes ([data-bm-draw]) — berjalan
-   otomatis tiap konten masuk tanpa flicker. Tidak perlu JS. */
+/* Branched draw: kunjungan pertama & reload pakai CSS keyframes
+   ([data-bm-draw], dipasang JS); pindah halaman meluncur dari posisi
+   lama via glideBranchLines di atas. */
 

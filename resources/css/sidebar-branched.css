@@ -64,21 +64,29 @@
     background: transparent;
     color: rgb(var(--accent-500) / 1);
 }
-/* Header grup (Management, Teknisi, ...): TANPA efek hover sama sekali —
-   warna & posisi diam (tetap bisa diklik untuk buka/tutup). Pil aktif
-   header dipertahankan. Daun top-level (Dashboard, Customer, ...)
-   tetap memakai hover/pil bawaan. */
-.sidebar .branched > button:hover {
+/* Header grup (Management, Teknisi, ...): baris div berisi link navigasi +
+   tombol chevron .branched-toggle (klik chevron = buka/tutup, klik label
+   = navigasi). Pil aktif header dipertahankan. Daun top-level (Dashboard,
+   Customer, ...) tetap memakai hover/pil bawaan. */
+.sidebar .branched-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 6px;
+    border: 0;
+    border-radius: 8px;
     background: transparent;
-    color: var(--nav-text);
+    color: inherit;
+    cursor: pointer;
 }
-.sidebar .branched > button[data-sidebar-active='true']:hover {
-    color: var(--nav-active-text);
+.sidebar .branched-toggle:hover {
+    background: rgb(255 255 255 / 0.08);
 }
-/* Pil aktif header grup ikut dicabut (efek tipis di tab ber-submenu):
-   penanda aktif header cukup warna teks. Daun top-level tak tersentuh. */
-.sidebar .branched > button[data-sidebar-active='true'] {
-    background: transparent;
+.sidebar .branched-toggle:focus-visible {
+    outline: 2px solid rgb(var(--accent-400) / 0.5);
+    outline-offset: 1px;
 }
 /* Hover mode gelap mengikuti warna tema (accent-300) untuk SELURUH
    link sidebar — daun biasa maupun grup; bukan putih/abu bawaan.
@@ -88,17 +96,19 @@
     color: rgb(var(--accent-300) / 1);
 }
 /* Geseran ikon/label header grup saat hover ikut dimatikan
-   (seperti aturan anak pohon di bawah). */
-.sidebar .branched > button:hover > span:not(.ml-auto),
-.sidebar .branched > button:hover svg {
+   (seperti aturan anak pohon di bawah). Chevron toggle juga diam
+   (rotate binding Alpine tetap jalan via properti rotate). */
+.sidebar .branched > div:hover > a > span,
+.sidebar .branched > div:hover > a svg {
     transform: none;
 }
-/* Opsi 1: marker ::before kiri dicabut khusus grup branched (anak +
-   header) — penanda aktif sudah ada: teks accent + garis reach.
-   Daun top-level tetap memakai marker bawaan. (0,3,2) menang atas
-   aturan bawaan (0,2,3). */
-.sidebar .branched-tree > a[aria-current='page']::before,
-.sidebar .branched > button[data-sidebar-active='true']::before {
+.sidebar .branched-toggle:hover svg {
+    transform: none;
+}
+/* Opsi 1: marker ::before kiri dicabut khusus anak pohon (penanda aktif
+   sudah ada: teks accent + garis reach). Daun top-level tetap memakai
+   marker bawaan. */
+.sidebar .branched-tree > a[aria-current='page']::before {
     content: none;
 }
 /* :not(.ml-auto) ikut dihitung → (0,4,3), menang atas aturan geser

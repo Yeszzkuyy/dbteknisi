@@ -95,23 +95,26 @@
                     <div class="space-y-1">
                         {{-- Management (Management Hub) --}}
                         @can('manage-sales-leads')
-                            <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }" class="branched"{{ $managementActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <a wire:navigate.hover href="{{ route('manage-sales.index') }}"
-                                        :aria-expanded="open"
-                                        aria-controls="sidebar-management-menu"
-                                        data-sidebar-active="{{ $managementActive ? 'true' : 'false' }}"
-                                        class="{{ $navLink }} w-full {{ $managementActive ? $navActive : $navInactive }}">
-                                    <x-icon name="briefcase" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                                    <span>Management</span>
-                                    <span class="ml-auto flex items-center gap-1.5">
-                                        <template x-if="$store.notif.unassigned > 0">
-                                            <span class="h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="{{ __('Ada lead belum di-assign') }}"></span>
-                                        </template>
+                            <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }" class="branched"{{ $managementActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="management" data-bm-active="{{ $managementIdx }}">
+                                <div class="{{ $navLink }} group w-full {{ $managementActive ? $navActive : $navInactive }}">
+                                    <a wire:navigate.hover href="{{ route('manage-sales.index') }}"
+                                            class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
+                                        <x-icon name="briefcase" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <span>Management</span>
+                                        <span class="ml-auto flex shrink-0 items-center gap-1.5">
+                                            <template x-if="$store.notif.unassigned > 0">
+                                                <span class="h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="{{ __('Ada lead belum di-assign') }}"></span>
+                                            </template>
+                                        </span>
+                                    </a>
+                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                            :aria-expanded="open" aria-controls="sidebar-management-menu"
+                                            aria-label="{{ __('Buka/tutup submenu') }}">
                                         <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                         </svg>
-                                    </span>
-                                </a>
+                                    </button>
+                                </div>
                                 <div id="sidebar-management-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: 192px">
@@ -119,7 +122,7 @@
                                                 <path class="branched-base" d="M 14 0 V 158" />
                                                 @for ($k = 0; $k < 5; $k++)
                                                     <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" {{ $k === $managementIdx ? 'data-bm-draw' : '' }} style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $managementIdx ? 0 : $bmLen($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $managementIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
                                     <a wire:navigate.hover href="{{ route('manage-sales.index') }}"
@@ -163,18 +166,21 @@
 
                         {{-- Teknisi --}}
                         @can('view-teknisi')
-                            <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="branched"{{ $technicianActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
-                                        :aria-expanded="open"
-                                        aria-controls="sidebar-technician-menu"
-                                        data-sidebar-active="{{ $technicianActive ? 'true' : 'false' }}"
-                                        class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive : $navInactive }}">
-                                    <x-icon name="tools" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                                    <span>{{ __('Teknisi') }}</span>
-                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </a>
+                            <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="branched"{{ $technicianActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="teknisi" data-bm-active="{{ $teknisiIdx }}">
+                                <div class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive : $navInactive }}">
+                                    <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
+                                            class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
+                                        <x-icon name="tools" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <span>{{ __('Teknisi') }}</span>
+                                    </a>
+                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                            :aria-expanded="open" aria-controls="sidebar-technician-menu"
+                                            aria-label="{{ __('Buka/tutup submenu') }}">
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div id="sidebar-technician-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: 300px">
@@ -182,7 +188,7 @@
                                                 <path class="branched-base" d="M 14 0 V 266" />
                                                 @for ($k = 0; $k < 8; $k++)
                                                     <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" {{ $k === $teknisiIdx ? 'data-bm-draw' : '' }} style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $teknisiIdx ? 0 : $bmLen($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $teknisiIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
                                     <a href="{{ route('teknisi.dashboard') }}"
@@ -241,19 +247,22 @@
 
                         {{-- Marketing --}}
                         @can('view-marketing')
-                            <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="branched"{{ $marketingActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
-                                        :aria-expanded="open"
-                                        aria-controls="sidebar-marketing-menu"
-                                        data-sidebar-active="{{ $marketingActive ? 'true' : 'false' }}"
-                                        class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive : $navInactive }}">
-                                    <x-icon name="chart-bar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                                    <span>Marketing</span>
-                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </a>
-                                @php($mktCount = 6 + ($hasMarketingMonitoring ? 1 : 0))
+                            @php($mktCount = 6 + ($hasMarketingMonitoring ? 1 : 0))
+                            <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="branched"{{ $marketingActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="marketing" data-bm-active="{{ $marketingIdx }}">
+                                <div class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive : $navInactive }}">
+                                    <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
+                                            class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
+                                        <x-icon name="chart-bar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <span>Marketing</span>
+                                    </a>
+                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                            :aria-expanded="open" aria-controls="sidebar-marketing-menu"
+                                            aria-label="{{ __('Buka/tutup submenu') }}">
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div id="sidebar-marketing-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: {{ 12 + $mktCount * 36 }}px">
@@ -261,7 +270,7 @@
                                                 <path class="branched-base" d="M 14 0 V {{ 24 + 36 * ($mktCount - 1) - 10 }}" />
                                                 @for ($k = 0; $k < $mktCount; $k++)
                                                     <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" {{ $k === $marketingIdx ? 'data-bm-draw' : '' }} style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $marketingIdx ? 0 : $bmLen($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $marketingIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
                                     <a href="{{ route('marketing.dashboard') }}"
@@ -316,19 +325,22 @@
 
                         {{-- Sales --}}
                         @can('view-sales')
-                            <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
-                                        :aria-expanded="open"
-                                        aria-controls="sidebar-sales-menu"
-                                        data-sidebar-active="{{ $salesActive ? 'true' : 'false' }}"
-                                        class="{{ $navLink }} group w-full {{ $salesActive ? $navActive : $navInactive }}">
-                                    <x-icon name="calendar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                                    <span>Sales</span>
-                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </a>
-                                @php($salesCount = 3 + ($hasSalesProject ? 1 : 0))
+                            @php($salesCount = 3 + ($hasSalesProject ? 1 : 0))
+                            <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="sales" data-bm-active="{{ $salesIdx }}">
+                                <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive : $navInactive }}">
+                                    <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
+                                            class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
+                                        <x-icon name="calendar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <span>Sales</span>
+                                    </a>
+                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                            :aria-expanded="open" aria-controls="sidebar-sales-menu"
+                                            aria-label="{{ __('Buka/tutup submenu') }}">
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div id="sidebar-sales-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: {{ 12 + $salesCount * 36 }}px">
@@ -336,7 +348,7 @@
                                                 <path class="branched-base" d="M 14 0 V {{ 24 + 36 * ($salesCount - 1) - 10 }}" />
                                                 @for ($k = 0; $k < $salesCount; $k++)
                                                     <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" {{ $k === $salesIdx ? 'data-bm-draw' : '' }} style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $salesIdx ? 0 : $bmLen($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $salesIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
                                     <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
@@ -373,18 +385,21 @@
 
                         {{-- Admin: Invoice, PO, Payment --}}
                         @can('view-admin')
-                            <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }" class="branched"{{ $adminActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <a wire:navigate.hover href="{{ route('admin.invoices.index') }}"
-                                        :aria-expanded="open"
-                                        aria-controls="sidebar-admin-menu"
-                                        data-sidebar-active="{{ $adminActive ? 'true' : 'false' }}"
-                                        class="{{ $navLink }} group w-full {{ $adminActive ? $navActive : $navInactive }}">
-                                    <x-icon name="folder" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                                    <span>Admin</span>
-                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </a>
+                            <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }" class="branched"{{ $adminActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="admin" data-bm-active="{{ $adminIdx }}">
+                                <div class="{{ $navLink }} group w-full {{ $adminActive ? $navActive : $navInactive }}">
+                                    <a wire:navigate.hover href="{{ route('admin.invoices.index') }}"
+                                            class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
+                                        <x-icon name="folder" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <span>Admin</span>
+                                    </a>
+                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                            :aria-expanded="open" aria-controls="sidebar-admin-menu"
+                                            aria-label="{{ __('Buka/tutup submenu') }}">
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div id="sidebar-admin-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: 120px">
@@ -392,7 +407,7 @@
                                                 <path class="branched-base" d="M 14 0 V 86" />
                                                 @for ($k = 0; $k < 3; $k++)
                                                     <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" {{ $k === $adminIdx ? 'data-bm-draw' : '' }} style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $adminIdx ? 0 : $bmLen($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $adminIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
                                     <a wire:navigate.hover href="{{ route('admin.invoices.index') }}"
@@ -448,18 +463,21 @@
 
                         {{-- Admin Panel (Super Admin only) --}}
                         @can('manage-monitoring')
-                            <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }" class="branched"{{ $adminPanelActive ? 'data-open' : '' }} :data-open="open ? '' : null">
-                                <a wire:navigate.hover href="{{ route('admin-panel.index') }}"
-                                        :aria-expanded="open"
-                                        aria-controls="sidebar-admin-panel-menu"
-                                        data-sidebar-active="{{ $adminPanelActive ? 'true' : 'false' }}"
-                                        class="{{ $navLink }} group w-full {{ $adminPanelActive ? $navActive : $navInactive }}">
-                                    <x-icon name="settings" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                                    <span>Admin Panel</span>
-                                    <svg class="ml-auto h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </a>
+                            <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }" class="branched"{{ $adminPanelActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="admin-panel" data-bm-active="{{ $adminPanelIdx }}">
+                                <div class="{{ $navLink }} group w-full {{ $adminPanelActive ? $navActive : $navInactive }}">
+                                    <a wire:navigate.hover href="{{ route('admin-panel.index') }}"
+                                            class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
+                                        <x-icon name="settings" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <span>Admin Panel</span>
+                                    </a>
+                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                            :aria-expanded="open" aria-controls="sidebar-admin-panel-menu"
+                                            aria-label="{{ __('Buka/tutup submenu') }}">
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div id="sidebar-admin-panel-menu" class="branched-body sidebar-hide mt-1">
                                     <div class="branched-fold">
                                         <div class="branched-tree" style="height: 228px">
@@ -467,7 +485,7 @@
                                                 <path class="branched-base" d="M 14 0 V 194" />
                                                 @for ($k = 0; $k < 6; $k++)
                                                     <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" {{ $k === $adminPanelIdx ? 'data-bm-draw' : '' }} style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $adminPanelIdx ? 0 : $bmLen($k) }}" />
+                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $adminPanelIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
                                     <a wire:navigate.hover href="{{ route('admin-panel.index') }}"
