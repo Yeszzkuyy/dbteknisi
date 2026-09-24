@@ -28,7 +28,10 @@
                 <h1 class="text-3xl font-bold text-slate-800">{{ __('Setting') }}</h1>
                 <p class="mt-1 text-slate-500">{{ __('Preferensi aplikasi Anda') }}</p>
             </div>
-            <x-icon-button as="a" icon="back" href="{{ route('dashboard') }}" title="{{ __('Kembali') }}" />
+            <div class="flex items-center gap-3">
+                <span id="settings-saved" class="hidden text-xs font-medium text-green-600 dark:text-green-400"></span>
+                <x-icon-button as="a" icon="back" href="{{ route('dashboard') }}" title="{{ __('Kembali') }}" />
+            </div>
         </div>
 
         <x-profile-tabs />
@@ -39,7 +42,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('settings.update') }}" class="space-y-6">
+        <form id="settings-form" method="POST" action="{{ route('settings.update') }}" class="space-y-6">
             @csrf
             @method('patch')
 
@@ -112,8 +115,8 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_email" value="1" class="peer sr-only" @checked($notifyEmail)>
-                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-accent-600 dark:bg-slate-600"></span>
-                            <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
+                            <span class="toggle-track h-6 w-11 rounded-full transition"></span>
+                            <span class="toggle-knob pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
 
@@ -124,8 +127,8 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_system" value="1" class="peer sr-only" @checked($notifySystem)>
-                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-accent-600 dark:bg-slate-600"></span>
-                            <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
+                            <span class="toggle-track h-6 w-11 rounded-full transition"></span>
+                            <span class="toggle-knob pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
 
@@ -136,8 +139,8 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_push" value="1" class="peer sr-only" @checked($notifyPush)>
-                            <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-accent-600 dark:bg-slate-600"></span>
-                            <span class="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition peer-checked:translate-x-5"></span>
+                            <span class="toggle-track h-6 w-11 rounded-full transition"></span>
+                            <span class="toggle-knob pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
                 </div>
@@ -185,14 +188,68 @@
                 </div>
             </section>
 
-            {{-- Simpan --}}
-            <div class="flex items-center gap-4">
-                <button type="submit"
-                        class="inline-flex items-center rounded-xl bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-700">
-                    {{ __('Simpan Pengaturan') }}
-                </button>
-            </div>
+            {{-- Simpan otomatis saat ada perubahan (tanpa tombol; noscript tetap ada tombol) --}}
+            <noscript>
+                <div class="flex items-center gap-4">
+                    <button type="submit"
+                            class="inline-flex items-center rounded-xl bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-700">
+                        {{ __('Simpan Pengaturan') }}
+                    </button>
+                </div>
+            </noscript>
         </form>
+
+        <style>
+            /* Toggle kontras mengikuti mode: ON = gelap di light, terang di dark.
+               Class sendiri (bukan utility bg-*) agar lolos override !important dark-mode global. */
+            .toggle-track{background-color:#cbd5e1}
+            .peer:checked ~ .toggle-track{background-color:#1e293b}
+            .toggle-knob{background-color:#fff}
+            .dark .toggle-track{background-color:var(--card-border)}
+            .dark .peer:checked ~ .toggle-track{background-color:#fff}
+            .dark .peer:checked ~ .toggle-knob{background-color:#1e293b}
+        </style>
+        <script>
+            // Autosave: tiap perubahan setting langsung PATCH tanpa reload.
+            (function () {
+                var form = document.getElementById('settings-form');
+                if (!form) return;
+                var status = document.getElementById('settings-saved');
+                var timer = null;
+                var localeInput = form.querySelector('[name="locale"]');
+                var lastLocale = localeInput ? localeInput.value : null;
+                form.addEventListener('change', function () {
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        var token = document.querySelector('meta[name="csrf-token"]')
+                            ? document.querySelector('meta[name="csrf-token"]').content : null;
+                        fetch(form.action, {
+                            method: 'POST',
+                            body: new FormData(form),
+                            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': token },
+                        }).then(function (res) {
+                            if (!res.ok) throw new Error();
+                            return res.json();
+                        }).then(function () {
+                            if (status) {
+                                var t = new Date();
+                                var hh = String(t.getHours()).padStart(2, '0');
+                                var mm = String(t.getMinutes()).padStart(2, '0');
+                                status.textContent = '{{ __('Tersimpan otomatis') }} ✓ ' + hh + ':' + mm;
+                                status.classList.remove('hidden');
+                            }
+                            var locale = localeInput ? localeInput.value : null;
+                            if (locale && locale !== lastLocale) {
+                                lastLocale = locale;
+                                window.location.reload();
+                            }
+                        }).catch(function () {
+                            if (window.toast) window.toast('{{ __('Gagal menyimpan pengaturan.') }}', false);
+                        });
+                    }, 400);
+                });
+            })();
+        </script>
 
         {{-- Area lanjutan (digerbang password) --}}
         <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-600 dark:bg-slate-800">

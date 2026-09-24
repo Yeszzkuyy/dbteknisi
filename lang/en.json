@@ -905,5 +905,7 @@
     "Pilih Company": "Select Company",
     "Semua Company": "All Companies",
     "Filter Company": "Filter by Company",
-    "Jika dimatikan, Anda tidak menerima notifikasi apa pun.": "When off, you won't receive any notifications."
+    "Jika dimatikan, Anda tidak menerima notifikasi apa pun.": "When off, you won't receive any notifications.",
+    "Tersimpan otomatis": "Auto-saved",
+    "Gagal menyimpan pengaturan.": "Failed to save settings."
 }

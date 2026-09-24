@@ -23,7 +23,7 @@ class SettingsController extends Controller
     /**
      * Persist the user's application preferences.
      */
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request): RedirectResponse|JsonResponse
     {
         $data = $request->validate([
             'theme' => ['required', 'in:light,dark,system'],
@@ -44,6 +44,10 @@ class SettingsController extends Controller
             'accent' => $data['accent'] ?? $user->preference('accent', 'ocean'),
         ]);
         $user->save();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'message' => __('Pengaturan berhasil disimpan.')]);
+        }
 
         return Redirect::route('settings.edit')->with('status', 'settings-updated');
     }

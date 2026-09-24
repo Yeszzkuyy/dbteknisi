@@ -43,6 +43,27 @@ class SettingsTest extends TestCase
         $this->assertFalse($user->preference('notify_system'));
     }
 
+    public function test_autosave_returns_json_and_persists_toggles(): void
+    {
+        $user = User::factory()->create();
+
+        // Checkbox off = key absent (seperti FormData browser) → tersimpan false.
+        $this->actingAs($user)
+            ->patchJson(route('settings.update'), [
+                'theme' => 'dark',
+                'locale' => 'id',
+                'notify_system' => '1',
+            ])
+            ->assertOk()
+            ->assertJsonPath('ok', true);
+
+        $user->refresh();
+
+        $this->assertFalse($user->preference('notify_email'));
+        $this->assertFalse($user->preference('notify_push'));
+        $this->assertTrue($user->preference('notify_system'));
+    }
+
     public function test_preferences_are_validated(): void
     {
         $user = User::factory()->create();
