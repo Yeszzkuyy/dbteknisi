@@ -114,6 +114,17 @@
     stroke: rgb(var(--accent-500) / 1);
     transition: stroke-dashoffset var(--bm-draw) var(--bm-ease);
 }
+/* Draw otomatis tiap konten masuk (load awal maupun hasil navigate):
+   animasi berjalan sendiri tanpa JS sehingga tidak flicker.
+   from 500 = tersembunyi penuh untuk semua panjang garis. */
+.sidebar .branched-reach[data-bm-draw] {
+    animation: bm-draw var(--bm-draw) var(--bm-ease);
+}
+@keyframes bm-draw {
+    from {
+        stroke-dashoffset: 500;
+    }
+}
 
 /* Mode minimized: submenu disembunyikan via .sidebar-hide (bawaan) */
 html.sidebar-collapsed .sidebar .branched-lines {
@@ -126,5 +137,8 @@ html.sidebar-collapsed .sidebar .branched-lines {
     }
     .sidebar .branched-reach {
         transition: none;
+    }
+    .sidebar .branched-reach[data-bm-draw] {
+        animation: none;
     }
 }
