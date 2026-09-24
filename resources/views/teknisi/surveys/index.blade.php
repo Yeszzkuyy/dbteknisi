@@ -5,10 +5,7 @@
             <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">{{ __('Daftar Survey') }}</h1>
             <p class="text-slate-500 mt-1">{{ __('Semua data survey untuk setiap project') }}</p>
         </div>
-        <a href="{{ route('teknisi.surveys.create') }}"
-           class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
-            {{ __('+ Tambah Survey') }}
-        </a>
+        <x-icon-button as="a" icon="add" href="{{ route('teknisi.surveys.create') }}" title="{{ __('Tambah Survey') }}" />
     </div>
 
     {{-- Filter --}}
@@ -36,12 +33,8 @@
                 </select>
             </div>
             <div class="flex gap-2">
-                <button type="submit" class="px-4 py-2 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
-                    Filter
-                </button>
-                <a href="{{ route('teknisi.surveys.index') }}" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium transition">
-                    Reset
-                </a>
+                <x-icon-button icon="filter" type="submit" title="{{ __('Filter') }}" />
+                <x-icon-button as="a" icon="reset" href="{{ route('teknisi.surveys.index') }}" title="{{ __('Reset') }}" />
             </div>
         </form>
     </div>
