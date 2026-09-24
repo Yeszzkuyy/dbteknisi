@@ -251,6 +251,108 @@ document.addEventListener('alpine:init', () => {
 
 Alpine.start();
 
+/* ============================================================
+   Toast global + form AJAX (tanpa refresh).
+   - <form data-ajax data-ajax-target="#tabel"> (GET): ganti target
+     dengan partial `html` + pushState URL.
+   - <form data-ajax> (POST/PUT/DELETE): JSON {ok, message,
+     redirect?}; tanpa redirect + data-ajax-remove="tr" → hapus
+     baris terdekat + toast. Sukses + redirect → pindah sekali.
+   - 422: kotak error inline di atas form. Gagal total: submit biasa.
+   - Diabaikan bila event sudah di-cancel (mis. confirm() batal).
+   ============================================================ */
+window.toast = function (message, ok = true) {
+    const el = document.createElement('div');
+    el.className = 'fixed bottom-6 right-6 z-[100] flex items-center gap-2 px-5 py-3 rounded-xl shadow-lg text-white transition-opacity ' + (ok ? 'bg-green-600' : 'bg-red-600');
+    el.textContent = message;
+    document.body.appendChild(el);
+    setTimeout(() => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+    }, 3500);
+};
+
+function ajaxShowErrors(form, errors) {
+    form.querySelector('[data-ajax-errors]')?.remove();
+    const box = document.createElement('div');
+    box.setAttribute('data-ajax-errors', '');
+    box.className = 'rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-5 py-3 mb-4';
+    const ul = document.createElement('ul');
+    ul.className = 'list-disc list-inside text-sm space-y-1';
+    Object.values(errors || {}).flat().forEach((msg) => {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    form.prepend(box);
+    box.scrollIntoView({ block: 'nearest' });
+}
+
+function ajaxToggleReset(form) {
+    const reset = form.parentElement?.querySelector('[data-ajax-reset]') || document.querySelector('[data-ajax-reset]');
+    if (!reset) return;
+    const filled = [...new FormData(form).values()].some((v) => String(v ?? '').trim() !== '');
+    reset.classList.toggle('hidden', !filled);
+}
+
+document.addEventListener('submit', async (e) => {
+    const form = e.target?.closest?.('form[data-ajax]');
+    if (!form || e.defaultPrevented) return;
+    e.preventDefault();
+
+    form.querySelector('[data-ajax-errors]')?.remove();
+    const btn = form.querySelector('[type="submit"]');
+    btn?.setAttribute('disabled', '');
+    const done = () => btn?.removeAttribute('disabled');
+
+    const headers = { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (token) headers['X-CSRF-TOKEN'] = token;
+
+    try {
+        if ((form.method || 'get').toLowerCase() === 'get') {
+            const params = new URLSearchParams(new FormData(form));
+            const url = form.action + (form.action.includes('?') ? '&' : '?') + params.toString();
+            const res = await fetch(url, { headers });
+            const data = await res.json();
+            if (data.html && form.dataset.ajaxTarget) {
+                document.querySelector(form.dataset.ajaxTarget).innerHTML = data.html;
+            }
+            history.pushState({}, '', url);
+            ajaxToggleReset(form);
+            done();
+            return;
+        }
+
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers });
+        if (res.status === 422) {
+            ajaxShowErrors(form, (await res.json()).errors);
+            done();
+            return;
+        }
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (data.message) window.toast(data.message, true);
+        if (data.redirect) {
+            window.location.href = data.redirect;
+            return;
+        }
+        if (form.dataset.ajaxRemove) {
+            const row = form.closest(form.dataset.ajaxRemove);
+            const tbody = row?.closest('tbody');
+            row?.remove();
+            if (tbody && !tbody.querySelector('tr')) {
+                tbody.innerHTML = '<tr><td colspan="99" class="py-16 text-center text-slate-400">Tidak ada data.</td></tr>';
+            }
+        }
+        done();
+    } catch (err) {
+        done();
+        form.submit();
+    }
+});
+
 /* Branched draw kini murni CSS keyframes ([data-bm-draw]) — berjalan
    otomatis tiap konten masuk tanpa flicker. Tidak perlu JS. */
 
