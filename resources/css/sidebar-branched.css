@@ -71,6 +71,14 @@
 .sidebar .branched > button:hover {
     background: transparent;
 }
+/* Opsi 1: marker ::before kiri dicabut khusus grup branched (anak +
+   header) — penanda aktif sudah ada: teks accent + garis reach.
+   Daun top-level tetap memakai marker bawaan. (0,3,2) menang atas
+   aturan bawaan (0,2,3). */
+.sidebar .branched-tree > a[aria-current='page']::before,
+.sidebar .branched > button[data-sidebar-active='true']::before {
+    content: none;
+}
 /* :not(.ml-auto) ikut dihitung → (0,4,3), menang atas aturan geser
    bawaan (0,3,3). Tanpa ini label masih bergeser 2px saat hover. */
 .sidebar nav .branched-tree > a:hover > span:not(.ml-auto),
