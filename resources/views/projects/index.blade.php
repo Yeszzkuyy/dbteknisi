@@ -7,15 +7,11 @@
             <p class="text-slate-500 mt-1">Semua project, termasuk yang selesai atau di-hold</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('customers.index') }}" 
-               class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
-                Lihat Customer
-            </a>
+            <x-icon-button as="a" href="{{ route('customers.index') }}" title="{{ __('Lihat Customer') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M15 9.5h3a2 2 0 0 1 2 2V21M8 7h3M8 11h3M8 15h3M17 13h1M17 17h1M2.5 21h19" /></svg>
+            </x-icon-button>
             @can('manage-teknisi')
-                <a href="{{ route('projects.create') }}" 
-                   class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
-                    + Tambah Project
-                </a>
+                <x-icon-button as="a" icon="add" href="{{ route('projects.create') }}" title="{{ __('Tambah Project') }}" />
             @endcan
         </div>
     </div>
