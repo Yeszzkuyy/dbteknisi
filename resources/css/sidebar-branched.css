@@ -48,6 +48,19 @@
     white-space: nowrap;
 }
 
+/* Paket A: hover item pohon TIDAK boleh menutupi cabang.
+   - Background hover dimatikan (seperti template: hanya warna teks berubah).
+   - Geseran translateX bawaan dimatikan agar teks tetap sejajar ujung cabang.
+   Spesifisitas (0,3,x) menang atas aturan hover global (0,2,x) dan
+   utility hover:bg-white/5 (0,2,0). */
+.sidebar .branched-tree > a:hover {
+    background: transparent;
+}
+.sidebar .branched-tree > a:hover svg,
+.sidebar .branched-tree > a:hover > span {
+    transform: none;
+}
+
 /* Garis: base = border lembut tema, reach = accent tema */
 .sidebar .branched-lines {
     position: absolute;
