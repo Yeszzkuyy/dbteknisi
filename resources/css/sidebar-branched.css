@@ -56,11 +56,14 @@
 .sidebar .branched-tree > a:hover {
     background: transparent;
 }
-/* Menu AKTIF disamakan dengan daun top-level: pil background + teks
-   warna theme (--nav-active-*, ikut data-theme di light mode).
-   Aturan aktif global di app.css yang berlaku (blok override di sini
-   sengaja dihapus). Garis reach tetap terlihat di atas pil via
-   z-index .branched-lines di bawah. */
+/* Pil background baris AKTIF dicabut lagi (pernah dikembalikan sesi
+   lain): pil melukis di atas cabang/reach. Aktif ditandai teks accent
+   + garis reach — seperti template. (0,3,1) menang atas aturan aktif
+   global (0,2,2) dan utility bg. */
+.sidebar .branched-tree > a[aria-current='page'] {
+    background: transparent;
+    color: rgb(var(--accent-500) / 1);
+}
 /* Header grup (Management, Teknisi, ...): TANPA efek hover sama sekali —
    warna & posisi diam (tetap bisa diklik untuk buka/tutup). Pil aktif
    header dipertahankan. Daun top-level (Dashboard, Customer, ...)
@@ -72,6 +75,19 @@
 .sidebar .branched > button[data-sidebar-active='true']:hover {
     color: var(--nav-active-text);
 }
+/* Pil aktif header grup ikut dicabut (efek tipis di tab ber-submenu):
+   penanda aktif header cukup warna teks. Daun top-level tak tersentuh. */
+.sidebar .branched > button[data-sidebar-active='true'] {
+    background: transparent;
+}
+/* Hover mode gelap mengikuti warna tema (accent-300), bukan putih/
+   abu bawaan. :not() mengecualikan baris aktif. Light mode tak diubah. */
+.dark .sidebar .branched-tree > a:hover:not([aria-current='page']) {
+    color: rgb(var(--accent-300) / 1);
+}
+.dark .sidebar .branched > button:hover:not([data-sidebar-active='true']) {
+    color: rgb(var(--accent-300) / 1);
+}
 /* Geseran ikon/label header grup saat hover ikut dimatikan
    (seperti aturan anak pohon di bawah). */
 .sidebar .branched > button:hover > span:not(.ml-auto),
@@ -79,7 +95,7 @@
     transform: none;
 }
 /* Opsi 1: marker ::before kiri dicabut khusus grup branched (anak +
-   header) — penanda aktif sudah ada: pil theme + garis reach.
+   header) — penanda aktif sudah ada: teks accent + garis reach.
    Daun top-level tetap memakai marker bawaan. (0,3,2) menang atas
    aturan bawaan (0,2,3). */
 .sidebar .branched-tree > a[aria-current='page']::before,
