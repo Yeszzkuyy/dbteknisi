@@ -10,6 +10,7 @@ use App\Models\WhatsappConversation;
 use App\Models\WhatsappMessage;
 use App\Notifications\WhatsappHandoffNotification;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Throwable;
@@ -62,6 +63,12 @@ class WhatsappBot
 
         foreach ($accounts as $account) {
             foreach ($this->pendingSenders($account)->take($maxPerAccount) as $sender) {
+                // Kunci per percakapan: cron jalan tiap 30 detik, respons AI bisa
+                // lebih lama — tanpa ini dua proses paralel membalas pesan yang sama.
+                $lock = Cache::lock("wa-bot-reply:{$account->id}:{$sender}", 120);
+                if (! $lock->acquire()) {
+                    continue;
+                }
                 try {
                     if ($this->replyTo($account, $sender)) {
                         $processed++;
@@ -71,6 +78,8 @@ class WhatsappBot
                         'account' => $account->id,
                         'sender' => $sender,
                     ]);
+                } finally {
+                    $lock->release();
                 }
             }
         }
