@@ -20,10 +20,11 @@ class RoleMenuTest extends TestCase
     }
 
     /**
-     * Header grup sidebar adalah link navigasi (tanpa toggle klik):
-     * lipatan dibuka/ditutup via JS mengikuti halaman aktif.
+     * Header grup sidebar: label berupa link navigasi + tombol chevron
+     * toggle buka/tutup (@click="open = !open", aria-controls ke menu).
+     * Lipatan juga tetap mengikuti halaman aktif via JS.
      */
-    public function test_sidebar_group_headers_are_navigation_links()
+    public function test_sidebar_group_headers_have_link_and_toggle()
     {
         $u = $this->loginAs('super-admin');
         $html = $this->actingAs($u)->get('/dashboard')->assertOk()->getContent();
@@ -43,9 +44,9 @@ class RoleMenuTest extends TestCase
             'sidebar-admin-panel-menu' => 'admin-panel',
         ] as $controls => $path) {
             $this->assertMatchesRegularExpression(
-                '/<a[^>]*aria-controls="' . $controls . '"/',
+                '/<button[^>]*@click="open = !open"[^>]*aria-controls="' . $controls . '"/',
                 $navHtml,
-                "header $controls harus berupa link"
+                "header $controls harus punya tombol toggle"
             );
             $this->assertStringContainsString($path, $navHtml);
         }
