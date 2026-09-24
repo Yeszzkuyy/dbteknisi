@@ -7,9 +7,6 @@
             <p class="text-slate-500 mt-1">Semua project, termasuk yang selesai atau di-hold</p>
         </div>
         <div class="flex gap-2">
-            <x-icon-button as="a" href="{{ route('customers.index') }}" title="{{ __('Lihat Customer') }}">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M15 9.5h3a2 2 0 0 1 2 2V21M8 7h3M8 11h3M8 15h3M17 13h1M17 17h1M2.5 21h19" /></svg>
-            </x-icon-button>
             @can('manage-teknisi')
                 <x-icon-button as="a" icon="add" href="{{ route('projects.create') }}" title="{{ __('Tambah Project') }}" />
             @endcan
@@ -68,11 +65,8 @@
                                     <a href="{{ route('customers.show', $project->customer_id) }}"
                                        title="{{ __('Lihat customer') }}"
                                        aria-label="{{ __('Lihat customer') }}"
-                                       class="group/btn relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-accent-600 text-white shadow-sm transition-all duration-300 hover:scale-110 hover:bg-accent-500 hover:shadow-lg hover:shadow-accent-500/40 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
-                                        <img src="{{ asset('icons/cust-view.png') }}" alt="" loading="lazy"
-                                             class="block h-5 w-5 group-hover/btn:hidden" />
-                                        <img src="{{ asset('icons/cust-view.gif') }}" alt="" loading="lazy"
-                                             class="hidden h-5 w-5 group-hover/btn:block" />
+                                       class="group/btn relative overflow-hidden p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 transition-transform duration-300 group-hover/btn:scale-110" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M15 9.5h3a2 2 0 0 1 2 2V21M8 7h3M8 11h3M8 15h3M17 13h1M17 17h1M2.5 21h19" /></svg>
                                         <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                     </a>
                                     <a href="{{ route('projects.show', $project) }}"
