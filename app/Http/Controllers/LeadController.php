@@ -379,7 +379,8 @@ class LeadController extends Controller
 
         return redirect()
             ->route('leads.index')
-            ->with('success', __('Lead berhasil ditambahkan'));
+            ->with('success', __('Lead berhasil ditambahkan'))
+            ->with('success_card', true);
     }
 
     public function show(Lead $lead)

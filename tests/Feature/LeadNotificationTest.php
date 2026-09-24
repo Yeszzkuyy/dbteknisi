@@ -58,7 +58,8 @@ class LeadNotificationTest extends TestCase
             'incoming_date' => now()->toDateString(),
         ])
             ->assertRedirect(route('leads.index'))
-            ->assertSessionHas('success');
+            ->assertSessionHas('success')
+            ->assertSessionHas('success_card', true);
 
         $this->assertSame(1, Lead::count());
         // Notifikasi wajib antre (tidak dikirim inline agar submit tetap cepat).
