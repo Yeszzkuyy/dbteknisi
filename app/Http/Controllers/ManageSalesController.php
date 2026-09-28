@@ -142,8 +142,8 @@ class ManageSalesController extends Controller
         };
         $mine = fn () => Lead::where('assigned_to', auth()->id());
         $kpi = [
-            'active' => (clone $mine)->whereNotIn('status', ['won', 'lost'])->count(),
-            'won_month' => (clone $mine)->where('status', 'won')
+            'active' => $mine()->whereNotIn('status', ['won', 'lost'])->count(),
+            'won_month' => $mine()->where('status', 'won')
                 ->whereMonth('updated_at', now()->month)
                 ->whereYear('updated_at', now()->year)->count(),
             'meetings_week' => Meeting::where($ownActivity)
