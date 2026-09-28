@@ -45,5 +45,9 @@ class DatabaseSeeder extends Seeder
 
         // 3. Data contoh (user per divisi, customer, project, aktivitas)
         $this->call(SampleDataSeeder::class);
+
+        // 4. Akun karyawan riil — TERAKHIR agar role-nya tidak tertimpa migrasi.
+        //    Rerun seeder ini untuk memulihkan user yang terhapus tidak sengaja.
+        $this->call(CompanyUserSeeder::class);
     }
 }
