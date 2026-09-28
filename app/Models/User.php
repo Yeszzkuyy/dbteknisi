@@ -53,6 +53,14 @@ class User extends Authenticatable
     }
 
     /**
+     * true bila avatar user memakai border animasi (khusus founder).
+     */
+    public function hasAnimatedAvatarBorder(): bool
+    {
+        return $this->email === 'yehezkielmayogi.ptnti@gmail.com';
+    }
+
+    /**
      * Alasan akun ini TIDAK boleh dihapus (null = boleh).
      * Melindungi dari lockout & penghapusan massal tidak sengaja.
      * Alur hapus akun karyawan yang benar: keluarkan dari
