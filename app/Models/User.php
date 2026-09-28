@@ -40,4 +40,25 @@ class User extends Authenticatable
     {
         return data_get($this->preferences, $key, $default);
     }
+
+    /**
+     * Alasan akun ini TIDAK boleh dihapus (null = boleh).
+     * Melindungi dari lockout & penghapusan massal tidak sengaja.
+     * Alur hapus akun karyawan yang benar: keluarkan dari
+     * CompanyUserSeeder, baru hapus.
+     */
+    public function deletionBlockReason(): ?string
+    {
+        $superAdminExists = \Spatie\Permission\Models\Role::where('name', 'super-admin')->exists();
+
+        if ($superAdminExists && $this->hasRole('super-admin') && static::role('super-admin')->count() <= 1) {
+            return __('Tidak bisa menghapus super-admin terakhir (sistem akan terkunci).');
+        }
+
+        if (str_ends_with((string) $this->email, '@tridayaapp.com')) {
+            return __('Akun karyawan dilindungi — keluarkan dulu dari CompanyUserSeeder bila memang harus dihapus.');
+        }
+
+        return null;
+    }
 }

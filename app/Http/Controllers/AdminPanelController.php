@@ -94,6 +94,10 @@ class AdminPanelController extends Controller
             return back()->with('error', __('Tidak bisa menghapus akun sendiri.'));
         }
 
+        if ($reason = $user->deletionBlockReason()) {
+            return back()->with('error', $reason);
+        }
+
         $user->delete();
         return redirect()->route('admin-panel.index')
             ->with('success', __('User berhasil dihapus.'));
