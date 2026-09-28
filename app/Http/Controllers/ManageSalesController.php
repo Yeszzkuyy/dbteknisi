@@ -119,6 +119,7 @@ class ManageSalesController extends Controller
     public function myLeads(Request $request)
     {
         $leads = Lead::with(['customer', 'partner'])
+            ->withCount(['meetings', 'followUps'])
             ->where('assigned_to', auth()->id())
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
                 fn ($c) => $c->whereLike('name', $request->search)))
