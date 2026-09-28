@@ -294,10 +294,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:monitor-marketing')
         ->name('leads.monitoring');
 
-    // Pipeline + detail lead — dipakai Marketing & Sales (sales di-scope ke own lead di controller/policy).
+    // Pipeline dipakai Marketing & Sales (sales di-scope ke own lead di controller/policy).
     Route::middleware('permission:view-marketing|manage-marketing|view-sales|manage-sales|manage-technician|manage-admin')->group(function () {
         Route::get('/leads/pipeline', [LeadController::class, 'pipeline'])->name('leads.pipeline');
-        Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
     });
 
     Route::middleware('permission:view-marketing|manage-marketing')->group(function () {
@@ -316,6 +315,13 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
     });
+
+    // Detail lead — HARUS di bawah semua /leads/* spesifik agar tidak memangsa
+    // /leads/activities dkk (route {lead} menelan segmen apa pun). Akses luas:
+    // Marketing & Sales (+ teknisi/admin), sales di-scope ke own lead di policy.
+    Route::get('/leads/{lead}', [LeadController::class, 'show'])
+        ->middleware('permission:view-marketing|manage-marketing|view-sales|manage-sales|manage-technician|manage-admin')
+        ->name('leads.show');
 
     // ============================================
     // WHATSAPP CENTER MARKETING (inbox 4 WA Company)
