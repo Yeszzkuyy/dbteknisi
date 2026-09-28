@@ -27,7 +27,7 @@ class GetLatestProjectsTest extends TestCase
 
     public function test_teknisi_can_see_latest_projects(): void
     {
-        $teknisi = $this->userWithRole('teknisi');
+        $teknisi = $this->userWithRole('technician');
         $this->actingAs($teknisi);
 
         $customer = Customer::create(['name' => 'PT Contoh']);

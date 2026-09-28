@@ -28,7 +28,7 @@ class GetMyTasksTest extends TestCase
 
     public function test_teknisi_sees_only_their_own_tasks(): void
     {
-        $teknisi = $this->userWithRole('teknisi');
+        $teknisi = $this->userWithRole('technician');
         $other = User::factory()->create();
 
         $this->actingAs($teknisi);
@@ -74,7 +74,7 @@ class GetMyTasksTest extends TestCase
 
     public function test_teknisi_without_tasks_gets_empty_message(): void
     {
-        $teknisi = $this->userWithRole('teknisi');
+        $teknisi = $this->userWithRole('technician');
 
         $result = (string) (new GetMyTasks($teknisi))->handle(new Request);
 

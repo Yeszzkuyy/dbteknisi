@@ -6,7 +6,7 @@
             <p class="text-slate-500 mt-1">Detail Project</p>
         </div>
         <div class="flex gap-2">
-            @can('manage-teknisi')
+            @can('manage-technician')
                 <a href="{{ route('projects.edit', $project) }}" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-medium transition">Edit Project</a>
             @endcan
             <a href="{{ route('projects.index') }}"

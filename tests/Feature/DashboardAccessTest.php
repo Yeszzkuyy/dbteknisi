@@ -27,9 +27,9 @@ class DashboardAccessTest extends TestCase
             ->assertOk();
     }
 
-    public function test_teknisi_can_access_general_dashboard(): void
+    public function test_technician_can_access_general_dashboard(): void
     {
-        $this->actingAs($this->userWithRole('teknisi'))
+        $this->actingAs($this->userWithRole('technician'))
             ->get(route('dashboard'))
             ->assertOk();
     }
@@ -41,9 +41,9 @@ class DashboardAccessTest extends TestCase
             ->assertOk();
     }
 
-    public function test_manager_can_access_general_dashboard(): void
+    public function test_ceo_can_access_general_dashboard(): void
     {
-        $this->actingAs($this->userWithRole('manager'))
+        $this->actingAs($this->userWithRole('ceo'))
             ->get(route('dashboard'))
             ->assertOk();
     }

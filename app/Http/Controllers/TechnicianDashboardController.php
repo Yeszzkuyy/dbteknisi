@@ -27,7 +27,7 @@ class TechnicianDashboardController extends Controller
     {
         $now = Carbon::now('Asia/Jakarta');
 
-        $technicians = User::role('teknisi')->orderBy('name')->get(['id', 'name', 'avatar']);
+        $technicians = User::role('technician')->orderBy('name')->get(['id', 'name', 'avatar']);
 
         $runningProjects = Project::with(['customer', 'status'])
             ->whereHas('status', fn ($q) => $q->whereIn('name', self::ACTIVE_STATUSES))

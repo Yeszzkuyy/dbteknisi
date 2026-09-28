@@ -72,12 +72,12 @@ class GetSalesSummaryTest extends TestCase
         $this->assertSame(1, $result['purchase_orders']['total']);
     }
 
-    public function test_manager_gets_sales_summary(): void
+    public function test_ceo_gets_sales_summary(): void
     {
-        $manager = $this->userWithRole('manager');
+        $ceo = $this->userWithRole('ceo');
         $this->seedSalesData();
 
-        $result = json_decode((string) (new GetSalesSummary($manager))->handle(new Request), true);
+        $result = json_decode((string) (new GetSalesSummary($ceo))->handle(new Request), true);
 
         $this->assertSame(2, $result['leads']['total']);
     }

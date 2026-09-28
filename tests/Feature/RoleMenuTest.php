@@ -53,9 +53,9 @@ class RoleMenuTest extends TestCase
         $this->assertStringNotContainsString('@click="open = !open"', $navHtml);
     }
 
-    public function test_teknisi_menu_and_access()
+    public function test_technician_menu_and_access()
     {
-        $u = $this->loginAs('teknisi');
+        $u = $this->loginAs('technician');
         $res = $this->actingAs($u)->get('/teknisi/dashboard')->assertOk();
         $html = $res->getContent();
 
@@ -143,9 +143,9 @@ class RoleMenuTest extends TestCase
         $this->actingAs($u)->get('/projects')->assertForbidden();
     }
 
-    public function test_manager_still_sees_all()
+    public function test_ceo_still_sees_all()
     {
-        $u = $this->loginAs('manager');
+        $u = $this->loginAs('ceo');
         $this->actingAs($u)->get('/projects')->assertOk();
         $this->actingAs($u)->get('/leads')->assertOk();
         $this->actingAs($u)->get('/customers')->assertOk();
@@ -163,7 +163,7 @@ class RoleMenuTest extends TestCase
     public function test_super_admin_bypasses_all_gates()
     {
         $u = $this->loginAs('super-admin');
-        foreach (['view-teknisi', 'view-sales', 'view-admin', 'view-marketing', 'manage-monitoring', 'apa-aja-yang-tidak-ada'] as $p) {
+        foreach (['view-technician', 'view-sales', 'view-admin', 'view-marketing', 'manage-monitoring', 'apa-aja-yang-tidak-ada'] as $p) {
             $this->assertTrue($u->can($p), $p);
         }
     }

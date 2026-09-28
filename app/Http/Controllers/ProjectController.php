@@ -61,7 +61,7 @@ class ProjectController extends Controller
         $workTypes = WorkType::all();
         $accountManagers = AccountManager::all();
         $statuses = ProjectStatus::orderBy('sort_order')->get();
-        $technicians = User::role('teknisi')->orderBy('name')->get(['id', 'name']);
+        $technicians = User::role('technician')->orderBy('name')->get(['id', 'name']);
 
         return view('projects.create', compact('customer', 'workTypes', 'accountManagers', 'statuses', 'technicians'));
     }
@@ -116,7 +116,7 @@ class ProjectController extends Controller
         $workTypes = WorkType::all();
         $accountManagers = AccountManager::all();
         $statuses = ProjectStatus::orderBy('sort_order')->get();
-        $technicians = User::role('teknisi')->orderBy('name')->get(['id', 'name']);
+        $technicians = User::role('technician')->orderBy('name')->get(['id', 'name']);
 
         return view('projects.edit', compact('project', 'customers', 'workTypes', 'accountManagers', 'statuses', 'technicians'));
     }

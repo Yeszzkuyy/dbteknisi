@@ -29,7 +29,7 @@ class GetProjectProgressTest extends TestCase
 
     public function test_authorized_user_gets_progress_summary(): void
     {
-        $teknisi = $this->userWithRole('teknisi');
+        $teknisi = $this->userWithRole('technician');
         $this->actingAs($teknisi);
 
         $customer = Customer::create(['name' => 'PT Contoh']);

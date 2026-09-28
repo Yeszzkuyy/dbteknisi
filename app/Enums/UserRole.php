@@ -5,7 +5,7 @@ namespace App\Enums;
 enum UserRole: string
 {
     case Manager = 'manager';
-    case Teknisi = 'teknisi';
+    case Teknisi = 'technician';
     case Guest = 'guest';
 
     public function canEdit(): bool

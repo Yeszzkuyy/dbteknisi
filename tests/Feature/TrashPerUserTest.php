@@ -24,7 +24,7 @@ class TrashPerUserTest extends TestCase
         $b = User::factory()->create();
         $sa = User::factory()->create();
 
-        $a->assignRole('teknisi');
+        $a->assignRole('technician');
         $b->assignRole('sales');
         $sa->assignRole('super-admin');
 

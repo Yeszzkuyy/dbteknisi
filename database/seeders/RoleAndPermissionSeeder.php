@@ -14,6 +14,12 @@ class RoleAndPermissionSeeder extends Seeder
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
+        // Ingat pemegang super-admin sebelum assignment dihapus
+        // (guard: di DB fresh, role belum ada — lewati tanpa throw)
+        $prevSuperAdmins = Role::where('name', 'super-admin')->exists()
+            ? User::role('super-admin')->pluck('id')->all()
+            : [];
+
         // Bersihkan data lama
         DB::table('model_has_roles')->delete();
         DB::table('model_has_permissions')->delete();
@@ -22,7 +28,7 @@ class RoleAndPermissionSeeder extends Seeder
         DB::table('permissions')->delete();
 
         // === 1. Create Permissions (pola manage-{divisi} & view-{divisi}) ===
-        $divisi = ['marketing', 'sales', 'admin', 'teknisi', 'monitoring'];
+        $divisi = ['marketing', 'sales', 'admin', 'technician', 'monitoring'];
         $permissions = [];
 
         foreach ($divisi as $d) {
@@ -34,10 +40,11 @@ class RoleAndPermissionSeeder extends Seeder
         $permissions[] = 'view-customer';
         $permissions[] = 'view-trash';
 
-        // Monitoring anggota divisi (khusus lead divisi)
+        // Monitoring anggota divisi (lead & manage tiap divisi)
         $permissions[] = 'monitor-marketing';
+        $permissions[] = 'monitor-technical';
 
-        // Manage Sales: management melihat & meng-assign lead dari marketing ke sales
+        // Hub Management: melihat & meng-assign lead + membuka placeholder Manage
         $permissions[] = 'manage-sales-leads';
 
         foreach ($permissions as $name) {
@@ -45,75 +52,59 @@ class RoleAndPermissionSeeder extends Seeder
         }
 
         // === 2. Create Roles & Assign Permissions ===
-        // Tiap role: divisinya sendiri + Dashboard, Customer, Trash.
-        // Monitoring hanya manager & super-admin.
         $common = ['view-customer', 'view-trash'];
 
-        $marketing = Role::create(['name' => 'marketing', 'guard_name' => 'web']);
-        $marketing->givePermissionTo([
-            'manage-marketing', 'view-marketing', ...$common,
-        ]);
+        $mk = fn (string $name, array $perms) => tap(
+            Role::create(['name' => $name, 'guard_name' => 'web']),
+            fn ($r) => $r->givePermissionTo($perms)
+        );
 
-        // Lead divisi marketing: akses penuh marketing + monitoring tim
-        $marketingLead = Role::create(['name' => 'marketing-lead', 'guard_name' => 'web']);
-        $marketingLead->givePermissionTo([
-            'manage-marketing', 'view-marketing', 'monitor-marketing', ...$common,
-        ]);
+        // Divisi
+        $mk('marketing', ['manage-marketing', 'view-marketing', ...$common]);
+        $mk('sales', ['manage-sales', 'view-sales', ...$common]);
+        $mk('admin', ['manage-admin', 'view-admin', ...$common]);
+        $mk('technician', ['manage-technician', 'view-technician', ...$common]);
 
-        $sales = Role::create(['name' => 'sales', 'guard_name' => 'web']);
-        $sales->givePermissionTo([
-            'manage-sales', 'view-sales', ...$common,
-        ]);
+        // Lead teknisi: 1 tingkat di atas technician biasa
+        $mk('lead-technician', ['manage-technician', 'view-technician', 'monitor-technical', ...$common]);
 
-        $admin = Role::create(['name' => 'admin', 'guard_name' => 'web']);
-        $admin->givePermissionTo([
-            'manage-admin', 'view-admin', ...$common,
-        ]);
+        // Hub Management (satu permission bersama manage-sales-leads)
+        $mk('management', ['manage-sales-leads', ...$common]);
+        $mk('manage-marketing', ['manage-sales-leads', 'view-marketing', 'monitor-marketing', ...$common]);
+        $mk('manage-technical', ['manage-sales-leads', 'view-technician', 'monitor-technical', ...$common]);
+        $mk('manage-admin', ['manage-sales-leads', 'view-admin', ...$common]);
 
-        $teknisi = Role::create(['name' => 'teknisi', 'guard_name' => 'web']);
-        $teknisi->givePermissionTo([
-            'manage-teknisi', 'view-teknisi', ...$common,
-        ]);
+        // CEO: semua view, tanpa manage (read-only; enforcement menyusul)
+        $mk('ceo', ['view-marketing', 'view-sales', 'view-admin', 'view-technician', 'view-monitoring', ...$common]);
 
-        $manager = Role::create(['name' => 'manager', 'guard_name' => 'web']);
-        $manager->givePermissionTo([
-            'view-marketing', 'view-sales', 'view-admin', 'view-teknisi', 'view-monitoring',
-        ]);
-
-        // Management (Bu Yanita, Bu Ayu): khusus Manage Sales, tanpa menu divisi lain
-        $management = Role::create(['name' => 'management', 'guard_name' => 'web']);
-        $management->givePermissionTo([
-            'manage-sales-leads', ...$common,
-        ]);
-
-        $superAdmin = Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
-        $superAdmin->givePermissionTo(Permission::all());
+        $mk('super-admin', Permission::pluck('name')->all());
 
         // === 3. Migrate Existing Users (jangan hapus user, hanya ganti role) ===
-        // Pakai withTrashed() karena beberapa user mungkin sudah di-soft-delete
+        $map = [
+            'teknisi' => 'technician',
+            'engineer' => 'technician',
+            'marketing-lead' => 'manage-marketing',
+            'manager' => 'ceo',
+        ];
+
         foreach (User::withTrashed()->get() as $user) {
             $user->syncRoles([]);
 
-            // User id=1 (Yeski) selalu jadi super-admin
-            if ($user->id === 1) {
+            // Yeski selalu jadi super-admin
+            if ($user->email === 'yehezkielmayogi.ptnti@gmail.com' || $user->id === 1) {
                 $user->assignRole('super-admin');
                 continue;
             }
 
             $oldRole = $user->getOriginal('role') ?? $user->role;
+            $target = $map[$oldRole] ?? $oldRole;
 
-            if (in_array($oldRole, ['teknisi', 'engineer'])) {
-                $user->assignRole('teknisi');
-            } elseif ($oldRole === 'admin') {
-                $user->assignRole('admin');
-            } elseif ($oldRole === 'sales') {
-                $user->assignRole('sales');
-            } elseif ($oldRole === 'marketing') {
-                $user->assignRole('marketing');
-            } elseif ($oldRole === 'manager') {
-                $user->assignRole('manager');
-            } elseif ($oldRole === 'management') {
-                $user->assignRole('management');
+            if ($target && Role::where('name', $target)->exists()) {
+                $user->assignRole($target);
+                // Selaraskan kolom role legacy agar query where('role', ...) tetap akurat
+                if ($user->role !== $target) {
+                    $user->forceFill(['role' => $target])->save();
+                }
             }
         }
 
@@ -128,8 +119,11 @@ class RoleAndPermissionSeeder extends Seeder
         $superAdminUser->assignRole('super-admin');
 
         // === 5. Kembalikan super-admin ke user yang punya kolom role=super-admin ===
-        // (seeder ini menghapus semua assignment role di atas, jadi pulihkan di sini)
         User::where('role', 'super-admin')->get()
             ->each(fn (User $u) => $u->assignRole('super-admin'));
+
+        // === 6. Kembalikan super-admin yang hilang akibat wipe (kolom role=guest tapi tadinya super-admin) ===
+        User::whereIn('id', $prevSuperAdmins)->get()
+            ->each(fn (User $u) => $u->hasRole('super-admin') ?: $u->assignRole('super-admin'));
     }
 }

@@ -109,7 +109,7 @@ class GoogleCalendarService
 
         $stats = ['created' => 0, 'updated' => 0, 'restored' => 0, 'skipped' => 0];
         $owner = User::query()
-            ->whereHas('permissions', fn ($q) => $q->whereIn('name', ['manage-teknisi', 'manage-admin']))
+            ->whereHas('permissions', fn ($q) => $q->whereIn('name', ['manage-technician', 'manage-admin']))
             ->orderBy('id')
             ->first() ?? User::query()->orderBy('id')->first();
 

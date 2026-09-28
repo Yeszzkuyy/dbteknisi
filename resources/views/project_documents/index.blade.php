@@ -116,7 +116,7 @@
                                    class="text-accent-600 hover:text-accent-800 text-sm">
                                     Download
                                 </a>
-                                @can('manage-teknisi')
+                                @can('manage-technician')
                                     <form action="{{ route('project-documents.destroy', $document) }}" 
                                           method="POST" 
                                           onsubmit="return confirm('Hapus dokumen ini?')"
