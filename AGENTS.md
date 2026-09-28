@@ -85,3 +85,30 @@ tombol menyatu dengan background.
 
 Setiap menambah **kelas Tailwind baru**: jalankan ulang `npm run build` setelah
 merge ke main, kalau tidak kelasnya tidak akan ter-compile.
+
+## 8. Database Safety Rules
+
+1. NEVER run:
+   - php artisan migrate:fresh
+   - php artisan migrate:refresh
+   - php artisan db:wipe
+   - DROP DATABASE
+   - DROP TABLE
+
+2. These commands are destructive and require explicit user approval.
+
+3. Before running any destructive database command:
+   - Explain exactly what will be deleted.
+   - Ask for confirmation.
+   - Do not execute until the user explicitly says yes.
+
+4. Normal development migrations are allowed:
+   - php artisan migrate
+   - php artisan migrate:status
+   - php artisan make:migration
+
+5. Never assume that resetting the database is acceptable just because
+   migrations or tests are failing.
+
+6. If a migration problem occurs, investigate the cause first instead
+   of using migrate:fresh as a shortcut.
