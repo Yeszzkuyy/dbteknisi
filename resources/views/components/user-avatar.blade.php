@@ -14,7 +14,7 @@
     $running = (bool) ($user?->hasAnimatedAvatarBorder() ?? false);
 @endphp
 
-<span class="relative inline-flex shrink-0">
+<span class="relative inline-flex shrink-0 self-center aspect-square items-center justify-center">
 @if ($running)
     <span aria-hidden="true"
           class="absolute -inset-1 rounded-full bg-[conic-gradient(from_0deg,#f59e0b,#ec4899,#8b5cf6,#22d3ee,#f59e0b)] animate-spin [animation-duration:3s] motion-reduce:animate-none"></span>
