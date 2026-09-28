@@ -112,4 +112,41 @@ class PasswordSecurityIndicatorTest extends TestCase
         $this->assertStringContainsString('self-center aspect-square', $html);
         $this->assertStringContainsString('conic-gradient', $html);
     }
+
+    public function test_avatar_shows_google_style_decoration_by_default(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $user = User::factory()->create();
+
+        $html = \Illuminate\Support\Facades\Blade::render(
+            '<x-user-avatar :user="$user" size="w-10 h-10" />',
+            ['user' => $user]
+        );
+
+        // Dekoratif: ring hijau + dot hijau meski password masih bawaan
+        $this->assertStringContainsString('ring-green-500', $html);
+        $this->assertStringContainsString('bg-green-500', $html);
+        $this->assertStringNotContainsString('ring-red-500', $html);
+    }
+
+    public function test_avatar_security_mode_reflects_password_status(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $user = User::factory()->create();
+
+        $red = \Illuminate\Support\Facades\Blade::render(
+            '<x-user-avatar :user="$user" size="w-10 h-10" :security="true" />',
+            ['user' => $user]
+        );
+        $this->assertStringContainsString('ring-red-500', $red);
+
+        $user->forceFill(['password_changed_at' => now()])->save();
+
+        $green = \Illuminate\Support\Facades\Blade::render(
+            '<x-user-avatar :user="$user" size="w-10 h-10" :security="true" />',
+            ['user' => $user->fresh()]
+        );
+        $this->assertStringContainsString('ring-green-500', $green);
+        $this->assertStringNotContainsString('ring-red-500', $green);
+    }
 }

@@ -539,7 +539,7 @@
     <div class="relative z-10 flex-shrink-0 border-t border-white/10 p-3">
         <a wire:navigate.hover href="{{ route('profile.edit') }}"
            class="sidebar-user group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 transition-all duration-300 hover:border-accent-400/30 hover:bg-white/10">
-            <x-user-avatar :user="auth()->user()" size="w-9 h-9" text="text-xs" :clickable="false" />
+            <x-user-avatar :user="auth()->user()" size="w-9 h-9" text="text-xs" :clickable="false" :security="true" />
             <span class="sidebar-hide min-w-0 flex-1">
                 <span class="block truncate text-sm font-semibold text-slate-200">{{ auth()->user()->name }}</span>
                 <span class="mt-0.5 block truncate text-[11px] text-slate-400">{{ \Illuminate\Support\Str::headline($roleName) }}</span>

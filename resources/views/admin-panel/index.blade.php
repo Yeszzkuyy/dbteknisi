@@ -47,7 +47,7 @@
                     @forelse($users as $user)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                             <td class="px-4 py-3">
-                                <x-user-avatar :user="$user" size="w-10 h-10" text="text-sm" clickable />
+                                <x-user-avatar :user="$user" size="w-10 h-10" text="text-sm" clickable :security="true" />
                             </td>
                             <td class="px-4 py-3">
                                 <p class="font-medium text-slate-900 dark:text-slate-100">{{ $user->name }}</p>
