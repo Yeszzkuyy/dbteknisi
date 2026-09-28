@@ -1,4 +1,4 @@
-@props(['user' => null, 'size' => 'w-10 h-10', 'text' => 'text-sm', 'color' => 'blue', 'class' => '', 'clickable' => null, 'security' => false])
+@props(['user' => null, 'size' => 'w-10 h-10', 'text' => 'text-sm', 'color' => 'blue', 'class' => '', 'clickable' => null])
 
 @php
     $colors = [
@@ -12,13 +12,10 @@
     $canZoom = $photoUrl !== null && $clickable !== false;
     // Border animasi khusus founder (Yeski) — tampil di semua pemakaian komponen.
     $running = (bool) ($user?->hasAnimatedAvatarBorder() ?? false);
-    // Ring + glow: aman = mengikuti warna tema aktif (accent), merah = password masih bawaan.
-    // Mode non-security (feed/list umum): selalu ikut tema (dekoratif).
-    $secure = ! $security || (bool) ($user?->hasSecurePassword() ?? false);
-    // Yeski: ring netral agar efek running terlihat jelas (tanpa merah/accent).
-    $ring = $running ? 'ring-slate-900/80' : ($secure ? 'ring-accent-500' : 'ring-red-500 dark:ring-red-400');
-    // Hover berupa glow mengikuti tema/status, bukan ring statis.
-    $glow = $secure ? 'hover:shadow-accent-500/50' : 'hover:shadow-red-500/50';
+    // Ring + hover glow selalu mengikuti warna tema aktif (accent).
+    // Yeski: ring netral agar efek running terlihat jelas.
+    $ring = $running ? 'ring-slate-900/80' : 'ring-accent-500';
+    $glow = 'hover:shadow-accent-500/50';
 @endphp
 
 <span class="relative inline-flex shrink-0 self-center aspect-square items-center justify-center">
