@@ -6,7 +6,9 @@ use App\Models\Customer;
 use App\Models\Project;
 use App\Observers\CustomerObserver;
 use App\Observers\ProjectObserver;
+use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -42,6 +44,17 @@ class AppServiceProvider extends ServiceProvider
                     $q->orWhereRaw('LOWER('.$column.') LIKE ?', [$term]);
                 }
             });
+        });
+
+        // Guardrail perintah DB destruktif: backup otomatis + konfirmasi nama DB.
+        // Lihat App\Console\DestructiveCommandGuard & AGENTS.md aturan 8.
+        Event::listen(CommandStarting::class, function (CommandStarting $event) {
+            $connection = (string) ($event->input->getParameterOption('--database', config('database.default')));
+            $cfg = config("database.connections.{$connection}", []);
+            $guard = app(\App\Console\DestructiveCommandGuard::class);
+            if ($guard->shouldGuard($event->command, (string) ($cfg['driver'] ?? ''), $cfg['database'] ?? null, $this->app->runningUnitTests())) {
+                $guard->handle($event->command, $event->input, $event->output, $connection, (string) ($cfg['driver'] ?? ''), $cfg['database'] ?? null);
+            }
         });
     }
 
