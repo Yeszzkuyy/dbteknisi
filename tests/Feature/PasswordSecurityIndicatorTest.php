@@ -123,8 +123,8 @@ class PasswordSecurityIndicatorTest extends TestCase
             ['user' => $user]
         );
 
-        // Dekoratif: ring biru + dot hijau meski password masih bawaan
-        $this->assertStringContainsString('ring-blue-500', $html);
+        // Dekoratif: ring hijau + dot hijau meski password masih bawaan
+        $this->assertStringContainsString('ring-green-500', $html);
         $this->assertStringContainsString('bg-green-500', $html);
         $this->assertStringNotContainsString('ring-red-500', $html);
     }
@@ -146,7 +146,7 @@ class PasswordSecurityIndicatorTest extends TestCase
             '<x-user-avatar :user="$user" size="w-10 h-10" :security="true" />',
             ['user' => $user->fresh()]
         );
-        $this->assertStringContainsString('ring-blue-500', $green);
+        $this->assertStringContainsString('ring-green-500', $green);
         $this->assertStringNotContainsString('ring-red-500', $green);
     }
 }

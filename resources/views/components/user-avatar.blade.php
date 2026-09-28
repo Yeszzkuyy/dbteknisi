@@ -15,7 +15,7 @@
     // Dekorasi ala akun Google: ring biru + dot hijau untuk semua.
     // Mode security (avatar sendiri / list admin): merah bila password masih bawaan.
     $secure = ! $security || (bool) ($user?->hasSecurePassword() ?? false);
-    $ring = $secure ? 'ring-blue-500 dark:ring-blue-400' : 'ring-red-500 dark:ring-red-400';
+    $ring = $secure ? 'ring-green-500 dark:ring-green-400' : 'ring-red-500 dark:ring-red-400';
     $dot = $secure ? 'bg-green-500' : 'bg-red-500';
     $dotTitle = $secure ? __('Akun aman') : __('Password belum diganti — segera diganti');
 @endphp
