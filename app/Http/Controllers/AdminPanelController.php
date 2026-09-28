@@ -75,6 +75,8 @@ class AdminPanelController extends Controller
         ]);
 
         if ($request->filled('password')) {
+            // Sengaja TIDAK menyentuh password_changed_at: reset oleh admin
+            // bukan penggantian oleh pemilik akun, indikator tetap merah.
             $user->update(['password' => Hash::make($request->password)]);
         }
 

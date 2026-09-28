@@ -18,6 +18,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_changed_at',
         'avatar',
         'preferences',
     ];
@@ -32,6 +33,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'password_changed_at' => 'datetime',
             'preferences' => 'array',
         ];
     }
@@ -39,6 +41,15 @@ class User extends Authenticatable
     public function preference(string $key, mixed $default = null): mixed
     {
         return data_get($this->preferences, $key, $default);
+    }
+
+    /**
+     * true bila user sudah pernah mengganti password bawaannya sendiri
+     * (via form password / reset). null = masih password awal → belum aman.
+     */
+    public function hasSecurePassword(): bool
+    {
+        return $this->password_changed_at !== null;
     }
 
     /**
