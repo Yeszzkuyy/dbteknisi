@@ -29,6 +29,19 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Terkait Lead (opsional)') }}</label>
+                    <select name="lead_id"
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                        <option value="">{{ __('-- Tidak terkait lead tertentu --') }}</option>
+                        @foreach($leads ?? [] as $lead)
+                            <option value="{{ $lead->id }}" @selected(old('lead_id', $followUp->lead_id) == $lead->id)>
+                                {{ $lead->customer->name ?? 'Lead #'.$lead->id }} — {{ ucfirst($lead->status) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Terkait Meeting') }}</label>
                     <select name="meeting_id"
                             class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">

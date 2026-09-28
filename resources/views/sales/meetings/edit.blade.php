@@ -50,6 +50,20 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Terkait Lead (opsional)') }}</label>
+                    <select name="lead_id"
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                        <option value="">{{ __('-- Tidak terkait lead tertentu --') }}</option>
+                        @foreach($leads ?? [] as $lead)
+                            <option value="{{ $lead->id }}" @selected(old('lead_id', $meeting->lead_id) == $lead->id)>
+                                {{ $lead->customer->name ?? 'Lead #'.$lead->id }} — {{ ucfirst($lead->status) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('lead_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Tanggal Meeting') }} <span class="text-red-500">*</span></label>
                     <x-datepicker name="meeting_date" required value="{{ old('meeting_date', $meeting->meeting_date->format('Y-m-d')) }}"></x-datepicker>
                 </div>

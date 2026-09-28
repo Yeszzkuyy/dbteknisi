@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\RespondsAjax;
 use App\Models\Customer;
+use App\Models\Lead;
 use App\Models\Meeting;
 use App\Services\SalesService;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class MeetingController extends Controller
 
     public function index(Request $request)
     {
-        $meetings = $this->salesService->getMeetings($request->only(['search', 'date_from', 'date_to', 'customer_id']));
+        $meetings = $this->salesService->getMeetings($request->only(['search', 'date_from', 'date_to', 'customer_id', 'lead_id']));
         $customers = Customer::orderBy('name')->get(['id', 'name']);
 
         return $this->ajaxPartial($request, 'sales.meetings._table', compact('meetings'), 'sales.meetings.index');
@@ -26,7 +27,12 @@ class MeetingController extends Controller
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
         $preselectedCustomerId = $request->query('customer_id');
-        return view('sales.meetings.create', compact('customers', 'preselectedCustomerId'));
+        $preselectedLeadId = $request->query('lead_id');
+        $leads = $this->leadOptions($preselectedCustomerId);
+        if ($preselectedLeadId && ($lead = Lead::with('customer')->find($preselectedLeadId))) {
+            $preselectedCustomerId = $lead->customer_id;
+        }
+        return view('sales.meetings.create', compact('customers', 'preselectedCustomerId', 'leads', 'preselectedLeadId'));
     }
 
     public function store(Request $request)
@@ -35,6 +41,7 @@ class MeetingController extends Controller
             'customer_mode' => 'required|in:new,existing',
             'customer_name' => 'nullable|required_if:customer_mode,new|string|max:255',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
+            'lead_id' => 'nullable|exists:leads,id',
             'meeting_date' => 'required|date',
             'participants' => 'nullable|string|max:500',
             'user_needs' => 'nullable|string',
@@ -45,6 +52,10 @@ class MeetingController extends Controller
 
         if ($validated['customer_mode'] === 'new') {
             $validated['customer_id'] = Customer::create(['name' => $validated['customer_name']])->id;
+            $validated['lead_id'] = null;
+        } elseif (!empty($validated['lead_id'])) {
+            $lead = Lead::find($validated['lead_id']);
+            $validated['customer_id'] = $lead->customer_id;
         }
 
         unset($validated['customer_mode'], $validated['customer_name']);
@@ -57,14 +68,15 @@ class MeetingController extends Controller
 
     public function show(Meeting $meeting)
     {
-        $meeting->load(['customer', 'creator', 'followUps' => fn($q) => $q->with('creator')]);
+        $meeting->load(['customer', 'creator', 'lead.customer', 'followUps' => fn($q) => $q->with('creator')]);
         return view('sales.meetings.show', compact('meeting'));
     }
 
     public function edit(Meeting $meeting)
     {
         $customers = Customer::orderBy('name')->get(['id', 'name']);
-        return view('sales.meetings.edit', compact('meeting', 'customers'));
+        $leads = $this->leadOptions($meeting->customer_id);
+        return view('sales.meetings.edit', compact('meeting', 'customers', 'leads'));
     }
 
     public function update(Request $request, Meeting $meeting)
@@ -73,6 +85,7 @@ class MeetingController extends Controller
             'customer_mode' => 'required|in:new,existing',
             'customer_name' => 'nullable|required_if:customer_mode,new|string|max:255',
             'customer_id' => 'nullable|required_if:customer_mode,existing|exists:customers,id',
+            'lead_id' => 'nullable|exists:leads,id',
             'meeting_date' => 'required|date',
             'participants' => 'nullable|string|max:500',
             'user_needs' => 'nullable|string',
@@ -83,6 +96,10 @@ class MeetingController extends Controller
 
         if ($validated['customer_mode'] === 'new') {
             $validated['customer_id'] = Customer::create(['name' => $validated['customer_name']])->id;
+            $validated['lead_id'] = null;
+        } elseif (!empty($validated['lead_id'])) {
+            $lead = Lead::find($validated['lead_id']);
+            $validated['customer_id'] = $lead->customer_id;
         }
 
         unset($validated['customer_mode'], $validated['customer_name']);
@@ -98,5 +115,18 @@ class MeetingController extends Controller
         $this->salesService->deleteMeeting($meeting);
 
         return $this->ajaxOrRedirect($request, 'sales.meetings.index', __('Meeting berhasil dihapus.'));
+    }
+
+    private function leadOptions(?int $customerId = null)
+    {
+        $query = Lead::with('customer')->latest()->limit(100);
+        if (auth()->user()?->hasRole('sales') && !auth()->user()?->can('manage-marketing')) {
+            $query->where('assigned_to', auth()->id());
+        }
+        if ($customerId) {
+            $query->where('customer_id', $customerId);
+        }
+
+        return $query->get(['id', 'customer_id', 'status', 'assigned_to']);
     }
 }

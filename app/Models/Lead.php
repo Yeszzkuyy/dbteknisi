@@ -74,4 +74,14 @@ class Lead extends Model
     {
         return $this->belongsTo(WhatsappAccount::class, 'whatsapp_account_id');
     }
+
+    public function meetings()
+    {
+        return $this->hasMany(Meeting::class);
+    }
+
+    public function followUps()
+    {
+        return $this->hasMany(FollowUp::class);
+    }
 }

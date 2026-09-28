@@ -5,10 +5,17 @@
             <p class="text-slate-500 mt-1">{{ __('Geser kartu antar kolom untuk mengubah status lead') }}</p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('leads.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-medium transition">
-                {{ __('Tabel Lead') }}
-            </a>
+            @if(auth()->user()->can('view-marketing') || auth()->user()->can('manage-marketing'))
+                <a href="{{ route('leads.index') }}"
+                   class="px-4 py-2.5 rounded-xl bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-medium transition">
+                    {{ __('Tabel Lead') }}
+                </a>
+            @else
+                <a href="{{ route('sales.my-leads') }}"
+                   class="px-4 py-2.5 rounded-xl bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-medium transition">
+                    {{ __('My Leads') }}
+                </a>
+            @endif
             @can('manage-marketing')
                 <a href="{{ route('leads.create') }}"
                    class="px-5 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white font-medium transition">
@@ -19,7 +26,8 @@
     </div>
 
     <div class="kanban-board overflow-x-auto pb-4"
-         @if(auth()->user()->can('manage-marketing')) data-editable="1" @endif>
+         @if(auth()->user()->can('manage-marketing') || auth()->user()->can('manage-sales')) data-editable="1" @endif
+         @if(auth()->user()->can('manage-sales') && !auth()->user()->can('manage-marketing')) data-sales-only="1" @endif>
         <div class="flex gap-4 min-w-max items-start">
             @foreach($statuses as $status)
                 @php
@@ -43,7 +51,7 @@
                     <div class="kanban-list p-3 space-y-3 min-h-24" data-status="{{ $status }}">
                         @foreach($columnLeads as $lead)
                             <div class="kanban-card bg-white dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 p-3 shadow-sm hover:shadow transition"
-                                 data-lead-id="{{ $lead->id }}">
+                                 data-lead-id="{{ $lead->id }}" data-mine="{{ (int) $lead->assigned_to === (int) auth()->id() ? 1 : 0 }}">
                                 <div class="flex items-center justify-between mb-1">
                                     @if($lead->pt_group)
                                         <span class="inline-flex px-1.5 py-0.5 rounded {{ \App\Models\Lead::PT_COLORS[$lead->pt_group] ?? 'bg-indigo-50 text-indigo-700' }} text-[11px] font-semibold">
@@ -75,7 +83,7 @@
         </div>
     </div>
 
-    @can('manage-marketing')
+    @if(auth()->user()->can('manage-marketing') || auth()->user()->can('manage-sales'))
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         var board = document.querySelector('.kanban-board[data-editable]');
@@ -84,6 +92,7 @@
             console.warn('SortableJS not available, pipeline drag & drop disabled.');
             return;
         }
+        var salesOnly = board.hasAttribute('data-sales-only');
 
         var csrf = document.querySelector('meta[name="csrf-token"]')?.content;
         var pendingChanges = new Map();
@@ -93,6 +102,7 @@
                 group: 'leads',
                 animation: 150,
                 ghostClass: 'opacity-40',
+                draggable: salesOnly ? '.kanban-card[data-mine="1"]' : '.kanban-card',
                 onEnd: function (evt) {
                     var leadId = evt.item.dataset.leadId;
                     var newStatus = evt.to.dataset.status;
@@ -186,5 +196,5 @@
         }
     });
     </script>
-    @endcan
+    @endif
 </x-app-layout>

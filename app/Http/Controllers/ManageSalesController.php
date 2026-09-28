@@ -116,14 +116,20 @@ class ManageSalesController extends Controller
             ->with('success', __('Lead di-assign ke') . ' ' . $salesUser->name);
     }
 
-    public function myLeads()
+    public function myLeads(Request $request)
     {
         $leads = Lead::with(['customer', 'partner'])
             ->where('assigned_to', auth()->id())
+            ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
+                fn ($c) => $c->whereLike('name', $request->search)))
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('sales.my-leads', compact('leads'));
+        $statuses = LeadController::STATUSES;
+
+        return view('sales.my-leads', compact('leads', 'statuses'));
     }
 
     public function activityLog(Request $request)

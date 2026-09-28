@@ -68,14 +68,36 @@ class LeadController extends Controller
     {
         $this->authorize('viewAny', Lead::class);
 
-        $leads = Lead::with(['customer', 'assignee', 'partner'])->orderByDesc('incoming_date')->get();
+        $query = Lead::with(['customer', 'assignee', 'partner'])->orderByDesc('incoming_date');
+
+        // Sales biasa hanya melihat pipeline lead miliknya sendiri.
+        $user = request()->user();
+        if ($user && $user->hasRole('sales') && !$user->can('manage-marketing') && !$user->can('manage-sales-leads')) {
+            $query->where('assigned_to', $user->id);
+        }
+
+        $leads = $query->get();
         $statuses = self::STATUSES;
 
         return view('leads.pipeline', compact('leads', 'statuses'));
     }
 
+    private function authorizeLeadStatus(Lead $lead): void
+    {
+        $user = request()->user();
+        if ($user && $user->can('manage-marketing')) {
+            return;
+        }
+        if ($user && $user->can('manage-sales') && (int) $lead->assigned_to === (int) $user->id) {
+            return;
+        }
+        abort(403);
+    }
+
     public function updateStatus(Request $request, Lead $lead)
     {
+        $this->authorizeLeadStatus($lead);
+
         $validated = $request->validate([
             'status' => 'required|in:'.implode(',', self::STATUSES),
         ]);
@@ -103,6 +125,7 @@ class LeadController extends Controller
         $results = [];
         foreach ($validated['changes'] as $change) {
             $lead = Lead::find($change['lead_id']);
+            $this->authorizeLeadStatus($lead);
             $old = $lead->status;
 
             if ($old !== $change['status']) {
@@ -509,7 +532,23 @@ class LeadController extends Controller
 
     public function convert(Lead $lead)
     {
-        $this->authorize('manage-marketing');
+        $user = request()->user();
+        $isOwner = $user && (int) $lead->assigned_to === (int) $user->id;
+        $allowed = $user && ($user->can('manage-marketing')
+            || ($isOwner && $user->can('manage-sales'))
+            || $user->can('manage-technician')
+            || $user->can('manage-admin'));
+
+        abort_unless($allowed, 403);
+
+        // Idempoten: lead yang sudah won/lost tidak boleh di-convert ulang.
+        if (in_array($lead->status, ['won', 'lost'], true)) {
+            $existing = Project::where('customer_id', $lead->customer_id)->latest()->first();
+
+            return redirect()
+                ->route($existing ? 'projects.show' : 'leads.show', $existing ?? $lead)
+                ->with('error', __('Lead sudah dikonversi sebelumnya.'));
+        }
 
         $validated = request()->validate([
             'project_name' => 'required|string|max:255',
@@ -526,7 +565,7 @@ class LeadController extends Controller
         ]);
 
         $lead->update(['status' => 'won']);
-        $this->logActivity($lead, 'converted');
+        $this->logActivity($lead, 'converted', ['project_id' => $project->id]);
 
         return redirect()
             ->route('projects.show', $project)

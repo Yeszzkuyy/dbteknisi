@@ -271,9 +271,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/leads/{lead}/edit', [LeadController::class, 'edit'])->name('leads.edit');
         Route::put('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
-        Route::patch('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert');
-        Route::patch('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
-        Route::patch('/leads/batch-status', [LeadController::class, 'batchUpdateStatus'])->name('leads.batch-status');
         Route::get('/leads/import', [LeadController::class, 'importForm'])->name('leads.import');
         Route::post('/leads/import', [LeadController::class, 'import'])->name('leads.import.execute');
 
@@ -285,17 +282,28 @@ Route::middleware('auth')->group(function () {
         Route::delete('/partners/{partner}', [PartnerController::class, 'destroy'])->name('partners.destroy');
     });
 
+    // Convert & status lead — dipakai Sales (own lead) + fallback Teknisi/Admin,
+    // otorisasi detail (owner vs semua) dicek di controller.
+    Route::middleware('permission:manage-marketing|manage-sales|manage-technician|manage-admin')->group(function () {
+        Route::patch('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert');
+        Route::patch('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
+        Route::patch('/leads/batch-status', [LeadController::class, 'batchUpdateStatus'])->name('leads.batch-status');
+    });
     // Monitoring tim marketing — khusus lead divisi (sebelum /leads/{lead})
     Route::get('/leads/monitoring', [LeadController::class, 'monitoring'])
         ->middleware('permission:monitor-marketing')
         ->name('leads.monitoring');
 
+    // Pipeline + detail lead — dipakai Marketing & Sales (sales di-scope ke own lead di controller/policy).
+    Route::middleware('permission:view-marketing|manage-marketing|view-sales|manage-sales|manage-technician|manage-admin')->group(function () {
+        Route::get('/leads/pipeline', [LeadController::class, 'pipeline'])->name('leads.pipeline');
+        Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
+    });
+
     Route::middleware('permission:view-marketing|manage-marketing')->group(function () {
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
-        Route::get('/leads/pipeline', [LeadController::class, 'pipeline'])->name('leads.pipeline');
         Route::get('/marketing/dashboard', [LeadController::class, 'dashboard'])->name('marketing.dashboard');
         Route::get('/leads/activities', [LeadController::class, 'activities'])->name('leads.activities');
-        Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
         Route::get('/leads/{lead}/documents/{document}/preview', [LeadController::class, 'previewDocument'])->name('leads.documents.preview');
         Route::get('/leads/{lead}/documents/{document}/download', [LeadController::class, 'downloadDocument'])->name('leads.documents.download');
 
