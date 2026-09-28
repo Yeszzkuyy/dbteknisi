@@ -15,12 +15,20 @@
                        placeholder="{{ __('Nama customer...') }}"
                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
             </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Status') }}</label>
+                <select name="overdue" onchange="this.form.requestSubmit()"
+                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    <option value="">{{ __('Semua') }}</option>
+                    <option value="1" @selected(request('overdue') === '1')>{{ __('Jatuh tempo') }}</option>
+                </select>
+            </div>
             <div class="flex items-end gap-2">
                 <button type="submit"
                         class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                     Filter
                 </button>
-                @if(request()->anyFilled(['search']))
+                @if(request()->anyFilled(['search', 'overdue']))
                     <a href="{{ route('sales.follow-ups.index') }}" data-ajax-reset
                        class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium transition">
                         Reset

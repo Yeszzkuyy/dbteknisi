@@ -49,7 +49,7 @@
 
     @php
         $notifInit = ['unread' => 0, 'unassigned' => 0, 'items' => []];
-        if (auth()->check() && auth()->user()->can('manage-sales-leads')) {
+        if (auth()->check() && auth()->user()->canany(['manage-sales-leads', 'manage-sales'])) {
             $notifInit = [
                 'unread' => auth()->user()->unreadNotifications()->count(),
                 'unassigned' => \App\Models\Lead::whereNull('assigned_to')->count(),

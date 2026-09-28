@@ -18,7 +18,7 @@ class FollowUpController extends Controller
 
     public function index(Request $request)
     {
-        $followUps = $this->salesService->getFollowUps($request->only(['search', 'customer_id', 'lead_id']));
+        $followUps = $this->salesService->getFollowUps($request->only(['search', 'customer_id', 'lead_id', 'overdue']));
         $customers = Customer::orderBy('name')->get(['id', 'name']);
 
         return $this->ajaxPartial($request, 'sales.follow-ups._table', compact('followUps'), 'sales.follow-ups.index');

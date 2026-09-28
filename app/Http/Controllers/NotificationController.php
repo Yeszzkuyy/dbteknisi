@@ -51,6 +51,7 @@ class NotificationController extends Controller
                         ?? ($isWhatsapp
                             ? route('whatsapp-center.index')
                             : route('manage-sales.edit', $data['lead_id'] ?? 0)),
+                    'title' => $data['title'] ?? null,
                     'customer' => $data['customer'] ?? 'Lead baru',
                     'preview' => $data['preview'] ?? null,
                     'type' => $data['type'] ?? ($isWhatsapp ? 'whatsapp' : 'lead'),
