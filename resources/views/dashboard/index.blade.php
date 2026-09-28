@@ -2,8 +2,9 @@
     {{-- Skeleton shimmer dashboard umum — hanya tampil sesaat setelah login.
          Konten asli tetap di-render server (SEO-safe); overlay ini sekadar veil. --}}
     <style>
+        /* Veil hanya seluas area konten <main> (relative): sidebar + header tetap terlihat. */
         #dash-skeleton {
-            position: fixed; inset: 0; z-index: 60;
+            position: absolute; inset: 0; z-index: 20;
             background-color: var(--bg);
             transition: opacity 0.3s ease;
         }
@@ -24,6 +25,8 @@
             background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.09) 50%, transparent 80%);
             background-size: 200% 100%;
         }
+        .skel-line { border-radius: 0.375rem; background: rgba(148, 163, 184, 0.35); }
+        .dark .skel-line { background: rgba(255, 255, 255, 0.12); }
         @keyframes skel-sweep {
             from { background-position: 180% 0; }
             to { background-position: -80% 0; }
@@ -33,16 +36,124 @@
             #dash-skeleton { display: none; }
         }
     </style>
-    <div id="dash-skeleton" hidden>
-        <div class="max-w-[1400px] mx-auto space-y-6 p-6">
-            <div class="skel-block h-32"></div>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <div class="skel-block h-28"></div>
-                <div class="skel-block h-28"></div>
-                <div class="skel-block h-28"></div>
-                <div class="skel-block h-28"></div>
+    <div id="dash-skeleton" hidden aria-hidden="true">
+        {{-- Padding disamakan dengan <main> agar posisi 1:1 dengan konten asli (main jadi acuan absolute). --}}
+        <div class="px-4 sm:px-6 lg:px-8 pb-8">
+            <div class="mx-auto max-w-[1400px] space-y-6">
+                {{-- Overview header --}}
+                <div class="skel-block rounded-2xl px-5 py-6 sm:px-7 sm:py-7">
+                    <div class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                        <div class="min-w-0 flex-1">
+                            <div class="skel-line h-3 w-40"></div>
+                            <div class="skel-line mt-3 h-8 w-full max-w-md"></div>
+                            <div class="skel-line mt-2 h-4 w-full max-w-lg"></div>
+                        </div>
+                        <div class="skel-line h-[68px] w-full shrink-0 lg:w-56"></div>
+                    </div>
+                </div>
+                {{-- Summary cards --}}
+                <div>
+                    <div class="mb-3 flex items-end justify-between gap-2 px-1">
+                        <div class="min-w-0">
+                            <div class="skel-line h-5 w-36"></div>
+                            <div class="skel-line mt-2 h-4 w-56 max-w-full"></div>
+                        </div>
+                        <div class="skel-line h-4 w-20 shrink-0"></div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                        <div class="skel-block p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="min-w-0 flex-1">
+                                    <div class="skel-line h-3 w-24"></div>
+                                    <div class="skel-line mt-3 h-8 w-20"></div>
+                                    <div class="skel-line mt-2 h-3 w-28"></div>
+                                </div>
+                                <div class="skel-line h-11 w-11 shrink-0"></div>
+                            </div>
+                        </div>
+                        <div class="skel-block p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="min-w-0 flex-1">
+                                    <div class="skel-line h-3 w-24"></div>
+                                    <div class="skel-line mt-3 h-8 w-20"></div>
+                                    <div class="skel-line mt-2 h-3 w-28"></div>
+                                </div>
+                                <div class="skel-line h-11 w-11 shrink-0"></div>
+                            </div>
+                        </div>
+                        <div class="skel-block p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="min-w-0 flex-1">
+                                    <div class="skel-line h-3 w-24"></div>
+                                    <div class="skel-line mt-3 h-8 w-20"></div>
+                                    <div class="skel-line mt-2 h-3 w-28"></div>
+                                </div>
+                                <div class="skel-line h-11 w-11 shrink-0"></div>
+                            </div>
+                        </div>
+                        <div class="skel-block p-5 sm:p-6">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="min-w-0 flex-1">
+                                    <div class="skel-line h-3 w-24"></div>
+                                    <div class="skel-line mt-3 h-8 w-20"></div>
+                                    <div class="skel-line mt-2 h-3 w-28"></div>
+                                </div>
+                                <div class="skel-line h-11 w-11 shrink-0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{-- Recent activities --}}
+                <div class="skel-block p-5 sm:p-7">
+                    <div class="flex items-end justify-between gap-3 border-b border-transparent pb-4">
+                        <div>
+                            <div class="skel-line h-5 w-40"></div>
+                            <div class="skel-line mt-2 h-4 w-64 max-w-full"></div>
+                        </div>
+                        <div class="skel-line h-6 w-24 shrink-0"></div>
+                    </div>
+                    <div class="flex items-start gap-4 border-b border-transparent py-4">
+                        <div class="skel-line h-10 w-10 shrink-0 !rounded-full"></div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="skel-line h-4 w-full max-w-sm"></div>
+                                <div class="skel-line h-3 w-16 shrink-0"></div>
+                            </div>
+                            <div class="skel-line mt-2 h-3 w-48 max-w-full"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 border-b border-transparent py-4">
+                        <div class="skel-line h-10 w-10 shrink-0 !rounded-full"></div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="skel-line h-4 w-full max-w-sm"></div>
+                                <div class="skel-line h-3 w-16 shrink-0"></div>
+                            </div>
+                            <div class="skel-line mt-2 h-3 w-48 max-w-full"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 border-b border-transparent py-4">
+                        <div class="skel-line h-10 w-10 shrink-0 !rounded-full"></div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="skel-line h-4 w-full max-w-sm"></div>
+                                <div class="skel-line h-3 w-16 shrink-0"></div>
+                            </div>
+                            <div class="skel-line mt-2 h-3 w-48 max-w-full"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 py-4">
+                        <div class="skel-line h-10 w-10 shrink-0 !rounded-full"></div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="skel-line h-4 w-full max-w-sm"></div>
+                                <div class="skel-line h-3 w-16 shrink-0"></div>
+                            </div>
+                            <div class="skel-line mt-2 h-3 w-48 max-w-full"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="skel-block h-64"></div>
         </div>
     </div>
     <script>

@@ -173,7 +173,7 @@
                 @endif
             </div>
 
-            <main class="flex-1 px-4 sm:px-6 lg:px-8 pb-8">
+            <main class="relative flex-1 px-4 sm:px-6 lg:px-8 pb-8">
                 @isset($header)<div class="mb-6">{{ $header }}</div>@endisset
                 {{ $slot }}
             </main>
