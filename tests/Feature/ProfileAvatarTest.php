@@ -76,7 +76,7 @@ class ProfileAvatarTest extends TestCase
     {
         $this->seed(RoleAndPermissionSeeder::class);
 
-        foreach (['super-admin', 'admin', 'manager', 'sales', 'marketing', 'teknisi'] as $role) {
+        foreach (['super-admin', 'admin', 'ceo', 'sales', 'marketing', 'technician'] as $role) {
             $user = User::factory()->create();
             $user->assignRole($role);
 

@@ -15,7 +15,7 @@ class ProjectTechnicianSelectTest extends TestCase
     {
         $this->seed(RoleAndPermissionSeeder::class);
         $user = User::factory()->create();
-        $user->givePermissionTo('manage-teknisi');
+        $user->givePermissionTo('manage-technician');
 
         return $user;
     }
@@ -26,9 +26,9 @@ class ProjectTechnicianSelectTest extends TestCase
         $this->actingAs($manager);
 
         $a = User::factory()->create(['name' => 'Teknisi Satu']);
-        $a->assignRole('teknisi');
+        $a->assignRole('technician');
         $b = User::factory()->create(['name' => 'Teknisi Dua']);
-        $b->assignRole('teknisi');
+        $b->assignRole('technician');
 
         // PIC & support dipilih via select (nilai = nama user), support berupa array
         $this->post(route('projects.store'), [

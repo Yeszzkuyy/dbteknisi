@@ -82,7 +82,7 @@ class GetLeadDetailsTest extends TestCase
 
     public function test_user_without_permission_is_denied(): void
     {
-        $teknisi = $this->makeUser('teknisi');
+        $teknisi = $this->makeUser('technician');
         $lead = $this->makeLead();
 
         $result = (string) (new GetLeadDetails($teknisi))->handle(new Request([

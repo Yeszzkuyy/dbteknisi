@@ -16,8 +16,8 @@ class TechnicianScheduleTest extends TestCase
     {
         $this->seed(RoleAndPermissionSeeder::class);
         $user = User::factory()->create();
-        $user->givePermissionTo('manage-teknisi');
-        $user->givePermissionTo('view-teknisi');
+        $user->givePermissionTo('manage-technician');
+        $user->givePermissionTo('view-technician');
 
         return $user;
     }

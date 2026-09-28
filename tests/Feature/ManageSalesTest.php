@@ -77,7 +77,7 @@ class ManageSalesTest extends TestCase
     {
         $this->actingAs($this->loginAs('management'));
         $teknisi = User::factory()->create();
-        $teknisi->assignRole('teknisi');
+        $teknisi->assignRole('technician');
         $lead = $this->makeLead();
 
         $this->actingAs($this->loginAs('management'))

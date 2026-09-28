@@ -30,7 +30,7 @@
     $adminIdx = request()->routeIs('admin.invoices.*') ? 0 : (request()->routeIs('admin.pos.*') ? 1 : (request()->routeIs('admin.payments.*') ? 2 : -1));
     $adminPanelIdx = request()->routeIs('admin-panel.index') ? 0 : (request()->routeIs('admin-panel.account-managers.*') ? 1 : (request()->routeIs('admin-panel.work-types.*') ? 2 : (request()->routeIs('admin-panel.document-categories.*') ? 3 : (request()->routeIs('admin-panel.project-statuses.*') ? 4 : (request()->routeIs('admin-panel.audit-log') ? 5 : -1)))));
     $hasMarketingMonitoring = auth()->user()->can('monitor-marketing');
-    $hasSalesProject = auth()->user()->can('view-teknisi') || auth()->user()->can('view-sales');
+    $hasSalesProject = auth()->user()->can('view-technician') || auth()->user()->can('view-sales');
 @endphp
 
 <aside class="relative flex h-full w-full flex-col overflow-hidden">
@@ -89,7 +89,7 @@
                 </div>
             </section>
 
-            @canany(['manage-sales-leads', 'view-teknisi', 'view-marketing', 'view-sales', 'view-admin'])
+            @canany(['manage-sales-leads', 'view-technician', 'view-marketing', 'view-sales', 'view-admin'])
                 <section aria-labelledby="sidebar-departments-label">
                     <p id="sidebar-departments-label" class="sidebar-hide px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Departments</p>
                     <div class="space-y-1">
@@ -165,7 +165,7 @@
                         @endcan
 
                         {{-- Teknisi --}}
-                        @can('view-teknisi')
+                        @can('view-technician')
                             <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="branched"{{ $technicianActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="teknisi" data-bm-active="{{ $teknisiIdx }}">
                                 <div class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
@@ -369,7 +369,7 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400" aria-hidden="true"></span>
                                         <span>Pipeline</span>
                                     </a>
-                                    @if(auth()->user()->can('view-teknisi') || auth()->user()->can('view-sales'))
+                                    @if(auth()->user()->can('view-technician') || auth()->user()->can('view-sales'))
                                         <a wire:navigate.hover href="{{ route('projects.index') }}"
                                            aria-current="{{ request()->routeIs('projects*') ? 'page' : 'false' }}"
                                            class="{{ $subNavLink }} {{ request()->routeIs('projects*') ? $navActive : $navInactive }}">

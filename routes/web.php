@@ -129,7 +129,7 @@ Route::middleware('auth')->group(function () {
     // ============================================
     // TEKNISI — manage
     // ============================================
-    Route::middleware('permission:manage-teknisi')->group(function () {
+    Route::middleware('permission:manage-technician')->group(function () {
         Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
         Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
         Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
@@ -149,7 +149,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/project-documents/{document}/preview', [ProjectDocumentController::class, 'preview'])->name('project-documents.preview');
     });
 
-    Route::middleware('permission:view-teknisi|manage-teknisi|view-sales')->group(function () {
+    Route::middleware('permission:view-technician|manage-technician|view-sales')->group(function () {
         Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
         Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
         Route::get('/projects/{project}/documents', [ProjectDocumentController::class, 'index'])->name('project-documents.index');
@@ -159,14 +159,14 @@ Route::middleware('auth')->group(function () {
     // ============================================
     // TEKNISI — Kalender & Jadwal (Google Calendar)
     // ============================================
-    Route::middleware('permission:view-teknisi|manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+    Route::middleware('permission:view-technician|manage-technician')->prefix('teknisi')->name('teknisi.')->group(function () {
         Route::get('/dashboard', [TechnicianDashboardController::class, 'index'])->name('dashboard');
         Route::get('/kalender/events', [TechnicianScheduleController::class, 'events'])->name('kalender.events');
         Route::get('/jadwal/google-events', [CalendarController::class, 'googleEvents'])->name('google-events');
         Route::get('/jadwal', [TechnicianScheduleController::class, 'jadwal'])->name('jadwal');
     });
 
-    Route::middleware('permission:manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+    Route::middleware('permission:manage-technician')->prefix('teknisi')->name('teknisi.')->group(function () {
         Route::post('/schedules', [TechnicianScheduleController::class, 'store'])->name('schedules.store');
         Route::put('/schedules/{schedule}', [TechnicianScheduleController::class, 'update'])->name('schedules.update');
         Route::delete('/schedules/{schedule}', [TechnicianScheduleController::class, 'destroy'])->name('schedules.destroy');
@@ -178,7 +178,7 @@ Route::middleware('auth')->group(function () {
     // ============================================
     // TEKNISI — Technical Workflow (Survey, Sizing, Request Harga, Instalasi, Document)
     // ============================================
-    Route::middleware('permission:view-teknisi|manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+    Route::middleware('permission:view-technician|manage-technician')->prefix('teknisi')->name('teknisi.')->group(function () {
         Route::get('/surveys', [\App\Http\Controllers\SurveyController::class, 'index'])->name('surveys.index');
         Route::get('/surveys/create', [\App\Http\Controllers\SurveyController::class, 'create'])->name('surveys.create');
         Route::get('/surveys/{survey}', [\App\Http\Controllers\SurveyController::class, 'show'])->name('surveys.show');
@@ -194,7 +194,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/documents', [\App\Http\Controllers\DocumentRepositoryController::class, 'index'])->name('documents.index');
     });
 
-    Route::middleware('permission:manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+    Route::middleware('permission:manage-technician')->prefix('teknisi')->name('teknisi.')->group(function () {
         Route::post('/surveys', [\App\Http\Controllers\SurveyController::class, 'store'])->name('surveys.store');
         Route::put('/surveys/{survey}', [\App\Http\Controllers\SurveyController::class, 'update'])->name('surveys.update');
         Route::delete('/surveys/{survey}', [\App\Http\Controllers\SurveyController::class, 'destroy'])->name('surveys.destroy');
@@ -284,7 +284,7 @@ Route::middleware('auth')->group(function () {
 
     // Convert & status lead — dipakai Sales (own lead) + fallback Teknisi/Admin,
     // otorisasi detail (owner vs semua) dicek di controller.
-    Route::middleware('permission:manage-marketing|manage-sales|manage-teknisi|manage-admin')->group(function () {
+    Route::middleware('permission:manage-marketing|manage-sales|manage-technician|manage-admin')->group(function () {
         Route::patch('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert');
         Route::patch('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
         Route::patch('/leads/batch-status', [LeadController::class, 'batchUpdateStatus'])->name('leads.batch-status');
@@ -295,7 +295,7 @@ Route::middleware('auth')->group(function () {
         ->name('leads.monitoring');
 
     // Pipeline + detail lead — dipakai Marketing & Sales (sales di-scope ke own lead di controller/policy).
-    Route::middleware('permission:view-marketing|manage-marketing|view-sales|manage-sales|manage-teknisi|manage-admin')->group(function () {
+    Route::middleware('permission:view-marketing|manage-marketing|view-sales|manage-sales|manage-technician|manage-admin')->group(function () {
         Route::get('/leads/pipeline', [LeadController::class, 'pipeline'])->name('leads.pipeline');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
     });

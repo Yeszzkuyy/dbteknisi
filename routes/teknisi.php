@@ -10,7 +10,7 @@ use App\Http\Controllers\CalendarController;
 use Illuminate\Support\Facades\Route;
 
 // Projects - Manage
-Route::middleware('permission:manage-teknisi')->group(function () {
+Route::middleware('permission:manage-technician')->group(function () {
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
@@ -31,7 +31,7 @@ Route::middleware('permission:manage-teknisi')->group(function () {
 });
 
 // Projects - View
-Route::middleware('permission:view-teknisi|manage-teknisi')->group(function () {
+Route::middleware('permission:view-technician|manage-technician')->group(function () {
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/projects/{project}/documents', [ProjectDocumentController::class, 'index'])->name('project-documents.index');
@@ -39,7 +39,7 @@ Route::middleware('permission:view-teknisi|manage-teknisi')->group(function () {
 });
 
 // Technician Dashboard & Calendar - View
-Route::middleware('permission:view-teknisi|manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+Route::middleware('permission:view-technician|manage-technician')->prefix('teknisi')->name('teknisi.')->group(function () {
     Route::get('/dashboard', [TechnicianDashboardController::class, 'index'])->name('dashboard');
     Route::get('/kalender/events', [TechnicianScheduleController::class, 'events'])->name('kalender.events');
     Route::get('/jadwal/google-events', [CalendarController::class, 'googleEvents'])->name('google-events');
@@ -48,7 +48,7 @@ Route::middleware('permission:view-teknisi|manage-teknisi')->prefix('teknisi')->
 });
 
 // Technician Calendar - Manage
-Route::middleware('permission:manage-teknisi')->prefix('teknisi')->name('teknisi.')->group(function () {
+Route::middleware('permission:manage-technician')->prefix('teknisi')->name('teknisi.')->group(function () {
     Route::post('/schedules', [TechnicianScheduleController::class, 'store'])->name('schedules.store');
     Route::put('/schedules/{schedule}', [TechnicianScheduleController::class, 'update'])->name('schedules.update');
     Route::delete('/schedules/{schedule}', [TechnicianScheduleController::class, 'destroy'])->name('schedules.destroy');

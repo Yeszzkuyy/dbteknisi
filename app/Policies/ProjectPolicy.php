@@ -13,27 +13,27 @@ class ProjectPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyPermission(['view-teknisi', 'manage-teknisi', 'view-sales']);
+        return $user->hasAnyPermission(['view-technician', 'manage-technician', 'view-sales']);
     }
 
     public function view(User $user, Project $project): bool
     {
-        return $user->hasAnyPermission(['view-teknisi', 'manage-teknisi', 'view-sales']);
+        return $user->hasAnyPermission(['view-technician', 'manage-technician', 'view-sales']);
     }
 
     public function create(User $user): bool
     {
-        return $user->can('manage-teknisi');
+        return $user->can('manage-technician');
     }
 
     public function update(User $user, Project $project): bool
     {
-        return $user->can('manage-teknisi');
+        return $user->can('manage-technician');
     }
 
     public function delete(User $user, Project $project): bool
     {
-        return $user->can('manage-teknisi');
+        return $user->can('manage-technician');
     }
 
     public function restore(User $user, Project $project): bool

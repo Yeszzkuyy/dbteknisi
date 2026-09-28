@@ -20,20 +20,27 @@ class SampleDataSeeder extends Seeder
             ['name' => 'Budi Marketing', 'email' => 'marketing@dbteknisi.com', 'role' => 'marketing'],
             ['name' => 'Sari Sales', 'email' => 'sales@dbteknisi.com', 'role' => 'sales'],
             ['name' => 'Andi Admin', 'email' => 'admin@dbteknisi.com', 'role' => 'admin'],
-            ['name' => 'Rudi Teknisi', 'email' => 'teknisi@dbteknisi.com', 'role' => 'teknisi'],
-            ['name' => 'Dewi Teknisi', 'email' => 'teknisi2@dbteknisi.com', 'role' => 'teknisi'],
-            ['name' => 'Pak Manager', 'email' => 'manager@dbteknisi.com', 'role' => 'manager'],
+            ['name' => 'Rudi Teknisi', 'email' => 'teknisi@dbteknisi.com', 'role' => 'technician'],
+            ['name' => 'Dewi Teknisi', 'email' => 'teknisi2@dbteknisi.com', 'role' => 'technician'],
+            ['name' => 'Joko Lead Teknisi', 'email' => 'lead-teknisi@dbteknisi.com', 'role' => 'lead-technician'],
+            ['name' => 'Pak Manager', 'email' => 'manager@dbteknisi.com', 'role' => 'ceo'],
             ['name' => 'Bu Yanita', 'email' => 'yanita@dbteknisi.com', 'role' => 'management'],
             ['name' => 'Bu Ayu', 'email' => 'ayu@dbteknisi.com', 'role' => 'management'],
         ];
 
         $userIds = [];
         foreach ($users as $u) {
-            $user = User::firstOrCreate(
+            $user = User::withTrashed()->firstOrCreate(
                 ['email' => $u['email']],
                 ['name' => $u['name'], 'password' => $password, 'role' => $u['role'], 'email_verified_at' => now()]
             );
+            if ($user->trashed()) {
+                $user->restore();
+            }
             $user->assignRole($u['role']);
+            if ($user->role !== $u['role']) {
+                $user->forceFill(['role' => $u['role']])->save();
+            }
             $userIds[$u['role']][] = $user->id;
         }
 
@@ -80,9 +87,9 @@ class SampleDataSeeder extends Seeder
                     'work_type_id' => $workTypes[$i % $workTypes->count()],
                     'project_status_id' => $statuses[$p['status']],
                     'progress' => $p['progress'],
-                    'pic_engineer' => User::find($userIds['teknisi'][$i % count($userIds['teknisi'])])->name,
+                    'pic_engineer' => User::find($userIds['technician'][$i % count($userIds['technician'])])->name,
                     'sales_user_id' => $userIds['sales'][0],
-                    'teknisi_user_id' => $userIds['teknisi'][$i % count($userIds['teknisi'])],
+                    'teknisi_user_id' => $userIds['technician'][$i % count($userIds['technician'])],
                     'start_date' => now()->subDays(30 - $i * 3),
                     'end_date' => now()->addDays(10 + $i * 5),
                     'description' => 'Data contoh hasil seeding.',

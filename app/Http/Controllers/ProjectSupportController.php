@@ -25,7 +25,7 @@ class ProjectSupportController extends Controller
     {
         $this->authorize('update', $project);
 
-        $engineers = User::where('role', 'teknisi')->get();
+        $engineers = User::where('role', 'technician')->get();
 
         return view(
             'project_supports.create',

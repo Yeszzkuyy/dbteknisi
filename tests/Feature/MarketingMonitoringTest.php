@@ -25,7 +25,7 @@ class MarketingMonitoringTest extends TestCase
 
     public function test_lead_can_view_monitoring_summary(): void
     {
-        $lead = $this->userWithRole('marketing-lead');
+        $lead = $this->userWithRole('manage-marketing');
         $junior = User::factory()->create();
         $junior->assignRole('marketing');
         $sales = User::factory()->create(['name' => 'Adi Sales']);

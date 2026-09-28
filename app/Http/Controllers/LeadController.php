@@ -536,7 +536,7 @@ class LeadController extends Controller
         $isOwner = $user && (int) $lead->assigned_to === (int) $user->id;
         $allowed = $user && ($user->can('manage-marketing')
             || ($isOwner && $user->can('manage-sales'))
-            || $user->can('manage-teknisi')
+            || $user->can('manage-technician')
             || $user->can('manage-admin'));
 
         abort_unless($allowed, 403);

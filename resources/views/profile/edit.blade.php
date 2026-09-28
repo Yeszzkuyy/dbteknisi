@@ -13,6 +13,8 @@
 
         {{-- Kartu profil --}}
         <section class="rounded-2xl border border-slate-200/60 bg-white p-10 text-center shadow-lg sm:p-14 dark:border-slate-700/50 dark:bg-slate-800 dark:shadow-black/20">
+                @php($secure = $user->hasSecurePassword())
+                @php($isYeski = $user->hasAnimatedAvatarBorder())
                 <form method="POST" action="{{ route('profile.avatar.update') }}" enctype="multipart/form-data"
                       x-data="{ preview: @js($user->avatar ? asset('storage/' . $user->avatar) : null) }">
                     @csrf
@@ -21,11 +23,16 @@
                     <button type="button" @click="$refs.avatar.click()"
                             class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                             aria-label="{{ __('Ubah foto profil') }}">
+                        {{-- Border running khusus Yeski: dua warna tema saling mengejar --}}
+                        @if($isYeski)
+                            <span aria-hidden="true" title="{{ __('Founder') }}"
+                                  class="absolute -inset-1.5 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,transparent_100deg,rgb(var(--accent-300))_180deg,transparent_280deg,rgb(var(--accent-500))_360deg)] shadow-[0_0_12px_2px_rgb(var(--accent-500)/0.45)]"></span>
+                        @endif
                         <img x-show="preview" x-cloak :src="preview" alt="{{ __('Foto profil') }}"
-                             class="h-24 w-24 rounded-full object-cover ring-4 ring-accent-100 shadow-lg dark:ring-accent-900/50 lg:h-28 lg:w-28">
+                             class="relative h-24 w-24 rounded-full object-cover ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'ring-slate-900/80' : 'ring-accent-300 dark:ring-accent-700' }}">
                         <div x-show="!preview" x-cloak aria-hidden="true"
-                             class="flex h-24 w-24 items-center justify-center rounded-full bg-accent-100 ring-4 ring-accent-100 shadow-lg lg:h-28 lg:w-28 dark:bg-accent-900/40 dark:ring-accent-900/50">
-                            <span class="text-3xl font-bold text-accent-600 lg:text-4xl dark:text-accent-300">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                             class="relative flex h-24 w-24 items-center justify-center rounded-full ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'bg-slate-900 ring-slate-900/80' : 'bg-accent-100 ring-accent-300 dark:bg-accent-900/40 dark:ring-accent-700' }}">
+                            <span class="text-3xl font-bold lg:text-4xl {{ $isYeski ? 'text-amber-300' : 'text-accent-600 dark:text-accent-300' }}">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                         </div>
 
                         {{-- Overlay hover: gelap + ikon kamera --}}
@@ -50,6 +57,17 @@
                         <span class="inline-flex items-center rounded-full bg-accent-50 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-accent-700 dark:bg-accent-500/10 dark:text-accent-400">
                             {{ $user->roles->first()?->name ?? __('Tanpa Role') }}
                         </span>
+                    </div>
+                    <div>
+                        @if($secure)
+                            <span class="inline-flex items-center rounded-full bg-accent-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-accent-700 dark:bg-accent-900/40 dark:text-accent-300">
+                                {{ __('Akun aman') }}
+                            </span>
+                        @else
+                            <span class="inline-flex items-center rounded-full bg-accent-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-accent-700 dark:bg-accent-900/40 dark:text-accent-300">
+                                {{ __('Password belum diganti') }}
+                            </span>
+                        @endif
                     </div>
                     <p class="flex items-center justify-center gap-1.5 pt-1 text-sm text-slate-500 dark:text-slate-400">
                         <x-icon name="mail" class="h-4 w-4" />

@@ -12,7 +12,7 @@ class LeadPolicy
         return $user->hasAnyPermission([
             'view-marketing', 'manage-marketing',
             'view-sales', 'manage-sales',
-            'manage-teknisi', 'manage-admin',
+            'manage-technician', 'manage-admin',
         ]);
     }
 
@@ -28,7 +28,7 @@ class LeadPolicy
         }
 
         // Fallback teknisi/admin agar bisa convert bila sales lupa.
-        return $user->can('manage-teknisi') || $user->can('manage-admin');
+        return $user->can('manage-technician') || $user->can('manage-admin');
     }
 
     public function create(User $user): bool
