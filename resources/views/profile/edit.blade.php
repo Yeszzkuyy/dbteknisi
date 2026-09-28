@@ -14,7 +14,7 @@
         {{-- Kartu profil --}}
         <section class="rounded-2xl border border-slate-200/60 bg-white p-10 text-center shadow-lg sm:p-14 dark:border-slate-700/50 dark:bg-slate-800 dark:shadow-black/20">
                 @php($secure = $user->hasSecurePassword())
-                @php($isYeski = $user->email === 'yehezkielmayogi.ptnti@gmail.com')
+                @php($isYeski = $user->hasAnimatedAvatarBorder())
                 <form method="POST" action="{{ route('profile.avatar.update') }}" enctype="multipart/form-data"
                       x-data="{ preview: @js($user->avatar ? asset('storage/' . $user->avatar) : null) }">
                     @csrf

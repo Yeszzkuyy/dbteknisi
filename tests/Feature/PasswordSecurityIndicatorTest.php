@@ -76,4 +76,25 @@ class PasswordSecurityIndicatorTest extends TestCase
             ->assertOk()
             ->assertSee('conic-gradient', false);
     }
+
+    public function test_running_border_visible_outside_profile(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $yeski = User::factory()->create(['email' => 'yehezkielmayogi.ptnti@gmail.com']);
+        $yeski->assignRole('super-admin');
+        $biasa = User::factory()->create();
+        $biasa->assignRole('marketing');
+
+        // Sidebar (dashboard) Yeski: ada ring running
+        $this->actingAs($yeski)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('conic-gradient', false);
+
+        // Sidebar user biasa: tidak ada
+        $this->actingAs($biasa)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee('conic-gradient', false);
+    }
 }
