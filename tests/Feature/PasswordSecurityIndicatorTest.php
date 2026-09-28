@@ -166,4 +166,19 @@ class PasswordSecurityIndicatorTest extends TestCase
         $this->assertStringContainsString('ring-green-500', $green);
         $this->assertStringNotContainsString('ring-red-500', $green);
     }
+
+    public function test_yeski_ring_is_neutral_so_running_effect_shows(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $yeski = User::factory()->create(['email' => 'yehezkielmayogi.ptnti@gmail.com']);
+
+        $html = \Illuminate\Support\Facades\Blade::render(
+            '<x-user-avatar :user="$user" size="w-10 h-10" :security="true" />',
+            ['user' => $yeski]
+        );
+
+        $this->assertStringNotContainsString('ring-red-500', $html);
+        $this->assertStringNotContainsString('ring-green-500', $html);
+        $this->assertStringContainsString('conic-gradient', $html);
+    }
 }
