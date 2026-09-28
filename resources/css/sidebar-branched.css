@@ -82,7 +82,7 @@
     cursor: pointer;
 }
 .sidebar .branched-toggle:hover {
-    background: rgb(255 255 255 / 0.08);
+    background: rgb(var(--accent-500) / 0.15);
 }
 .sidebar .branched-toggle:focus-visible {
     outline: 2px solid rgb(var(--accent-400) / 0.5);
