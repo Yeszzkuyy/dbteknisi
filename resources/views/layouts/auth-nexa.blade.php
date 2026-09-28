@@ -28,13 +28,11 @@
 
         /* Token port template Nexa (oklch -> hex). Satu-satunya sumber aksen auth. */
         :root {
-            --nx-deep: #0a2272;
             --nx-blue: #0063e1;
             --nx-bright: #008bf6;
             --nx-glow: #30aff8;
             --nx-surface: #f5f7f9;
             --nx-card: #ffffff;
-            --nx-input: #ffffff;
             --nx-line: #e5e8ed;
             --nx-ink: #171f2e;
             --nx-muted: rgba(23, 31, 46, 0.55);
@@ -46,7 +44,6 @@
         .dark {
             --nx-surface: #020618;
             --nx-card: #0f172b;
-            --nx-input: #333a4b;
             --nx-line: rgba(255, 255, 255, 0.1);
             --nx-ink: #f8fafc;
             --nx-muted: #90a1b9;
@@ -101,47 +98,47 @@
             .nx-card { min-height: 640px; }
         }
 
-        /* Panel brand */
+        /* Panel brand: biru flat + tepi awan (style referensi) */
         .nx-brand {
             position: relative;
             overflow: hidden;
             padding: 2.5rem 2rem;
             color: #f8fafc;
-            background-image: linear-gradient(142deg, var(--nx-deep) 0%, var(--nx-blue) 58%, var(--nx-bright) 100%);
+            background: #2563eb;
         }
         @media (min-width: 640px) { .nx-brand { padding: 2.5rem; } }
         @media (min-width: 1024px) {
             .nx-brand { display: flex; width: 42%; flex-direction: column; padding: 3rem 2.5rem; }
         }
 
-        .nx-brand::before {
-            content: "";
+        .nx-cloud-v {
+            display: none;
             position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-        }
-        .nx-brand-glow {
-            position: absolute;
-            top: -6rem;
-            left: -4rem;
-            width: 16rem;
-            height: 16rem;
-            border-radius: 9999px;
-            background: var(--nx-glow);
-            opacity: 0.25;
-            filter: blur(90px);
-            pointer-events: none;
-        }
-        .nx-sea {
-            position: absolute;
-            inset: 0;
-            width: 100%;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 110px;
             height: 100%;
             pointer-events: none;
+        }
+        .nx-cloud-h {
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 46px;
+            pointer-events: none;
+        }
+        @media (min-width: 1024px) {
+            .nx-cloud-v { display: block; }
+            .nx-cloud-h { display: none; }
+            .nx-brand-inner { padding-right: 4.5rem; }
+        }
+        @media (min-width: 1280px) {
+            .nx-cloud-v { width: 140px; }
+            .nx-brand-inner { padding-right: 5.5rem; }
         }
 
         .nx-brand-inner { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; }
@@ -149,12 +146,21 @@
         .nx-brand-top { margin-top: auto; margin-bottom: auto; }
         @media (min-width: 1024px) { .nx-brand-top { margin: auto 0; } }
 
-        .nx-eyebrow { font-size: 0.875rem; font-weight: 500; color: rgba(255, 255, 255, 0.7); }
-        .nx-logo-row { display: flex; flex-direction: column; align-items: flex-start; gap: 1.25rem; margin-top: 1.5rem; }
-        .nx-logo { display: block; height: 2.75rem; width: auto; }
-        .nx-product { font-size: 1.875rem; font-weight: 700; letter-spacing: -0.025em; color: #fff; line-height: 1.1; }
-        .nx-product small { display: block; margin-top: 0.35rem; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.18em; color: rgba(255, 255, 255, 0.7); }
-        .nx-tagline { margin: 1rem 0 0; max-width: 30ch; font-size: 0.875rem; line-height: 1.6; color: rgba(255, 255, 255, 0.7); }
+        .nx-eyebrow { font-size: 0.875rem; font-weight: 500; color: rgba(255, 255, 255, 0.85); text-align: center; }
+        .nx-logo-row { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-top: 1.5rem; text-align: center; }
+        .nx-logo-badge {
+            display: grid;
+            place-items: center;
+            width: 3.75rem;
+            height: 3.75rem;
+            border-radius: 9999px;
+            background: #fff;
+            box-shadow: 0 10px 24px rgba(2, 20, 60, 0.3);
+        }
+        .nx-logo { display: block; height: 2.1rem; width: auto; }
+        .nx-product { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; color: #fff; line-height: 1.2; }
+        .nx-product small { display: block; margin-top: 0.3rem; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.2em; color: rgba(255, 255, 255, 0.75); }
+        .nx-tagline { margin: 1.25rem auto 0; max-width: 32ch; font-size: 0.8rem; line-height: 1.7; color: rgba(255, 255, 255, 0.75); text-align: center; }
         .nx-secure { display: none; margin-top: 2rem; font-family: ui-monospace, monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: rgba(255, 255, 255, 0.4); }
         @media (min-width: 1024px) { .nx-secure { display: block; } }
 
@@ -211,26 +217,27 @@
         .nx-form { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1.5rem; }
         .nx-field { display: flex; flex-direction: column; gap: 0.375rem; }
         .nx-label { font-size: 13px; font-weight: 500; color: var(--nx-muted); }
+        /* Input underline ala referensi */
         .nx-input {
             display: block;
             width: 100%;
-            height: 2.75rem;
-            padding: 0 1rem;
-            border: 1px solid var(--nx-line);
-            border-radius: 0.75rem;
+            height: 2.5rem;
+            padding: 0 0.1rem;
+            border: 0;
+            border-bottom: 1.5px solid var(--nx-line);
+            border-radius: 0;
             outline: none;
-            background: var(--nx-input);
+            background: transparent;
             color: var(--nx-ink);
             font: inherit;
             font-size: 0.875rem;
-            box-shadow: 0 1px 2px rgba(20, 30, 60, 0.04);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: border-color 0.2s ease;
         }
         .nx-input::placeholder { color: var(--nx-faint); }
-        .nx-input:hover { border-color: var(--nx-faint); }
-        .nx-input:focus { border-color: var(--nx-blue); box-shadow: 0 0 0 4px var(--nx-ring); }
-        .nx-input[aria-invalid="true"] { border-color: var(--nx-des); }
-        .nx-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 4px rgba(231, 0, 11, 0.15); }
+        .nx-input:hover { border-bottom-color: var(--nx-faint); }
+        .nx-input:focus { border-bottom-color: var(--nx-blue); box-shadow: none; }
+        .nx-input[aria-invalid="true"] { border-bottom-color: var(--nx-des); }
+        .nx-input[aria-invalid="true"]:focus { box-shadow: none; }
         .nx-pass-wrap { position: relative; }
         .nx-pass-wrap .nx-input { padding-right: 2.75rem; }
         .nx-pass-toggle {
@@ -287,7 +294,8 @@
         .nx-btn-primary:disabled { cursor: not-allowed; opacity: 0.6; pointer-events: none; }
         .nx-btn-secondary { border: 1px solid var(--nx-line); background: var(--nx-card); color: var(--nx-muted); }
         .nx-btn-secondary:hover { transform: translateY(-2px); border-color: var(--nx-faint); color: var(--nx-ink); }
-        .nx-btn-stack { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.25rem; }
+        .nx-btn-stack { display: flex; flex-direction: row; gap: 0.75rem; margin-top: 0.5rem; }
+        .nx-btn-stack .nx-btn { flex: 1; }
 
         a.nx-btn:focus-visible, button.nx-btn:focus-visible, .nx-input:focus-visible, .nx-tab:focus-visible {
             outline: 3px solid var(--nx-ring);
@@ -299,13 +307,8 @@
                 from { opacity: 0; transform: translateY(16px); }
                 to { opacity: 1; transform: translateY(0); }
             }
-            @keyframes nx-glow-breathe {
-                0%, 100% { opacity: 0.55; }
-                50% { opacity: 0.9; }
-            }
             .nx-rise { animation: nx-rise 0.65s cubic-bezier(0.32, 0.72, 0, 1) both; }
             .nx-rise-late { animation: nx-rise 0.65s cubic-bezier(0.32, 0.72, 0, 1) 0.16s both; }
-            .nx-brand-glow { animation: nx-glow-breathe 9s ease-in-out infinite; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -324,14 +327,38 @@
     <main class="nx-card nx-rise">
         <div class="nx-flex">
             <section class="nx-brand" aria-label="Product">
-                <canvas class="nx-sea" aria-hidden="true"></canvas>
-                <div class="nx-brand-glow" aria-hidden="true"></div>
+                <svg class="nx-cloud-v" viewBox="0 0 120 640" preserveAspectRatio="none" aria-hidden="true">
+                    <g style="fill: var(--nx-card)">
+                        <rect x="55" y="0" width="65" height="640" />
+                        <circle cx="55" cy="40" r="34" />
+                        <circle cx="55" cy="120" r="24" />
+                        <circle cx="55" cy="195" r="40" />
+                        <circle cx="55" cy="280" r="26" />
+                        <circle cx="55" cy="355" r="44" />
+                        <circle cx="55" cy="445" r="28" />
+                        <circle cx="55" cy="520" r="38" />
+                        <circle cx="55" cy="600" r="26" />
+                    </g>
+                </svg>
+                <svg class="nx-cloud-h" viewBox="0 0 640 64" preserveAspectRatio="none" aria-hidden="true">
+                    <g style="fill: var(--nx-card)">
+                        <rect x="0" y="28" width="640" height="36" />
+                        <circle cx="60" cy="30" r="26" />
+                        <circle cx="150" cy="30" r="34" />
+                        <circle cx="250" cy="30" r="24" />
+                        <circle cx="350" cy="30" r="36" />
+                        <circle cx="450" cy="30" r="26" />
+                        <circle cx="550" cy="30" r="32" />
+                    </g>
+                </svg>
 
                 <div class="nx-brand-inner">
                     <div class="nx-brand-top">
                         <p class="nx-eyebrow">Welcome to</p>
                         <div class="nx-logo-row">
-                            <img class="nx-logo" src="{{ asset('images/logo/logo.png') }}" alt="3DY App logo">
+                            <span class="nx-logo-badge">
+                                <img class="nx-logo" src="{{ asset('images/logo/logo-lightmode.png') }}" alt="3DY App logo">
+                            </span>
                             <p class="nx-product">3DY App<small>Tridaya Group</small></p>
                         </div>
                         <p class="nx-tagline">Manage your workspace, data, and applications from one place.</p>
@@ -357,113 +384,5 @@
             </div>
         </div>
     </main>
-    <script>
-        // ponytail: laut 3D panel brand — 3 lapis ombak ambient + bibir pantai
-        // berdenyut di tepi kanan (desktop). Satu frame statis bila reduced-motion.
-        (() => {
-            const canvas = document.querySelector('.nx-sea');
-            const host = canvas ? canvas.closest('.nx-brand') : null;
-            if (!canvas || !host || !canvas.getContext) return;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-
-            const css = getComputedStyle(document.documentElement);
-            const card = (css.getPropertyValue('--nx-card') || '#ffffff').trim();
-            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const desktop = window.matchMedia('(min-width: 1024px)');
-            const wide = window.matchMedia('(min-width: 1280px)');
-
-            let W = 0, H = 0, raf = 0;
-
-            const size = () => {
-                const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-                const r = host.getBoundingClientRect();
-                W = Math.max(1, Math.round(r.width));
-                H = Math.max(1, Math.round(r.height));
-                canvas.width = Math.round(W * dpr);
-                canvas.height = Math.round(H * dpr);
-                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            };
-
-            // y permukaan ombak: jumlah 2 sinus (kedalaman via frekuensi/beda fase)
-            const surf = (x, t, wl, a1, a2, sp, ph) =>
-                Math.sin((x / wl) * Math.PI * 2 + t * sp + ph) * a1 +
-                Math.sin((x / (wl * 0.37)) * Math.PI * 2 - t * sp * 1.6 + ph * 2) * a2;
-
-            const layer = (t, base, amp, wl, sp, ph, top, glow) => {
-                ctx.beginPath();
-                ctx.moveTo(0, H);
-                for (let x = 0; x <= W; x += 4) {
-                    ctx.lineTo(x, base + surf(x, t, wl, amp, amp * 0.45, sp, ph));
-                }
-                ctx.lineTo(W, H);
-                ctx.closePath();
-                const g = ctx.createLinearGradient(0, base - amp * 2, 0, H);
-                g.addColorStop(0, top);
-                g.addColorStop(1, 'rgba(255,255,255,0)');
-                ctx.fillStyle = g;
-                ctx.fill();
-                // sorotan puncak: garis cahaya + blur = kesan 3D
-                ctx.beginPath();
-                for (let x = 0; x <= W; x += 4) {
-                    const y = base + surf(x, t, wl, amp, amp * 0.45, sp, ph);
-                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                }
-                ctx.strokeStyle = glow;
-                ctx.lineWidth = 1.5;
-                ctx.shadowColor = 'rgba(255,255,255,0.8)';
-                ctx.shadowBlur = 12;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-            };
-
-            // bibir pantai di tepi kanan: punggung berdenyut berisi warna kartu + 2 gema putih
-            const shore = (t, edgeW, lag, fill) => {
-                ctx.beginPath();
-                ctx.moveTo(W, 0);
-                for (let y = 0; y <= H; y += 6) {
-                    const x = W - edgeW
-                        + Math.sin((y / H) * Math.PI * 2.2 + t * 0.7 + lag) * 16
-                        + Math.sin((y / H) * Math.PI * 5.1 - t * 1.1 + lag * 2) * 7;
-                    ctx.lineTo(x, y);
-                }
-                ctx.lineTo(W, H);
-                ctx.closePath();
-                ctx.fillStyle = fill;
-                ctx.fill();
-            };
-
-            const frame = (now) => {
-                const t = now / 1000;
-                ctx.clearRect(0, 0, W, H);
-                // jauh -> dekat: redup, cepat, dan makin terang
-                layer(t, H * 0.60, 10, W * 0.9, 0.35, 0.0, 'rgba(255,255,255,0.07)', 'rgba(255,255,255,0.18)');
-                layer(t, H * 0.72, 14, W * 0.65, 0.55, 1.7, 'rgba(48,175,248,0.14)', 'rgba(255,255,255,0.28)');
-                layer(t, H * 0.84, 18, W * 0.5, 0.8, 3.4, 'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.4)');
-                if (desktop.matches) {
-                    const edgeW = wide.matches ? 170 : 120;
-                    shore(t, edgeW + 60, 2.1, 'rgba(255,255,255,0.14)');
-                    shore(t, edgeW + 30, 1.1, 'rgba(255,255,255,0.34)');
-                    shore(t, edgeW, 0.0, card);
-                }
-                if (!reduce && !document.hidden) raf = requestAnimationFrame(frame);
-            };
-
-            const kick = () => {
-                if (raf) cancelAnimationFrame(raf);
-                raf = 0;
-                if (reduce) { frame(1200); return; }
-                raf = requestAnimationFrame(frame);
-            };
-
-            size();
-            kick();
-            new ResizeObserver(() => { size(); if (reduce || !raf) kick(); }).observe(host);
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; }
-                else kick();
-            });
-        })();
-    </script>
 </body>
 </html>
