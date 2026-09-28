@@ -98,6 +98,10 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        if ($reason = $user->deletionBlockReason()) {
+            return Redirect::route('profile.edit')->withErrors(['password' => $reason], 'userDeletion');
+        }
+
         Auth::logout();
 
         $user->delete();
