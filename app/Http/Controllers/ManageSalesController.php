@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\FollowUp;
 use App\Models\Lead;
 use App\Models\LeadActivity;
+use App\Models\Meeting;
 use App\Models\User;
 use App\Notifications\LeadAssignedNotification;
 use App\Notifications\NewLeadNotification;
@@ -130,7 +132,28 @@ class ManageSalesController extends Controller
 
         $statuses = LeadController::STATUSES;
 
-        return view('sales.my-leads', compact('leads', 'statuses'));
+        // KPI global milik sales yang login (tidak ikut filter tabel).
+        // won bulan ini memakai updated_at karena tidak ada kolom won_at.
+        // Baris lama tanpa lead_id tetap dihitung via created_by.
+        $ownLead = fn ($q) => $q->where('assigned_to', auth()->id());
+        $ownActivity = function ($q) use ($ownLead) {
+            $q->whereHas('lead', $ownLead)
+                ->orWhere(fn ($w) => $w->whereNull('lead_id')->where('created_by', auth()->id()));
+        };
+        $mine = fn () => Lead::where('assigned_to', auth()->id());
+        $kpi = [
+            'active' => (clone $mine)->whereNotIn('status', ['won', 'lost'])->count(),
+            'won_month' => (clone $mine)->where('status', 'won')
+                ->whereMonth('updated_at', now()->month)
+                ->whereYear('updated_at', now()->year)->count(),
+            'meetings_week' => Meeting::where($ownActivity)
+                ->whereBetween('meeting_date', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'overdue' => FollowUp::where($ownActivity)
+                ->whereNotNull('follow_up_date')
+                ->whereDate('follow_up_date', '<', today())->count(),
+        ];
+
+        return view('sales.my-leads', compact('leads', 'statuses', 'kpi'));
     }
 
     public function activityLog(Request $request)

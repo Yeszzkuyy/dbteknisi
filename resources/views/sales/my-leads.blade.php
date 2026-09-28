@@ -6,6 +6,26 @@
         </div>
     </div>
 
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Lead Aktif') }}</p>
+            <p class="mt-1 text-3xl font-bold text-slate-800 dark:text-slate-100">{{ $kpi['active'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Won Bulan Ini') }}</p>
+            <p class="mt-1 text-3xl font-bold text-green-700 dark:text-green-300">{{ $kpi['won_month'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Meeting Minggu Ini') }}</p>
+            <p class="mt-1 text-3xl font-bold text-blue-700 dark:text-blue-300">{{ $kpi['meetings_week'] ?? 0 }}</p>
+        </div>
+        <a href="{{ route('sales.follow-ups.index', ['overdue' => 1]) }}"
+           class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 hover:shadow transition">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Follow Up Jatuh Tempo') }}</p>
+            <p class="mt-1 text-3xl font-bold {{ ($kpi['overdue'] ?? 0) > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-800 dark:text-slate-100' }}">{{ $kpi['overdue'] ?? 0 }}</p>
+        </a>
+    </div>
+
     <form method="GET" action="{{ route('sales.my-leads') }}" class="flex flex-wrap gap-3 mb-4">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Cari customer...') }}"
                class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
