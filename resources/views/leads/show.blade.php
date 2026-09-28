@@ -5,7 +5,12 @@
             <p class="text-slate-500 mt-1">{{ __('Informasi lengkap lead / opportunity') }}</p>
         </div>
         <div class="flex gap-3">
-            @php($canConvert = auth()->user()?->can('manage-marketing') || ((int) $lead->assigned_to === (int) auth()->id() && auth()->user()?->can('manage-sales')) || auth()->user()?->can('manage-technician') || auth()->user()?->can('manage-admin'))
+            @php
+                $canConvert = auth()->user()?->can('manage-marketing')
+                    || ((int) $lead->assigned_to === (int) auth()->id() && auth()->user()?->can('manage-sales'))
+                    || auth()->user()?->can('manage-technician')
+                    || auth()->user()?->can('manage-admin');
+            @endphp
             @if($canConvert && !in_array($lead->status, ['won', 'lost']))
                     <button type="button"
                             onclick="openConvertModal()"
