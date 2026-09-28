@@ -88,8 +88,8 @@
 
     <div class="flex items-center gap-2 sm:gap-3">
 
-        {{-- Notifikasi (Management: lead baru butuh di-assign) --}}
-        @can('manage-sales-leads')
+        {{-- Notifikasi (Management: lead baru butuh di-assign; Sales: follow-up jatuh tempo) --}}
+        @canany(['manage-sales-leads', 'manage-sales'])
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open; $store.notif.refresh()"
                         class="beam-notif relative inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition-all duration-300 hover:scale-105 hover:bg-accent-500/10 hover:text-accent-600 active:scale-95 dark:text-slate-300 dark:hover:bg-accent-400/10 dark:hover:text-accent-400"
@@ -121,7 +121,10 @@
                                class="flex items-start gap-3 min-w-0 flex-1 px-4 py-2.5">
                                 <span class="mt-1.5 h-2 w-2 rounded-full shrink-0" :class="n.read ? 'bg-slate-300 dark:bg-zinc-600' : 'bg-red-500'"></span>
                                 <span class="min-w-0">
-                                    <span class="block text-sm text-slate-700 dark:text-slate-200">{{ __('Lead baru') }}: <strong x-text="n.customer"></strong></span>
+                                    <span class="block text-sm text-slate-700 dark:text-slate-200"><strong x-text="n.title || '{{ __('Lead baru') }}'"></strong>: <strong x-text="n.customer"></strong></span>
+                                    <template x-if="n.preview">
+                                        <span class="block text-xs text-slate-500 dark:text-slate-400 truncate" x-text="n.preview"></span>
+                                    </template>
                                     <span class="block text-xs text-slate-400 dark:text-slate-500" x-text="n.ago"></span>
                                 </span>
                             </a>
@@ -136,7 +139,8 @@
                     </template>
                 </div>
 
-                {{-- Toast kecil: lead baru belum di-assign --}}
+                {{-- Toast kecil: lead baru belum di-assign (khusus management) --}}
+                @can('manage-sales-leads')
                 <template x-teleport="body">
                     <div x-show="$store.notif.toast"
                          x-transition.opacity.duration.300ms
@@ -151,6 +155,7 @@
                         </div>
                     </div>
                 </template>
+                @endcan
             </div>
         @endcan
 

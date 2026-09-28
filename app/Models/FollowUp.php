@@ -15,11 +15,13 @@ class FollowUp extends Model
         'meeting_id',
         'description',
         'follow_up_date',
+        'reminder_sent_at',
         'created_by',
     ];
 
     protected $casts = [
         'follow_up_date' => 'date',
+        'reminder_sent_at' => 'datetime',
     ];
 
     public function customer()

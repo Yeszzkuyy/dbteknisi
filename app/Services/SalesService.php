@@ -77,6 +77,11 @@ class SalesService
             $query->where('lead_id', $filters['lead_id']);
         }
 
+        if (!empty($filters['overdue'])) {
+            $query->whereNotNull('follow_up_date')
+                ->whereDate('follow_up_date', '<', today());
+        }
+
         $this->scopeToOwnLeads($query);
 
         return $query->latest('follow_up_date')->paginate(15);

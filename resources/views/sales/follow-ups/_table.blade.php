@@ -26,6 +26,9 @@
                         </td>
                         <td class="px-6 py-4 text-slate-600">
                             {{ $fu->follow_up_date ? $fu->follow_up_date->format('d M Y') : '-' }}
+                            @if($fu->follow_up_date && $fu->follow_up_date->isBefore(today()))
+                                <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-red-100 text-red-700">{{ __('Terlambat') }}</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-slate-600">{{ $fu->creator?->name ?? '-' }}</td>
                         <td class="px-6 py-4">
