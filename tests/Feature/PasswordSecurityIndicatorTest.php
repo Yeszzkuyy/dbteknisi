@@ -129,6 +129,20 @@ class PasswordSecurityIndicatorTest extends TestCase
         $this->assertStringNotContainsString('ring-red-500', $html);
     }
 
+    public function test_avatar_hover_is_glow_not_static_ring(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $user = User::factory()->create(['avatar' => 'avatars/coba.png']);
+
+        $html = \Illuminate\Support\Facades\Blade::render(
+            '<x-user-avatar :user="$user" size="w-10 h-10" />',
+            ['user' => $user]
+        );
+
+        $this->assertStringContainsString('hover:shadow-green-500/50', $html);
+        $this->assertStringNotContainsString('hover:ring-accent-300', $html);
+    }
+
     public function test_avatar_security_mode_reflects_password_status(): void
     {
         $this->seed(RoleAndPermissionSeeder::class);
