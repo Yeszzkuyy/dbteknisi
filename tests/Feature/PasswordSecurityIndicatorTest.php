@@ -111,6 +111,9 @@ class PasswordSecurityIndicatorTest extends TestCase
         // Wrapper anti-melar (penyebab avatar lonjong di list flex) + ring running tetap ada
         $this->assertStringContainsString('self-center aspect-square', $html);
         $this->assertStringContainsString('conic-gradient', $html);
+        // Chasing ganda mengikuti variabel tema aktif
+        $this->assertStringContainsString('var(--accent-500)', $html);
+        $this->assertStringContainsString('var(--accent-300)', $html);
     }
 
     public function test_avatar_shows_google_style_decoration_by_default(): void
@@ -123,10 +126,10 @@ class PasswordSecurityIndicatorTest extends TestCase
             ['user' => $user]
         );
 
-        // Dekoratif: ring hijau + dot hijau meski password masih bawaan
+        // Cukup warna ring: hijau meski password masih bawaan, tanpa dot
         $this->assertStringContainsString('ring-green-500', $html);
-        $this->assertStringContainsString('bg-green-500', $html);
         $this->assertStringNotContainsString('ring-red-500', $html);
+        $this->assertStringNotContainsString('-right-0.5 -top-0.5', $html);
     }
 
     public function test_avatar_hover_is_glow_not_static_ring(): void
