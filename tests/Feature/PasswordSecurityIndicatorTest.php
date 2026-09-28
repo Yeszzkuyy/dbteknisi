@@ -146,25 +146,26 @@ class PasswordSecurityIndicatorTest extends TestCase
         $this->assertStringNotContainsString('hover:ring-accent-300', $html);
     }
 
-    public function test_avatar_security_mode_reflects_password_status(): void
+    public function test_avatar_always_follows_theme_regardless_of_password_status(): void
     {
         $this->seed(RoleAndPermissionSeeder::class);
         $user = User::factory()->create();
 
-        $red = \Illuminate\Support\Facades\Blade::render(
-            '<x-user-avatar :user="$user" size="w-10 h-10" :security="true" />',
+        $before = \Illuminate\Support\Facades\Blade::render(
+            '<x-user-avatar :user="$user" size="w-10 h-10" />',
             ['user' => $user]
         );
-        $this->assertStringContainsString('ring-red-500', $red);
+        $this->assertStringContainsString('ring-accent-500', $before);
+        $this->assertStringNotContainsString('ring-red-500', $before);
 
         $user->forceFill(['password_changed_at' => now()])->save();
 
-        $green = \Illuminate\Support\Facades\Blade::render(
-            '<x-user-avatar :user="$user" size="w-10 h-10" :security="true" />',
+        $after = \Illuminate\Support\Facades\Blade::render(
+            '<x-user-avatar :user="$user" size="w-10 h-10" />',
             ['user' => $user->fresh()]
         );
-        $this->assertStringContainsString('ring-accent-500', $green);
-        $this->assertStringNotContainsString('ring-red-500', $green);
+        $this->assertStringContainsString('ring-accent-500', $after);
+        $this->assertStringNotContainsString('ring-red-500', $after);
     }
 
     public function test_yeski_ring_is_neutral_so_running_effect_shows(): void
@@ -173,7 +174,7 @@ class PasswordSecurityIndicatorTest extends TestCase
         $yeski = User::factory()->create(['email' => 'yehezkielmayogi.ptnti@gmail.com']);
 
         $html = \Illuminate\Support\Facades\Blade::render(
-            '<x-user-avatar :user="$user" size="w-10 h-10" :security="true" />',
+            '<x-user-avatar :user="$user" size="w-10 h-10" />',
             ['user' => $yeski]
         );
 
