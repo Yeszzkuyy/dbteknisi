@@ -36,7 +36,13 @@
                 <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
             @endforeach
         </select>
-        @if(request('search') || request('status'))
+        <select name="touched" onchange="this.form.submit()"
+                class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
+            <option value="">{{ __('Semua Aktivitas') }}</option>
+            <option value="yes" @selected(request('touched') === 'yes')>{{ __('Sudah disentuh') }}</option>
+            <option value="no" @selected(request('touched') === 'no')>{{ __('Belum disentuh') }}</option>
+        </select>
+        @if(request('search') || request('status') || request('touched'))
             <a href="{{ route('sales.my-leads') }}"
                class="px-3 py-2 border border-slate-300 text-slate-700 hover:bg-white text-sm rounded-lg transition">{{ __('Reset') }}</a>
         @endif
@@ -101,6 +107,17 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
+                                @php
+                                    $leadWaLink = $lead->customer?->waLink(
+                                        __('Halo :name, izin follow up penawaran kami.', ['name' => $lead->customer?->contact_person ?: ($lead->customer?->name ?? '')])
+                                    );
+                                @endphp
+                                @if($leadWaLink)
+                                    <a href="{{ $leadWaLink }}" target="_blank" title="{{ __('Chat WhatsApp') }}"
+                                       class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 text-sm font-semibold transition">
+                                        {{ __('WA') }}
+                                    </a>
+                                @endif
                                 <a href="{{ route('leads.show', $lead) }}"
                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold transition">
                                     {{ __('Detail') }}

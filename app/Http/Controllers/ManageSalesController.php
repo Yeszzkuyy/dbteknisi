@@ -126,6 +126,9 @@ class ManageSalesController extends Controller
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
                 fn ($c) => $c->whereLike('name', $request->search)))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('touched'), fn ($q) => $request->touched === 'yes'
+                ? $q->where(fn ($w) => $w->has('meetings')->orHas('followUps'))
+                : $q->whereDoesntHave('meetings')->whereDoesntHave('followUps'))
             ->latest()
             ->paginate(15)
             ->withQueryString();
