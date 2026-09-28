@@ -200,6 +200,42 @@
                 </div>
 
                 <div class="mt-1 pt-1 border-t">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Riwayat Meeting & Follow Up') }}</label>
+                        @can('manage-sales')
+                            <div class="flex gap-2">
+                                <a href="{{ route('sales.meetings.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}"
+                                   class="px-3 py-1.5 text-xs rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium transition">{{ __('+ Meeting') }}</a>
+                                <a href="{{ route('sales.follow-ups.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}"
+                                   class="px-3 py-1.5 text-xs rounded-lg bg-green-100 hover:bg-green-200 text-green-700 font-medium transition">{{ __('+ Follow Up') }}</a>
+                            </div>
+                        @endcan
+                    </div>
+                    <div class="mt-3 space-y-2">
+                        @forelse($timeline ?? [] as $item)
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
+                                <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 {{ $item['type'] === 'meeting' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                    {{ $item['title'] }}
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-slate-800 dark:text-slate-100 line-clamp-2">{{ $item['summary'] ?: '-' }}</p>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ $item['date'] ? \Carbon\Carbon::parse($item['date'])->format('d M Y') : '-' }}
+                                        @if($item['by']) • {{ $item['by'] }} @endif
+                                    </p>
+                                </div>
+                                @if($item['url'])
+                                    <a href="{{ $item['url'] }}"
+                                       class="shrink-0 px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">{{ __('Detail') }}</a>
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-slate-500">{{ __('Belum ada meeting atau follow up untuk lead ini.') }}</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="mt-1 pt-1 border-t">
                     <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Dokumentasi Instalasi (Read-Only)') }}</label>
                     <p class="mt-1 text-sm text-slate-500">{{ __('Dokumen dari project terkait customer ini (diunggah Tim Teknisi)') }}</p>
 

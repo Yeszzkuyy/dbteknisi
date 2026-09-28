@@ -410,11 +410,31 @@ class LeadController extends Controller
     {
         $this->authorize('view', $lead);
 
-        $lead->load(['customer', 'partner', 'activities.user', 'customer.projects.documents']);
+        $lead->load(['customer', 'partner', 'activities.user', 'customer.projects.documents', 'meetings.creator', 'followUps.creator']);
         $documents = $lead->customer->projects->flatMap->documents;
         $projectStatuses = ProjectStatus::orderBy('sort_order')->get(['id', 'name']);
         $workTypes = WorkType::orderBy('name')->get(['id', 'name']);
-        return view('leads.show', compact('lead', 'documents', 'projectStatuses', 'workTypes'));
+
+        // Riwayat gabungan meeting + follow-up milik lead ini, terbaru dulu.
+        // Link detail hanya untuk yang boleh manage-sales (role sales memilikinya).
+        $canOpenDetail = auth()->user()?->can('manage-sales');
+        $timeline = $lead->meetings->map(fn ($m) => [
+            'type' => 'meeting',
+            'date' => $m->meeting_date,
+            'title' => __('Meeting'),
+            'summary' => $m->user_needs ?: $m->notes,
+            'by' => $m->creator?->name,
+            'url' => $canOpenDetail ? route('sales.meetings.show', $m) : null,
+        ])->concat($lead->followUps->map(fn ($f) => [
+            'type' => 'follow-up',
+            'date' => $f->follow_up_date ?? $f->created_at,
+            'title' => __('Follow Up'),
+            'summary' => $f->description,
+            'by' => $f->creator?->name,
+            'url' => $canOpenDetail ? route('sales.follow-ups.show', $f) : null,
+        ]))->sortByDesc('date')->values();
+
+        return view('leads.show', compact('lead', 'documents', 'projectStatuses', 'workTypes', 'timeline'));
     }
 
     public function edit(Lead $lead)
