@@ -25,7 +25,7 @@
     // Indeks anak aktif per grup (-1 = tidak ada) untuk garis reach accent.
     $managementIdx = request()->routeIs('manage-sales.activity-log') ? 4 : (request()->routeIs('manage-sales*') ? 0 : (request()->routeIs('manage.marketing*') ? 1 : (request()->routeIs('manage.technical*') ? 2 : (request()->routeIs('manage.admin*') ? 3 : -1))));
     $teknisiIdx = request()->routeIs('teknisi.dashboard*') ? 0 : (request()->routeIs('projects*') ? 1 : (request()->routeIs('teknisi.jadwal*') ? 2 : (request()->routeIs('teknisi.surveys*') ? 3 : (request()->routeIs('teknisi.sizing-projects*') ? 4 : (request()->routeIs('teknisi.request-hargas*') ? 5 : (request()->routeIs('teknisi.instalasis*') ? 6 : (request()->routeIs('teknisi.documents*') ? 7 : -1)))))));
-    $marketingIdx = request()->routeIs('marketing.dashboard') ? 0 : (request()->routeIs('whatsapp-center*') ? 1 : (request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 2 : (request()->routeIs('leads.pipeline') ? 3 : (request()->routeIs('partners*') ? 4 : (request()->routeIs('leads.activities') ? 5 : (request()->routeIs('leads.monitoring') ? 6 : -1))))));
+    $marketingIdx = request()->routeIs('marketing.dashboard') ? 0 : (request()->routeIs('whatsapp-center*') ? 1 : (request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 2 : (request()->routeIs('partners*') ? 3 : (request()->routeIs('leads.activities') ? 4 : (request()->routeIs('leads.monitoring') ? 5 : -1)))));
     $salesIdx = request()->routeIs('sales.my-leads') ? 0 : (request()->routeIs('sales.meetings.*') ? 1 : (request()->routeIs('sales.follow-ups.*') ? 2 : (request()->routeIs('leads.pipeline') ? 3 : (request()->routeIs('projects*') ? 4 : -1))));
     $adminIdx = request()->routeIs('admin.invoices.*') ? 0 : (request()->routeIs('admin.pos.*') ? 1 : (request()->routeIs('admin.payments.*') ? 2 : -1));
     $adminPanelIdx = request()->routeIs('admin-panel.index') ? 0 : (request()->routeIs('admin-panel.account-managers.*') ? 1 : (request()->routeIs('admin-panel.work-types.*') ? 2 : (request()->routeIs('admin-panel.document-categories.*') ? 3 : (request()->routeIs('admin-panel.project-statuses.*') ? 4 : (request()->routeIs('admin-panel.audit-log') ? 5 : -1)))));
@@ -247,7 +247,7 @@
 
                         {{-- Marketing --}}
                         @can('view-marketing')
-                            @php($mktCount = 6 + ($hasMarketingMonitoring ? 1 : 0))
+                            @php($mktCount = 5 + ($hasMarketingMonitoring ? 1 : 0))
                             <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="branched"{{ $marketingActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="marketing" data-bm-active="{{ $marketingIdx }}">
                                 <div class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
