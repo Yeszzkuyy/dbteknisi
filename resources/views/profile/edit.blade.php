@@ -23,10 +23,10 @@
                     <button type="button" @click="$refs.avatar.click()"
                             class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                             aria-label="{{ __('Ubah foto profil') }}">
-                        {{-- Border running khusus Yeski --}}
+                        {{-- Border running khusus Yeski: dua warna tema saling mengejar --}}
                         @if($isYeski)
                             <span aria-hidden="true" title="{{ __('Founder') }}"
-                                  class="absolute -inset-1.5 rounded-full bg-[conic-gradient(from_0deg,#f59e0b,#ec4899,#8b5cf6,#22d3ee,#f59e0b)] animate-spin [animation-duration:3s] motion-reduce:animate-none"></span>
+                                  class="absolute -inset-1.5 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,transparent_100deg,rgb(var(--accent-300))_180deg,transparent_280deg,rgb(var(--accent-500))_360deg)] shadow-[0_0_12px_2px_rgb(var(--accent-500)/0.45)]"></span>
                         @endif
                         <img x-show="preview" x-cloak :src="preview" alt="{{ __('Foto profil') }}"
                              class="relative h-24 w-24 rounded-full object-cover ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'ring-slate-900/80' : ($secure ? 'ring-green-300 dark:ring-green-800' : 'ring-red-300 dark:ring-red-800') }}">
@@ -43,9 +43,6 @@
                         <span class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-accent-600 text-white shadow-lg ring-2 ring-white dark:ring-slate-800">
                             <x-icon name="camera" class="h-4 w-4" />
                         </span>
-                        {{-- Dot status keamanan password: hijau = sudah diganti, merah = masih bawaan --}}
-                        <span class="absolute -right-1 -top-1 h-5 w-5 rounded-full {{ $secure ? 'bg-green-500' : 'bg-red-500' }} ring-2 ring-white dark:ring-slate-800"
-                              title="{{ $secure ? __('Akun aman — password sudah diganti') : __('Belum aman — password masih bawaan, segera diganti') }}"></span>
                     </button>
 
                     <input type="file" x-ref="avatar" name="avatar" class="hidden"
@@ -63,13 +60,11 @@
                     </div>
                     <div>
                         @if($secure)
-                            <span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-green-700 dark:bg-green-900/40 dark:text-green-300">
-                                <span class="h-2 w-2 rounded-full bg-green-500"></span>
+                            <span class="inline-flex items-center rounded-full bg-green-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-green-700 dark:bg-green-900/40 dark:text-green-300">
                                 {{ __('Akun aman') }}
                             </span>
                         @else
-                            <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-red-700 dark:bg-red-900/40 dark:text-red-300">
-                                <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                            <span class="inline-flex items-center rounded-full bg-red-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-red-700 dark:bg-red-900/40 dark:text-red-300">
                                 {{ __('Password belum diganti') }}
                             </span>
                         @endif

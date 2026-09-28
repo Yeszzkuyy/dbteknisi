@@ -12,20 +12,19 @@
     $canZoom = $photoUrl !== null && $clickable !== false;
     // Border animasi khusus founder (Yeski) — tampil di semua pemakaian komponen.
     $running = (bool) ($user?->hasAnimatedAvatarBorder() ?? false);
-    // Dekorasi ala akun Google: ring biru + dot hijau untuk semua.
-    // Mode security (avatar sendiri / list admin): merah bila password masih bawaan.
+    // Ring + glow mengikuti status: hijau = aman, merah = password masih bawaan.
+    // Mode non-security (feed/list umum): selalu hijau dekoratif.
     $secure = ! $security || (bool) ($user?->hasSecurePassword() ?? false);
     $ring = $secure ? 'ring-green-500 dark:ring-green-400' : 'ring-red-500 dark:ring-red-400';
-    $dot = $secure ? 'bg-green-500' : 'bg-red-500';
-    $dotTitle = $secure ? __('Akun aman') : __('Password belum diganti — segera diganti');
     // Hover berupa glow mengikuti status, bukan ring statis.
     $glow = $secure ? 'hover:shadow-green-500/50' : 'hover:shadow-red-500/50';
 @endphp
 
 <span class="relative inline-flex shrink-0 self-center aspect-square items-center justify-center">
 @if ($running)
+    {{-- Dua warna tema saling mengejar (looping), mengikuti html[data-theme] + dark mode --}}
     <span aria-hidden="true"
-          class="absolute -inset-1 rounded-full bg-[conic-gradient(from_0deg,#f59e0b,#ec4899,#8b5cf6,#22d3ee,#f59e0b)] animate-spin [animation-duration:3s] motion-reduce:animate-none"></span>
+          class="absolute -inset-1 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,transparent_100deg,rgb(var(--accent-300))_180deg,transparent_280deg,rgb(var(--accent-500))_360deg)] shadow-[0_0_12px_2px_rgb(var(--accent-500)/0.45)]"></span>
 @endif
 @if ($canZoom)
     <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="80" height="80" loading="lazy" decoding="async"
@@ -41,5 +40,4 @@
         <span class="{{ $text }} font-semibold">{{ strtoupper(substr($user?->name ?? '?', 0, 1)) }}</span>
     </div>
 @endif
-    <span class="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full {{ $dot }} ring-2 ring-white dark:ring-slate-800" title="{{ $dotTitle }}"></span>
 </span>
