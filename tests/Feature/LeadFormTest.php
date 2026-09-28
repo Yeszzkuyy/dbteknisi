@@ -197,6 +197,27 @@ class LeadFormTest extends TestCase
             ->assertSee(__('Log Aktivitas Lead'));
     }
 
+    public function test_show_renders_without_raw_blade_directives(): void
+    {
+        $customer = Customer::create(['name' => 'PT Render Uji']);
+        $lead = Lead::create([
+            'customer_id' => $customer->id,
+            'pt_group' => 'NTI',
+            'segment' => 'vendor',
+            'incoming_date' => now()->toDateString(),
+            'status' => 'new',
+        ]);
+
+        $this->actingAs($this->marketingUser())
+            ->get(route('leads.show', $lead))
+            ->assertOk()
+            ->assertSee('PT Render Uji')
+            ->assertDontSee('@if($canConvert', false)
+            ->assertDontSee('@can(', false)
+            ->assertDontSee('@csrf', false)
+            ->assertDontSee('<?php(', false);
+    }
+
     public function test_segment_is_required_and_validated(): void
     {
         $customer = Customer::create(['name' => 'PT Lama']);
