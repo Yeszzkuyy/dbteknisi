@@ -136,18 +136,13 @@
             filter: blur(90px);
             pointer-events: none;
         }
-        .nx-wave {
-            display: none;
+        .nx-sea {
             position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            width: 120px;
+            inset: 0;
+            width: 100%;
             height: 100%;
             pointer-events: none;
         }
-        @media (min-width: 1024px) { .nx-wave { display: block; } }
-        @media (min-width: 1280px) { .nx-wave { width: 170px; } }
 
         .nx-brand-inner { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; }
         @media (min-width: 1024px) { .nx-brand-inner { justify-content: space-between; } }
@@ -304,17 +299,12 @@
                 from { opacity: 0; transform: translateY(16px); }
                 to { opacity: 1; transform: translateY(0); }
             }
-            @keyframes nx-wave-drift {
-                0%, 100% { transform: translateX(0); }
-                50% { transform: translateX(5px); }
-            }
             @keyframes nx-glow-breathe {
                 0%, 100% { opacity: 0.55; }
                 50% { opacity: 0.9; }
             }
             .nx-rise { animation: nx-rise 0.65s cubic-bezier(0.32, 0.72, 0, 1) both; }
             .nx-rise-late { animation: nx-rise 0.65s cubic-bezier(0.32, 0.72, 0, 1) 0.16s both; }
-            .nx-wave { animation: nx-wave-drift 10s ease-in-out infinite; }
             .nx-brand-glow { animation: nx-glow-breathe 9s ease-in-out infinite; }
         }
 
@@ -334,12 +324,8 @@
     <main class="nx-card nx-rise">
         <div class="nx-flex">
             <section class="nx-brand" aria-label="Product">
+                <canvas class="nx-sea" aria-hidden="true"></canvas>
                 <div class="nx-brand-glow" aria-hidden="true"></div>
-                <svg class="nx-wave" viewBox="0 0 170 640" preserveAspectRatio="none" aria-hidden="true">
-                    <path d="M64 0c46 74-32 148 22 224s-26 150 28 226c34 48 16 96 4 190H170V0Z" fill="rgba(255,255,255,0.14)" />
-                    <path d="M96 0c44 70-28 146 24 222s-24 152 28 228c32 48 14 96 2 190H170V0Z" fill="rgba(255,255,255,0.34)" />
-                    <path d="M128 0c38 66-24 144 26 220s-22 154 26 230c28 46 10 96 0 190H170V0Z" fill="var(--nx-card)" />
-                </svg>
 
                 <div class="nx-brand-inner">
                     <div class="nx-brand-top">
@@ -371,5 +357,113 @@
             </div>
         </div>
     </main>
+    <script>
+        // ponytail: laut 3D panel brand — 3 lapis ombak ambient + bibir pantai
+        // berdenyut di tepi kanan (desktop). Satu frame statis bila reduced-motion.
+        (() => {
+            const canvas = document.querySelector('.nx-sea');
+            const host = canvas ? canvas.closest('.nx-brand') : null;
+            if (!canvas || !host || !canvas.getContext) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            const css = getComputedStyle(document.documentElement);
+            const card = (css.getPropertyValue('--nx-card') || '#ffffff').trim();
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const desktop = window.matchMedia('(min-width: 1024px)');
+            const wide = window.matchMedia('(min-width: 1280px)');
+
+            let W = 0, H = 0, raf = 0;
+
+            const size = () => {
+                const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+                const r = host.getBoundingClientRect();
+                W = Math.max(1, Math.round(r.width));
+                H = Math.max(1, Math.round(r.height));
+                canvas.width = Math.round(W * dpr);
+                canvas.height = Math.round(H * dpr);
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            };
+
+            // y permukaan ombak: jumlah 2 sinus (kedalaman via frekuensi/beda fase)
+            const surf = (x, t, wl, a1, a2, sp, ph) =>
+                Math.sin((x / wl) * Math.PI * 2 + t * sp + ph) * a1 +
+                Math.sin((x / (wl * 0.37)) * Math.PI * 2 - t * sp * 1.6 + ph * 2) * a2;
+
+            const layer = (t, base, amp, wl, sp, ph, top, glow) => {
+                ctx.beginPath();
+                ctx.moveTo(0, H);
+                for (let x = 0; x <= W; x += 4) {
+                    ctx.lineTo(x, base + surf(x, t, wl, amp, amp * 0.45, sp, ph));
+                }
+                ctx.lineTo(W, H);
+                ctx.closePath();
+                const g = ctx.createLinearGradient(0, base - amp * 2, 0, H);
+                g.addColorStop(0, top);
+                g.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = g;
+                ctx.fill();
+                // sorotan puncak: garis cahaya + blur = kesan 3D
+                ctx.beginPath();
+                for (let x = 0; x <= W; x += 4) {
+                    const y = base + surf(x, t, wl, amp, amp * 0.45, sp, ph);
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = glow;
+                ctx.lineWidth = 1.5;
+                ctx.shadowColor = 'rgba(255,255,255,0.8)';
+                ctx.shadowBlur = 12;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            };
+
+            // bibir pantai di tepi kanan: punggung berdenyut berisi warna kartu + 2 gema putih
+            const shore = (t, edgeW, lag, fill) => {
+                ctx.beginPath();
+                ctx.moveTo(W, 0);
+                for (let y = 0; y <= H; y += 6) {
+                    const x = W - edgeW
+                        + Math.sin((y / H) * Math.PI * 2.2 + t * 0.7 + lag) * 16
+                        + Math.sin((y / H) * Math.PI * 5.1 - t * 1.1 + lag * 2) * 7;
+                    ctx.lineTo(x, y);
+                }
+                ctx.lineTo(W, H);
+                ctx.closePath();
+                ctx.fillStyle = fill;
+                ctx.fill();
+            };
+
+            const frame = (now) => {
+                const t = now / 1000;
+                ctx.clearRect(0, 0, W, H);
+                // jauh -> dekat: redup, cepat, dan makin terang
+                layer(t, H * 0.60, 10, W * 0.9, 0.35, 0.0, 'rgba(255,255,255,0.07)', 'rgba(255,255,255,0.18)');
+                layer(t, H * 0.72, 14, W * 0.65, 0.55, 1.7, 'rgba(48,175,248,0.14)', 'rgba(255,255,255,0.28)');
+                layer(t, H * 0.84, 18, W * 0.5, 0.8, 3.4, 'rgba(255,255,255,0.13)', 'rgba(255,255,255,0.4)');
+                if (desktop.matches) {
+                    const edgeW = wide.matches ? 170 : 120;
+                    shore(t, edgeW + 60, 2.1, 'rgba(255,255,255,0.14)');
+                    shore(t, edgeW + 30, 1.1, 'rgba(255,255,255,0.34)');
+                    shore(t, edgeW, 0.0, card);
+                }
+                if (!reduce && !document.hidden) raf = requestAnimationFrame(frame);
+            };
+
+            const kick = () => {
+                if (raf) cancelAnimationFrame(raf);
+                raf = 0;
+                if (reduce) { frame(1200); return; }
+                raf = requestAnimationFrame(frame);
+            };
+
+            size();
+            kick();
+            new ResizeObserver(() => { size(); if (reduce || !raf) kick(); }).observe(host);
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; }
+                else kick();
+            });
+        })();
+    </script>
 </body>
 </html>
