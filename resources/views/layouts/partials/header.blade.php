@@ -168,7 +168,7 @@
         <div class="relative" x-data="{ open: false }">
             {{-- Avatar --}}
             <button @click="open = !open"
-                    class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg {{ (auth()->user()?->hasSecurePassword() ?? true) ? 'hover:shadow-green-500/50' : 'hover:shadow-red-500/50' }} active:scale-95 shrink-0">
+                    class="flex items-center justify-center rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg {{ (auth()->user()?->hasSecurePassword() ?? true) ? 'hover:shadow-accent-500/50' : 'hover:shadow-red-500/50' }} active:scale-95 shrink-0">
                 <x-user-avatar :user="auth()->user()" size="w-10 h-10" text="text-sm" :clickable="false" :security="true" />
             </button>
 

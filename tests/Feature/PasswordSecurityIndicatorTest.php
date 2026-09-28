@@ -127,7 +127,7 @@ class PasswordSecurityIndicatorTest extends TestCase
         );
 
         // Cukup warna ring: hijau meski password masih bawaan, tanpa dot
-        $this->assertStringContainsString('ring-green-500', $html);
+        $this->assertStringContainsString('ring-accent-500', $html);
         $this->assertStringNotContainsString('ring-red-500', $html);
         $this->assertStringNotContainsString('-right-0.5 -top-0.5', $html);
     }
@@ -142,7 +142,7 @@ class PasswordSecurityIndicatorTest extends TestCase
             ['user' => $user]
         );
 
-        $this->assertStringContainsString('hover:shadow-green-500/50', $html);
+        $this->assertStringContainsString('hover:shadow-accent-500/50', $html);
         $this->assertStringNotContainsString('hover:ring-accent-300', $html);
     }
 
@@ -163,7 +163,7 @@ class PasswordSecurityIndicatorTest extends TestCase
             '<x-user-avatar :user="$user" size="w-10 h-10" :security="true" />',
             ['user' => $user->fresh()]
         );
-        $this->assertStringContainsString('ring-green-500', $green);
+        $this->assertStringContainsString('ring-accent-500', $green);
         $this->assertStringNotContainsString('ring-red-500', $green);
     }
 
@@ -178,7 +178,7 @@ class PasswordSecurityIndicatorTest extends TestCase
         );
 
         $this->assertStringNotContainsString('ring-red-500', $html);
-        $this->assertStringNotContainsString('ring-green-500', $html);
+        $this->assertStringNotContainsString('ring-accent-500', $html);
         $this->assertStringContainsString('conic-gradient', $html);
     }
 }
