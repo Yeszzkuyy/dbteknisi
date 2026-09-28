@@ -33,11 +33,24 @@ class ManageMenuTest extends TestCase
 
     public function test_non_management_roles_cannot_open_manage_placeholders(): void
     {
-        foreach (['marketing', 'sales', 'teknisi'] as $role) {
+        foreach (['marketing', 'sales', 'technician', 'lead-technician', 'ceo'] as $role) {
             $this->actingAs($this->loginAs($role));
 
             foreach (['manage.marketing.index', 'manage.technical.index', 'manage.admin.index'] as $route) {
                 $this->get(route($route))->assertForbidden();
+            }
+        }
+    }
+
+    public function test_hub_roles_can_open_manage_placeholders(): void
+    {
+        foreach (['management', 'manage-marketing', 'manage-technical', 'manage-admin'] as $role) {
+            $this->actingAs($this->loginAs($role));
+
+            foreach (['manage.marketing.index', 'manage.technical.index', 'manage.admin.index'] as $route) {
+                $this->get(route($route))
+                    ->assertOk()
+                    ->assertSee(__('Dalam Pengembangan'));
             }
         }
     }

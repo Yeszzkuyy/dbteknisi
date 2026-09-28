@@ -42,7 +42,7 @@ class GetProjectDetailsTest extends TestCase
 
     public function test_authorized_user_gets_project_details(): void
     {
-        $teknisi = $this->userWithRole('teknisi');
+        $teknisi = $this->userWithRole('technician');
         $this->actingAs($teknisi);
         $project = $this->makeProject();
 
@@ -65,7 +65,7 @@ class GetProjectDetailsTest extends TestCase
 
     public function test_project_id_is_required(): void
     {
-        $teknisi = $this->userWithRole('teknisi');
+        $teknisi = $this->userWithRole('technician');
 
         $result = (string) (new GetProjectDetails($teknisi))->handle(new Request);
 
@@ -74,7 +74,7 @@ class GetProjectDetailsTest extends TestCase
 
     public function test_nonexistent_project_returns_not_found(): void
     {
-        $teknisi = $this->userWithRole('teknisi');
+        $teknisi = $this->userWithRole('technician');
 
         $result = (string) (new GetProjectDetails($teknisi))->handle(new Request(['project_id' => 9999]));
 

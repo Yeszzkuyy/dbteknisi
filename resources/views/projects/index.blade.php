@@ -7,7 +7,7 @@
             <p class="text-slate-500 mt-1">Semua project, termasuk yang selesai atau di-hold</p>
         </div>
         <div class="flex gap-2">
-            @can('manage-teknisi')
+            @can('manage-technician')
                 <x-icon-button as="a" icon="add" href="{{ route('projects.create') }}" title="{{ __('Tambah Project') }}" />
             @endcan
         </div>
@@ -79,7 +79,7 @@
                                              class="hidden h-5 w-5 group-hover/btn:block" />
                                         <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                     </a>
-                                    @can('manage-teknisi')
+                                    @can('manage-technician')
                                         <a href="{{ route('projects.edit', $project) }}"
                                            title="{{ __('Edit project') }}"
                                            aria-label="{{ __('Edit project') }}"

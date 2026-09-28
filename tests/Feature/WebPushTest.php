@@ -81,7 +81,7 @@ class WebPushTest extends TestCase
         $owner = User::factory()->create();
         $owner->assignRole('management');
         $tech = User::factory()->create();
-        $tech->assignRole('teknisi');
+        $tech->assignRole('technician');
 
         TechnicianSchedule::create([
             'user_id' => $owner->id,

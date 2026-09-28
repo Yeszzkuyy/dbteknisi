@@ -52,7 +52,7 @@ class SecurityAccessTest extends TestCase
 
     /**
      * Dokumen project hanya boleh diakses divisi yang punya akses project
-     * (view-teknisi/manage-teknisi/view-sales). Marketing dilarang.
+     * (view-technician/manage-technician/view-sales). Marketing dilarang.
      */
     public function test_marketing_cannot_download_project_document(): void
     {
@@ -69,7 +69,7 @@ class SecurityAccessTest extends TestCase
      */
     public function test_teknisi_can_download_project_document(): void
     {
-        $u = $this->loginAs('teknisi');
+        $u = $this->loginAs('technician');
         $doc = $this->makeProjectDocument($u);
 
         $this->actingAs($u)->get(route('project-documents.download', $doc))->assertOk();
@@ -92,7 +92,7 @@ class SecurityAccessTest extends TestCase
      */
     public function test_teknisi_can_upload_project_document(): void
     {
-        $u = $this->loginAs('teknisi');
+        $u = $this->loginAs('technician');
         $this->actingAs($u);
         $customer = Customer::create(['name' => 'PT Upload']);
         $workType = \App\Models\WorkType::create(['name' => 'Instalasi']);
@@ -157,7 +157,7 @@ class SecurityAccessTest extends TestCase
      */
     public function test_dangerous_file_extensions_rejected(): void
     {
-        $u = $this->loginAs('teknisi');
+        $u = $this->loginAs('technician');
         $this->actingAs($u);
         $customer = Customer::create(['name' => 'PT Bahaya']);
         $workType = \App\Models\WorkType::create(['name' => 'Instalasi']);
@@ -182,7 +182,7 @@ class SecurityAccessTest extends TestCase
      */
     public function test_unallowed_extension_rejected(): void
     {
-        $u = $this->loginAs('teknisi');
+        $u = $this->loginAs('technician');
         $this->actingAs($u);
         $customer = Customer::create(['name' => 'PT Batas']);
         $workType = \App\Models\WorkType::create(['name' => 'Instalasi']);
@@ -205,7 +205,7 @@ class SecurityAccessTest extends TestCase
      */
     public function test_valid_document_still_accepted(): void
     {
-        $u = $this->loginAs('teknisi');
+        $u = $this->loginAs('technician');
         $this->actingAs($u);
         $customer = Customer::create(['name' => 'PT Valid']);
         $workType = \App\Models\WorkType::create(['name' => 'Instalasi']);

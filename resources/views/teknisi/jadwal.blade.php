@@ -50,7 +50,7 @@
     :projects="$projects"
     :technicians="$technicians"
     :connected="$connected"
-    :can-manage="auth()->user()->can('manage-teknisi')"
+    :can-manage="auth()->user()->can('manage-technician')"
     :old-data="$oldData"
 />
 </x-app-layout>

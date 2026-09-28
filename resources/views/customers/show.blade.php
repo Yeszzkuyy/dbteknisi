@@ -213,7 +213,7 @@
                 {{-- TAB 2: PROJECTS --}}
                 <div x-show="tab === 'projects'" x-transition>
                     <x-section-header title="{{ __('Daftar Project') }}">
-                        @can('manage-teknisi')
+                        @can('manage-technician')
                             <x-add-button href="{{ route('projects.create', ['customer_id' => $customer->id]) }}">
                                 {{ __('+ Tambah Project') }}
                             </x-add-button>
@@ -261,11 +261,11 @@
                                             <div class="flex flex-wrap justify-end items-center gap-x-3 gap-y-1">
                                                 <a href="{{ route('projects.show', $project) }}"
                                                    class="text-accent-600 hover:text-accent-800 text-sm whitespace-nowrap">Detail</a>
-                                                @can('manage-teknisi')
+                                                @can('manage-technician')
                                                     <a href="{{ route('projects.edit', $project) }}"
                                                        class="text-amber-600 hover:text-amber-800 text-sm whitespace-nowrap">Edit</a>
                                                 @endcan
-                                                @can('manage-teknisi')
+                                                @can('manage-technician')
                                                     <form action="{{ route('projects.destroy', $project) }}" method="POST"
                                                           onsubmit="return confirm('{{ __('Hapus project ini?') }}')" class="inline-block m-0">
                                                         @csrf @method('DELETE')
@@ -358,7 +358,7 @@
                         $firstProject = $customer->projects->first();
                     @endphp
                     <x-section-header title="{{ __('Dokumen') }}">
-                        @can('manage-teknisi')
+                        @can('manage-technician')
                             @if($firstProject)
                                 <x-add-button href="{{ route('project-documents.index', $firstProject) }}">
                                     {{ __('+ Kelola Dokumen') }}

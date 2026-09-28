@@ -20,7 +20,7 @@ class TechnicianDashboardTest extends TestCase
     {
         $this->seed(RoleAndPermissionSeeder::class);
         $user = User::factory()->create();
-        $user->givePermissionTo('view-teknisi');
+        $user->givePermissionTo('view-technician');
 
         return $user;
     }
@@ -44,9 +44,9 @@ class TechnicianDashboardTest extends TestCase
         $user = $this->authorizedUser();
 
         $naufal = User::factory()->create(['name' => 'Naufal']);
-        $naufal->assignRole('teknisi');
+        $naufal->assignRole('technician');
         $budi = User::factory()->create(['name' => 'Budi']);
-        $budi->assignRole('teknisi');
+        $budi->assignRole('technician');
 
         $open = ProjectStatus::create(['name' => 'Open', 'color' => 'blue', 'sort_order' => 1]);
         $done = ProjectStatus::create(['name' => 'Done', 'color' => 'green', 'sort_order' => 2]);
@@ -84,8 +84,8 @@ class TechnicianDashboardTest extends TestCase
         $user = $this->authorizedUser();
 
         $andi = User::factory()->create(['name' => 'Andi Pratama']);
-        $andi->assignRole('teknisi');
-        User::factory()->create(['name' => 'Sari'])->assignRole('teknisi');
+        $andi->assignRole('technician');
+        User::factory()->create(['name' => 'Sari'])->assignRole('technician');
 
         $open = ProjectStatus::create(['name' => 'Open', 'color' => 'blue', 'sort_order' => 1]);
 
@@ -114,7 +114,7 @@ class TechnicianDashboardTest extends TestCase
         $user = $this->authorizedUser();
 
         $inactive = User::factory()->create(['name' => 'Dedi']);
-        $inactive->assignRole('teknisi');
+        $inactive->assignRole('technician');
 
         $this->actingAs($user)
             ->get(route('teknisi.dashboard'))
