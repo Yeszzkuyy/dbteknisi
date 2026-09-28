@@ -27,9 +27,9 @@ unset PGPASSWORD
 cp "$APP_DIR/.env" "$WORK/.env"
 chmod 600 "$WORK/.env"
 
+# Video background statis & sudah di GitHub: tidak ikut paket harian.
 tar -czf - -C "$APP_DIR" \
     storage/app/public \
-    public/videos \
     public/images \
     -C "$WORK" db.dump .env \
     | openssl enc -aes-256-cbc -salt -pbkdf2 -pass "file:$PASS_FILE" -out "$PKG"
