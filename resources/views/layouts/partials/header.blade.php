@@ -169,7 +169,7 @@
             {{-- Avatar --}}
             <button @click="open = !open"
                     class="rounded-full hover:ring-2 hover:ring-accent-300 transition-all duration-300 hover:scale-105 active:scale-95 shrink-0">
-                <x-user-avatar :user="auth()->user()" size="w-10 h-10" text="text-sm" :clickable="false" />
+                <x-user-avatar :user="auth()->user()" size="w-10 h-10" text="text-sm" :clickable="false" :security="true" />
             </button>
 
             {{-- Dropdown Menu --}}
