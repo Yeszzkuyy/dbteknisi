@@ -276,22 +276,10 @@ tbody tr { transition: background-color 0.2s ease; }
         to   { opacity: 1; transform: none; }
     }
 
-    main > * { animation: rise 0.55s var(--ease-out) backwards; }
-    main > :nth-child(1) { animation-delay: 0.02s; }
-    main > :nth-child(2) { animation-delay: 0.08s; }
-    main > :nth-child(3) { animation-delay: 0.14s; }
-    main > :nth-child(4) { animation-delay: 0.2s; }
-    main > :nth-child(n+5) { animation-delay: 0.26s; }
-
-    /* Stat grid: kartu muncul bergiliran */
-    main > .grid > * { animation: rise 0.55s var(--ease-out) backwards; }
-    main > .grid > :nth-child(1) { animation-delay: 0.1s; }
-    main > .grid > :nth-child(2) { animation-delay: 0.17s; }
-    main > .grid > :nth-child(3) { animation-delay: 0.24s; }
-    main > .grid > :nth-child(4) { animation-delay: 0.31s; }
-
-    /* Reveal saat scroll (dipicu IntersectionObserver di layout) */
-    [data-reveal] {
+    /* Reveal saat scroll (dipicu IntersectionObserver di layout).
+       State awal hanya bila html.js — tanpa JS langsung tampil final,
+       dan konten di atas fold ditandai in-view sinkron agar tanpa kedip. */
+    html.js [data-reveal] {
         opacity: 0;
         transform: translateY(16px);
         transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);

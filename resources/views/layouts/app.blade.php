@@ -247,14 +247,21 @@
                 nav.scrollTop=+(sessionStorage.getItem('sidebar-scroll')||0);
                 if(!nav.dataset.bound){nav.dataset.bound='1';nav.addEventListener('scroll',function(){sessionStorage.setItem('sidebar-scroll',nav.scrollTop)});}
             }
-            // Reveal saat scroll — hormati prefers-reduced-motion
+            // Reveal saat scroll — hormati prefers-reduced-motion.
+            // Elemen yang sudah di viewport langsung in-view sinkron (tanpa
+            // tunggu callback observer) agar konten atas tidak kedip/pop-in.
             if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){
                 if(!window.__revealIO){
                     window.__revealIO=new IntersectionObserver(function(entries){
                         entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in-view');window.__revealIO.unobserve(en.target)}});
                     },{threshold:0.12});
                 }
-                document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function(el){window.__revealIO.observe(el)});
+                var vh=window.innerHeight||0;
+                document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function(el){
+                    var r=el.getBoundingClientRect();
+                    if(r.top<vh&&r.bottom>0){el.classList.add('in-view');}
+                    else{window.__revealIO.observe(el);}
+                });
             }else{
                 document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('in-view')});
             }
