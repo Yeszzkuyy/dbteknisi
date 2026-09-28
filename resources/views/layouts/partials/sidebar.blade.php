@@ -8,8 +8,8 @@
     $customerActive = request()->routeIs('customers*');
     $managementActive = request()->routeIs('manage-sales*') || request()->routeIs('manage.*');
     $technicianActive = request()->routeIs('projects*') || request()->routeIs('teknisi.*');
-    $marketingActive = request()->routeIs(['leads*', 'partners*', 'marketing.dashboard', 'whatsapp-center*']);
-    $salesActive = request()->routeIs('sales.*') || request()->routeIs('projects*');
+    $marketingActive = (request()->routeIs(['leads*', 'partners*', 'marketing.dashboard', 'whatsapp-center*']) && !request()->routeIs('leads.pipeline'));
+    $salesActive = request()->routeIs('sales.*') || request()->routeIs('projects*') || request()->routeIs('leads.pipeline');
     $adminActive = request()->routeIs('admin.invoices.*') || request()->routeIs('admin.pos.*') || request()->routeIs('admin.payments.*');
     $adminPanelActive = request()->routeIs('admin-panel*');
 
@@ -26,7 +26,7 @@
     $managementIdx = request()->routeIs('manage-sales.activity-log') ? 4 : (request()->routeIs('manage-sales*') ? 0 : (request()->routeIs('manage.marketing*') ? 1 : (request()->routeIs('manage.technical*') ? 2 : (request()->routeIs('manage.admin*') ? 3 : -1))));
     $teknisiIdx = request()->routeIs('teknisi.dashboard*') ? 0 : (request()->routeIs('projects*') ? 1 : (request()->routeIs('teknisi.jadwal*') ? 2 : (request()->routeIs('teknisi.surveys*') ? 3 : (request()->routeIs('teknisi.sizing-projects*') ? 4 : (request()->routeIs('teknisi.request-hargas*') ? 5 : (request()->routeIs('teknisi.instalasis*') ? 6 : (request()->routeIs('teknisi.documents*') ? 7 : -1)))))));
     $marketingIdx = request()->routeIs('marketing.dashboard') ? 0 : (request()->routeIs('whatsapp-center*') ? 1 : (request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 2 : (request()->routeIs('leads.pipeline') ? 3 : (request()->routeIs('partners*') ? 4 : (request()->routeIs('leads.activities') ? 5 : (request()->routeIs('leads.monitoring') ? 6 : -1))))));
-    $salesIdx = request()->routeIs('sales.my-leads') ? 0 : (request()->routeIs('sales.meetings.*') ? 1 : (request()->routeIs('sales.follow-ups.*') ? 2 : (request()->routeIs('projects*') ? 3 : -1)));
+    $salesIdx = request()->routeIs('sales.my-leads') ? 0 : (request()->routeIs('sales.meetings.*') ? 1 : (request()->routeIs('sales.follow-ups.*') ? 2 : (request()->routeIs('leads.pipeline') ? 3 : (request()->routeIs('projects*') ? 4 : -1))));
     $adminIdx = request()->routeIs('admin.invoices.*') ? 0 : (request()->routeIs('admin.pos.*') ? 1 : (request()->routeIs('admin.payments.*') ? 2 : -1));
     $adminPanelIdx = request()->routeIs('admin-panel.index') ? 0 : (request()->routeIs('admin-panel.account-managers.*') ? 1 : (request()->routeIs('admin-panel.work-types.*') ? 2 : (request()->routeIs('admin-panel.document-categories.*') ? 3 : (request()->routeIs('admin-panel.project-statuses.*') ? 4 : (request()->routeIs('admin-panel.audit-log') ? 5 : -1)))));
     $hasMarketingMonitoring = auth()->user()->can('monitor-marketing');
@@ -291,12 +291,6 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true"></span>
                                         <span>Lead / Opportunity</span>
                                     </a>
-                                    <a href="{{ route('leads.pipeline') }}"
-                                       aria-current="{{ request()->routeIs('leads.pipeline') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('leads.pipeline') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400" aria-hidden="true"></span>
-                                        <span>Pipeline</span>
-                                    </a>
                                     <a wire:navigate.hover href="{{ route('partners.index') }}"
                                        aria-current="{{ request()->routeIs('partners*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('partners*') ? $navActive : $navInactive }}">
@@ -325,7 +319,7 @@
 
                         {{-- Sales --}}
                         @can('view-sales')
-                            @php($salesCount = 3 + ($hasSalesProject ? 1 : 0))
+                            @php($salesCount = 4 + ($hasSalesProject ? 1 : 0))
                             <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="sales" data-bm-active="{{ $salesIdx }}">
                                 <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
@@ -368,6 +362,12 @@
                                        class="{{ $subNavLink }} {{ request()->routeIs('sales.follow-ups.*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
                                         <span>Follow Up</span>
+                                    </a>
+                                    <a wire:navigate.hover href="{{ route('leads.pipeline') }}"
+                                       aria-current="{{ request()->routeIs('leads.pipeline') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('leads.pipeline') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400" aria-hidden="true"></span>
+                                        <span>Pipeline</span>
                                     </a>
                                     @if(auth()->user()->can('view-teknisi') || auth()->user()->can('view-sales'))
                                         <a wire:navigate.hover href="{{ route('projects.index') }}"

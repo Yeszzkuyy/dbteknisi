@@ -5,14 +5,15 @@
             <p class="text-slate-500 mt-1">{{ __('Informasi lengkap lead / opportunity') }}</p>
         </div>
         <div class="flex gap-3">
-            @can('manage-marketing')
-                @if(!in_array($lead->status, ['won', 'lost']))
+            @php($canConvert = auth()->user()?->can('manage-marketing') || ((int) $lead->assigned_to === (int) auth()->id() && auth()->user()?->can('manage-sales')) || auth()->user()?->can('manage-teknisi') || auth()->user()?->can('manage-admin'))
+            @if($canConvert && !in_array($lead->status, ['won', 'lost']))
                     <button type="button"
                             onclick="openConvertModal()"
                             class="px-4 py-2.5 rounded-xl bg-green-100 hover:bg-green-200 text-green-700 text-sm font-medium transition">
                         {{ __('Konversi ke Project') }}
                     </button>
                 @endif
+            @can('manage-marketing')
                 <a href="{{ route('leads.edit', $lead) }}"
                    class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
                     Edit
@@ -26,7 +27,7 @@
                     </button>
                 </form>
             @endcan
-            <a href="{{ route('leads.index') }}"
+            <a href="{{ (auth()->user()->can('view-marketing') || auth()->user()->can('manage-marketing')) ? route('leads.index') : route('sales.my-leads') }}"
                class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
                 {{ __('Kembali') }}
             </a>
@@ -250,7 +251,7 @@
             </div>
 </x-app-layout>
 
-@can('manage-marketing')
+@if($canConvert ?? false)
 @if(!in_array($lead->status, ['won', 'lost']))
 <div id="convertModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
     <div class="flex min-h-full items-center justify-center p-4">
@@ -306,7 +307,7 @@
     </div>
 </div>
 @endif
-@endcan
+@endif
 
 <script>
     function openConvertModal() {

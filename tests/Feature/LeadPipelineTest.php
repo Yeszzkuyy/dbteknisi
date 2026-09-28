@@ -75,7 +75,7 @@ class LeadPipelineTest extends TestCase
         $this->assertSame('new', $lead->fresh()->status);
     }
 
-    public function test_sales_cannot_update_lead_status(): void
+    public function test_sales_cannot_update_unassigned_lead_status(): void
     {
         $user = $this->userWithRole('sales');
         $lead = $this->makeLead();
@@ -85,6 +85,18 @@ class LeadPipelineTest extends TestCase
             ->assertForbidden();
 
         $this->assertSame('new', $lead->fresh()->status);
+    }
+
+    public function test_sales_can_update_own_assigned_lead_status(): void
+    {
+        $user = $this->userWithRole('sales');
+        $lead = $this->makeLead(['assigned_to' => $user->id]);
+
+        $this->actingAs($user)
+            ->patch(route('leads.update-status', $lead), ['status' => 'contacted'])
+            ->assertNoContent();
+
+        $this->assertSame('contacted', $lead->fresh()->status);
     }
 
     public function test_dashboard_shows_marketing_stats(): void

@@ -6,12 +6,29 @@
         </div>
     </div>
 
+    <form method="GET" action="{{ route('sales.my-leads') }}" class="flex flex-wrap gap-3 mb-4">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Cari customer...') }}"
+               class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
+        <select name="status" onchange="this.form.submit()"
+                class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
+            <option value="">{{ __('Semua Status') }}</option>
+            @foreach($statuses ?? [] as $status)
+                <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+            @endforeach
+        </select>
+        @if(request('search') || request('status'))
+            <a href="{{ route('sales.my-leads') }}"
+               class="px-3 py-2 border border-slate-300 text-slate-700 hover:bg-white text-sm rounded-lg transition">{{ __('Reset') }}</a>
+        @endif
+    </form>
+
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
                 <thead class="bg-slate-50 dark:bg-slate-700">
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Lead / Customer</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Status') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Kebutuhan') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Solusi') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Progress FollowUp</th>
@@ -28,6 +45,9 @@
                                     @if($lead->pt_group)<span class="inline-flex px-1.5 py-0.5 rounded {{ \App\Models\Lead::PT_COLORS[$lead->pt_group] ?? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' }} text-[11px] font-semibold mr-1">{{ $lead->pt_group }}</span>@endif
                                     {{ $lead->customer->contact_person ? 'PIC: '.$lead->customer->contact_person : '' }}
                                 </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">{{ ucfirst($lead->status) }}</span>
                             </td>
                             <td class="px-6 py-4">
                                 @if($lead->kebutuhan)
@@ -57,21 +77,24 @@
                                     <span class="text-slate-400">-</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <a href="{{ route('sales.follow-ups.create', ['customer_id' => $lead->customer_id]) }}"
-                                   class="inline-flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-semibold transition shadow-sm hover:shadow-md hover:-translate-y-px active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300">
-                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-white/15">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                        </svg>
-                                    </span>
-                                    {{ __('Tambahkan Lead') }}
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <a href="{{ route('leads.show', $lead) }}"
+                                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold transition">
+                                    {{ __('Detail') }}
+                                </a>
+                                <a href="{{ route('sales.meetings.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}"
+                                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-semibold transition">
+                                    {{ __('Meeting') }}
+                                </a>
+                                <a href="{{ route('sales.follow-ups.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}"
+                                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 text-sm font-semibold transition">
+                                    {{ __('Follow Up') }}
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                                <td colspan="7" class="px-6 py-12 text-center text-slate-500">
                                 {{ __('Belum ada lead yang di-assign kepada Anda.') }}
                             </td>
                         </tr>

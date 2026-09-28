@@ -11,7 +11,7 @@ class SalesService
 {
     public function getMeetings(array $filters = [])
     {
-        $query = Meeting::with(['customer', 'creator', 'followUps']);
+        $query = Meeting::with(['customer', 'creator', 'followUps', 'lead']);
 
         if (!empty($filters['search'])) {
             $query->whereHas('customer', function ($q) use ($filters) {
@@ -30,6 +30,12 @@ class SalesService
         if (!empty($filters['customer_id'])) {
             $query->where('customer_id', $filters['customer_id']);
         }
+
+        if (!empty($filters['lead_id'])) {
+            $query->where('lead_id', $filters['lead_id']);
+        }
+
+        $this->scopeToOwnLeads($query);
 
         return $query->latest('meeting_date')->paginate(15);
     }
@@ -55,7 +61,7 @@ class SalesService
 
     public function getFollowUps(array $filters = [])
     {
-        $query = FollowUp::with(['customer', 'meeting', 'creator']);
+        $query = FollowUp::with(['customer', 'meeting', 'creator', 'lead']);
 
         if (!empty($filters['search'])) {
             $query->whereHas('customer', function ($q) use ($filters) {
@@ -66,6 +72,12 @@ class SalesService
         if (!empty($filters['customer_id'])) {
             $query->where('customer_id', $filters['customer_id']);
         }
+
+        if (!empty($filters['lead_id'])) {
+            $query->where('lead_id', $filters['lead_id']);
+        }
+
+        $this->scopeToOwnLeads($query);
 
         return $query->latest('follow_up_date')->paginate(15);
     }
@@ -97,5 +109,26 @@ class SalesService
     public function getCustomerFollowUps(Customer $customer)
     {
         return $customer->followUps()->with(['meeting', 'creator'])->latest('follow_up_date')->get();
+    }
+
+    /**
+     * Sales biasa hanya melihat meeting/follow-up dari lead miliknya
+     * (atau yang ia buat sendiri untuk data lama tanpa lead_id).
+     */
+    private function scopeToOwnLeads($query): void
+    {
+        $user = auth()->user();
+        if (!$user || !$user->hasRole('sales')) {
+            return;
+        }
+        if ($user->can('manage-marketing') || $user->can('manage-sales-leads')) {
+            return;
+        }
+
+        $userId = $user->id;
+        $query->where(function ($q) use ($userId) {
+            $q->whereHas('lead', fn ($l) => $l->where('assigned_to', $userId))
+                ->orWhere(fn ($w) => $w->whereNull('lead_id')->where('created_by', $userId));
+        });
     }
 }

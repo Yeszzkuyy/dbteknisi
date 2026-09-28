@@ -11,6 +11,7 @@ class Meeting extends Model
 
     protected $fillable = [
         'customer_id',
+        'lead_id',
         'meeting_date',
         'participants',
         'user_needs',
@@ -27,6 +28,11 @@ class Meeting extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class)->withTrashed();
+    }
+
+    public function lead()
+    {
+        return $this->belongsTo(Lead::class);
     }
 
     public function creator()
