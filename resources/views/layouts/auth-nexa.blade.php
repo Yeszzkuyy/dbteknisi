@@ -98,7 +98,7 @@
         .nx-flex { display: flex; flex-direction: column; height: 100%; }
         @media (min-width: 1024px) {
             .nx-flex { flex-direction: row; }
-            .nx-card { min-height: 580px; }
+            .nx-card { min-height: 640px; }
         }
 
         /* Panel brand */
