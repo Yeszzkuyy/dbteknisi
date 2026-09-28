@@ -174,7 +174,7 @@
                                             </svg>
                                         </button>
                                         <a href="{{ route('leads.attachments.download', [$lead, $doc]) }}" title="Download"
-                                           class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
+                                           class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
                                             </svg>
@@ -237,7 +237,7 @@
                                             @if($doc->is_image || $doc->is_pdf)
                                                 <a href="{{ route('leads.documents.preview', ['lead' => $lead->id, 'document' => $doc->id]) }}"
                                                    target="_blank"
-                                                   class="px-3 py-1.5 text-xs rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium transition">
+                                                   class="px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">
                                                     {{ __('Pratinjau') }}
                                                 </a>
                                             @endif
