@@ -97,4 +97,19 @@ class PasswordSecurityIndicatorTest extends TestCase
             ->assertOk()
             ->assertDontSee('conic-gradient', false);
     }
+
+    public function test_avatar_wrapper_stays_square_in_flex_contexts(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $yeski = User::factory()->create(['email' => 'yehezkielmayogi.ptnti@gmail.com']);
+
+        $html = \Illuminate\Support\Facades\Blade::render(
+            '<x-user-avatar :user="$user" size="w-10 h-10" />',
+            ['user' => $yeski]
+        );
+
+        // Wrapper anti-melar (penyebab avatar lonjong di list flex) + ring running tetap ada
+        $this->assertStringContainsString('self-center aspect-square', $html);
+        $this->assertStringContainsString('conic-gradient', $html);
+    }
 }
