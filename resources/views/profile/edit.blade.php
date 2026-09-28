@@ -14,6 +14,7 @@
         {{-- Kartu profil --}}
         <section class="rounded-2xl border border-slate-200/60 bg-white p-10 text-center shadow-lg sm:p-14 dark:border-slate-700/50 dark:bg-slate-800 dark:shadow-black/20">
                 @php($secure = $user->hasSecurePassword())
+                @php($isYeski = $user->email === 'yehezkielmayogi.ptnti@gmail.com')
                 <form method="POST" action="{{ route('profile.avatar.update') }}" enctype="multipart/form-data"
                       x-data="{ preview: @js($user->avatar ? asset('storage/' . $user->avatar) : null) }">
                     @csrf
@@ -22,11 +23,16 @@
                     <button type="button" @click="$refs.avatar.click()"
                             class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                             aria-label="{{ __('Ubah foto profil') }}">
+                        {{-- Border running khusus Yeski --}}
+                        @if($isYeski)
+                            <span aria-hidden="true" title="{{ __('Founder') }}"
+                                  class="absolute -inset-1.5 rounded-full bg-[conic-gradient(from_0deg,#f59e0b,#ec4899,#8b5cf6,#22d3ee,#f59e0b)] animate-spin [animation-duration:3s] motion-reduce:animate-none"></span>
+                        @endif
                         <img x-show="preview" x-cloak :src="preview" alt="{{ __('Foto profil') }}"
-                             class="h-24 w-24 rounded-full object-cover ring-4 shadow-lg lg:h-28 lg:w-28 {{ $secure ? 'ring-green-300 dark:ring-green-800' : 'ring-red-300 dark:ring-red-800' }}">
+                             class="relative h-24 w-24 rounded-full object-cover ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'ring-slate-900/80' : ($secure ? 'ring-green-300 dark:ring-green-800' : 'ring-red-300 dark:ring-red-800') }}">
                         <div x-show="!preview" x-cloak aria-hidden="true"
-                             class="flex h-24 w-24 items-center justify-center rounded-full ring-4 shadow-lg lg:h-28 lg:w-28 {{ $secure ? 'bg-green-100 ring-green-300 dark:bg-green-900/40 dark:ring-green-800' : 'bg-red-100 ring-red-300 dark:bg-red-900/40 dark:ring-red-800' }}">
-                            <span class="text-3xl font-bold lg:text-4xl {{ $secure ? 'text-green-600 dark:text-green-300' : 'text-red-600 dark:text-red-300' }}">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                             class="relative flex h-24 w-24 items-center justify-center rounded-full ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'bg-slate-900 ring-slate-900/80' : ($secure ? 'bg-green-100 ring-green-300 dark:bg-green-900/40 dark:ring-green-800' : 'bg-red-100 ring-red-300 dark:bg-red-900/40 dark:ring-red-800') }}">
+                            <span class="text-3xl font-bold lg:text-4xl {{ $isYeski ? 'text-amber-300' : ($secure ? 'text-green-600 dark:text-green-300' : 'text-red-600 dark:text-red-300') }}">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                         </div>
 
                         {{-- Overlay hover: gelap + ikon kamera --}}

@@ -64,4 +64,16 @@ class PasswordSecurityIndicatorTest extends TestCase
 
         $this->assertNull($user->fresh()->password_changed_at);
     }
+
+    public function test_yeski_gets_running_border(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $yeski = User::factory()->create(['email' => 'yehezkielmayogi.ptnti@gmail.com']);
+        $yeski->assignRole('super-admin');
+
+        $this->actingAs($yeski)
+            ->get(route('profile.edit'))
+            ->assertOk()
+            ->assertSee('conic-gradient', false);
+    }
 }
