@@ -47,6 +47,9 @@ class RoleAndPermissionSeeder extends Seeder
         // Hub Management: melihat & meng-assign lead + membuka placeholder Manage
         $permissions[] = 'manage-sales-leads';
 
+        // Inside Sales: mengerjakan task permintaan dari sales (bukan manage divisi)
+        $permissions[] = 'manage-inside-sales';
+
         foreach ($permissions as $name) {
             Permission::create(['name' => $name, 'guard_name' => 'web']);
         }
@@ -73,6 +76,9 @@ class RoleAndPermissionSeeder extends Seeder
         $mk('manage-marketing', ['manage-sales-leads', 'view-marketing', 'monitor-marketing', ...$common]);
         $mk('manage-technical', ['manage-sales-leads', 'view-technician', 'monitor-technical', ...$common]);
         $mk('manage-admin', ['manage-sales-leads', 'view-admin', ...$common]);
+
+        // Inside Sales: hanya task yang di-assign kepadanya (lead terlihat bila ada task)
+        $mk('inside-sales', ['manage-inside-sales', ...$common]);
 
         // CEO: semua view, tanpa manage (read-only; enforcement menyusul)
         $mk('ceo', ['view-marketing', 'view-sales', 'view-admin', 'view-technician', 'view-monitoring', ...$common]);

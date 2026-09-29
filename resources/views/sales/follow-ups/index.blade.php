@@ -17,11 +17,13 @@
             </div>
             <div>
                 <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Status') }}</label>
-                <select name="overdue" onchange="this.form.requestSubmit()"
-                        class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                    <option value="">{{ __('Semua') }}</option>
-                    <option value="1" @selected(request('overdue') === '1')>{{ __('Jatuh tempo') }}</option>
-                </select>
+                    <select name="overdue" onchange="this.form.requestSubmit()"
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                        <option value="">{{ __('Semua') }}</option>
+                        <option value="today" @selected(request('overdue') === 'today')>{{ __('Hari ini') }}</option>
+                        <option value="upcoming" @selected(request('overdue') === 'upcoming')>{{ __('Mendatang') }}</option>
+                        <option value="1" @selected(request('overdue') === '1')>{{ __('Jatuh tempo') }}</option>
+                    </select>
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit"

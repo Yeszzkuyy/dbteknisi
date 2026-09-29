@@ -11,6 +11,7 @@ use App\Http\Controllers\DocumentCategoryController;
 use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\KnowledgeBaseController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LeadTaskController;
 use App\Http\Controllers\ManageSalesController;
 use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\MonitoringController;
@@ -320,7 +321,7 @@ Route::middleware('auth')->group(function () {
     // /leads/activities dkk (route {lead} menelan segmen apa pun). Akses luas:
     // Marketing & Sales (+ teknisi/admin), sales di-scope ke own lead di policy.
     Route::get('/leads/{lead}', [LeadController::class, 'show'])
-        ->middleware('permission:view-marketing|manage-marketing|view-sales|manage-sales|manage-technician|manage-admin')
+        ->middleware('permission:view-marketing|manage-marketing|view-sales|manage-sales|manage-technician|manage-admin|manage-inside-sales')
         ->name('leads.show');
 
     // ============================================
@@ -369,6 +370,21 @@ Route::middleware('auth')->group(function () {
 
     // Lead milik sales (muncul di menu Sales)
     Route::middleware('permission:view-sales|manage-sales')->get('/sales/my-leads', [ManageSalesController::class, 'myLeads'])->name('sales.my-leads');
+
+    // ============================================
+    // INSIDE SALES TASK — request bantuan untuk lead
+    // ============================================
+    Route::middleware('permission:view-sales|manage-sales|manage-sales-leads|manage-inside-sales')
+        ->prefix('lead-tasks')->name('lead-tasks.')->group(function () {
+            Route::get('/', [LeadTaskController::class, 'index'])->name('index');
+            Route::get('/create', [LeadTaskController::class, 'create'])->name('create');
+            Route::post('/', [LeadTaskController::class, 'store'])->name('store');
+            Route::get('/{leadTask}', [LeadTaskController::class, 'show'])->name('show');
+            Route::get('/{leadTask}/edit', [LeadTaskController::class, 'edit'])->name('edit');
+            Route::put('/{leadTask}', [LeadTaskController::class, 'update'])->name('update');
+            Route::delete('/{leadTask}', [LeadTaskController::class, 'destroy'])->name('destroy');
+            Route::post('/{leadTask}/comments', [LeadTaskController::class, 'storeComment'])->name('comments.store');
+        });
 
     // ============================================
     // MONITORING — Manager & Super Admin

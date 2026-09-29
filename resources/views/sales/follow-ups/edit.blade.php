@@ -55,6 +55,19 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Jenis Follow Up') }}</label>
+                    <select name="type"
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                        <option value="">{{ __('-- Pilih jenis --') }}</option>
+                        @foreach(\App\Models\FollowUp::TYPES as $type)
+                            <option value="{{ $type }}" @selected(old('type', $followUp->type) === $type)>
+                                {{ \App\Models\FollowUp::typeLabel($type) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Deskripsi') }} <span class="text-red-500">*</span></label>
                     <textarea name="description" rows="4" required
                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('description', $followUp->description) }}</textarea>
@@ -63,6 +76,11 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Tanggal Follow Up') }}</label>
                     <x-datepicker name="follow_up_date" value="{{ old('follow_up_date', $followUp->follow_up_date?->format('Y-m-d')) }}"></x-datepicker>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Next Follow Up (opsional)') }}</label>
+                    <x-datepicker name="next_follow_up_date" value="{{ old('next_follow_up_date', $followUp->next_follow_up_date?->format('Y-m-d')) }}"></x-datepicker>
                 </div>
 
                 <div class="flex gap-3 pt-2">

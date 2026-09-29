@@ -26,8 +26,20 @@
                     <dd class="font-medium text-slate-800">{{ $followUp->customer?->name ?? '-' }}</dd>
                 </div>
                 <div>
+                    <dt class="text-xs text-slate-400">{{ __('Jenis') }}</dt>
+                    <dd class="font-medium text-slate-800">{{ $followUp->type ? \App\Models\FollowUp::typeLabel($followUp->type) : '-' }}</dd>
+                </div>
+                <div>
                     <dt class="text-xs text-slate-400">{{ __('Tanggal Follow Up') }}</dt>
                     <dd class="font-medium text-slate-800">{{ $followUp->follow_up_date ? $followUp->follow_up_date->format('d M Y') : '-' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-slate-400">{{ __('Next Follow Up') }}</dt>
+                    <dd class="font-medium text-slate-800">{{ $followUp->next_follow_up_date ? $followUp->next_follow_up_date->format('d M Y') : '-' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-slate-400">{{ __('Terkait Lead') }}</dt>
+                    <dd class="font-medium text-slate-800">{{ $followUp->lead?->customer?->name ?? '-' }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs text-slate-400">{{ __('Terkait Meeting') }}</dt>

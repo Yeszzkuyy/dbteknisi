@@ -17,6 +17,9 @@
                     <tr class="hover:bg-slate-50 transition">
                         <td class="px-6 py-4">
                             <span class="font-semibold text-slate-800">{{ $fu->customer?->name ?? '-' }}</span>
+                            @if($fu->type)
+                                <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-indigo-50 text-indigo-700">{{ \App\Models\FollowUp::typeLabel($fu->type) }}</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-slate-600 max-w-xs truncate">
                             {{ Str::limit($fu->description, 100) }}
@@ -28,6 +31,9 @@
                             {{ $fu->follow_up_date ? $fu->follow_up_date->format('d M Y') : '-' }}
                             @if($fu->follow_up_date && $fu->follow_up_date->isBefore(today()))
                                 <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-red-100 text-red-700">{{ __('Terlambat') }}</span>
+                            @endif
+                            @if($fu->next_follow_up_date)
+                                <span class="block mt-1 text-[11px] text-slate-500">{{ __('Berikutnya:') }} {{ $fu->next_follow_up_date->format('d M Y') }}</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-slate-600">{{ $fu->creator?->name ?? '-' }}</td>

@@ -418,8 +418,8 @@ class LeadController extends Controller
     {
         $this->authorize('view', $lead);
 
-        $lead->load(['customer', 'partner', 'activities.user', 'customer.projects.documents', 'meetings.creator', 'followUps.creator']);
-        $documents = $lead->customer->projects->flatMap->documents;
+        $lead->load(['customer', 'partner', 'assignee', 'tasks.assignee', 'activities.user', 'customer.projects.documents', 'meetings.creator', 'followUps.creator']);
+        $documents = $lead->customer ? $lead->customer->projects->flatMap->documents : collect();
         $projectStatuses = ProjectStatus::orderBy('sort_order')->get(['id', 'name']);
         $workTypes = WorkType::orderBy('name')->get(['id', 'name']);
 

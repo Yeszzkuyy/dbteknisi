@@ -64,6 +64,20 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Jenis Follow Up') }}</label>
+                    <select name="type"
+                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                        <option value="">{{ __('-- Pilih jenis --') }}</option>
+                        @foreach(\App\Models\FollowUp::TYPES as $type)
+                            <option value="{{ $type }}" @selected(old('type') === $type)>
+                                {{ \App\Models\FollowUp::typeLabel($type) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Deskripsi Follow Up') }} <span class="text-red-500">*</span></label>
                     <textarea name="description" rows="4" required
                               placeholder="{{ __('Jelaskan tindak lanjut yang dilakukan atau informasi tambahan dari user...') }}"
@@ -75,6 +89,12 @@
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Tanggal Follow Up') }}</label>
                     <x-datepicker name="follow_up_date" value="{{ old('follow_up_date', date('Y-m-d')) }}"></x-datepicker>
                     @error('follow_up_date') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Next Follow Up (opsional)') }}</label>
+                    <x-datepicker name="next_follow_up_date" value="{{ old('next_follow_up_date') }}"></x-datepicker>
+                    @error('next_follow_up_date') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="flex gap-3 pt-2">

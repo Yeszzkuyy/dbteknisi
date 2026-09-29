@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Meeting;
 use App\Models\FollowUp;
 use App\Models\Customer;
+use App\Models\LeadActivity;
 use Illuminate\Support\Facades\DB;
 
 class SalesService
@@ -44,7 +45,16 @@ class SalesService
     {
         return DB::transaction(function () use ($data) {
             $data['created_by'] = auth()->id();
-            return Meeting::create($data);
+            $meeting = Meeting::create($data);
+            if (!empty($meeting->lead_id)) {
+                LeadActivity::create([
+                    'lead_id' => $meeting->lead_id,
+                    'user_id' => auth()->id(),
+                    'action' => 'meeting_created',
+                ]);
+            }
+
+            return $meeting;
         });
     }
 
@@ -77,9 +87,17 @@ class SalesService
             $query->where('lead_id', $filters['lead_id']);
         }
 
+        // overdue: 1 = jatuh tempo (< hari ini, kompatibel link lama),
+        // today = hari ini, upcoming = setelah hari ini.
         if (!empty($filters['overdue'])) {
-            $query->whereNotNull('follow_up_date')
-                ->whereDate('follow_up_date', '<', today());
+            $query->whereNotNull('follow_up_date');
+            if ($filters['overdue'] === 'today') {
+                $query->whereDate('follow_up_date', today());
+            } elseif ($filters['overdue'] === 'upcoming') {
+                $query->whereDate('follow_up_date', '>', today());
+            } else {
+                $query->whereDate('follow_up_date', '<', today());
+            }
         }
 
         $this->scopeToOwnLeads($query);
@@ -91,7 +109,16 @@ class SalesService
     {
         return DB::transaction(function () use ($data) {
             $data['created_by'] = auth()->id();
-            return FollowUp::create($data);
+            $followUp = FollowUp::create($data);
+            if (!empty($followUp->lead_id)) {
+                LeadActivity::create([
+                    'lead_id' => $followUp->lead_id,
+                    'user_id' => auth()->id(),
+                    'action' => 'followup_created',
+                ]);
+            }
+
+            return $followUp;
         });
     }
 

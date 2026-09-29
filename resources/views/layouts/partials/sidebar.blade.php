@@ -89,7 +89,7 @@
                 </div>
             </section>
 
-            @canany(['manage-sales-leads', 'view-technician', 'view-marketing', 'view-sales', 'view-admin'])
+            @canany(['manage-sales-leads', 'view-technician', 'view-marketing', 'view-sales', 'view-admin', 'manage-inside-sales'])
                 <section aria-labelledby="sidebar-departments-label">
                     <p id="sidebar-departments-label" class="sidebar-hide px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Departments</p>
                     <div class="space-y-1">
@@ -432,6 +432,16 @@
                                     </div>
                                 </div>
                             </div>
+                        @endcan
+
+                        {{-- Inside Sales Task --}}
+                        @canany(['manage-inside-sales', 'manage-sales-leads'])
+                            <a wire:navigate.hover href="{{ route('lead-tasks.index') }}"
+                               aria-current="{{ request()->routeIs('lead-tasks*') ? 'page' : 'false' }}"
+                               class="{{ $navLink }} {{ request()->routeIs('lead-tasks*') ? $navActive.' branched-active' : $navInactive }}">
+                                <x-icon name="file-text" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                <span>Inside Sales</span>
+                            </a>
                         @endcan
                     </div>
                 </section>

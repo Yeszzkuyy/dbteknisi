@@ -53,7 +53,9 @@ class FollowUpController extends Controller
             'lead_id' => 'nullable|exists:leads,id',
             'meeting_id' => 'nullable|exists:meetings,id',
             'description' => 'required|string',
+            'type' => 'nullable|in:'.implode(',', \App\Models\FollowUp::TYPES),
             'follow_up_date' => 'nullable|date',
+            'next_follow_up_date' => 'nullable|date',
         ]);
 
         if (!empty($validated['lead_id'])) {
@@ -90,7 +92,9 @@ class FollowUpController extends Controller
             'lead_id' => 'nullable|exists:leads,id',
             'meeting_id' => 'nullable|exists:meetings,id',
             'description' => 'required|string',
+            'type' => 'nullable|in:'.implode(',', \App\Models\FollowUp::TYPES),
             'follow_up_date' => 'nullable|date',
+            'next_follow_up_date' => 'nullable|date',
         ]);
 
         if (!empty($validated['lead_id'])) {

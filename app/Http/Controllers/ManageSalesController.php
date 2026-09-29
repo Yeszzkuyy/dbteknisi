@@ -80,6 +80,15 @@ class ManageSalesController extends Controller
             $this->logActivity($lead, 'updated', $changes);
         }
 
+        // Perubahan assignee via form edit dicatat eksplisit sebagai reassign.
+        if (array_key_exists('assigned_to', $changes)
+            && !empty($changes['assigned_to']['old'])
+            && (int) $changes['assigned_to']['old'] !== (int) $changes['assigned_to']['new']) {
+            $this->logActivity($lead, 'reassigned', [
+                'assigned_to' => $changes['assigned_to'],
+            ]);
+        }
+
         if (!empty($validated['assigned_to'])) {
             $this->clearLeadNotifications($lead);
         }
@@ -108,8 +117,9 @@ class ManageSalesController extends Controller
 
         $this->notifyAssignee($lead, $previousAssignee);
 
-        $this->logActivity($lead, 'assigned', [
-            'assigned_to' => ['old' => $lead->getOriginal('assigned_to'), 'new' => $salesUser->id],
+        // Assign pertama vs reassign dibedakan; old diambil sebelum save.
+        $this->logActivity($lead, $previousAssignee ? 'reassigned' : 'assigned', [
+            'assigned_to' => ['old' => $previousAssignee, 'new' => $salesUser->id],
         ]);
 
         $this->clearLeadNotifications($lead);

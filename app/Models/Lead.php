@@ -84,4 +84,9 @@ class Lead extends Model
     {
         return $this->hasMany(FollowUp::class);
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(LeadTask::class);
+    }
 }

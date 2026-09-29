@@ -51,6 +51,11 @@ class LeadActivity extends Model
             'converted' => __('Mengonversi lead menjadi Project'),
             'status_changed' => __('Memindahkan posisi lead di pipeline'),
             'assigned' => __('Meng-assign lead ke sales'),
+            'reassigned' => __('Meng-assign ulang lead ke sales lain'),
+            'meeting_created' => __('Mencatat meeting'),
+            'followup_created' => __('Mencatat follow up'),
+            'task_created' => __('Membuat inside sales task'),
+            'task_status_changed' => __('Mengubah status inside sales task'),
             default => $this->action,
         };
     }

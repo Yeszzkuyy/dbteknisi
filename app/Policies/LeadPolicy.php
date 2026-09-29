@@ -27,6 +27,11 @@ class LeadPolicy
             return (int) $lead->assigned_to === (int) $user->id;
         }
 
+        // Inside sales boleh melihat lead yang punya task untuknya.
+        if ($user->can('manage-inside-sales')) {
+            return $lead->tasks()->where('assigned_to', $user->id)->exists();
+        }
+
         // Fallback teknisi/admin agar bisa convert bila sales lupa.
         return $user->can('manage-technician') || $user->can('manage-admin');
     }

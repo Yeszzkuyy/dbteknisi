@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">{{ __('Detail Lead') }}: {{ $lead->customer->name }}</h1>
+            <h1 class="text-3xl font-bold text-slate-800">{{ __('Detail Lead') }}: {{ $lead->customer?->name ?? '-' }}</h1>
             <p class="text-slate-500 mt-1">{{ __('Informasi lengkap lead / opportunity') }}</p>
         </div>
         <div class="flex gap-3">
@@ -32,6 +32,10 @@
                     </button>
                 </form>
             @endcan
+            <a href="{{ route('leads.pipeline') }}"
+               class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium transition">
+                {{ __('Kembali ke Pipeline') }}
+            </a>
             <a href="{{ (auth()->user()->can('view-marketing') || auth()->user()->can('manage-marketing')) ? route('leads.index') : route('sales.my-leads') }}"
                class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
                 {{ __('Kembali') }}
@@ -47,11 +51,11 @@
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Perusahaan') }}</label>
-                        <p class="mt-1 text-slate-900 dark:text-slate-100 font-semibold">{{ $lead->customer->company ?? $lead->customer->name }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100 font-semibold">{{ $lead->customer?->company ?? $lead->customer?->name ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">PIC</label>
-                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->contact_person ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer?->contact_person ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Status</label>
@@ -77,6 +81,10 @@
                         <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->source ? \App\Http\Controllers\LeadController::label($lead->source) : '-' }}</p>
                     </div>
                     <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Sales Penanganan') }}</label>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->assignee?->name ?? '-' }}</p>
+                    </div>
+                    <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Segment</label>
                         <p class="mt-1 text-slate-900 dark:text-slate-100 font-semibold">{{ $lead->segment ? \App\Http\Controllers\LeadController::label($lead->segment) : '-' }}</p>
                     </div>
@@ -96,19 +104,19 @@
 
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Alamat') }}</label>
-                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->address ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer?->address ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Telpon Kantor') }}</label>
-                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->phone ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer?->phone ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('No WA') }}</label>
-                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->whatsapp ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer?->whatsapp ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Email</label>
-                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer->email ?? '-' }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->customer?->email ?? '-' }}</p>
                     </div>
 
                     <div>
@@ -117,7 +125,11 @@
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Dibuat pada') }}</label>
-                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->created_at->format('d M Y H:i') }}</p>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->created_at?->format('d M Y H:i') ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Terakhir Diperbarui') }}</label>
+                        <p class="mt-1 text-slate-900 dark:text-slate-100">{{ $lead->updated_at?->format('d M Y H:i') ?? '-' }}</p>
                     </div>
                 </div>
 
@@ -236,6 +248,63 @@
                             </div>
                         @empty
                             <p class="text-slate-500">{{ __('Belum ada meeting atau follow up untuk lead ini.') }}</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="mt-1 pt-1 border-t">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Riwayat Lead') }}</label>
+                    <div class="mt-3 space-y-2">
+                        @forelse($lead->activities->sortByDesc('created_at') as $activity)
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
+                                <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-slate-200 text-slate-700 dark:bg-slate-600 dark:text-slate-200">
+                                    {{ $activity->actionLabel() }}
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-slate-800 dark:text-slate-100">
+                                        {{ $activity->user?->name ?? 'System' }}
+                                    </p>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ $activity->created_at?->setTimezone('Asia/Jakarta')->format('d M Y H:i') ?? '-' }}
+                                    </p>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-slate-500">{{ __('Belum ada riwayat untuk lead ini.') }}</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="mt-1 pt-1 border-t">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Inside Sales Task') }}</label>
+                        @php
+                            $canRequestTask = auth()->user()?->can('manage-sales-leads')
+                                || auth()->user()?->can('manage-marketing')
+                                || ((int) $lead->assigned_to === (int) auth()->id() && auth()->user()?->can('manage-sales'));
+                        @endphp
+                        @if($canRequestTask)
+                            <a href="{{ route('lead-tasks.create', ['lead_id' => $lead->id]) }}"
+                               class="px-3 py-1.5 text-xs rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium transition">{{ __('+ Request Inside Sales') }}</a>
+                        @endif
+                    </div>
+                    <div class="mt-3 space-y-2">
+                        @forelse($lead->tasks->sortByDesc('created_at') as $task)
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
+                                <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-indigo-50 text-indigo-700">
+                                    {{ \App\Models\LeadTask::statusLabel($task->status) }}
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <a href="{{ route('lead-tasks.show', $task) }}"
+                                       class="text-sm font-medium text-slate-800 dark:text-slate-100 hover:underline line-clamp-2">{{ $task->title }}</a>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ $task->assignee?->name ?? __('Belum di-assign') }}
+                                        @if($task->due_date) • {{ $task->due_date->format('d M Y') }} @endif
+                                    </p>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-slate-500">{{ __('Belum ada inside sales task untuk lead ini.') }}</p>
                         @endforelse
                     </div>
                 </div>
