@@ -53,11 +53,9 @@
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">Status Assignment</label>
-                    <select name="assignment" class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        <option value="">{{ __('Semua') }}</option>
-                        <option value="new" {{ request('assignment') === 'new' ? 'selected' : '' }}>{{ __('NEW (Belum di-assign)') }}</option>
-                        <option value="assigned" {{ request('assignment') === 'assigned' ? 'selected' : '' }}>ASSIGNED</option>
-                    </select>
+                    <x-glide-select name="assignment" class="mt-1" label="Status Assignment" empty-label="Semua"
+                        :options="[['value' => 'new', 'label' => 'NEW (Belum di-assign)'], ['value' => 'assigned', 'label' => 'ASSIGNED']]"
+                        :value="request('assignment', '')" autosubmit />
                 </div>
                 <div class="sm:col-span-2 lg:col-span-2 flex items-end gap-2">
                     <div class="group relative">

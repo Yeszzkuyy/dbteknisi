@@ -208,10 +208,14 @@ export default function GlideSelect({
     if (disabled && phase !== 'closed') close('instant');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
-  // Menu portal berposisi fixed: tutup saat scroll/resize daripada melayang.
+  // Menu portal berposisi fixed: tutup saat scroll/resize di LUAR menu
+  // agar tidak melayang; scroll di dalam list dibiarkan (daftar panjang).
   useEffect(() => {
     if (phase === 'closed') return undefined;
-    const onScroll = () => close('instant');
+    const onScroll = e => {
+      if (e && e.target instanceof Node && menuRef.current && menuRef.current.contains(e.target)) return;
+      close('instant');
+    };
     document.addEventListener('scroll', onScroll, true);
     window.addEventListener('resize', onScroll);
     return () => {
