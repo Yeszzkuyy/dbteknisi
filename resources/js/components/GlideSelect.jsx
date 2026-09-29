@@ -130,6 +130,9 @@ export default function GlideSelect({
     p.style.transform = `translateY(${active * step}px)`;
     p.style.opacity = '1';
     instant.current = false;
+    // Opsi aktif di bawah lipatan ikut digulir ke tampilan (navigasi keyboard).
+    var opt = menuRef.current ? menuRef.current.querySelector('[data-index="' + active + '"]') : null;
+    if (opt && opt.scrollIntoView) opt.scrollIntoView({ block: 'nearest' });
   }, [active, phase, step]);
 
   const open = viaKey => {
@@ -222,6 +225,26 @@ export default function GlideSelect({
       document.removeEventListener('scroll', onScroll, true);
       window.removeEventListener('resize', onScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+  // Roda mouse di dalam list: gulir manual non-passive agar deterministik
+  // (hanya saat list masih bisa bergerak ke arah itu; di ujung dibiarkan).
+  useEffect(() => {
+    if (phase === 'closed') return undefined;
+    const list = menuRef.current ? menuRef.current.querySelector('.glide-select__list') : null;
+    if (!list) return undefined;
+    const onWheel = e => {
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      if (!dy) return;
+      const canUp = list.scrollTop > 0;
+      const canDown = list.scrollTop + list.clientHeight < list.scrollHeight - 1;
+      if ((dy < 0 && canUp) || (dy > 0 && canDown)) {
+        e.preventDefault();
+        list.scrollTop += dy;
+      }
+    };
+    list.addEventListener('wheel', onWheel, { passive: false });
+    return () => list.removeEventListener('wheel', onWheel);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
   useEffect(() => () => clearTimeout(closeTimer.current), []);
