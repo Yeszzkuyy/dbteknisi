@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('leads', function (Blueprint $table) {
+            $table->string('lost_reason', 30)->nullable()->after('status');
+            $table->text('lost_note')->nullable()->after('lost_reason');
+            $table->timestamp('closed_at')->nullable()->after('lost_note');
+            $table->text('closing_note')->nullable()->after('closed_at');
+        });
+
+        Schema::table('lead_documents', function (Blueprint $table) {
+            $table->string('category', 30)->nullable()->after('mime_type');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('lead_documents', function (Blueprint $table) {
+            $table->dropColumn('category');
+        });
+
+        Schema::table('leads', function (Blueprint $table) {
+            $table->dropColumn(['lost_reason', 'lost_note', 'closed_at', 'closing_note']);
+        });
+    }
+};

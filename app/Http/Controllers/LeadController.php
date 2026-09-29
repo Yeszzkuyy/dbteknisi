@@ -105,7 +105,12 @@ class LeadController extends Controller
 
         if ($validated['status'] !== $lead->status) {
             $old = $lead->status;
-            $lead->update(['status' => $validated['status']]);
+            $payload = ['status' => $validated['status']];
+            if ($validated['status'] !== 'lost') {
+                $payload['lost_reason'] = null;
+                $payload['lost_note'] = null;
+            }
+            $lead->update($payload);
 
             $this->logActivity($lead, 'status_changed', [
                 'status' => ['old' => $old, 'new' => $validated['status']],
@@ -130,7 +135,12 @@ class LeadController extends Controller
             $old = $lead->status;
 
             if ($old !== $change['status']) {
-                $lead->update(['status' => $change['status']]);
+                $payload = ['status' => $change['status']];
+                if ($change['status'] !== 'lost') {
+                    $payload['lost_reason'] = null;
+                    $payload['lost_note'] = null;
+                }
+                $lead->update($payload);
 
                 $this->logActivity($lead, 'status_changed', [
                     'status' => ['old' => $old, 'new' => $change['status']],
@@ -564,6 +574,44 @@ class LeadController extends Controller
             ->with('success', __('Lead berhasil dihapus'));
     }
 
+    public function saveOutcome(Request $request, Lead $lead)
+    {
+        $this->authorizeLeadStatus($lead);
+
+        $validated = $request->validate([
+            'lost_reason' => 'nullable|in:'.implode(',', Lead::LOST_REASONS),
+            'lost_note' => 'nullable|string|max:2000',
+        ]);
+
+        $lead->fill($validated);
+        $changes = [];
+        foreach (['lost_reason', 'lost_note'] as $field) {
+            if ($lead->isDirty($field)) {
+                $changes[$field] = ['old' => $lead->getOriginal($field), 'new' => $lead->{$field}];
+            }
+        }
+        $lead->save();
+
+        if ($changes) {
+            $this->logActivity($lead, 'updated', $changes);
+        }
+
+        return back()->with('success', __('Hasil lead tersimpan.'));
+    }
+
+    public function categorizeAttachment(Request $request, Lead $lead, LeadDocument $document)
+    {
+        $this->authorize('update', $lead);
+        abort_unless((int) $document->lead_id === (int) $lead->id, 404);
+
+        $validated = $request->validate([
+            'category' => 'nullable|in:'.implode(',', LeadDocument::CATEGORIES),
+        ]);
+        $document->update(['category' => $validated['category']]);
+
+        return back()->with('success', __('Kategori dokumen tersimpan.'));
+    }
+
     public function convert(Lead $lead)
     {
         $user = request()->user();
@@ -587,18 +635,23 @@ class LeadController extends Controller
         $validated = request()->validate([
             'project_name' => 'required|string|max:255',
             'project_status_id' => 'required|exists:project_statuses,id',
-            'work_type_id' => 'nullable|exists:work_types,id',
+            'work_type_id' => 'required|exists:work_types,id',
+            'closing_note' => 'nullable|string|max:2000',
         ]);
 
         $project = Project::create([
             'project_name' => $validated['project_name'],
             'customer_id' => $lead->customer_id,
             'project_status_id' => $validated['project_status_id'],
-            'work_type_id' => $validated['work_type_id'],
+            'work_type_id' => $validated['work_type_id'] ?? null,
             'start_date' => now()->toDateString(),
         ]);
 
-        $lead->update(['status' => 'won']);
+        $lead->update([
+            'status' => 'won',
+            'closed_at' => now(),
+            'closing_note' => $validated['closing_note'] ?? null,
+        ]);
         $this->logActivity($lead, 'converted', ['project_id' => $project->id]);
 
         return redirect()

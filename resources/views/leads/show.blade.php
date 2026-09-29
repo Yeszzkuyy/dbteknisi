@@ -169,15 +169,80 @@
                     </div>
                 @endif
 
+                @if(in_array($lead->status, ['won', 'lost']))
+                    <div class="mt-1 pt-1 border-t">
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Hasil Akhir') }}</label>
+                        @if($lead->status === 'won')
+                            <div class="mt-1 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl text-sm text-slate-700 dark:text-slate-200">
+                                <p class="font-semibold text-green-700 dark:text-green-300">{{ __('Won') }}
+                                    @if($lead->closed_at)
+                                        <span class="font-normal text-slate-500">• {{ $lead->closed_at->setTimezone('Asia/Jakarta')->format('d M Y H:i') }}</span>
+                                    @endif
+                                </p>
+                                @if($lead->closing_note)
+                                    <p class="mt-1 whitespace-pre-wrap">{{ $lead->closing_note }}</p>
+                                @endif
+                            </div>
+                        @else
+                            <div class="mt-1 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl text-sm text-slate-700 dark:text-slate-200">
+                                <p class="font-semibold text-red-700 dark:text-red-300">{{ __('Lost') }}
+                                    @if($lead->lost_reason)
+                                        <span class="font-normal">• {{ \App\Models\Lead::lostReasonLabel($lead->lost_reason) }}</span>
+                                    @endif
+                                </p>
+                                @if($lead->lost_note)
+                                    <p class="mt-1 whitespace-pre-wrap">{{ $lead->lost_note }}</p>
+                                @endif
+                            </div>
+                            @php
+                                $canOutcome = auth()->user()?->can('manage-marketing')
+                                    || ((int) $lead->assigned_to === (int) auth()->id() && auth()->user()?->can('manage-sales'))
+                                    || auth()->user()?->can('manage-technician')
+                                    || auth()->user()?->can('manage-admin');
+                            @endphp
+                            @if($canOutcome)
+                                <form action="{{ route('leads.outcome', $lead) }}" method="POST" class="mt-3 flex flex-wrap items-end gap-3">
+                                    @csrf @method('PATCH')
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Alasan Lost') }}</label>
+                                        <select name="lost_reason"
+                                                class="rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
+                                            <option value="">{{ __('-- Pilih alasan --') }}</option>
+                                            @foreach(\App\Models\Lead::LOST_REASONS as $reason)
+                                                <option value="{{ $reason }}" @selected(old('lost_reason', $lead->lost_reason) === $reason)>
+                                                    {{ \App\Models\Lead::lostReasonLabel($reason) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="flex-1 min-w-52">
+                                        <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Catatan') }}</label>
+                                        <input type="text" name="lost_note" value="{{ old('lost_note', $lead->lost_note) }}"
+                                               placeholder="{{ __('Catatan tambahan (opsional)') }}"
+                                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
+                                    </div>
+                                    <button type="submit"
+                                            class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition">
+                                        {{ __('Simpan') }}
+                                    </button>
+                                </form>
+                            @endif
+                        @endif
+                    </div>
+                @endif
+
                 <div class="mt-1 pt-1 border-t">
                     <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Lampiran (BOQ / Kebutuhan User)') }}</label>
                     <div class="mt-3 space-y-2">
                         @if($lead->documents->isEmpty())
                             <p class="text-slate-500">{{ __('Belum ada lampiran.') }}</p>
                         @else
-                            @foreach($lead->documents as $doc)
+                                @foreach($lead->documents as $doc)
                                     <div class="flex items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
                                     <span class="text-sm text-slate-800 truncate">{{ $doc->file_name }}</span>
+                                    <span class="shrink-0 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 text-slate-700">
+                                        {{ \App\Models\LeadDocument::categoryLabel($doc->category) }}
+                                    </span>
                                     <div class="flex items-center gap-2 shrink-0">
                                         <button type="button" title="{{ __('Lihat') }}"
                                                 data-url="{{ route('leads.attachments.show', [$lead, $doc]) }}"
@@ -207,6 +272,20 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
                                                     </svg>
                                                 </button>
+                                            </form>
+                                        @endcan
+                                        @can('manage-marketing')
+                                            <form action="{{ route('leads.attachments.category', [$lead, $doc]) }}" method="POST" class="inline-flex">
+                                                @csrf @method('PATCH')
+                                                <select name="category" onchange="this.form.submit()" title="{{ __('Kategori dokumen') }}"
+                                                        class="rounded-lg border-slate-300 text-xs text-slate-600 focus:border-accent-500 focus:ring-accent-500">
+                                                    <option value="">{{ __('Tanpa kategori') }}</option>
+                                                    @foreach(\App\Models\LeadDocument::CATEGORIES as $category)
+                                                        <option value="{{ $category }}" @selected($doc->category === $category)>
+                                                            {{ \App\Models\LeadDocument::categoryLabel($category) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </form>
                                         @endcan
                                     </div>
@@ -392,14 +471,20 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Tipe Pekerjaan (Opsional)') }}</label>
-                        <select name="work_type_id"
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Tipe Pekerjaan') }} <span class="text-red-500">*</span></label>
+                        <select name="work_type_id" required
+                                 class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent">
                             <option value="">{{ __('-- Pilih Tipe Pekerjaan --') }}</option>
                             @foreach($workTypes ?? [] as $type)
                                 <option value="{{ $type->id }}">{{ $type->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Closing Note (Opsional)') }}</label>
+                        <textarea name="closing_note" rows="3"
+                                  placeholder="{{ __('Catatan penutupan: kesepakatan, nilai deal, tindak lanjut...') }}"
+                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"></textarea>
                     </div>
                 </div>
                 <div class="flex justify-end gap-3 p-4 border-t border-slate-200">

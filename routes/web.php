@@ -289,6 +289,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert');
         Route::patch('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
         Route::patch('/leads/batch-status', [LeadController::class, 'batchUpdateStatus'])->name('leads.batch-status');
+        Route::patch('/leads/{lead}/outcome', [LeadController::class, 'saveOutcome'])->name('leads.outcome');
     });
     // Monitoring tim marketing — khusus lead divisi (sebelum /leads/{lead})
     Route::get('/leads/monitoring', [LeadController::class, 'monitoring'])
@@ -313,6 +314,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/leads/{lead}/attachments/{document}', [LeadController::class, 'destroyAttachment'])
             ->middleware('permission:manage-marketing')
             ->name('leads.attachments.destroy');
+        Route::patch('/leads/{lead}/attachments/{document}/category', [LeadController::class, 'categorizeAttachment'])
+            ->middleware('permission:manage-marketing')
+            ->name('leads.attachments.category');
 
         Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
     });
