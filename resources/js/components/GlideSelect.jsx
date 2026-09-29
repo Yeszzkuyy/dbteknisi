@@ -258,28 +258,31 @@ export default function GlideSelect({
   };
 
   const origin = `${side === 'bottom' ? 'top' : 'bottom'} ${align}`;
+  // Variabel tema dipakai trigger (di root) DAN menu portal (di body) —
+  // portal memutus pewarisan DOM, jadi menu dapat salinannya sendiri.
+  const themeVars = {
+    '--gs-accent': accentColor,
+    '--gs-surface': surfaceColor,
+    '--gs-highlight': highlightColor,
+    '--gs-text': textColor,
+    '--gs-radius': `${radius}px`,
+    '--gs-inner-radius': `${Math.max(3, radius - 4)}px`,
+    '--gs-chip': `${S.chip}px`,
+    '--gs-row': `${S.row}px`,
+    '--gs-font': `${S.font}px`,
+    '--gs-menu-w': `${menuWidth}px`,
+    '--gs-pop': `${popDuration}ms`,
+    '--gs-pop-out': `${popOut}ms`,
+    '--gs-glide': `${glideDuration}ms`,
+    '--gs-origin': origin
+  };
   return (
     <div
       ref={rootRef}
       className={`glide-select${className ? ` ${className}` : ''}`}
       data-size={size}
       data-disabled={disabled ? '' : undefined}
-      style={{
-        '--gs-accent': accentColor,
-        '--gs-surface': surfaceColor,
-        '--gs-highlight': highlightColor,
-        '--gs-text': textColor,
-        '--gs-radius': `${radius}px`,
-        '--gs-inner-radius': `${Math.max(3, radius - 4)}px`,
-        '--gs-chip': `${S.chip}px`,
-        '--gs-row': `${S.row}px`,
-        '--gs-font': `${S.font}px`,
-        '--gs-menu-w': `${menuWidth}px`,
-        '--gs-pop': `${popDuration}ms`,
-        '--gs-pop-out': `${popOut}ms`,
-        '--gs-glide': `${glideDuration}ms`,
-        '--gs-origin': origin
-      }}
+      style={themeVars}
       onAnimationEnd={e => {
         if (e.animationName === 'gs-swap' && rootRef.current) delete rootRef.current.dataset.swap;
       }}
@@ -312,7 +315,7 @@ export default function GlideSelect({
       </button>
       {phase !== 'closed' ? createPortal(
         <div ref={menuRef} className="glide-select__menu glide-select__menu--portal" data-state="open" data-side={side} data-align={align}
-             style={menuPos ? { top: menuPos.top, left: menuPos.left, width: menuPos.width } : undefined}>
+             style={menuPos ? { ...themeVars, top: menuPos.top, left: menuPos.left, width: menuPos.width } : themeVars}>
           <div
             id={`${id}-list`}
             role="listbox"
