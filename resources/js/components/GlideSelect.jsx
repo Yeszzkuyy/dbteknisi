@@ -274,7 +274,8 @@ export default function GlideSelect({
     '--gs-pop': `${popDuration}ms`,
     '--gs-pop-out': `${popOut}ms`,
     '--gs-glide': `${glideDuration}ms`,
-    '--gs-origin': origin
+    '--gs-origin': origin,
+    '--gs-ease-out': 'cubic-bezier(0.23, 1, 0.32, 1)'
   };
   return (
     <div
