@@ -21,7 +21,9 @@ class PartnerController extends Controller
 
         $partners = $query->latest()->paginate(15)->withQueryString();
 
-        return view('partners.index', compact('partners'));
+        return $request->ajax()
+            ? view('partners._table', compact('partners'))->render()
+            : view('partners.index', compact('partners'));
     }
 
     public function create()
