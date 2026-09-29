@@ -62,8 +62,17 @@
     <script>window.vapidPublicKey = @json(config('webpush.vapid.public_key'));</script>
     @endauth
     {{-- Penanda JS aktif sepagi mungkin (sebelum CSS) agar animasi appear
-         sempat mulai dari state awal, bukan langsung final --}}
-    <script>document.documentElement.classList.add('js');</script>
+         sempat mulai dari state awal, bukan langsung final.
+         reveal-on: [data-reveal] disembunyikan (opacity 0) HANYA bila JS
+         jalan; fallback mandiri di sini memaksa tampil bila script ekor
+         body gagal — cegah dashboard blank putih. --}}
+    <script>
+        document.documentElement.classList.add('js');
+        document.documentElement.classList.add('reveal-on');
+        setTimeout(function () {
+            try { document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function (el) { el.classList.add('in-view'); }); } catch (e) {}
+        }, 1200);
+    </script>
 
     @livewireStyles
 
@@ -192,6 +201,34 @@
         // Safety-net opsi A: paksa tampilkan [data-reveal] bila observer tak pernah
         // fire / JS error parsial — cegah dashboard blank putih (opacity: 0).
         function forceReveal(){document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function(el){el.classList.add('in-view')});}
+        // Reveal mandiri (di luar initChrome): satu-satunya penentu konten
+        // tampil — kegagalan sidebar/parallax tak boleh bikin blank putih.
+        function initReveal(){
+            // Reveal saat scroll — hormati prefers-reduced-motion.
+            // Elemen yang sudah di viewport langsung in-view sinkron (tanpa
+            // tunggu callback observer) agar konten atas tidak kedip/pop-in.
+            // Fallback timer memaksa tampil bila observer tak fire (JS error,
+            // morph Livewire) — cegah blank putih.
+            try{
+            if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){
+                if(!window.__revealIO){
+                    window.__revealIO=new IntersectionObserver(function(entries){
+                        entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in-view');window.__revealIO.unobserve(en.target)}});
+                    },{threshold:0.12});
+                }
+                var vh=window.innerHeight||0;
+                document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function(el){
+                    var r=el.getBoundingClientRect();
+                    if(r.top<vh&&r.bottom>0){el.classList.add('in-view');}
+                    else{window.__revealIO.observe(el);}
+                });
+            }else{
+                document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('in-view')});
+            }
+            }catch(e){forceReveal();}
+            if(window.__revealFallback)clearTimeout(window.__revealFallback);
+            window.__revealFallback=setTimeout(forceReveal,1500);
+        }
         function initChrome(){
             var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay'),h=document.getElementById('hamburgerBtn');
             if(!s||!o)return;
@@ -250,30 +287,8 @@
                 nav.scrollTop=+(sessionStorage.getItem('sidebar-scroll')||0);
                 if(!nav.dataset.bound){nav.dataset.bound='1';nav.addEventListener('scroll',function(){sessionStorage.setItem('sidebar-scroll',nav.scrollTop)});}
             }
-            // Reveal saat scroll — hormati prefers-reduced-motion.
-            // Elemen yang sudah di viewport langsung in-view sinkron (tanpa
-            // tunggu callback observer) agar konten atas tidak kedip/pop-in.
-            // Fallback timer memaksa tampil bila observer tak fire (JS error,
-            // morph Livewire) — cegah blank putih.
-            try{
-            if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){
-                if(!window.__revealIO){
-                    window.__revealIO=new IntersectionObserver(function(entries){
-                        entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in-view');window.__revealIO.unobserve(en.target)}});
-                    },{threshold:0.12});
-                }
-                var vh=window.innerHeight||0;
-                document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function(el){
-                    var r=el.getBoundingClientRect();
-                    if(r.top<vh&&r.bottom>0){el.classList.add('in-view');}
-                    else{window.__revealIO.observe(el);}
-                });
-            }else{
-                document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('in-view')});
-            }
-            }catch(e){forceReveal();}
-            if(window.__revealFallback)clearTimeout(window.__revealFallback);
-            window.__revealFallback=setTimeout(forceReveal,1500);
+            // Reveal konten — delegasi ke initReveal() mandiri (lihat atas).
+            initReveal();
             // Parallax mouse halus untuk [data-parallax-mouse] — nonaktif di
             // touch / reduced-motion; kembali ke posisi awal saat mouse pergi
             if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.matchMedia('(hover: hover)').matches){
@@ -300,8 +315,14 @@
             }
         }
         function initChromeSafe(){try{initChrome()}catch(e){try{forceReveal()}catch(_){}}}
+        function initRevealSafe(){try{initReveal()}catch(e){try{forceReveal()}catch(_){}}}
         document.addEventListener('DOMContentLoaded',initChromeSafe);
         document.addEventListener('livewire:navigated',initChromeSafe);
+        document.addEventListener('DOMContentLoaded',initRevealSafe);
+        document.addEventListener('livewire:navigated',initRevealSafe);
+        // Script di ekor body = DOM sudah ter-parse: reveal sinkron langsung,
+        // tak menunggu DOMContentLoaded/initChrome.
+        initRevealSafe();
         // Last-resort: jalan saat parse, tak tergantung initChrome sukses.
         setTimeout(function(){try{forceReveal()}catch(e){}},2000);
     </script>

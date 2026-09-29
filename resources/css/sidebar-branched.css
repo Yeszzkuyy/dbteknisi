@@ -95,14 +95,10 @@
 .dark .sidebar nav button:hover:not([data-sidebar-active='true']) {
     color: rgb(var(--accent-300) / 1);
 }
-/* Geseran ikon/label header grup saat hover ikut dimatikan
-   (seperti aturan anak pohon di bawah). Chevron toggle juga diam
-   (rotate binding Alpine tetap jalan via properti rotate). */
-.sidebar .branched > div:hover > a > span,
-.sidebar .branched > div:hover > a svg {
-    transform: none;
-}
-.sidebar .branched-toggle:hover svg {
+/* Chevron toggle diam saat hover — TAPI jangan bunuh rotate-180 Alpine
+   (penanda grup terbuka). Tailwind v3 rotate pakai `transform`, bukan
+   properti `rotate`, sehingga :not(.rotate-180) wajib dikecualikan. */
+.sidebar .branched-toggle:hover svg:not(.rotate-180) {
     transform: none;
 }
 /* Opsi 1: marker ::before kiri dicabut khusus anak pohon (penanda aktif

@@ -96,7 +96,7 @@
                         {{-- Management (Management Hub) --}}
                         @can('manage-sales-leads')
                             <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }" class="branched"{{ $managementActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="management" data-bm-active="{{ $managementIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $managementActive ? $navActive : $navInactive }}">
+                                <div class="{{ $navLink }} group w-full {{ $managementActive ? $navActive.' branched-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('manage-sales.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="briefcase" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
@@ -167,7 +167,7 @@
                         {{-- Teknisi --}}
                         @can('view-technician')
                             <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="branched"{{ $technicianActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="teknisi" data-bm-active="{{ $teknisiIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive : $navInactive }}">
+                                <div class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive.' branched-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="tools" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
@@ -249,7 +249,7 @@
                         @can('view-marketing')
                             @php($mktCount = 5 + ($hasMarketingMonitoring ? 1 : 0))
                             <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="branched"{{ $marketingActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="marketing" data-bm-active="{{ $marketingIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive : $navInactive }}">
+                                <div class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive.' branched-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="chart-bar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
@@ -321,7 +321,7 @@
                         @can('view-sales')
                             @php($salesCount = 4 + ($hasSalesProject ? 1 : 0))
                             <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="sales" data-bm-active="{{ $salesIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive : $navInactive }}">
+                                <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive.' branched-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="calendar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
@@ -386,7 +386,7 @@
                         {{-- Admin: Invoice, PO, Payment --}}
                         @can('view-admin')
                             <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }" class="branched"{{ $adminActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="admin" data-bm-active="{{ $adminIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $adminActive ? $navActive : $navInactive }}">
+                                <div class="{{ $navLink }} group w-full {{ $adminActive ? $navActive.' branched-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('admin.invoices.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="folder" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
@@ -464,7 +464,7 @@
                         {{-- Admin Panel (Super Admin only) --}}
                         @can('manage-monitoring')
                             <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }" class="branched"{{ $adminPanelActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="admin-panel" data-bm-active="{{ $adminPanelIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $adminPanelActive ? $navActive : $navInactive }}">
+                                <div class="{{ $navLink }} group w-full {{ $adminPanelActive ? $navActive.' branched-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('admin-panel.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="settings" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />

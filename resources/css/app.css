@@ -226,7 +226,9 @@ tbody tr { transition: background-color 0.2s ease; }
 .sidebar nav button > span { transition: transform 0.25s var(--ease-out); }
 @media (hover: hover) {
     .sidebar nav a:hover svg,
-    .sidebar nav button:hover svg { transform: translateX(2px); }
+    /* Toggle chevron dikecualikan: panah vertikal jangan bergeser,
+       dan rotate-180 penanda buka harus utuh (lihat sidebar-branched.css). */
+    .sidebar nav button:hover:not(.branched-toggle) svg { transform: translateX(2px); }
     .sidebar nav a:hover > span:not(.ml-auto),
     .sidebar nav button:hover > span:not(.ml-auto) { transform: translateX(2px); }
 }
@@ -253,6 +255,14 @@ tbody tr { transition: background-color 0.2s ease; }
 .sidebar nav button:hover { color: var(--nav-hover-text); background: var(--nav-hover-bg); }
 .sidebar nav a[aria-current="page"],
 .sidebar nav [data-sidebar-active="true"] { color: var(--nav-active-text); background: var(--nav-active-bg); }
+/* Header grup departemen (.branched > div): <div> tak tercakup aturan
+   a/button di atas sehingga utility text-slate-300/text-white bocor
+   (hilang di light mode). Samakan dengan warna tema; .branched-active
+   ditandai di Blade saat grup aktif. */
+.sidebar nav .branched > div { color: var(--nav-text); }
+.sidebar nav .branched > div:hover { color: var(--nav-hover-text); background: var(--nav-hover-bg); }
+.sidebar nav .branched > div.branched-active { color: var(--nav-active-text); background: var(--nav-active-bg); }
+.sidebar nav .branched > div.branched-active:hover { color: var(--nav-active-text); }
 .sidebar nav p { color: var(--nav-muted); }
 .sidebar .border-white\/10 { border-color: var(--sidebar-border-soft); }
 .sidebar .sidebar-logo h1 { color: var(--sidebar-logo-text); }
@@ -277,20 +287,23 @@ tbody tr { transition: background-color 0.2s ease; }
     }
 
     /* Reveal saat scroll (dipicu IntersectionObserver di layout).
-       State awal hanya bila html.js — tanpa JS langsung tampil final,
-       dan konten di atas fold ditandai in-view sinkron agar tanpa kedip. */
-    html.js [data-reveal] {
+       State awal hanya bila html.js.reveal-on — class reveal-on ditambah
+       script <head> sepagi mungkin; tanpa JS (atau bila script head gagal)
+       konten langsung tampil final, dan konten di atas fold ditandai
+       in-view sinkron agar tanpa kedip. */
+    html.js.reveal-on [data-reveal] {
         opacity: 0;
         transform: translateY(16px);
         transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
     }
-    [data-reveal].in-view { opacity: 1; transform: none; }
+    /* Bobot (0,4,1) > rule sembunyi (0,3,1): .in-view selalu menang. */
+    html.js.reveal-on [data-reveal].in-view { opacity: 1; transform: none; }
     [data-reveal][data-reveal-delay="1"] { transition-delay: 0.07s; }
     [data-reveal][data-reveal-delay="2"] { transition-delay: 0.14s; }
     [data-reveal][data-reveal-delay="3"] { transition-delay: 0.21s; }
 
     /* Bar chart tumbuh (tinggi/lebar 0 → target) saat ancestor .in-view.
-       State 0 hanya bila html.js — tanpa JS langsung tampil final. */
+       State 0 hanya bila html.js.reveal-on — tanpa JS langsung tampil final. */
     [data-grow-h] {
         height: var(--h);
         transition: height 1.2s var(--ease-out);
@@ -301,8 +314,8 @@ tbody tr { transition: background-color 0.2s ease; }
         transition: width 1.2s var(--ease-out);
         transition-delay: var(--d, 0ms);
     }
-    html.js [data-reveal]:not(.in-view) [data-grow-h] { height: 0; }
-    html.js [data-reveal]:not(.in-view) [data-grow-w] { width: 0; }
+    html.js.reveal-on [data-reveal]:not(.in-view) [data-grow-h] { height: 0; }
+    html.js.reveal-on [data-reveal]:not(.in-view) [data-grow-w] { width: 0; }
 
     /* Parallax mouse (nilai diisi JS via --px/--py); hanya untuk dekorasi opt-in */
     [data-parallax-mouse] {
