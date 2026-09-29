@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\User;
+use App\Notifications\LeadAssignedNotification;
 use App\Notifications\NewLeadNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\SendQueuedNotifications;
@@ -97,6 +98,93 @@ class LeadNotificationTest extends TestCase
         $this->storeLead(['assigned_to' => $sales->id]);
 
         Notification::assertNotSentTo($managementUser, NewLeadNotification::class);
+    }
+
+    public function test_assigned_new_lead_notifies_only_the_assignee(): void
+    {
+        Notification::fake();
+        $marketing = $this->loginAs('marketing');
+        $this->actingAs($marketing);
+
+        $salesA = User::factory()->create();
+        $salesA->assignRole('sales');
+        $salesB = User::factory()->create();
+        $salesB->assignRole('sales');
+
+        $this->storeLead(['assigned_to' => $salesA->id]);
+
+        Notification::assertSentTo($salesA, LeadAssignedNotification::class);
+        Notification::assertNotSentTo($salesB, LeadAssignedNotification::class);
+        Notification::assertNotSentTo($salesA, NewLeadNotification::class);
+
+        $lead = Lead::latest()->first();
+        $this->assertSame($salesA->id, $lead->assigned_to);
+        $this->assertSame($marketing->id, $lead->assigned_by);
+        $this->assertNotNull($lead->assigned_at);
+    }
+
+    public function test_update_changing_assignee_notifies_only_new_assignee(): void
+    {
+        Notification::fake();
+        $this->actingAs($this->loginAs('marketing'));
+
+        $salesA = User::factory()->create();
+        $salesA->assignRole('sales');
+        $salesB = User::factory()->create();
+        $salesB->assignRole('sales');
+
+        $customer = Customer::create(['name' => 'PT Ganti Sales']);
+        $lead = Lead::create([
+            'customer_id' => $customer->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'status' => 'new',
+            'assigned_to' => $salesA->id,
+            'incoming_date' => now()->toDateString(),
+        ]);
+
+        $this->put(route('leads.update', $lead), [
+            'customer_mode' => 'existing',
+            'customer_id' => $customer->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'assigned_to' => $salesB->id,
+            'incoming_date' => now()->toDateString(),
+        ])->assertRedirect(route('leads.index'));
+
+        Notification::assertSentTo($salesB, LeadAssignedNotification::class);
+        Notification::assertNotSentTo($salesA, LeadAssignedNotification::class);
+    }
+
+    public function test_update_without_assignee_change_sends_nothing(): void
+    {
+        Notification::fake();
+        $this->actingAs($this->loginAs('marketing'));
+
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+
+        $customer = Customer::create(['name' => 'PT Tetap Sales']);
+        $lead = Lead::create([
+            'customer_id' => $customer->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'status' => 'new',
+            'assigned_to' => $sales->id,
+            'incoming_date' => now()->toDateString(),
+        ]);
+
+        $this->put(route('leads.update', $lead), [
+            'customer_mode' => 'existing',
+            'customer_id' => $customer->id,
+            'pt_group' => 'NTI',
+            'segment' => 'end_user',
+            'assigned_to' => $sales->id,
+            'kebutuhan' => 'Update kebutuhan',
+            'incoming_date' => now()->toDateString(),
+        ])->assertRedirect(route('leads.index'));
+
+        Notification::assertNothingSent();
     }
 
     public function test_management_can_mark_all_notifications_read(): void
