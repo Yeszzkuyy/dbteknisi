@@ -19,7 +19,7 @@
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 w-full">
-            <form action="{{ route('customers.update', $customer) }}" method="POST" data-loading-text="{{ __('Menyimpan…') }}">
+            <form action="{{ route('customers.update', $customer) }}" method="POST" data-loading-text="Saving…">
                 @csrf
                 @method('PUT')
 

@@ -23,7 +23,7 @@
     </div>
 
     <form action="{{ route('customers.store') }}" method="POST"
-          data-loading-text="{{ __('Menyimpan…') }}"
+          data-loading-text="Saving…"
           class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 space-y-4 w-full">
         @csrf
 
