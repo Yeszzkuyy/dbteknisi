@@ -66,18 +66,27 @@ Setelah merge ke main: `git pull`, lalu `npm run build` jika ada perubahan CSS/J
 - Kredensial / `.env`
 - File hasil eksperimen tanpa persetujuan
 
-## 7. Warna tombol (konvensi UI)
+## 7. Tombol (konvensi UI)
 
-Setiap aksi punya warna bawaan — pakai kelas ini konsisten di semua view:
+Setiap aksi punya warna bawaan — pakai pola ini konsisten di semua view
+(acuan: `leads/create.blade.php`, komponen `x-icon-button`):
 
-| Aksi | Kelas standar |
+| Aksi | Pola standar |
 |---|---|
-| Simpan / Tambah / Submit utama | `bg-blue-600 hover:bg-blue-700 text-white` |
+| Simpan / Tambah / Submit utama | `bg-accent-600 hover:bg-accent-500 text-white` + shine + scale (lihat efek standar di bawah) |
+| Batal (teks, di form) | `bg-accent-500 hover:bg-accent-600 text-white` + shine + scale |
+| Kembali / Batal (ghost) | `border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200` |
+| Tombol ikon (filter/reset/back/add/import/...) | `<x-icon-button>` — jangan tulis ulang, cukup `as`/`icon`/`title` |
 | Lihat / detail | `bg-indigo-50 hover:bg-indigo-100 text-indigo-700` |
 | Edit | `bg-blue-100 hover:bg-blue-200 text-blue-700` |
 | Hapus | `bg-red-100 hover:bg-red-200 text-red-700` |
-| Aksi positif (convert/approve) | `bg-green-100 hover:bg-green-200 text-green-700` |
-| Batal / Kembali | `border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200` |
+| Aksi positif (convert/approve/assign) | `bg-green-100 hover:bg-green-200 text-green-700` |
+
+Efek standar tombol teks: `group relative overflow-hidden` + span shine
+(`pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r
+from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out
+group-hover:translate-x-full`) + `transition-all duration-300 hover:scale-105
+hover:shadow-lg active:scale-95` (tombol utama tambah `hover:shadow-accent-500/40 hover:brightness-110`).
 
 **Larangan:** jangan pakai `bg-slate-*`, `bg-gray-*`, atau `bg-white` sebagai
 background tombol — CSS dark-mode global mengoverride kelas tersebut sehingga

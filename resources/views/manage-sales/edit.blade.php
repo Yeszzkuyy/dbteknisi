@@ -4,10 +4,7 @@
             <h1 class="text-3xl font-bold text-slate-800">{{ __('Kelola Lead:') }} {{ $lead->customer->name ?? 'N/A' }}</h1>
             <p class="text-slate-500 mt-1">{{ __('Isi solusi, progress follow-up, catatan internal, dan assign ke Sales') }}</p>
         </div>
-        <a href="{{ route('manage-sales.index') }}"
-           class="px-4 py-2.5 rounded-xl bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 text-sm font-medium transition">
-            {{ __('Kembali') }}
-        </a>
+        <x-icon-button as="a" icon="back" href="{{ route('manage-sales.index') }}" title="Kembali" />
     </div>
 
     <form action="{{ route('manage-sales.update', $lead) }}" method="POST" data-loading-text="Saving…"
@@ -109,11 +106,13 @@
         {{-- Aksi --}}
         <div class="flex justify-end gap-3 border-t border-slate-200">
             <a href="{{ route('manage-sales.index') }}"
-               class="px-4 py-2.5 rounded-xl bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 text-sm font-medium transition">
+               class="group relative overflow-hidden px-4 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-sm font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent-500/30 active:scale-95">
+                <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
                 {{ __('Batal') }}
             </a>
             <button type="submit"
-                    class="px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
+                    class="group relative overflow-hidden px-6 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-500 text-white text-sm font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent-500/40 hover:brightness-110 active:scale-95">
+                <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
                 {{ __('Simpan') }}
             </button>
         </div>
