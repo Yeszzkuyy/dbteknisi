@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\WorkType;
 use App\Models\WhatsappAccount;
 use App\Models\WhatsappMessage;
+use App\Notifications\LeadAssignedNotification;
 use App\Notifications\NewLeadNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -393,7 +394,14 @@ class LeadController extends Controller
         $this->saveAttachments($request, $lead);
         $this->logActivity($lead, 'created');
 
-        if (empty($lead->assigned_to)) {
+        if (!empty($lead->assigned_to)) {
+            // Langsung di-assign saat dibuat: hanya sales itu yang diberi tahu.
+            $lead->forceFill([
+                'assigned_by' => auth()->id(),
+                'assigned_at' => now(),
+            ])->saveQuietly();
+            $this->notifyAssignee($lead, null);
+        } else {
             Notification::send(
                 User::permission('manage-sales-leads')->get(),
                 new NewLeadNotification($lead)
@@ -526,8 +534,14 @@ class LeadController extends Controller
             }
         }
 
+        $previousAssignee = $lead->getOriginal('assigned_to');
         $lead->save();
         $this->syncAttachments($request, $lead);
+
+        // Ganti assignee saat edit: hanya sales baru yang diberi tahu.
+        if (!empty($lead->assigned_to) && (int) $lead->assigned_to !== (int) $previousAssignee) {
+            $this->notifyAssignee($lead, $previousAssignee);
+        }
 
         if ($changes) {
             $this->logActivity($lead, 'updated', $changes);
@@ -729,6 +743,24 @@ class LeadController extends Controller
             'action' => $action,
             'changes' => $changes,
         ]);
+    }
+
+    /**
+     * Notifikasi assign hanya ke sales yang dituju (tidak broadcast).
+     */
+    private function notifyAssignee(Lead $lead, mixed $previousAssignee): void
+    {
+        if (empty($lead->assigned_to)
+            || (int) $lead->assigned_to === (int) $previousAssignee
+            || (int) $lead->assigned_to === (int) auth()->id()) {
+            return;
+        }
+
+        try {
+            User::find($lead->assigned_to)?->notify(new LeadAssignedNotification($lead));
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     public function previewDocument(Lead $lead, ProjectDocument $document)
