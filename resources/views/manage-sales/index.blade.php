@@ -108,24 +108,18 @@
                                 <form action="{{ route('manage-sales.update', $lead) }}" method="POST" data-loading-text="Updating…">
                                     @csrf
                                     @method('PUT')
-                                    <select name="pt_group" onchange="this.form.submit()" title="{{ __('Ubah lead dari PT') }}"
-                                            class="w-24 rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
-                                        <option value="">—</option>
-                                        @foreach(\App\Models\Lead::PT_GROUPS as $pt)
-                                            <option value="{{ $pt }}" {{ $lead->pt_group === $pt ? 'selected' : '' }}>{{ $pt }}</option>
-                                        @endforeach
-                                    </select>
+                                    <x-glide-select name="pt_group" size="sm" class="w-24" label="Lead dari PT" empty-label="—"
+                                        :options="collect(\App\Models\Lead::PT_GROUPS)->map(fn ($g) => ['value' => $g, 'label' => $g])->all()"
+                                        :value="$lead->pt_group" autosubmit />
                                 </form>
                             </td>
                             <td class="px-6 py-4 text-left">
                                 <form action="{{ route('manage-sales.assign', $lead) }}" method="POST" class="flex items-center gap-2" data-loading-text="Assigning…">
                                     @csrf
-                                    <select name="assigned_to" class="w-40 rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
-                                        <option value="">{{ __('— Pilih Sales —') }}</option>
-                                        @foreach($salesUsers as $user)
-                                            <option value="{{ $user->id }}" {{ $lead->assigned_to === $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                                        @endforeach
-                                    </select>
+                                    <x-glide-select name="assigned_to" size="sm" class="w-40" label="Assign ke Sales"
+                                        placeholder="— Pilih Sales —"
+                                        :options="$salesUsers->map(fn ($u) => ['value' => $u->id, 'label' => $u->name])->all()"
+                                        :value="$lead->assigned_to" required />
                                     <button type="submit" title="{{ __('Assign ke Sales') }}"
                                             class="group relative inline-flex items-center gap-1.5 overflow-hidden px-3 py-2 rounded-xl bg-green-100 hover:bg-green-200 text-green-700 text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-green-500/30 hover:brightness-105 active:scale-95">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
