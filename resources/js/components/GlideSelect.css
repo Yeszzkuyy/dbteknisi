@@ -139,7 +139,7 @@
 /* Menu di-portal ke body: fixed agar lolos dari scroll-container
    (tabel overflow-x-auto). Posisi + lebar via inline style;
    min-width/bottom/right bawaan harus dinetralkan. */
-.glide-select__menu--portal {
+.glide-select__menu.glide-select__menu--portal {
   position: fixed;
   z-index: 80;
   min-width: 0;
