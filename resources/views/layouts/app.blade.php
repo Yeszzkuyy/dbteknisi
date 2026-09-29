@@ -189,6 +189,9 @@
         // (navigasi tanpa refresh me-morph ulang konten; elemen yang
         // diganti morph kehilangan listener, jadi binding diulang di sini
         // dengan pengaman dataset.bound agar tidak ganda).
+        // Safety-net opsi A: paksa tampilkan [data-reveal] bila observer tak pernah
+        // fire / JS error parsial — cegah dashboard blank putih (opacity: 0).
+        function forceReveal(){document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function(el){el.classList.add('in-view')});}
         function initChrome(){
             var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay'),h=document.getElementById('hamburgerBtn');
             if(!s||!o)return;
@@ -250,6 +253,9 @@
             // Reveal saat scroll — hormati prefers-reduced-motion.
             // Elemen yang sudah di viewport langsung in-view sinkron (tanpa
             // tunggu callback observer) agar konten atas tidak kedip/pop-in.
+            // Fallback timer memaksa tampil bila observer tak fire (JS error,
+            // morph Livewire) — cegah blank putih.
+            try{
             if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&'IntersectionObserver' in window){
                 if(!window.__revealIO){
                     window.__revealIO=new IntersectionObserver(function(entries){
@@ -265,6 +271,9 @@
             }else{
                 document.querySelectorAll('[data-reveal]').forEach(function(el){el.classList.add('in-view')});
             }
+            }catch(e){forceReveal();}
+            if(window.__revealFallback)clearTimeout(window.__revealFallback);
+            window.__revealFallback=setTimeout(forceReveal,1500);
             // Parallax mouse halus untuk [data-parallax-mouse] — nonaktif di
             // touch / reduced-motion; kembali ke posisi awal saat mouse pergi
             if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.matchMedia('(hover: hover)').matches){
@@ -290,8 +299,11 @@
                 });
             }
         }
-        document.addEventListener('DOMContentLoaded',initChrome);
-        document.addEventListener('livewire:navigated',initChrome);
+        function initChromeSafe(){try{initChrome()}catch(e){try{forceReveal()}catch(_){}}}
+        document.addEventListener('DOMContentLoaded',initChromeSafe);
+        document.addEventListener('livewire:navigated',initChromeSafe);
+        // Last-resort: jalan saat parse, tak tergantung initChrome sukses.
+        setTimeout(function(){try{forceReveal()}catch(e){}},2000);
     </script>
 </body>
 </html>
