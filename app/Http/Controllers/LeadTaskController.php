@@ -116,6 +116,11 @@ class LeadTaskController extends Controller
             'changes' => ['task' => $task->title],
         ]);
 
+        // Beri tahu inside sales yang di-assign (kecuali pembuatnya sendiri).
+        if ($task->assigned_to && (int) $task->assigned_to !== (int) auth()->id()) {
+            $task->assignee?->notify(new \App\Notifications\LeadTaskNotification($task, 'created'));
+        }
+
         return redirect()
             ->route('lead-tasks.show', $task)
             ->with('success', __('Inside sales task berhasil dibuat.'));
@@ -168,6 +173,13 @@ class LeadTaskController extends Controller
                 'action' => 'task_status_changed',
                 'changes' => ['task_status' => ['old' => $oldStatus, 'new' => $leadTask->status]],
             ]);
+
+            // Beri tahu creator + assignee (kecuali aktor sendiri).
+            foreach ([$leadTask->creator, $leadTask->assignee] as $recipient) {
+                if ($recipient && (int) $recipient->id !== (int) auth()->id()) {
+                    $recipient->notify(new \App\Notifications\LeadTaskNotification($leadTask, 'status'));
+                }
+            }
         }
 
         return redirect()

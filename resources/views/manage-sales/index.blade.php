@@ -9,6 +9,39 @@
         </div>
     </div>
 
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Total Lead') }}</p>
+            <p class="mt-1 text-3xl font-bold text-slate-800 dark:text-slate-100">{{ $stats['total'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Belum di-assign') }}</p>
+            <p class="mt-1 text-3xl font-bold {{ ($stats['unassigned'] ?? 0) > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-800 dark:text-slate-100' }}">{{ $stats['unassigned'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Won Bulan Ini') }}</p>
+            <p class="mt-1 text-3xl font-bold text-green-700 dark:text-green-300">{{ $stats['won_month'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Lost Bulan Ini') }}</p>
+            <p class="mt-1 text-3xl font-bold text-slate-800 dark:text-slate-100">{{ $stats['lost_month'] ?? 0 }}</p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Follow Up Jatuh Tempo') }}</p>
+            <p class="mt-1 text-3xl font-bold text-slate-800 dark:text-slate-100">{{ $stats['overdue'] ?? 0 }}</p>
+            @if(($bySales ?? collect())->isNotEmpty())
+                <div class="mt-2 space-y-1 border-t border-slate-100 dark:border-slate-700 pt-2">
+                    @foreach($bySales as $row)
+                        <p class="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+                            <span class="truncate">{{ $row->assignee?->name ?? '-' }}</span>
+                            <span class="font-bold text-slate-700 dark:text-slate-200">{{ $row->total }}</span>
+                        </p>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600">
         <div class="p-5 border-b dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-t-2xl">
             <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

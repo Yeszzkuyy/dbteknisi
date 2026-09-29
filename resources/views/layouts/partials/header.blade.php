@@ -88,8 +88,8 @@
 
     <div class="flex items-center gap-2 sm:gap-3">
 
-        {{-- Notifikasi (Management: lead baru butuh di-assign; Sales: follow-up jatuh tempo) --}}
-        @canany(['manage-sales-leads', 'manage-sales'])
+        {{-- Notifikasi (Management: lead baru butuh di-assign; Sales: follow-up jatuh tempo; Inside Sales: task) --}}
+        @canany(['manage-sales-leads', 'manage-sales', 'manage-inside-sales'])
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open; $store.notif.refresh()"
                         class="beam-notif relative inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition-all duration-300 hover:scale-105 hover:bg-accent-500/10 hover:text-accent-600 active:scale-95 dark:text-slate-300 dark:hover:bg-accent-400/10 dark:hover:text-accent-400"

@@ -28,7 +28,26 @@ class ManageSalesController extends Controller
 
         $salesUsers = User::role('sales')->orderBy('name')->get(['id', 'name']);
 
-        return view('manage-sales.index', compact('leads', 'salesUsers'));
+        // Agregat global (tidak ikut filter tabel).
+        $stats = [
+            'total' => Lead::count(),
+            'unassigned' => Lead::whereNull('assigned_to')->count(),
+            'won_month' => Lead::where('status', 'won')
+                ->whereMonth('updated_at', now()->month)
+                ->whereYear('updated_at', now()->year)->count(),
+            'lost_month' => Lead::where('status', 'lost')
+                ->whereMonth('updated_at', now()->month)
+                ->whereYear('updated_at', now()->year)->count(),
+            'overdue' => FollowUp::whereNotNull('follow_up_date')
+                ->whereDate('follow_up_date', '<', today())->count(),
+        ];
+        $bySales = Lead::selectRaw('assigned_to, count(*) as total')
+            ->whereNotNull('assigned_to')
+            ->groupBy('assigned_to')
+            ->orderByDesc('total')
+            ->limit(5)->with('assignee:id,name')->get();
+
+        return view('manage-sales.index', compact('leads', 'salesUsers', 'stats', 'bySales'));
     }
 
     public function edit(Lead $lead)
@@ -166,9 +185,32 @@ class ManageSalesController extends Controller
             'overdue' => FollowUp::where($ownActivity)
                 ->whereNotNull('follow_up_date')
                 ->whereDate('follow_up_date', '<', today())->count(),
+            'followups_today' => FollowUp::where($ownActivity)
+                ->whereDate('follow_up_date', today())->count(),
+            'followups_upcoming' => FollowUp::where($ownActivity)
+                ->whereNotNull('follow_up_date')
+                ->whereDate('follow_up_date', '>', today())->count(),
         ];
 
-        return view('sales.my-leads', compact('leads', 'statuses', 'kpi'));
+        // List ringkas: follow-up hari ini + mendatang, meeting minggu ini, task saya.
+        $dueFollowUps = FollowUp::with('customer')
+            ->where($ownActivity)
+            ->whereNotNull('follow_up_date')
+            ->whereDate('follow_up_date', '<=', today()->addWeek())
+            ->orderBy('follow_up_date')
+            ->limit(5)->get();
+        $weekMeetings = Meeting::with('customer')
+            ->where($ownActivity)
+            ->whereBetween('meeting_date', [now()->startOfWeek(), now()->endOfWeek()])
+            ->orderBy('meeting_date')
+            ->limit(5)->get();
+        $myTasks = \App\Models\LeadTask::with(['lead.customer', 'assignee'])
+            ->whereHas('lead', $ownLead)
+            ->whereNotIn('status', ['done'])
+            ->orderBy('due_date')
+            ->limit(5)->get();
+
+        return view('sales.my-leads', compact('leads', 'statuses', 'kpi', 'dueFollowUps', 'weekMeetings', 'myTasks'));
     }
 
     public function activityLog(Request $request)

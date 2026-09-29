@@ -24,7 +24,55 @@
             <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Follow Up Jatuh Tempo') }}</p>
             <p class="mt-1 text-3xl font-bold {{ ($kpi['overdue'] ?? 0) > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-800 dark:text-slate-100' }}">{{ $kpi['overdue'] ?? 0 }}</p>
         </a>
+        <a href="{{ route('sales.follow-ups.index', ['overdue' => 'today']) }}"
+           class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 hover:shadow transition">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Follow Up Hari Ini') }}</p>
+            <p class="mt-1 text-3xl font-bold text-slate-800 dark:text-slate-100">{{ $kpi['followups_today'] ?? 0 }}</p>
+        </a>
+        <a href="{{ route('sales.follow-ups.index', ['overdue' => 'upcoming']) }}"
+           class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 hover:shadow transition">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Follow Up Mendatang') }}</p>
+            <p class="mt-1 text-3xl font-bold text-slate-800 dark:text-slate-100">{{ $kpi['followups_upcoming'] ?? 0 }}</p>
+        </a>
     </div>
+
+    @if(($dueFollowUps ?? collect())->isNotEmpty() || ($weekMeetings ?? collect())->isNotEmpty() || ($myTasks ?? collect())->isNotEmpty())
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">{{ __('Follow Up Mendesak') }}</h3>
+                @forelse($dueFollowUps as $fu)
+                    <a href="{{ route('sales.follow-ups.show', $fu) }}" class="block py-2 border-b border-slate-100 dark:border-slate-700 last:border-0 hover:underline">
+                        <span class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $fu->customer?->name ?? '-' }}</span>
+                        <span class="block text-xs text-slate-500">{{ $fu->follow_up_date?->format('d M Y') ?? '-' }}</span>
+                    </a>
+                @empty
+                    <p class="text-sm text-slate-400">{{ __('Tidak ada.') }}</p>
+                @endforelse
+            </div>
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">{{ __('Meeting Minggu Ini') }}</h3>
+                @forelse($weekMeetings as $meeting)
+                    <a href="{{ route('sales.meetings.show', $meeting) }}" class="block py-2 border-b border-slate-100 dark:border-slate-700 last:border-0 hover:underline">
+                        <span class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $meeting->customer?->name ?? '-' }}</span>
+                        <span class="block text-xs text-slate-500">{{ $meeting->meeting_date?->format('d M Y') ?? '-' }}</span>
+                    </a>
+                @empty
+                    <p class="text-sm text-slate-400">{{ __('Tidak ada.') }}</p>
+                @endforelse
+            </div>
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">{{ __('Inside Sales Task Aktif') }}</h3>
+                @forelse($myTasks as $task)
+                    <a href="{{ route('lead-tasks.show', $task) }}" class="block py-2 border-b border-slate-100 dark:border-slate-700 last:border-0 hover:underline">
+                        <span class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ $task->title }}</span>
+                        <span class="block text-xs text-slate-500">{{ $task->assignee?->name ?? __('Belum di-assign') }}</span>
+                    </a>
+                @empty
+                    <p class="text-sm text-slate-400">{{ __('Tidak ada.') }}</p>
+                @endforelse
+            </div>
+        </div>
+    @endif
 
     <form method="GET" action="{{ route('sales.my-leads') }}" class="flex flex-wrap gap-3 mb-4">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Cari customer...') }}"
