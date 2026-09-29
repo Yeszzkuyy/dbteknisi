@@ -146,6 +146,10 @@
   margin: 0;
   bottom: auto;
   right: auto;
+  /* List di dalam yang scroll (aturan legacy max-height menu dimatikan
+     di sini agar tidak jadi scroller kedua yang memotong list). */
+  max-height: none;
+  overflow: visible;
 }
 
 .glide-select__list {
