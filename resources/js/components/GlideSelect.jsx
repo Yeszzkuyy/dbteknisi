@@ -1,4 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import './GlideSelect.css';
 
@@ -66,6 +67,7 @@ export default function GlideSelect({
   const [phase, setPhase] = useState('closed');
   const [active, setActive] = useState(null);
   const [side, setSide] = useState(placement);
+  const [menuPos, setMenuPos] = useState(null);
   const rootRef = useRef(null);
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
@@ -84,14 +86,23 @@ export default function GlideSelect({
     const root = rootRef.current;
     if (!el || !root) return;
     const r = root.getBoundingClientRect();
-    const need = el.offsetHeight + MENU_GAP;
-    setSide(
+    const h = el.offsetHeight;
+    const need = h + MENU_GAP;
+    // Menu di-portal ke body (fixed): hitung posisi dari viewport agar
+    // lolos dari scroll-container (mis. tabel overflow-x-auto).
+    const nextSide =
       placement === 'bottom' && r.bottom + need > window.innerHeight
         ? 'top'
         : placement === 'top' && r.top - need < 0
           ? 'bottom'
-          : placement
-    );
+          : placement;
+    setSide(nextSide);
+    const w = Math.max(r.width, menuWidth);
+    setMenuPos({
+      width: w,
+      left: Math.max(8, Math.min(align === 'right' ? r.right - w : r.left, window.innerWidth - w - 8)),
+      top: Math.max(8, nextSide === 'bottom' ? r.bottom + MENU_GAP : r.top - h - MENU_GAP),
+    });
     el.style.transitionDuration = instant.current ? '0ms' : '';
     el.dataset.state = 'closed';
     void el.offsetHeight;
@@ -186,6 +197,7 @@ export default function GlideSelect({
   useEffect(() => {
     if (phase === 'closed') return undefined;
     const onDown = e => {
+      if (menuRef.current && menuRef.current.contains(e.target)) return;
       if (rootRef.current && !rootRef.current.contains(e.target)) close('pop');
     };
     document.addEventListener('pointerdown', onDown, true);
@@ -196,6 +208,18 @@ export default function GlideSelect({
     if (disabled && phase !== 'closed') close('instant');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
+  // Menu portal berposisi fixed: tutup saat scroll/resize daripada melayang.
+  useEffect(() => {
+    if (phase === 'closed') return undefined;
+    const onScroll = () => close('instant');
+    document.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onScroll);
+    return () => {
+      document.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
   useEffect(() => () => clearTimeout(closeTimer.current), []);
 
   const rowAt = y => {
@@ -286,8 +310,9 @@ export default function GlideSelect({
           <ChevronIcon />
         </span>
       </button>
-      {phase !== 'closed' ? (
-        <div ref={menuRef} className="glide-select__menu" data-state="open" data-side={side} data-align={align}>
+      {phase !== 'closed' ? createPortal(
+        <div ref={menuRef} className="glide-select__menu glide-select__menu--portal" data-state="open" data-side={side} data-align={align}
+             style={menuPos ? { top: menuPos.top, left: menuPos.left, width: menuPos.width } : undefined}>
           <div
             id={`${id}-list`}
             role="listbox"
@@ -322,7 +347,8 @@ export default function GlideSelect({
               </div>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </div>
   );
