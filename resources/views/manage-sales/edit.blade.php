@@ -83,26 +83,19 @@
                         {{ __('Lead dari PT') }}
                         <x-info-tip tip="{{ __('Jenama penyedia yang menangani lead ini. Bisa diubah jikalau management menggantinya.') }}" />
                     </label>
-                    <select name="pt_group" id="pt_group"
-                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        <option value="">{{ __('— Pilih PT —') }}</option>
-                        @foreach(\App\Models\Lead::PT_GROUPS as $pt)
-                            <option value="{{ $pt }}" {{ old('pt_group', $lead->pt_group) === $pt ? 'selected' : '' }}>{{ $pt }}</option>
-                        @endforeach
-                    </select>
+                    <x-glide-select name="pt_group" id="pt_group" :label="__('Lead dari PT')" empty-label="— Pilih PT —"
+                        :options="collect(\App\Models\Lead::PT_GROUPS)->map(fn ($g) => ['value' => $g, 'label' => $g])->all()"
+                        :value="old('pt_group', $lead->pt_group)" :error="$errors->first('pt_group')" />
                 </div>
                 <div>
                     <label for="assigned_to" class="flex items-center gap-1.5 text-sm font-medium text-slate-700 mb-1">
                         {{ __('Assign / Direct ke Sales') }}
                         <x-info-tip tip="{{ __('Sales yang bertanggung jawab follow-up lead ini.') }}" />
                     </label>
-                    <select name="assigned_to" id="assigned_to"
-                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        <option value="">{{ __('— Belum di-assign (NEW) —') }}</option>
-                        @foreach($salesUsers as $user)
-                            <option value="{{ $user->id }}" {{ old('assigned_to', $lead->assigned_to) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-glide-select name="assigned_to" id="assigned_to" :label="__('Assign / Direct ke Sales')"
+                        :placeholder="__('— Belum di-assign (NEW) —')"
+                        :options="$salesUsers->map(fn ($u) => ['value' => $u->id, 'label' => $u->name])->all()"
+                        :value="old('assigned_to', $lead->assigned_to)" :error="$errors->first('assigned_to')" />
                     @if($lead->assignee)
                         <p class="mt-1 text-xs text-slate-500">
                             {{ __('Di-assign ke') }} {{ $lead->assignee->name }}
