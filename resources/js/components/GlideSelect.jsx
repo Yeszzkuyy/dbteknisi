@@ -236,9 +236,10 @@ export default function GlideSelect({
   useEffect(() => () => clearTimeout(closeTimer.current), []);
 
   const rowAt = y => {
-    const s = scrub.current;
-    if (!s) return null;
-    const i = Math.floor((y - s.top - PAD) / step);
+    const list = menuRef.current ? menuRef.current.querySelector('.glide-select__list') : null;
+    if (!list) return null;
+    // Posisi + scroll dibaca live agar klik/drag tetap tepat walau list digulir.
+    const i = Math.floor((y - list.getBoundingClientRect().top - PAD + list.scrollTop) / step);
     return i >= 0 && i < items.length ? i : null;
   };
   const onListDown = e => {
@@ -246,7 +247,7 @@ export default function GlideSelect({
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {}
-    scrub.current = { id: e.pointerId, top: e.currentTarget.getBoundingClientRect().top };
+    scrub.current = { id: e.pointerId };
     instant.current = true;
     setActive(rowAt(e.clientY));
   };
