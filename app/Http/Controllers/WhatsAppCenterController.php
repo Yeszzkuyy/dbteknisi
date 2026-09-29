@@ -35,6 +35,7 @@ class WhatsAppCenterController extends Controller
             'label' => $a->name ?: 'WA '.strtoupper(substr($a->account_code, 3)),
             'name' => $a->name,
             'phone_number' => $a->phone_number,
+            'gateway_type' => $a->gateway_type,
             'gateway_status' => $a->gateway_status,
         ])->values();
 
