@@ -84,7 +84,8 @@ class ManageSalesController extends Controller
 
         return redirect()
             ->route('manage-sales.index')
-            ->with('success', __('Lead berhasil diperbarui'));
+            ->with('success', __('Lead berhasil diperbarui'))
+            ->with('success_card', true);
     }
 
     public function assign(Request $request, Lead $lead)
@@ -113,7 +114,8 @@ class ManageSalesController extends Controller
 
         return redirect()
             ->route('manage-sales.index')
-            ->with('success', __('Lead di-assign ke') . ' ' . $salesUser->name);
+            ->with('success', __('Lead di-assign ke') . ' ' . $salesUser->name)
+            ->with('success_card', true);
     }
 
     public function myLeads()

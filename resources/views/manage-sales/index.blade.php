@@ -1,4 +1,7 @@
 <x-app-layout>
+    @if(session('success') && session('success_card'))
+        <x-status-card :message="session('success')" />
+    @endif
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Manage Sales</h1>
@@ -102,7 +105,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-left">
-                                <form action="{{ route('manage-sales.update', $lead) }}" method="POST">
+                                <form action="{{ route('manage-sales.update', $lead) }}" method="POST" data-loading-text="Updating…">
                                     @csrf
                                     @method('PUT')
                                     <select name="pt_group" onchange="this.form.submit()" title="{{ __('Ubah lead dari PT') }}"
@@ -115,7 +118,7 @@
                                 </form>
                             </td>
                             <td class="px-6 py-4 text-left">
-                                <form action="{{ route('manage-sales.assign', $lead) }}" method="POST" class="flex items-center gap-2">
+                                <form action="{{ route('manage-sales.assign', $lead) }}" method="POST" class="flex items-center gap-2" data-loading-text="Assigning…">
                                     @csrf
                                     <select name="assigned_to" class="w-40 rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 text-sm">
                                         <option value="">{{ __('— Pilih Sales —') }}</option>

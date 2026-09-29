@@ -125,7 +125,7 @@ function showSubmitOverlay(form) {
 }
 
 function fallbackLoadingText() {
-    return (document.documentElement.lang || 'en').startsWith('id') ? 'Memuat…' : 'Loading...';
+    return 'Loading...';
 }
 
 // Anti-duplikat: kunci tombol saat submit benar-benar jalan.
@@ -133,7 +133,7 @@ function fallbackLoadingText() {
 // Didaftarkan duluan agar wireRequiredValidation bisa membukanya lagi.
 function wireSubmitGuard() {
     document.querySelectorAll('form:not([data-submit-guarded])').forEach((form) => {
-        if (!form.querySelector('[data-glide-mount]')) return;
+        if (!form.querySelector('[data-glide-mount]') && !form.hasAttribute('data-loading-text')) return;
         form.dataset.submitGuarded = 'true';
         form.addEventListener('invalid', () => setSubmitLocked(form, false), true);
         form.addEventListener('submit', () => setSubmitLocked(form, true));
