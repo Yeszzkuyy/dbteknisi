@@ -343,12 +343,13 @@
             });}
             // Klik header grup / toggle saat rail → lebarkan dulu, lalu buka
             // submenu-nya (di rail submenu tak punya ruang untuk ditampilkan).
-            s.querySelectorAll('nav button[type="button"], nav a[aria-controls]').forEach(function(b){
+            s.querySelectorAll('nav button[type="button"], nav a[aria-controls], .sb-group > div > a').forEach(function(b){
                 if(b.dataset.bound)return;b.dataset.bound='1';
                 b.addEventListener('click',function(){
                     if(window.innerWidth<1024||!root.classList.contains('sidebar-collapsed'))return;
                     setCollapsed(false);
-                    var scope=null;try{scope=window.Alpine?Alpine.$data(b.closest('.sb-group')):null}catch(e){}
+                    var group=b.closest('.sb-group');if(!group)return;
+                    var scope=null;try{scope=window.Alpine?Alpine.$data(group):null}catch(e){}
                     if(scope&&typeof scope.open==='boolean'&&!scope.open)scope.open=true;
                 });
             });
