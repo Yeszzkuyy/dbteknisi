@@ -265,7 +265,7 @@ tbody tr { transition: background-color 0.2s ease; }
 .sidebar nav .sb-group > div.sb-active:hover { color: var(--nav-active-text); }
 .sidebar nav p { color: var(--nav-muted); }
 .sidebar .border-white\/10 { border-color: var(--sidebar-border-soft); }
-.sidebar .sidebar-logo h1 { color: var(--sidebar-logo-text); }
+.sidebar .sidebar-logo h1 { color: var(--sidebar-logo-text); font-family: "Times New Roman", Times, serif; }
 .sidebar .sidebar-logo p { color: var(--nav-muted); }
 .sidebar .sidebar-logo { border-color: var(--sidebar-border-soft); }
 .sidebar .sidebar-user { border-color: var(--sidebar-border-soft); background: var(--sidebar-panel-bg); }
