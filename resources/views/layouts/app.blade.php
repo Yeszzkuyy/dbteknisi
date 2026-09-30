@@ -184,6 +184,10 @@
             html.sidebar-collapsed .sidebar .sb-head,
             html.sidebar-collapsed .sidebar-user,
             html.sidebar-collapsed .sidebar-collapse{gap:0}
+            /* ml-auto pada span notif/label tetap menyerap ruang kosong meski
+               max-width:0 → ikon terdorong ke tepi kiri. Setel margin 0. */
+            html.sidebar-collapsed .sidebar nav a > span.ml-auto,
+            html.sidebar-collapsed .sidebar nav button > span.ml-auto{margin-left:0!important;margin-right:0!important}
             /* Toggle sub-menu tak ada gunanya di rail (sub-menu tersembunyi)
                dan diameternya bikin header grup tidak simetris. */
             html.sidebar-collapsed .sidebar .sb-toggle{display:none!important}
