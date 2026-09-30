@@ -44,7 +44,7 @@
         $canViewSales ? ['route' => route('sales.follow-ups.index'), 'match' => 'sales.follow-ups.*', 'label' => 'Follow Up', 'dot' => 'bg-green-400'] : null,
         $canViewSales ? ['route' => route('leads.pipeline'), 'match' => 'leads.pipeline', 'label' => 'Pipeline', 'dot' => 'bg-sky-400'] : null,
         $hasSalesProject ? ['route' => route('projects.index'), 'match' => 'projects*', 'label' => 'Project', 'dot' => 'bg-cyan-400'] : null,
-        auth()->user()->can('manage-inside-sales') ? ['route' => route('lead-tasks.index'), 'match' => 'lead-tasks*', 'label' => 'Inside Sales', 'dot' => 'bg-cyan-400'] : null,
+        auth()->user()->can('manage-inside-sales') ? ['route' => route('lead-tasks.index'), 'match' => 'lead-tasks*', 'label' => 'Inside Sales', 'dot' => 'bg-fuchsia-400'] : null,
     ]));
     $salesCount = count($salesItems);
     $salesIdx = collect($salesItems)->search(fn ($item) => request()->routeIs($item['match']));
