@@ -262,20 +262,20 @@
 
             <div class="px-4 sm:px-6 lg:px-8 pt-5">
                 @if(session('success') && !session('success_card'))
-                    <div class="rounded-xl bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-400 px-5 py-3 mb-4">{{ session('success') }}</div>
+                    <x-toast type="success">{{ session('success') }}</x-toast>
                 @endif
                 @if(session('error'))
-                    <div class="rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-5 py-3 mb-4">{{ session('error') }}</div>
+                    <x-toast type="error">{{ session('error') }}</x-toast>
                 @endif
                 @if($errors->any())
-                    <div class="rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-5 py-3 mb-4">
+                    <x-toast type="error">
                         <p class="font-semibold mb-1">{{ __('Terdapat kesalahan pada form:') }}</p>
                         <ul class="list-disc list-inside text-sm">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
-                    </div>
+                    </x-toast>
                 @endif
             </div>
 
@@ -285,7 +285,7 @@
             </main>
 
             <footer class="px-4 sm:px-6 lg:px-8 pb-4 text-center text-[11px] text-slate-400 dark:text-slate-500">
-                {{ __('Animated icons by') }} <a href="https://lordicon.com/" target="_blank" rel="noopener" class="hover:underline">Lordicon.com</a>
+                Tridayaapp.com
             </footer>
         </div>
     </div>
@@ -473,6 +473,26 @@
             window.addEventListener('pageshow',stop);
             stop();
         })();
+        // Pertahankan posisi scroll halaman saat reload dari halaman yang sama
+        // (mis. preset This Month/3/6 Month + submit filter dashboard marketing):
+        // reload full page me-reset scroll ke atas. Pulihkan hanya bila datang
+        // dari path yang sama; navigasi dari menu lain tetap mulai dari atas.
+        // Restore instan (bukan smooth) — tujuannya tidak pindah, bukan animasi.
+        (function(){
+            if(window.__pageScrollBound)return;window.__pageScrollBound=true;
+            try{
+                if('scrollRestoration' in history)history.scrollRestoration='manual';
+                var key='page-scroll:'+window.location.pathname;
+                var ref=null;
+                try{ref=document.referrer?new URL(document.referrer).pathname:null;}catch(e){}
+                var y=+(sessionStorage.getItem(key)||0);
+                if(y>0&&ref===window.location.pathname){window.scrollTo(0,y);}
+                window.addEventListener('beforeunload',function(){
+                    try{sessionStorage.setItem(key,String(window.scrollY||0));}catch(e){}
+                });
+            }catch(e){}
+        })();
     </script>
+    @livewireScripts
 </body>
 </html>

@@ -115,7 +115,7 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_email" value="1" class="peer sr-only" @checked($notifyEmail)>
-                            <span class="toggle-track h-6 w-11 rounded-full transition"></span>
+                            <span class="toggle-track h-6 w-11 rounded-full transition peer-focus-visible:ring-2 peer-focus-visible:ring-accent-500 peer-focus-visible:ring-offset-2"></span>
                             <span class="toggle-knob pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
@@ -127,7 +127,7 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_system" value="1" class="peer sr-only" @checked($notifySystem)>
-                            <span class="toggle-track h-6 w-11 rounded-full transition"></span>
+                            <span class="toggle-track h-6 w-11 rounded-full transition peer-focus-visible:ring-2 peer-focus-visible:ring-accent-500 peer-focus-visible:ring-offset-2"></span>
                             <span class="toggle-knob pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>
@@ -139,7 +139,7 @@
                         </span>
                         <span class="relative inline-flex shrink-0 items-center">
                             <input type="checkbox" name="notify_push" value="1" class="peer sr-only" @checked($notifyPush)>
-                            <span class="toggle-track h-6 w-11 rounded-full transition"></span>
+                            <span class="toggle-track h-6 w-11 rounded-full transition peer-focus-visible:ring-2 peer-focus-visible:ring-accent-500 peer-focus-visible:ring-offset-2"></span>
                             <span class="toggle-knob pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"></span>
                         </span>
                     </label>

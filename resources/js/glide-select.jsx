@@ -183,3 +183,6 @@ function wireRequiredValidation() {
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountAll);
 else mountAll();
+// Navigasi Livewire (morph) tidak me-reload modul: mount ulang node baru.
+// Guard data-mounted mencegah mount ganda pada node lama.
+document.addEventListener('livewire:navigated', mountAll);

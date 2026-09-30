@@ -309,8 +309,10 @@ tbody tr { transition: background-color 0.2s ease; }
     [data-reveal][data-reveal-delay="2"] { transition-delay: 0.14s; }
     [data-reveal][data-reveal-delay="3"] { transition-delay: 0.21s; }
 
-    /* Bar chart tumbuh (tinggi/lebar 0 → target) saat ancestor .in-view.
-       State 0 hanya bila html.js.reveal-on — tanpa JS langsung tampil final. */
+    /* Bar chart tumbuh (tinggi/lebar 0 → target) tiap kunjungan saat ancestor
+       .in-view. State 0 hanya bila html.js (JS jalan) — tanpa JS langsung
+       tampil final. Sengaja TIDAK digate .reveal-on: reveal teks dibatasi
+       sekali per sesi, tapi grafik harus beranimasi tiap kunjungan. */
     [data-grow-h] {
         height: var(--h);
         transition: height 1.2s var(--ease-out);
@@ -321,8 +323,8 @@ tbody tr { transition: background-color 0.2s ease; }
         transition: width 1.2s var(--ease-out);
         transition-delay: var(--d, 0ms);
     }
-    html.js.reveal-on [data-reveal]:not(.in-view) [data-grow-h] { height: 0; }
-    html.js.reveal-on [data-reveal]:not(.in-view) [data-grow-w] { width: 0; }
+    html.js [data-reveal]:not(.in-view) [data-grow-h] { height: 0; }
+    html.js [data-reveal]:not(.in-view) [data-grow-w] { width: 0; }
 
     /* Parallax mouse (nilai diisi JS via --px/--py); hanya untuk dekorasi opt-in */
     [data-parallax-mouse] {

@@ -39,12 +39,17 @@
     border-left: 1px solid var(--sidebar-border);
 }
 
+/* Jarak header grup ke sub-item pertama ("menu" vs "sub menu" tidak
+   gabung). Margin di sini aman untuk collapse 0fr: ia berada di dalam
+   area overflow:hidden .sb-sub-list sehingga ikut terpotong penuh
+   saat sub-menu tertutup. */
+.sidebar .sb-sub-list > .sb-sub-item:first-child { margin-top: 6px; }
+
 /* ---------- Item sub-menu: blur + naik, stagger per anak ----------
-   Hanya pada kunjungan pertama per sesi (html:not(.sidebar-settled)).
-   Navigasi di app ini full page reload, jadi tanpa penanda ini tiap
-   pindah menu memutar ulang efek "turun-turun" sub-menu aktif. */
+   Main tiap grup dibuka (termasuk grup aktif saat pindah menu, karena
+   navigasi full page reload). */
 @media (prefers-reduced-motion: no-preference) {
-    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item {
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item {
         animation: sb-sub-in 180ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
     }
 }
@@ -66,13 +71,13 @@
 /* Stagger per anak. Sub-item terbanyak = 8 (grup Teknisi), jadi 8 slot
    cukup; sisanya memakai delay slot terakhir. */
 @media (prefers-reduced-motion: no-preference) {
-    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(1) { animation-delay: var(--sb-stagger-first); }
-    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(2) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger)); }
-    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(3) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 2); }
-    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(4) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 3); }
-    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(5) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 4); }
-    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(6) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 5); }
-    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(n + 7) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 6); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(1) { animation-delay: var(--sb-stagger-first); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(2) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger)); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(3) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 2); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(4) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 3); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(5) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 4); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(6) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 5); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(n + 7) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 6); }
 }
 
 /* ---------- Tombol buka/tutup grup ---------- */

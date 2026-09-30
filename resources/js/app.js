@@ -1,11 +1,17 @@
 
 
-import Alpine from 'alpinejs';
+import AlpineBundle from 'alpinejs';
 import Sortable from 'sortablejs';
 import ApexCharts from 'apexcharts';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
+// Satu copy Alpine untuk seluruh app: Livewire menyuntik Alpine miliknya
+// sendiri (window.Alpine) + start saat DOMContentLoaded. Start ganda dari
+// dua copy = double-init seluruh x-data (store terbelah, listener ganda).
+// Jadi pakai copy Livewire bila ada; bundle sendiri hanya fallback bila
+// Livewire absen, dan start manual hanya dalam kasus fallback itu.
+const Alpine = window.Alpine ?? AlpineBundle;
 window.Alpine = Alpine;
 window.Sortable = Sortable;
 window.ApexCharts = ApexCharts;
@@ -249,7 +255,7 @@ document.addEventListener('alpine:init', () => {
     }));
 });
 
-Alpine.start();
+if (!window.Livewire) Alpine.start();
 
 /* ============================================================
    Sidebar grup — buka/tutup mengikuti halaman AKTIF, bukan klik.
@@ -343,6 +349,22 @@ function ajaxToggleReset(form) {
     reset.classList.toggle('hidden', !filled);
 }
 
+// Skeleton baris tabel selama filter AJAX berjalan: jumlah kolom dibaca dari
+// thead target (fallback 4), baris pulse bawaan Tailwind. Diganti respons asli.
+function ajaxSkeleton(target, rows = 5) {
+    const table = target.querySelector('table');
+    const tbody = table?.querySelector('tbody');
+    if (!tbody) return;
+    const cols = table.querySelectorAll('thead th').length || 4;
+    let cells = '';
+    for (let c = 0; c < cols; c++) {
+        cells += '<td class="px-6 py-4"><div class="h-4 rounded-md bg-slate-200 dark:bg-slate-700 animate-pulse"></div></td>';
+    }
+    let html = '';
+    for (let r = 0; r < rows; r++) html += '<tr>' + cells + '</tr>';
+    tbody.innerHTML = html;
+}
+
 document.addEventListener('submit', async (e) => {
     const form = e.target?.closest?.('form[data-ajax]');
     if (!form || e.defaultPrevented) return;
@@ -361,6 +383,8 @@ document.addEventListener('submit', async (e) => {
         if ((form.method || 'get').toLowerCase() === 'get') {
             const params = new URLSearchParams(new FormData(form));
             const url = form.action + (form.action.includes('?') ? '&' : '?') + params.toString();
+            const target = form.dataset.ajaxTarget ? document.querySelector(form.dataset.ajaxTarget) : null;
+            if (target) ajaxSkeleton(target);
             const res = await fetch(url, { headers });
             const data = await res.json();
             if (data.html && form.dataset.ajaxTarget) {
