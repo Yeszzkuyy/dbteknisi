@@ -335,16 +335,51 @@
             if(window.__revealFallback)clearTimeout(window.__revealFallback);
             window.__revealFallback=setTimeout(forceReveal,1500);
         }
+        // Hover pill meluncur ala template (SharedLayoutBg): satu pill
+        // selebar nav mengikuti item yang di-hover. Tanpa :scope (rapuh di
+        // sebagian browser) — keanggotaan dicek via nav.contains. Class
+        // html.sb-pill diset hanya setelah bind sukses, sehingga CSS yang
+        // mentransparankan hover bawaan tak pernah jalan tanpa pill.
+        function initHoverPill(){
+            var nav=document.getElementById('sidebar-navigation');if(!nav)return;
+            if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+            var pill=nav.querySelector(':scope > .sb-hover-pill');
+            if(!pill){pill=document.createElement('span');pill.className='sb-hover-pill';pill.setAttribute('aria-hidden','true');nav.append(pill);}
+            if(nav.dataset.pillBound)return;nav.dataset.pillBound='1';
+            document.documentElement.classList.add('sb-pill');
+            function place(el){
+                var x=0,y=0,node=el;
+                while(node&&node!==nav){x+=node.offsetLeft;y+=node.offsetTop;node=node.offsetParent;}
+                pill.style.width=el.offsetWidth+'px';
+                pill.style.height=el.offsetHeight+'px';
+                pill.style.transform='translate('+x+'px,'+y+'px)';
+                pill.style.opacity='1';
+            }
+            nav.addEventListener('mousemove',function(e){
+                if(document.documentElement.classList.contains('sidebar-collapsed')&&window.innerWidth>=1024){pill.style.opacity='0';return;}
+                var t=e.target&&e.target.closest?e.target.closest('a, .sb-head'):null;
+                if(!t||!nav.contains(t)) {pill.style.opacity='0';return;}
+                if(t.tagName==='A'){var hd=t.closest('.sb-head');if(hd&&nav.contains(hd))t=hd;}
+                if(t.closest('.sb-group:not([data-open]) .sb-sub')){pill.style.opacity='0';return;}
+                place(t);
+            });
+            nav.addEventListener('mouseleave',function(){pill.style.opacity='0';});
+        }
         function initChrome(){
             var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay'),h=document.getElementById('hamburgerBtn');
             if(!s||!o)return;
             function isMobileBar(){return window.innerWidth<1024}
             var lastFocus=null;
             var FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+            // Scroll-lock ala template: body position:fixed (posisi scroll
+            // terjaga) — overflow:hidden saja bikin halaman lompat di mobile.
+            var sbScrollY=0,sbBodyPrev=null;
+            function lockBar(){sbScrollY=window.scrollY||0;sbBodyPrev={l:document.body.style.left,o:document.body.style.overflow,p:document.body.style.position,r:document.body.style.right,t:document.body.style.top};document.body.style.position='fixed';document.body.style.top=(-sbScrollY)+'px';document.body.style.left='0';document.body.style.right='0';document.body.style.overflow='hidden';}
+            function unlockBar(){if(!sbBodyPrev)return;document.body.style.position=sbBodyPrev.p;document.body.style.top=sbBodyPrev.t;document.body.style.left=sbBodyPrev.l;document.body.style.right=sbBodyPrev.r;document.body.style.overflow=sbBodyPrev.o;sbBodyPrev=null;window.scrollTo(0,sbScrollY);}
             // Sheet mobile ala template: scroll-lock + inert + fokus masuk,
             // tutup kembalikan fokus. Desktop (sidebar terlihat) tak disentuh.
-            function open(){s.classList.add('open');o.classList.add('active');if(!isMobileBar())return;lastFocus=document.activeElement;s.setAttribute('role','dialog');s.setAttribute('aria-modal','true');s.removeAttribute('inert');document.body.style.overflow='hidden';var f=s.querySelector(FOCUSABLE);if(f)f.focus({preventScroll:true});}
-            function close(restore){s.classList.remove('open');o.classList.remove('active');if(!isMobileBar())return;s.removeAttribute('role');s.removeAttribute('aria-modal');s.setAttribute('inert','');document.body.style.overflow='';if(restore!==false&&lastFocus&&document.contains(lastFocus))lastFocus.focus({preventScroll:true});}
+            function open(){s.classList.add('open');o.classList.add('active');if(!isMobileBar())return;lastFocus=document.activeElement;s.setAttribute('role','dialog');s.setAttribute('aria-modal','true');s.removeAttribute('inert');lockBar();var f=s.querySelector(FOCUSABLE);if(f)f.focus({preventScroll:true});}
+            function close(restore){s.classList.remove('open');o.classList.remove('active');if(!isMobileBar())return;s.removeAttribute('role');s.removeAttribute('aria-modal');s.setAttribute('inert','');unlockBar();if(restore!==false&&lastFocus&&document.contains(lastFocus))lastFocus.focus({preventScroll:true});}
             close(false);
             if(isMobileBar()){s.setAttribute('inert','');}
             if(h&&!h.dataset.bound){h.dataset.bound='1';h.addEventListener('click',function(){s.classList.contains('open')?close():open()});}
@@ -391,6 +426,7 @@
             });
 
             s.querySelectorAll('a,button[type="submit"]').forEach(function(e){if(e.dataset.bound)return;e.dataset.bound='1';e.addEventListener('click',function(){if(window.innerWidth<1024)close(false)})});
+            initHoverPill();
             if(!window.__chromeGlobals){
                 window.__chromeGlobals=true;
                 // ⌘B / Ctrl+B = toggle rail (ala template animated sidebar).
@@ -404,7 +440,7 @@
                     root.classList.toggle('sidebar-collapsed');
                     setCollapsed(root.classList.contains('sidebar-collapsed'));
                 });
-                window.addEventListener('resize',function(){if(window.innerWidth>=1024){var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');if(sb){sb.classList.remove('open');sb.removeAttribute('role');sb.removeAttribute('aria-modal');sb.removeAttribute('inert');}if(ov)ov.classList.remove('active');document.body.style.overflow='';}});
+                window.addEventListener('resize',function(){if(window.innerWidth>=1024){var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');if(sb){sb.classList.remove('open');sb.removeAttribute('role');sb.removeAttribute('aria-modal');sb.removeAttribute('inert');}if(ov)ov.classList.remove('active');unlockBar();}});
                 document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;var sb=document.getElementById('sidebar');if(sb&&sb.classList.contains('open'))close();});
                 // Focus trap sheet mobile ala template (Tab muter di dalam sidebar).
                 document.addEventListener('keydown',function(e){
