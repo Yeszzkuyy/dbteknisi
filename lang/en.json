@@ -959,5 +959,9 @@
     "Terakhir": "Last",
     "Total Lead": "Total Leads",
     "Status Assignment": "Assignment Status",
-    "ASSIGNED": "ASSIGNED"
+    "ASSIGNED": "ASSIGNED",
+    "Dashboard Sales": "Sales Dashboard",
+    "Halo, :name. Ringkasan performa lead Anda.": "Hi, :name. Here is your lead performance summary.",
+    "Status Lead Saya": "My Lead Status",
+    "Klik status untuk melihat lead tersebut di My Leads.": "Click a status to view those leads in My Leads."
 }

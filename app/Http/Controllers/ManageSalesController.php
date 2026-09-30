@@ -154,26 +154,8 @@ class ManageSalesController extends Controller
             ->with('success_card', true);
     }
 
-    public function myLeads(Request $request)
+    public function dashboard()
     {
-        $leads = Lead::with(['customer', 'partner'])
-            ->withCount(['meetings', 'followUps'])
-            ->where('assigned_to', auth()->id())
-            ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
-                fn ($c) => $c->whereLike('name', $request->search)))
-            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
-            ->when($request->filled('touched'), fn ($q) => $request->touched === 'yes'
-                ? $q->where(fn ($w) => $w->has('meetings')->orHas('followUps'))
-                : $q->whereDoesntHave('meetings')->whereDoesntHave('followUps'))
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
-
-        $statuses = LeadController::STATUSES;
-
-        // KPI global milik sales yang login (tidak ikut filter tabel).
-        // won bulan ini memakai updated_at karena tidak ada kolom won_at.
-        // Baris lama tanpa lead_id tetap dihitung via created_by.
         $ownLead = fn ($q) => $q->where('assigned_to', auth()->id());
         $ownActivity = function ($q) use ($ownLead) {
             $q->whereHas('lead', $ownLead)
@@ -197,7 +179,6 @@ class ManageSalesController extends Controller
                 ->whereDate('follow_up_date', '>', today())->count(),
         ];
 
-        // List ringkas: follow-up hari ini + mendatang, meeting minggu ini, task saya.
         $dueFollowUps = FollowUp::with('customer')
             ->where($ownActivity)
             ->whereNotNull('follow_up_date')
@@ -215,7 +196,46 @@ class ManageSalesController extends Controller
             ->orderBy('due_date')
             ->limit(5)->get();
 
-        return view('sales.my-leads', compact('leads', 'statuses', 'kpi', 'dueFollowUps', 'weekMeetings', 'myTasks'));
+        // Donat status lead milik sendiri (palet = warna badge status).
+        $statusCounts = $mine()->selectRaw('status, count(*) as total')
+            ->groupBy('status')->pluck('total', 'status');
+        $statusPalette = [
+            'new' => '#3b82f6',
+            'contacted' => '#eab308',
+            'qualified' => '#a855f7',
+            'proposal' => '#f97316',
+            'won' => '#22c55e',
+            'lost' => '#ef4444',
+        ];
+        $donutSales = collect(LeadController::STATUSES)->map(fn ($status) => [
+            'label' => ucfirst($status),
+            'value' => (int) ($statusCounts[$status] ?? 0),
+            'key' => $status,
+            'color' => $statusPalette[$status] ?? '#64748b',
+        ])->values();
+        $funnelTotal = $donutSales->sum('value');
+
+        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal'));
+    }
+
+    public function myLeads(Request $request)
+    {
+        $leads = Lead::with(['customer', 'partner'])
+            ->withCount(['meetings', 'followUps'])
+            ->where('assigned_to', auth()->id())
+            ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
+                fn ($c) => $c->whereLike('name', $request->search)))
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('touched'), fn ($q) => $request->touched === 'yes'
+                ? $q->where(fn ($w) => $w->has('meetings')->orHas('followUps'))
+                : $q->whereDoesntHave('meetings')->whereDoesntHave('followUps'))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $statuses = LeadController::STATUSES;
+
+        return view('sales.my-leads', compact('leads', 'statuses'));
     }
 
     public function activityLog(Request $request)

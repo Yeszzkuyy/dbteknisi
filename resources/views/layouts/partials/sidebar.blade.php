@@ -26,7 +26,7 @@
     $managementIdx = request()->routeIs('manage-sales.activity-log') ? 4 : (request()->routeIs('manage-sales*') ? 0 : (request()->routeIs('manage.marketing*') ? 1 : (request()->routeIs('manage.technical*') ? 2 : (request()->routeIs('manage.admin*') ? 3 : -1))));
     $teknisiIdx = request()->routeIs('teknisi.dashboard*') ? 0 : (request()->routeIs('projects*') ? 1 : (request()->routeIs('teknisi.jadwal*') ? 2 : (request()->routeIs('teknisi.surveys*') ? 3 : (request()->routeIs('teknisi.sizing-projects*') ? 4 : (request()->routeIs('teknisi.request-hargas*') ? 5 : (request()->routeIs('teknisi.instalasis*') ? 6 : (request()->routeIs('teknisi.documents*') ? 7 : -1)))))));
     $marketingIdx = request()->routeIs('marketing.dashboard') ? 0 : (request()->routeIs('whatsapp-center*') ? 1 : (request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 2 : (request()->routeIs('partners*') ? 3 : (request()->routeIs('leads.activities') ? 4 : (request()->routeIs('leads.monitoring') ? 5 : -1)))));
-    $salesIdx = request()->routeIs('sales.my-leads') ? 0 : (request()->routeIs('sales.meetings.*') ? 1 : (request()->routeIs('sales.follow-ups.*') ? 2 : (request()->routeIs('leads.pipeline') ? 3 : (request()->routeIs('projects*') ? 4 : -1))));
+    $salesIdx = request()->routeIs('sales.dashboard') ? 0 : (request()->routeIs('sales.my-leads') ? 1 : (request()->routeIs('sales.meetings.*') ? 2 : (request()->routeIs('sales.follow-ups.*') ? 3 : (request()->routeIs('leads.pipeline') ? 4 : (request()->routeIs('projects*') ? 5 : -1)))));
     $adminIdx = request()->routeIs('admin.invoices.*') ? 0 : (request()->routeIs('admin.pos.*') ? 1 : (request()->routeIs('admin.payments.*') ? 2 : -1));
     $adminPanelIdx = request()->routeIs('admin-panel.index') ? 0 : (request()->routeIs('admin-panel.account-managers.*') ? 1 : (request()->routeIs('admin-panel.work-types.*') ? 2 : (request()->routeIs('admin-panel.document-categories.*') ? 3 : (request()->routeIs('admin-panel.project-statuses.*') ? 4 : (request()->routeIs('admin-panel.audit-log') ? 5 : -1)))));
     $hasMarketingMonitoring = auth()->user()->can('monitor-marketing');
@@ -324,10 +324,10 @@
 
                         {{-- Sales --}}
                         @can('view-sales')
-                            @php($salesCount = 4 + ($hasSalesProject ? 1 : 0))
+                            @php($salesCount = 5 + ($hasSalesProject ? 1 : 0))
                             <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="sales" data-bm-active="{{ $salesIdx }}">
                                 <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive.' branched-active' : $navInactive }}">
-                                    <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
+                                    <a wire:navigate.hover href="{{ route('sales.dashboard') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="calendar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                                         <span>Sales</span>
@@ -350,6 +350,12 @@
                                                     <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $salesIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
+                                    <a wire:navigate.hover href="{{ route('sales.dashboard') }}"
+                                       aria-current="{{ request()->routeIs('sales.dashboard') ? 'page' : 'false' }}"
+                                       class="{{ $subNavLink }} {{ request()->routeIs('sales.dashboard') ? $navActive : $navInactive }}">
+                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
+                                        <span>Dashboard</span>
+                                    </a>
                                     <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
                                        aria-current="{{ request()->routeIs('sales.my-leads') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('sales.my-leads') ? $navActive : $navInactive }}">

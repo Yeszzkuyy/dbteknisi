@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Customer;
+use App\Models\FollowUp;
 use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\User;
@@ -154,6 +155,52 @@ class ManageSalesTest extends TestCase
         $this->assertStringContainsString($mine->customer->name, $res->getContent());
         $this->assertStringNotContainsString($otherLead->customer->name, $res->getContent());
         $this->assertSame(1, Lead::where('assigned_to', $sales->id)->count());
+    }
+
+    public function test_sales_dashboard_renders_scoped_to_own_account(): void
+    {
+        $sales = $this->loginAs('sales');
+        $otherSales = User::factory()->create();
+        $otherSales->assignRole('sales');
+
+        $mine = $this->makeLead($sales, 'PT Dasbor Saya');
+        $otherLead = $this->makeLead($otherSales, 'PT Dasbor Lain');
+
+        FollowUp::create([
+            'customer_id' => $mine->customer_id,
+            'lead_id' => $mine->id,
+            'follow_up_date' => now()->subDay()->toDateString(),
+            'description' => 'FU Mendesak Saya',
+            'created_by' => $sales->id,
+        ]);
+        FollowUp::create([
+            'customer_id' => $otherLead->customer_id,
+            'lead_id' => $otherLead->id,
+            'follow_up_date' => now()->subDay()->toDateString(),
+            'description' => 'FU Sales Lain',
+            'created_by' => $otherSales->id,
+        ]);
+
+        $res = $this->actingAs($sales)->get(route('sales.dashboard'))->assertOk();
+        $content = $res->getContent();
+
+        $this->assertStringContainsString('Sales Dashboard', $content);
+        $this->assertStringContainsString($mine->customer->name, $content);
+        $this->assertStringNotContainsString($otherLead->customer->name, $content);
+    }
+
+    public function test_my_leads_keeps_table_without_dashboard_sections(): void
+    {
+        $sales = $this->loginAs('sales');
+        $this->makeLead($sales, 'PT Tabel Saya');
+
+        $res = $this->actingAs($sales)->get(route('sales.my-leads'))->assertOk();
+        $content = $res->getContent();
+
+        $this->assertStringContainsString('PT Tabel Saya', $content);
+        $this->assertStringContainsString('My Leads', $content);
+        $this->assertStringContainsString('Search customer', $content);
+        $this->assertStringNotContainsString('My Lead Status', $content);
     }
 
     public function test_marketing_can_store_lead_without_assignment(): void
