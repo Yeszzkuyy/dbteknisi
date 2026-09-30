@@ -32,8 +32,10 @@
     flex-direction: column;
     gap: 2px;
     overflow: hidden;
-    margin: 4px 0 6px;
-    padding-left: 12px;
+    /* Padding (bukan margin) untuk jarak vertikal: margin berada di luar
+       box sehingga ikut menambah tinggi track 0fr dan submenu tertutup
+       menyisakan tinggi ~10px. */
+    padding: 4px 0 6px 12px;
     border-left: 1px solid var(--sidebar-border);
 }
 
