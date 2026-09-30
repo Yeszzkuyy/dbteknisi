@@ -80,6 +80,8 @@
                         <x-icon name="users" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                         <span>Customer</span>
                     </a>
+                    {{-- AI Assistant SENGAJA full reload (tanpa wire:navigate):
+                         halaman chat stateful; morph berisiko merusak riwayat/ketikan. --}}
                     <a href="{{ route('ai.assistant.index') }}"
                        aria-current="{{ request()->routeIs('ai.assistant*') ? 'page' : 'false' }}"
                        class="{{ $navLink }} {{ request()->routeIs('ai.assistant*') ? $navActive : $navInactive }}">
@@ -191,7 +193,7 @@
                                                     <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $teknisiIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
-                                    <a href="{{ route('teknisi.dashboard') }}"
+                                    <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
                                        aria-current="{{ request()->routeIs('teknisi.dashboard*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('teknisi.dashboard*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
@@ -203,7 +205,8 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
                                         <span>Project</span>
                                     </a>
-                                    <a href="{{ route('teknisi.jadwal') }}"
+                                    {{-- Jadwal: kalender re-init tiap livewire:navigated (teknisi-calendar.js) --}}
+                                    <a wire:navigate.hover href="{{ route('teknisi.jadwal') }}"
                                        aria-current="{{ request()->routeIs('teknisi.jadwal*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('teknisi.jadwal*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
@@ -273,12 +276,14 @@
                                                     <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $marketingIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
-                                    <a href="{{ route('marketing.dashboard') }}"
+                                    <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
                                        aria-current="{{ request()->routeIs('marketing.dashboard') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('marketing.dashboard') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
                                         <span>Dashboard</span>
                                     </a>
+                                    {{-- WhatsApp Center SENGAJA full reload (tanpa wire:navigate):
+                                         aplikasi Alpine raksasa + chat state; morph berisiko merusak. --}}
                                     <a href="{{ route('whatsapp-center.index') }}"
                                        aria-current="{{ request()->routeIs('whatsapp-center*') ? 'page' : 'false' }}"
                                        class="{{ $subNavLink }} {{ request()->routeIs('whatsapp-center*') ? $navActive : $navInactive }}">

@@ -148,10 +148,17 @@
         input:focus,select:focus,textarea:focus{border-color:var(--input-border-focus)!important}
         input::placeholder,textarea::placeholder{color:var(--text-muted)!important}
         .dark input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]){color-scheme:dark}
+        /* Progress bar pindah menu (wire:navigate): strip accent meluncur
+           kiri-ke-kanan selama navigating; hormati reduced-motion. */
+        #navigate-progress{position:fixed;top:0;left:0;height:3px;width:35%;z-index:1002;opacity:0;pointer-events:none;border-radius:0 3px 3px 0;background:linear-gradient(90deg,rgb(var(--accent-500)/0),rgb(var(--accent-500)),rgb(var(--accent-400)));box-shadow:0 0 12px rgb(var(--accent-500)/.7);transform:translateX(-110%);transition:opacity .25s ease}
+        #navigate-progress[data-run]{opacity:1;animation:nav-progress-slide 1.1s ease-in-out infinite}
+        @keyframes nav-progress-slide{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
+        @media(prefers-reduced-motion:reduce){#navigate-progress{display:none}}
     </style>
 </head>
 <body class="font-sans antialiased">
 
+    <div id="navigate-progress" aria-hidden="true"></div>
     <div id="sidebarOverlay" class="sidebar-overlay dark:bg-black/60"></div>
 
     <div class="app-wrapper">
@@ -325,6 +332,17 @@
         initRevealSafe();
         // Last-resort: jalan saat parse, tak tergantung initChrome sukses.
         setTimeout(function(){try{forceReveal()}catch(e){}},2000);
+        // Progress bar pindah menu (wire:navigate): hidup saat navigating,
+        // mati saat navigated; failsafe + anti double-bind (morph me-mount ulang).
+        (function(){
+            var bar=document.getElementById('navigate-progress');if(!bar||bar.dataset.navBound)return;bar.dataset.navBound='1';
+            var failsafe=null;
+            function run(){bar.setAttribute('data-run','');if(failsafe)clearTimeout(failsafe);failsafe=setTimeout(stop,8000);}
+            function stop(){bar.removeAttribute('data-run');if(failsafe){clearTimeout(failsafe);failsafe=null;}}
+            document.addEventListener('livewire:navigating',run);
+            document.addEventListener('livewire:navigated',stop);
+            window.addEventListener('pageshow',stop);
+        })();
     </script>
 </body>
 </html>

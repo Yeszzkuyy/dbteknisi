@@ -76,7 +76,7 @@
                         <svg class="h-3.5 w-3.5 shrink-0 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                     @endif
                     @if($crumb['url'] && $i !== $lastCrumb)
-                        <a href="{{ $crumb['url'] }}" class="truncate text-slate-500 transition hover:text-accent-600 dark:text-slate-400 dark:hover:text-accent-400">{{ $crumb['label'] }}</a>
+                        <a wire:navigate.hover href="{{ $crumb['url'] }}" class="truncate text-slate-500 transition hover:text-accent-600 dark:text-slate-400 dark:hover:text-accent-400">{{ $crumb['label'] }}</a>
                     @else
                         <span @if($i === $lastCrumb) aria-current="page" @endif class="{{ $i === $lastCrumb ? 'truncate font-bold text-slate-800 dark:text-slate-100' : 'truncate text-slate-500 dark:text-slate-400' }}">{{ $crumb['label'] }}</span>
                     @endif
@@ -149,7 +149,7 @@
                             <span class="h-2 w-2 shrink-0 rounded-full bg-red-500 animate-ping"></span>
                             <p class="text-sm text-slate-700 dark:text-slate-200">
                                 {{ __('Lead baru belum di-assign') }} &mdash;
-                                <a href="{{ route('manage-sales.index') }}" class="font-semibold text-accent-600 hover:text-accent-700">{{ __('kelola') }}</a>
+                                <a wire:navigate.hover href="{{ route('manage-sales.index') }}" class="font-semibold text-accent-600 hover:text-accent-700">{{ __('kelola') }}</a>
                             </p>
                             <button @click="$store.notif.toast = false" class="text-slate-400 hover:text-slate-600" aria-label="{{ __('Tutup') }}">&#10005;</button>
                         </div>
@@ -189,7 +189,7 @@
                  class="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-slate-200 dark:border-zinc-800 py-2 z-50 origin-top-right">
                 
                 {{-- Profil --}}
-                <a href="{{ route('profile.edit') }}" 
+                <a wire:navigate.hover href="{{ route('profile.edit') }}" 
                    class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-800 transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -198,6 +198,8 @@
                 </a>
 
                 {{-- Setting --}}
+                {{-- Setting SENGAJA full reload: script autosave di halaman ini
+                     jalan sekali saat load; wire:navigate tidak re-run script. --}}
                 <a href="{{ route('settings.edit') }}"
                    class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-800 transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
