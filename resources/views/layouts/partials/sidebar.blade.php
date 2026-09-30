@@ -9,7 +9,9 @@
     $managementActive = request()->routeIs('manage-sales*') || request()->routeIs('manage.*');
     $technicianActive = request()->routeIs('projects*') || request()->routeIs('teknisi.*');
     $marketingActive = (request()->routeIs(['leads*', 'partners*', 'marketing.dashboard', 'whatsapp-center*']) && !request()->routeIs('leads.pipeline'));
-    $salesActive = request()->routeIs('sales.*') || request()->routeIs('projects*') || request()->routeIs('leads.pipeline');
+    // Grup Sales tampil juga untuk role inside-sales; sub-menu dirakit per-item di bawah
+    // (user only melihat item yang boleh ia akses).
+    $salesActive = request()->routeIs('sales.*') || request()->routeIs('projects*') || request()->routeIs('leads.pipeline') || request()->routeIs('lead-tasks*');
     $adminActive = request()->routeIs('admin.invoices.*') || request()->routeIs('admin.pos.*') || request()->routeIs('admin.payments.*');
     $adminPanelActive = request()->routeIs('admin-panel*');
 
@@ -26,11 +28,29 @@
     $managementIdx = request()->routeIs('manage-sales.activity-log') ? 4 : (request()->routeIs('manage-sales*') ? 0 : (request()->routeIs('manage.marketing*') ? 1 : (request()->routeIs('manage.technical*') ? 2 : (request()->routeIs('manage.admin*') ? 3 : -1))));
     $teknisiIdx = request()->routeIs('teknisi.dashboard*') ? 0 : (request()->routeIs('projects*') ? 1 : (request()->routeIs('teknisi.jadwal*') ? 2 : (request()->routeIs('teknisi.surveys*') ? 3 : (request()->routeIs('teknisi.sizing-projects*') ? 4 : (request()->routeIs('teknisi.request-hargas*') ? 5 : (request()->routeIs('teknisi.instalasis*') ? 6 : (request()->routeIs('teknisi.documents*') ? 7 : -1)))))));
     $marketingIdx = request()->routeIs('marketing.dashboard') ? 0 : (request()->routeIs('whatsapp-center*') ? 1 : (request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 2 : (request()->routeIs('partners*') ? 3 : (request()->routeIs('leads.activities') ? 4 : (request()->routeIs('leads.monitoring') ? 5 : -1)))));
-    $salesIdx = request()->routeIs('sales.dashboard') ? 0 : (request()->routeIs('sales.my-leads') ? 1 : (request()->routeIs('sales.meetings.*') ? 2 : (request()->routeIs('sales.follow-ups.*') ? 3 : (request()->routeIs('leads.pipeline') ? 4 : (request()->routeIs('projects*') ? 5 : -1)))));
     $adminIdx = request()->routeIs('admin.invoices.*') ? 0 : (request()->routeIs('admin.pos.*') ? 1 : (request()->routeIs('admin.payments.*') ? 2 : -1));
     $adminPanelIdx = request()->routeIs('admin-panel.index') ? 0 : (request()->routeIs('admin-panel.account-managers.*') ? 1 : (request()->routeIs('admin-panel.work-types.*') ? 2 : (request()->routeIs('admin-panel.document-categories.*') ? 3 : (request()->routeIs('admin-panel.project-statuses.*') ? 4 : (request()->routeIs('admin-panel.audit-log') ? 5 : -1)))));
     $hasMarketingMonitoring = auth()->user()->can('monitor-marketing');
     $hasSalesProject = auth()->user()->can('view-technician') || auth()->user()->can('view-sales');
+
+    // Sub-menu Sales dirakit dari item yang benar-benar boleh diakses user ini, lalu
+    // dipakai untuk $salesCount + $salesIdx (indeks garis "reach" aktif). Tidak ada
+    // indeks hardcode, jadi menambah/memindahkan sub-item tidak bikin garis meleset.
+    $canViewSales = auth()->user()->can('view-sales');
+    $salesItems = array_values(array_filter([
+        $canViewSales ? ['route' => route('sales.dashboard'), 'match' => 'sales.dashboard', 'label' => 'Dashboard', 'dot' => 'bg-violet-400'] : null,
+        $canViewSales ? ['route' => route('sales.my-leads'), 'match' => 'sales.my-leads', 'label' => 'My Leads', 'dot' => 'bg-amber-400'] : null,
+        $canViewSales ? ['route' => route('sales.meetings.index'), 'match' => 'sales.meetings.*', 'label' => 'Tracker Meeting', 'dot' => 'bg-blue-400'] : null,
+        $canViewSales ? ['route' => route('sales.follow-ups.index'), 'match' => 'sales.follow-ups.*', 'label' => 'Follow Up', 'dot' => 'bg-green-400'] : null,
+        $canViewSales ? ['route' => route('leads.pipeline'), 'match' => 'leads.pipeline', 'label' => 'Pipeline', 'dot' => 'bg-sky-400'] : null,
+        $hasSalesProject ? ['route' => route('projects.index'), 'match' => 'projects*', 'label' => 'Project', 'dot' => 'bg-cyan-400'] : null,
+        auth()->user()->can('manage-inside-sales') ? ['route' => route('lead-tasks.index'), 'match' => 'lead-tasks*', 'label' => 'Inside Sales', 'dot' => 'bg-cyan-400'] : null,
+    ]));
+    $salesCount = count($salesItems);
+    $salesIdx = collect($salesItems)->search(fn ($item) => request()->routeIs($item['match']));
+    $salesIdx = $salesIdx === false ? -1 : $salesIdx;
+    // Header grup harus menuju halaman pertama yang boleh dibuka user ini (mis. inside-sales).
+    $salesLanding = $salesItems[0]['route'] ?? route('dashboard');
 @endphp
 
 <aside class="relative flex h-full w-full flex-col overflow-hidden">
@@ -323,11 +343,10 @@
                         @endcan
 
                         {{-- Sales --}}
-                        @can('view-sales')
-                            @php($salesCount = 5 + ($hasSalesProject ? 1 : 0))
+                        @canany(['view-sales', 'manage-inside-sales'])
                             <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="sales" data-bm-active="{{ $salesIdx }}">
                                 <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive.' branched-active' : $navInactive }}">
-                                    <a wire:navigate.hover href="{{ route('sales.dashboard') }}"
+                                    <a wire:navigate.hover href="{{ $salesLanding }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="calendar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                                         <span>Sales</span>
@@ -350,49 +369,19 @@
                                                     <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $salesIdx ? 0 : $bmLen($k) }}" />
                                                 @endfor
                                             </svg>
-                                    <a wire:navigate.hover href="{{ route('sales.dashboard') }}"
-                                       aria-current="{{ request()->routeIs('sales.dashboard') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('sales.dashboard') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
-                                        <span>Dashboard</span>
-                                    </a>
-                                    <a wire:navigate.hover href="{{ route('sales.my-leads') }}"
-                                       aria-current="{{ request()->routeIs('sales.my-leads') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('sales.my-leads') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true"></span>
-                                        <span>My Leads</span>
-                                    </a>
-                                    <a wire:navigate.hover href="{{ route('sales.meetings.index') }}"
-                                       aria-current="{{ request()->routeIs('sales.meetings.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('sales.meetings.*') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
-                                        <span>Tracker Meeting</span>
-                                    </a>
-                                    <a wire:navigate.hover href="{{ route('sales.follow-ups.index') }}"
-                                       aria-current="{{ request()->routeIs('sales.follow-ups.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('sales.follow-ups.*') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
-                                        <span>Follow Up</span>
-                                    </a>
-                                    <a wire:navigate.hover href="{{ route('leads.pipeline') }}"
-                                       aria-current="{{ request()->routeIs('leads.pipeline') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('leads.pipeline') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400" aria-hidden="true"></span>
-                                        <span>Pipeline</span>
-                                    </a>
-                                    @if(auth()->user()->can('view-technician') || auth()->user()->can('view-sales'))
-                                        <a wire:navigate.hover href="{{ route('projects.index') }}"
-                                           aria-current="{{ request()->routeIs('projects*') ? 'page' : 'false' }}"
-                                           class="{{ $subNavLink }} {{ request()->routeIs('projects*') ? $navActive : $navInactive }}">
-                                            <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
-                                            <span>Project</span>
+                                    @foreach($salesItems as $item)
+                                        <a wire:navigate.hover href="{{ $item['route'] }}"
+                                           aria-current="{{ request()->routeIs($item['match']) ? 'page' : 'false' }}"
+                                           class="{{ $subNavLink }} {{ request()->routeIs($item['match']) ? $navActive : $navInactive }}">
+                                            <span class="h-1.5 w-1.5 shrink-0 rounded-full {{ $item['dot'] }}" aria-hidden="true"></span>
+                                            <span>{{ $item['label'] }}</span>
                                         </a>
-                                    @endif
+                                    @endforeach
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @endcan
+                        @endcanany
 
                         {{-- Admin: Invoice, PO, Payment --}}
                         @can('view-admin')
@@ -445,15 +434,6 @@
                             </div>
                         @endcan
 
-                        {{-- Inside Sales Task --}}
-                        @canany(['manage-inside-sales', 'manage-sales-leads'])
-                            <a wire:navigate.hover href="{{ route('lead-tasks.index') }}"
-                               aria-current="{{ request()->routeIs('lead-tasks*') ? 'page' : 'false' }}"
-                               class="{{ $navLink }} {{ request()->routeIs('lead-tasks*') ? $navActive.' branched-active' : $navInactive }}">
-                                <x-icon name="file-text" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
-                                <span>Inside Sales</span>
-                            </a>
-                        @endcan
                     </div>
                 </section>
             @endcanany
