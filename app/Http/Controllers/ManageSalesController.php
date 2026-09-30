@@ -18,11 +18,16 @@ class ManageSalesController extends Controller
     public function index(Request $request)
     {
         $query = Lead::with(['customer', 'assignee', 'partner'])
+            ->withCount(['meetings', 'followUps'])
+            ->withMax('followUps as last_follow_up_at', 'follow_up_date')
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
                 fn ($c) => $c->whereLike('name', $request->search)))
             ->when($request->filled('assignment'), fn ($q) => $request->assignment === 'assigned'
                 ? $q->whereNotNull('assigned_to')
-                : $q->whereNull('assigned_to'));
+                : $q->whereNull('assigned_to'))
+            ->when($request->filled('touched'), fn ($q) => $request->touched === 'yes'
+                ? $q->where(fn ($w) => $w->has('meetings')->orHas('followUps'))
+                : $q->whereDoesntHave('meetings')->whereDoesntHave('followUps'));
 
         $leads = $query->latest()->paginate(15)->withQueryString();
 

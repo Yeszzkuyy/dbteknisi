@@ -53,11 +53,17 @@
                 </div>
                 <div>
                     <label class="text-sm font-medium text-slate-500">Status Assignment</label>
-                    <x-glide-select name="assignment" class="mt-1" label="Status Assignment" empty-label="Semua"
-                        :options="[['value' => 'new', 'label' => 'NEW (Belum di-assign)'], ['value' => 'assigned', 'label' => 'ASSIGNED']]"
+                    <x-glide-select name="assignment" class="mt-1" :label="__('Status Assignment')" :empty-label="__('Semua')"
+                        :options="[['value' => 'new', 'label' => __('NEW (Belum di-assign)')], ['value' => 'assigned', 'label' => __('ASSIGNED')]]"
                         :value="request('assignment', '')" autosubmit />
                 </div>
-                <div class="sm:col-span-2 lg:col-span-2 flex items-end gap-2">
+                <div>
+                    <label class="text-sm font-medium text-slate-500">{{ __('Aktivitas Sales') }}</label>
+                    <x-glide-select name="touched" class="mt-1" :label="__('Aktivitas Sales')" :empty-label="__('Semua')"
+                        :options="[['value' => 'yes', 'label' => __('Sudah disentuh')], ['value' => 'no', 'label' => __('Belum disentuh')]]"
+                        :value="request('touched', '')" autosubmit />
+                </div>
+                <div class="sm:col-span-2 lg:col-span-1 flex items-end gap-2">
                     <div class="group relative">
                         <button type="submit" title="{{ __('Filter') }}" aria-label="{{ __('Filter') }}"
                                 class="relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-accent-600 text-white shadow-sm transition-all duration-300 hover:scale-110 hover:bg-accent-500 hover:shadow-lg hover:shadow-accent-500/40 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/40 focus-visible:ring-offset-2 active:scale-95">
@@ -88,6 +94,7 @@
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Lead / Customer</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Aktivitas') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Kebutuhan') }}</th>
                         <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Tanggal Masuk') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase tracking-wider">{{ __('Lead dari PT') }}</th>
@@ -121,6 +128,28 @@
                                     </span>
                                 @endif
                             </td>
+                            <td class="px-6 py-4 text-center">
+                                @php $touched = ($lead->meetings_count ?? 0) + ($lead->follow_ups_count ?? 0) > 0; @endphp
+                                @if($touched)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 whitespace-nowrap">
+                                        <x-icon name="check-circle" class="h-3.5 w-3.5" />
+                                        {{ __('Sudah disentuh') }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 whitespace-nowrap">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-yellow-500"></span>
+                                        {{ __('Belum disentuh') }}
+                                    </span>
+                                @endif
+                                <span class="block mt-1 text-[11px] text-slate-500 whitespace-nowrap">
+                                    {{ $lead->meetings_count ?? 0 }} {{ __('meeting') }} • {{ $lead->follow_ups_count ?? 0 }} {{ __('follow up') }}
+                                </span>
+                                @if($lead->last_follow_up_at)
+                                    <span class="block text-[11px] text-slate-400 whitespace-nowrap">
+                                        {{ __('Terakhir') }}: {{ \Carbon\Carbon::parse($lead->last_follow_up_at)->format('d M Y') }}
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-left">
                                 @if($lead->kebutuhan)
                                     <span class="text-sm text-slate-700 whitespace-normal break-words max-w-[220px] inline-block align-middle">{{ $lead->kebutuhan }}</span>
@@ -139,7 +168,7 @@
                                 <form action="{{ route('manage-sales.update', $lead) }}" method="POST" data-loading-text="Updating…">
                                     @csrf
                                     @method('PUT')
-                                    <x-glide-select name="pt_group" size="sm" class="w-24" label="Lead dari PT" empty-label="—"
+                                    <x-glide-select name="pt_group" size="sm" class="w-24" :label="__('Lead dari PT')" empty-label="—"
                                         :options="collect(\App\Models\Lead::PT_GROUPS)->map(fn ($g) => ['value' => $g, 'label' => $g])->all()"
                                         :value="$lead->pt_group" autosubmit />
                                 </form>
@@ -147,8 +176,8 @@
                             <td class="px-6 py-4 text-left">
                                 <form action="{{ route('manage-sales.assign', $lead) }}" method="POST" class="flex items-center gap-2" data-loading-text="Assigning…">
                                     @csrf
-                                    <x-glide-select name="assigned_to" size="sm" class="w-40" label="Assign ke Sales"
-                                        placeholder="— Pilih Sales —"
+                                    <x-glide-select name="assigned_to" size="sm" class="w-40" :label="__('Assign ke Sales')"
+                                        :placeholder="__('— Pilih Sales —')"
                                         :options="$salesUsers->map(fn ($u) => ['value' => $u->id, 'label' => $u->name])->all()"
                                         :value="$lead->assigned_to" required />
                                     <button type="submit" title="{{ __('Assign ke Sales') }}"
@@ -174,7 +203,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center text-slate-500">
+                            <td colspan="8" class="px-6 py-12 text-center text-slate-500">
                                 {{ __('Belum ada lead dari marketing.') }}
                             </td>
                         </tr>
