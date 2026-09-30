@@ -94,25 +94,80 @@
         *{margin:0;padding:0;box-sizing:border-box}
         [x-cloak]{display:none!important}
         .icon-expand{display:none}
-        .sidebar{position:fixed;top:0;left:0;height:100vh;width:280px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out,width .3s cubic-bezier(.16,1,.3,1);overflow-y:auto}
+
+        /* ============================================================
+           Sidebar morph — lebar berubah dengan spring (linear() easing
+           hasil sampling respons critically-damped: k380 c35 m0.75),
+           bukan bezier. Delay/spring dinaikkan hanya di width; yang
+           rail pakai lebar sama supaya konten ikut propulsion.
+           ============================================================ */
+        :root{
+            --sb-w:280px;
+            --sb-w-rail:76px;
+            --sb-dur:.32s;
+            --sb-ease:linear(0.000, 0.100, 0.289, 0.475, 0.629, 0.745, 0.829, 0.887, 0.926, 0.952, 0.969, 0.981, 0.988, 0.992, 0.995);
+            --sb-ease-soft:cubic-bezier(.23,1,.32,1);
+            /* Label: enter lebih lambat (200ms + delay 80ms), exit cepat (120ms) */
+            --sb-label-in:200ms;
+            --sb-label-in-delay:80ms;
+            --sb-label-out:120ms;
+        }
+
+        /* Label sidebar: memudar + geser, asimetris enter/exit ala template.
+           max-width:0 (bukan display:none) supaya ruang ikut menyusut
+           halus dan ikon tetap center di rail. */
+        .sidebar .sidebar-hide,
+        .sidebar nav a > span,
+        .sidebar nav button > span{
+            max-width:16rem;
+            overflow:hidden;
+            transition:
+                opacity var(--sb-label-in) var(--sb-ease-soft) var(--sb-label-in-delay),
+                transform var(--sb-label-in) var(--sb-ease-soft) var(--sb-label-in-delay),
+                max-width var(--sb-label-in) var(--sb-ease-soft) var(--sb-label-in-delay);
+        }
+
+        .sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sb-w);background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);z-index:999;transform:translateX(-100%);transition:transform .3s ease-in-out,width var(--sb-dur) var(--sb-ease);overflow-y:auto}
         .sidebar.open{transform:translateX(0)}
         .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998}
         .sidebar-overlay.active{display:block}
-        .main-content{margin-left:0;width:100%;min-height:100vh;display:flex;flex-direction:column;transition:margin-left .3s cubic-bezier(.16,1,.3,1),width .3s cubic-bezier(.16,1,.3,1)}
+        .main-content{margin-left:0;width:100%;min-height:100vh;display:flex;flex-direction:column;transition:margin-left var(--sb-dur) var(--sb-ease),width var(--sb-dur) var(--sb-ease)}
+
+        /* Rail hover: strip tipis di tepi sidebar, muncul garis saat hover.
+           Memakai --sb-w-rail (bukan 76px) supaya rail ikut.spring. */
+        .sb-rail{position:absolute;top:0;bottom:0;left:100%;width:12px;z-index:21;cursor:pointer;background:transparent;transition:background-color 200ms ease}
+        .sb-rail:hover,.sb-rail:focus-visible{background:rgb(var(--accent-500)/.07)}
+        .sb-rail::after{content:"";position:absolute;top:50%;left:5px;width:2px;height:34px;margin-top:-17px;border-radius:2px;background:rgb(var(--accent-500)/.5);opacity:0;transition:opacity 200ms ease}
+        .sb-rail:hover::after,.sb-rail:focus-visible::after{opacity:1}
 
         @media(min-width:1024px){
-            .sidebar{position:fixed;left:0;top:0;transform:translateX(0)!important;width:280px;height:100vh;overflow:hidden}
+            .sidebar{position:fixed;left:0;top:0;transform:translateX(0)!important;width:var(--sb-w);height:100vh;overflow:hidden}
             .sidebar-overlay{display:none!important}
-            .main-content{margin-left:280px;width:calc(100% - 280px);flex:1;min-width:0}
+            .main-content{margin-left:var(--sb-w);width:calc(100% - var(--sb-w));flex:1;min-width:0}
             .app-wrapper{display:flex;min-height:100vh}
             #hamburgerBtn{display:none!important}
+            .sb-rail{display:block}
+        }
 
-            /* Sidebar minimized (icons only) */
-            html.sidebar-collapsed .sidebar{width:76px}
-            html.sidebar-collapsed .main-content{margin-left:76px;width:calc(100% - 76px)}
-            html.sidebar-collapsed .sidebar-hide{display:none!important}
+        @media(max-width:1023px){
+            .sb-rail{display:none}
+        }
+
+        @media(min-width:1024px){
+            /* Sidebar rail (icons only) — width jujur ditransisi */
+            html.sidebar-collapsed{--sb-w:var(--sb-w-rail)}
+            html.sidebar-collapsed .sidebar-hide,
             html.sidebar-collapsed .sidebar nav a > span,
-            html.sidebar-collapsed .sidebar nav button > span{display:none!important}
+            html.sidebar-collapsed .sidebar nav button > span{
+                max-width:0;
+                opacity:0;
+                transform:translateX(-4px);
+                pointer-events:none;
+                transition:
+                    opacity var(--sb-label-out) ease,
+                    transform var(--sb-label-out) ease,
+                    max-width var(--sb-label-out) ease;
+            }
             html.sidebar-collapsed .sidebar nav button > svg.ml-auto{display:none!important}
             html.sidebar-collapsed .sidebar nav a,
             html.sidebar-collapsed .sidebar nav button{justify-content:center;padding-left:0;padding-right:0}
@@ -171,6 +226,8 @@
 <body class="font-sans antialiased">
 
     <div id="navigate-progress" aria-hidden="true"></div>
+    <button id="sidebarRail" class="sb-rail" type="button" tabindex="-1"
+            aria-label="{{ __('Perkecil sidebar') }}"></button>
     <div id="sidebarOverlay" class="sidebar-overlay dark:bg-black/60"></div>
 
     <div class="app-wrapper">
@@ -278,16 +335,39 @@
                 if(window.innerWidth<1024){close();return}
                 setCollapsed(!root.classList.contains('sidebar-collapsed'));
             });}
-            // Klik header grup saat minimized → lebarkan sidebar dulu
-            // (header grup kini link navigasi: tetap lebarkan + lanjut pindah halaman)
+            // Rail tipis di tepi sidebar (desktop): toggle yang sama.
+            var rail=document.getElementById('sidebarRail');
+            if(rail&&!rail.dataset.bound){rail.dataset.bound='1';rail.addEventListener('click',function(){
+                if(window.innerWidth<1024)return;
+                setCollapsed(!root.classList.contains('sidebar-collapsed'));
+            });}
+            // Klik header grup / toggle saat rail → lebarkan dulu, lalu buka
+            // submenu-nya (di rail submenu tak punya ruang untuk ditampilkan).
             s.querySelectorAll('nav button[type="button"], nav a[aria-controls]').forEach(function(b){
                 if(b.dataset.bound)return;b.dataset.bound='1';
-                b.addEventListener('click',function(){if(window.innerWidth>=1024&&root.classList.contains('sidebar-collapsed'))setCollapsed(false)});
+                b.addEventListener('click',function(){
+                    if(window.innerWidth<1024||!root.classList.contains('sidebar-collapsed'))return;
+                    setCollapsed(false);
+                    var scope=null;try{scope=window.Alpine?Alpine.$data(b.closest('.sb-group')):null}catch(e){}
+                    if(scope&&typeof scope.open==='boolean'&&!scope.open)scope.open=true;
+                });
             });
 
             s.querySelectorAll('a,button[type="submit"]').forEach(function(e){if(e.dataset.bound)return;e.dataset.bound='1';e.addEventListener('click',function(){window.innerWidth<1024&&close()})});
             if(!window.__chromeGlobals){
                 window.__chromeGlobals=true;
+                // ⌘B / Ctrl+B = toggle rail (ala template animated sidebar).
+                document.addEventListener('keydown',function(e){
+                    if(e.key.toLowerCase()!=='b'||!(e.metaKey||e.ctrlKey))return;
+                    e.preventDefault();
+                    if(window.innerWidth<1024){var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');
+                        if(!sb)return;
+                        if(sb.classList.contains('open')){sb.classList.remove('open');ov&&ov.classList.remove('active')}
+                        else{sb.classList.add('open');ov&&ov.classList.add('active')}
+                        return;}
+                    root.classList.toggle('sidebar-collapsed');
+                    setCollapsed(root.classList.contains('sidebar-collapsed'));
+                });
                 window.addEventListener('resize',function(){var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');if(window.innerWidth>=1024&&sb){sb.classList.remove('open');ov&&ov.classList.remove('active')}});
                 document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;var sb=document.getElementById('sidebar');if(sb&&sb.classList.contains('open')){sb.classList.remove('open');var ov=document.getElementById('sidebarOverlay');ov&&ov.classList.remove('active')}});
             }

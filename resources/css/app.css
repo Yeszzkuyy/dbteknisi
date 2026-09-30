@@ -2,7 +2,7 @@
 @import './themes/accent/terracotta.css';
 @import './themes/accent/purple.css';
 @import './themes/accent/emerald.css';
-@import './sidebar-branched.css';
+@import './sidebar-nav.css';
 
 @tailwind base;
 @tailwind components;
@@ -226,9 +226,9 @@ tbody tr { transition: background-color 0.2s ease; }
 .sidebar nav button > span { transition: transform 0.25s var(--ease-out); }
 @media (hover: hover) {
     .sidebar nav a:hover svg,
-    /* Toggle chevron dikecualikan: panah vertikal jangan bergeser,
-       dan rotate-180 penanda buka harus utuh (lihat sidebar-branched.css). */
-    .sidebar nav button:hover:not(.branched-toggle) svg { transform: translateX(2px); }
+    /* Toggle sub-menu dikecualikan: chevron punya transform sendiri
+       (rotate 90deg saat grup terbuka — lihat sidebar-nav.css). */
+    .sidebar nav button:hover:not(.sb-toggle) svg { transform: translateX(2px); }
     .sidebar nav a:hover > span:not(.ml-auto),
     .sidebar nav button:hover > span:not(.ml-auto) { transform: translateX(2px); }
 }
@@ -255,14 +255,14 @@ tbody tr { transition: background-color 0.2s ease; }
 .sidebar nav button:hover { color: var(--nav-hover-text); background: var(--nav-hover-bg); }
 .sidebar nav a[aria-current="page"],
 .sidebar nav [data-sidebar-active="true"] { color: var(--nav-active-text); background: var(--nav-active-bg); }
-/* Header grup departemen (.branched > div): <div> tak tercakup aturan
+/* Header grup departemen (.sb-group > div): <div> tak tercakup aturan
    a/button di atas sehingga utility text-slate-300/text-white bocor
-   (hilang di light mode). Samakan dengan warna tema; .branched-active
+   (hilang di light mode). Samakan dengan warna tema; .sb-active
    ditandai di Blade saat grup aktif. */
-.sidebar nav .branched > div { color: var(--nav-text); }
-.sidebar nav .branched > div:hover { color: var(--nav-hover-text); background: var(--nav-hover-bg); }
-.sidebar nav .branched > div.branched-active { color: var(--nav-active-text); background: var(--nav-active-bg); }
-.sidebar nav .branched > div.branched-active:hover { color: var(--nav-active-text); }
+.sidebar nav .sb-group > div { color: var(--nav-text); }
+.sidebar nav .sb-group > div:hover { color: var(--nav-hover-text); background: var(--nav-hover-bg); }
+.sidebar nav .sb-group > div.sb-active { color: var(--nav-active-text); background: var(--nav-active-bg); }
+.sidebar nav .sb-group > div.sb-active:hover { color: var(--nav-active-text); }
 .sidebar nav p { color: var(--nav-muted); }
 .sidebar .border-white\/10 { border-color: var(--sidebar-border-soft); }
 .sidebar .sidebar-logo h1 { color: var(--sidebar-logo-text); }

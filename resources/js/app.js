@@ -273,7 +273,7 @@ function sidebarGroupMatches(group) {
 }
 
 function syncSidebarGroups() {
-    document.querySelectorAll('#sidebar-navigation .branched').forEach((group) => {
+    document.querySelectorAll('#sidebar-navigation .sb-group').forEach((group) => {
         const want = sidebarGroupMatches(group);
         const has = group.hasAttribute('data-open');
         let scope = null;
@@ -297,70 +297,6 @@ function syncSidebarGroups() {
     });
 }
 document.addEventListener('livewire:navigated', () => syncSidebarGroups());
-
-/* ============================================================
-   BranchedMenu glide: garis reach meluncur dari posisi lama ke
-   aktif (ala template), bukan draw ulang dari nol.
-   - Posisi lama per grup disimpan di sessionStorage.
-   - Kunjungan pertama / reload halaman yang sama: draw klasik.
-   - Berjalan saat load awal DAN setiap livewire:navigated.
-   - Pakai WAAPI (bukan transisi CSS + rAF) agar tidak berpacu
-     dengan first paint / morph — animasi dijamin jalan.
-   ============================================================ */
-const BM_GLIDE_MS = 380;
-const BM_GLIDE_DELAY_MS = 120;
-const BM_GLIDE_EASE = 'cubic-bezier(0.23, 1, 0.32, 1)';
-
-function glideBranchLines() {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    document.querySelectorAll('#sidebar-navigation .branched[data-bm-group]').forEach((root) => {
-        const key = 'bm-pos-' + root.dataset.bmGroup;
-        const active = parseInt(root.dataset.bmActive ?? '-1', 10);
-        const paths = [...root.querySelectorAll('.branched-reach')];
-        let prev = null;
-        try {
-            prev = JSON.parse(sessionStorage.getItem(key) ?? 'null');
-        } catch {}
-        try {
-            sessionStorage.setItem(key, JSON.stringify(active));
-        } catch {}
-        if (reduce || active < 0 || active >= paths.length) return;
-        const el = paths[active];
-        const full = parseFloat(el.style.strokeDasharray) || 0;
-        if (!full) return;
-        if (prev === null || prev === active || prev < 0 || prev >= paths.length) {
-            el.dataset.bmDraw = ''; // draw klasik dari nol
-            return;
-        }
-        // Mulai dari titik cabang lama lalu meluncur ke 0: garis turun
-        // trunk baru berbelok ke baris. Geometri = cermin Blade:
-        // pad 6, rowH 36, setengah baris 18, R 10.
-        const start = Math.max(0, Math.min(full, 6 + prev * 36 + 18 - 10));
-        // Matikan transisi CSS selama glide agar tidak beradu dengan WAAPI.
-        el.style.transition = 'none';
-        el.style.strokeDashoffset = String(start);
-        if (typeof el.animate !== 'function') {
-            el.style.strokeDashoffset = '0';
-            el.style.transition = '';
-            return;
-        }
-        const anim = el.animate([{ strokeDashoffset: String(start) }, { strokeDashoffset: '0' }], {
-            duration: BM_GLIDE_MS,
-            delay: BM_GLIDE_DELAY_MS,
-            easing: BM_GLIDE_EASE,
-            fill: 'backwards'
-        });
-        anim.onfinish = () => {
-            el.style.strokeDashoffset = '0';
-            el.style.transition = '';
-            try {
-                anim.cancel();
-            } catch {}
-        };
-    });
-}
-document.addEventListener('DOMContentLoaded', glideBranchLines);
-document.addEventListener('livewire:navigated', glideBranchLines);
 
 /* ============================================================
    Toast global + form AJAX (tanpa refresh).
@@ -464,7 +400,6 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
-/* Branched draw: kunjungan pertama & reload pakai CSS keyframes
-   ([data-bm-draw], dipasang JS); pindah halaman meluncur dari posisi
-   lama via glideBranchLines di atas. */
+/* Sidebar grup buka/tutup mengikuti halaman aktif; transisi buka-tutup
+   sepenuhnya CSS (sidebar-nav.css). Tidak ada lagi garis bercabang SVG. */
 

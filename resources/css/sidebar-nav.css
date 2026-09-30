@@ -1,0 +1,152 @@
+/* ============================================================
+   Sidebar nav — sub-menu ala template "animated sidebar":
+   indent + border-left, buka/tutup dengan stagger blur per item.
+
+   Menggantikan branched-tree SVG (garis trunk + reach): sub-menu
+   kini daftar polos ber-indent; animasinya dipindah ke CSS.
+
+   Token (app.blade.php): --sb-dur, --sb-ease, --sb-ease-soft
+   ============================================================ */
+.sidebar .sb-group {
+    --sb-stagger: 45ms;
+    --sb-stagger-first: 35ms;
+}
+
+/* ---------- Sub-menu: tinggi 0 -> 1fr ---------- */
+.sidebar .sb-sub {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--sb-dur) var(--sb-ease-soft);
+}
+
+.sidebar .sb-group[data-open] > .sb-sub {
+    grid-template-rows: 1fr;
+}
+
+/* Wrapper: pemotong tinggi (min-height:0 wajib agar 0fr benar-benar
+   collapses) + indent ala template. */
+.sidebar .sb-sub-list {
+    display: flex;
+    min-height: 0;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    margin: 4px 0 6px;
+    padding-left: 12px;
+    border-left: 1px solid var(--sidebar-border);
+}
+
+/* ---------- Item sub-menu: blur + naik, stagger per anak ---------- */
+@media (prefers-reduced-motion: no-preference) {
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item {
+        animation: sb-sub-in 180ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
+    }
+}
+
+@keyframes sb-sub-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+        filter: blur(3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+        filter: blur(0);
+    }
+}
+
+/* Stagger per anak. Sub-item terbanyak = 8 (grup Teknisi), jadi 8 slot
+   cukup; sisanya memakai delay slot terakhir. */
+@media (prefers-reduced-motion: no-preference) {
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(1) { animation-delay: var(--sb-stagger-first); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(2) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger)); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(3) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 2); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(4) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 3); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(5) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 4); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(6) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 5); }
+    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(n + 7) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 6); }
+}
+
+/* ---------- Tombol buka/tutup grup ---------- */
+.sidebar .sb-toggle {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 6px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.sidebar .sb-toggle:hover {
+    background: rgb(var(--accent-500) / 0.15);
+}
+
+.sidebar .sb-toggle:focus-visible {
+    outline: 2px solid rgb(var(--accent-400) / 0.5);
+    outline-offset: 1px;
+}
+
+/* Chevron rotate 90deg — utility Tailwind transition, bukan custom,
+   tapi Utility rotate harus menang atas hover icon global. */
+.sidebar .sb-toggle:hover svg {
+    transform: none;
+}
+
+.sidebar .sb-toggle:hover svg.rotate-90 {
+    transform: rotate(90deg);
+}
+
+/* ---------- Item aktif sub-menu ---------- */
+.sidebar .sb-sub-item[aria-current='page'] {
+    background: rgb(var(--accent-500) / 0.12);
+    color: rgb(var(--accent-300) / 1);
+}
+
+/* ---------- Press feedback (whileTap scale 0.98) ---------- */
+@media (hover: hover) and (pointer: fine) {
+    .sidebar .sb-group > div > a,
+    .sidebar .sb-sub-item {
+        transition:
+            transform 120ms var(--sb-ease-soft),
+            background-color 150ms ease,
+            color 150ms ease;
+    }
+
+    .sidebar .sb-group > div > a:active,
+    .sidebar .sb-sub-item:active {
+        transform: scale(0.98);
+    }
+}
+
+/* ---------- Hover mode gelap mengikuti accent ---------- */
+.dark .sidebar nav a:hover:not([aria-current='page']),
+.dark .sidebar nav button:hover:not([data-sidebar-active='true']) {
+    color: rgb(var(--accent-300) / 1);
+}
+
+/* ---------- Rail (collapsed) ---------- */
+html.sidebar-collapsed .sidebar .sb-sub {
+    display: none;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar .sb-sub {
+        transition: none;
+    }
+
+    .sidebar .sb-sub-item {
+        opacity: 1;
+        transform: none;
+        filter: none;
+        animation: none !important;
+    }
+}

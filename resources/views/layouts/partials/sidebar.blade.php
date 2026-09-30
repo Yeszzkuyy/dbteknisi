@@ -17,25 +17,10 @@
 
     $roleName = auth()->user()->roles->first()?->name ?? 'User';
 
-    // Geometri pohon branched (port BranchedMenu React Bits, px).
-    $bmTrunk = 14; $bmIndent = 40; $bmRowH = 36; $bmPad = 6; $bmR = 10; $bmEndX = $bmIndent - 8;
-    $bmRowY = fn($k) => $bmPad + $k * $bmRowH + $bmRowH / 2;
-    $bmBranch = fn($k) => 'M '.$bmTrunk.' '.($bmRowY($k) - $bmR).' A '.$bmR.' '.$bmR.' 0 0 0 '.($bmTrunk + $bmR).' '.$bmRowY($k).' H '.$bmEndX;
-    $bmReach = fn($k) => 'M '.$bmTrunk.' 0 V '.($bmRowY($k) - $bmR).' A '.$bmR.' '.$bmR.' 0 0 0 '.($bmTrunk + $bmR).' '.$bmRowY($k).' H '.$bmEndX;
-    $bmLen = fn($k) => round(($bmRowY($k) - $bmR) + (M_PI * $bmR / 2) + ($bmEndX - $bmTrunk - $bmR), 1);
-
-    // Indeks anak aktif per grup (-1 = tidak ada) untuk garis reach accent.
-    $managementIdx = request()->routeIs('manage-sales.activity-log') ? 4 : (request()->routeIs('manage-sales*') ? 0 : (request()->routeIs('manage.marketing*') ? 1 : (request()->routeIs('manage.technical*') ? 2 : (request()->routeIs('manage.admin*') ? 3 : -1))));
-    $teknisiIdx = request()->routeIs('teknisi.dashboard*') ? 0 : (request()->routeIs('projects*') ? 1 : (request()->routeIs('teknisi.jadwal*') ? 2 : (request()->routeIs('teknisi.surveys*') ? 3 : (request()->routeIs('teknisi.sizing-projects*') ? 4 : (request()->routeIs('teknisi.request-hargas*') ? 5 : (request()->routeIs('teknisi.instalasis*') ? 6 : (request()->routeIs('teknisi.documents*') ? 7 : -1)))))));
-    $marketingIdx = request()->routeIs('marketing.dashboard') ? 0 : (request()->routeIs('whatsapp-center*') ? 1 : (request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 2 : (request()->routeIs('partners*') ? 3 : (request()->routeIs('leads.activities') ? 4 : (request()->routeIs('leads.monitoring') ? 5 : -1)))));
-    $adminIdx = request()->routeIs('admin.invoices.*') ? 0 : (request()->routeIs('admin.pos.*') ? 1 : (request()->routeIs('admin.payments.*') ? 2 : -1));
-    $adminPanelIdx = request()->routeIs('admin-panel.index') ? 0 : (request()->routeIs('admin-panel.account-managers.*') ? 1 : (request()->routeIs('admin-panel.work-types.*') ? 2 : (request()->routeIs('admin-panel.document-categories.*') ? 3 : (request()->routeIs('admin-panel.project-statuses.*') ? 4 : (request()->routeIs('admin-panel.audit-log') ? 5 : -1)))));
     $hasMarketingMonitoring = auth()->user()->can('monitor-marketing');
     $hasSalesProject = auth()->user()->can('view-technician') || auth()->user()->can('view-sales');
 
-    // Sub-menu Sales dirakit dari item yang benar-benar boleh diakses user ini, lalu
-    // dipakai untuk $salesCount + $salesIdx (indeks garis "reach" aktif). Tidak ada
-    // indeks hardcode, jadi menambah/memindahkan sub-item tidak bikin garis meleset.
+    // Sub-menu Sales dirakit dari item yang benar-benar boleh diakses user ini.
     $canViewSales = auth()->user()->can('view-sales');
     $salesItems = array_values(array_filter([
         $canViewSales ? ['route' => route('sales.dashboard'), 'match' => 'sales.dashboard', 'label' => 'Dashboard', 'dot' => 'bg-violet-400'] : null,
@@ -46,9 +31,6 @@
         $hasSalesProject ? ['route' => route('projects.index'), 'match' => 'projects*', 'label' => 'Project', 'dot' => 'bg-cyan-400'] : null,
         auth()->user()->can('manage-inside-sales') ? ['route' => route('lead-tasks.index'), 'match' => 'lead-tasks*', 'label' => 'Inside Sales', 'dot' => 'bg-fuchsia-400'] : null,
     ]));
-    $salesCount = count($salesItems);
-    $salesIdx = collect($salesItems)->search(fn ($item) => request()->routeIs($item['match']));
-    $salesIdx = $salesIdx === false ? -1 : $salesIdx;
     // Header grup harus menuju halaman pertama yang boleh dibuka user ini (mis. inside-sales).
     $salesLanding = $salesItems[0]['route'] ?? route('dashboard');
 @endphp
@@ -117,8 +99,8 @@
                     <div class="space-y-1">
                         {{-- Management (Management Hub) --}}
                         @can('manage-sales-leads')
-                            <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }" class="branched"{{ $managementActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="management" data-bm-active="{{ $managementIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $managementActive ? $navActive.' branched-active' : $navInactive }}">
+                            <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }" class="sb-group"{{ $managementActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="management">
+                                <div class="{{ $navLink }} group w-full {{ $managementActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('manage-sales.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="briefcase" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
@@ -129,27 +111,19 @@
                                             </template>
                                         </span>
                                     </a>
-                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                    <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
                                             :aria-expanded="open" aria-controls="sidebar-management-menu"
                                             aria-label="{{ __('Buka/tutup submenu') }}">
-                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </button>
                                 </div>
-                                <div id="sidebar-management-menu" class="branched-body sidebar-hide mt-1">
-                                    <div class="branched-fold">
-                                        <div class="branched-tree" style="height: 192px">
-                                            <svg class="branched-lines" width="40" height="192" aria-hidden="true">
-                                                <path class="branched-base" d="M 14 0 V 158" />
-                                                @for ($k = 0; $k < 5; $k++)
-                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $managementIdx ? 0 : $bmLen($k) }}" />
-                                                @endfor
-                                            </svg>
+                                <div id="sidebar-management-menu" class="sb-sub sidebar-hide">
+                                    <div class="sb-sub-list">
                                     <a wire:navigate.hover href="{{ route('manage-sales.index') }}"
                                        aria-current="{{ request()->routeIs('manage-sales*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('manage-sales*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('manage-sales*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
                                         <span>Manage Sales</span>
                                         <template x-if="$store.notif.unassigned > 0">
@@ -158,147 +132,128 @@
                                     </a>
                                     <a wire:navigate.hover href="{{ route('manage.marketing.index') }}"
                                        aria-current="{{ request()->routeIs('manage.marketing*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('manage.marketing*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('manage.marketing*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true"></span>
                                         <span>Manage Marketing</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('manage.technical.index') }}"
                                        aria-current="{{ request()->routeIs('manage.technical*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('manage.technical*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('manage.technical*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
                                         <span>Manage Technical</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('manage.admin.index') }}"
                                        aria-current="{{ request()->routeIs('manage.admin*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('manage.admin*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('manage.admin*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
                                         <span>Manage Admin</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('manage-sales.activity-log') }}"
                                        aria-current="{{ request()->routeIs('manage-sales.activity-log') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('manage-sales.activity-log') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('manage-sales.activity-log') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" aria-hidden="true"></span>
                                         <span>Activity Log</span>
                                     </a>
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
+</div>
+</div>
                         @endcan
 
                         {{-- Teknisi --}}
                         @can('view-technician')
-                            <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="branched"{{ $technicianActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="teknisi" data-bm-active="{{ $teknisiIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive.' branched-active' : $navInactive }}">
+                            <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="sb-group"{{ $technicianActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="teknisi">
+                                <div class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="tools" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                                         <span>{{ __('Teknisi') }}</span>
                                     </a>
-                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                    <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
                                             :aria-expanded="open" aria-controls="sidebar-technician-menu"
                                             aria-label="{{ __('Buka/tutup submenu') }}">
-                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </button>
                                 </div>
-                                <div id="sidebar-technician-menu" class="branched-body sidebar-hide mt-1">
-                                    <div class="branched-fold">
-                                        <div class="branched-tree" style="height: 300px">
-                                            <svg class="branched-lines" width="40" height="300" aria-hidden="true">
-                                                <path class="branched-base" d="M 14 0 V 266" />
-                                                @for ($k = 0; $k < 8; $k++)
-                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $teknisiIdx ? 0 : $bmLen($k) }}" />
-                                                @endfor
-                                            </svg>
+                                <div id="sidebar-technician-menu" class="sb-sub sidebar-hide">
+                                    <div class="sb-sub-list">
                                     <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
                                        aria-current="{{ request()->routeIs('teknisi.dashboard*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.dashboard*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.dashboard*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
                                         <span>{{ __('Dashboard Teknisi') }}</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('projects.index') }}"
                                        aria-current="{{ request()->routeIs('projects*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('projects*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('projects*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
                                         <span>Project</span>
                                     </a>
                                     {{-- Jadwal: kalender re-init tiap livewire:navigated (teknisi-calendar.js) --}}
                                     <a wire:navigate.hover href="{{ route('teknisi.jadwal') }}"
                                        aria-current="{{ request()->routeIs('teknisi.jadwal*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.jadwal*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.jadwal*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
                                         <span>{{ __('Jadwal') }}</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('teknisi.surveys.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.surveys*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.surveys*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.surveys*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-yellow-400" aria-hidden="true"></span>
                                         <span>Survey</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('teknisi.sizing-projects.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.sizing-projects*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.sizing-projects*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.sizing-projects*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" aria-hidden="true"></span>
                                         <span>Sizing Project</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('teknisi.request-hargas.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.request-hargas*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.request-hargas*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.request-hargas*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" aria-hidden="true"></span>
                                         <span>{{ __('Request Harga') }}</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('teknisi.instalasis.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.instalasis*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.instalasis*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.instalasis*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
                                         <span>{{ __('Instalasi') }}</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('teknisi.documents.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.documents*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('teknisi.documents*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.documents*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true"></span>
                                         <span>Document</span>
                                     </a>
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
+</div>
+</div>
                         @endcan
 
                         {{-- Marketing --}}
                         @can('view-marketing')
-                            @php($mktCount = 5 + ($hasMarketingMonitoring ? 1 : 0))
-                            <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="branched"{{ $marketingActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="marketing" data-bm-active="{{ $marketingIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive.' branched-active' : $navInactive }}">
+                            <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="sb-group"{{ $marketingActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="marketing">
+                                <div class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="chart-bar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                                         <span>Marketing</span>
                                     </a>
-                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                    <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
                                             :aria-expanded="open" aria-controls="sidebar-marketing-menu"
                                             aria-label="{{ __('Buka/tutup submenu') }}">
-                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </button>
                                 </div>
-                                <div id="sidebar-marketing-menu" class="branched-body sidebar-hide mt-1">
-                                    <div class="branched-fold">
-                                        <div class="branched-tree" style="height: {{ 12 + $mktCount * 36 }}px">
-                                            <svg class="branched-lines" width="40" height="{{ 12 + $mktCount * 36 }}" aria-hidden="true">
-                                                <path class="branched-base" d="M 14 0 V {{ 24 + 36 * ($mktCount - 1) - 10 }}" />
-                                                @for ($k = 0; $k < $mktCount; $k++)
-                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $marketingIdx ? 0 : $bmLen($k) }}" />
-                                                @endfor
-                                            </svg>
+                                <div id="sidebar-marketing-menu" class="sb-sub sidebar-hide">
+                                    <div class="sb-sub-list">
                                     <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
                                        aria-current="{{ request()->routeIs('marketing.dashboard') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('marketing.dashboard') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('marketing.dashboard') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
                                         <span>Dashboard</span>
                                     </a>
@@ -306,132 +261,113 @@
                                          aplikasi Alpine raksasa + chat state; morph berisiko merusak. --}}
                                     <a href="{{ route('whatsapp-center.index') }}"
                                        aria-current="{{ request()->routeIs('whatsapp-center*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('whatsapp-center*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('whatsapp-center*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
                                         <span>WhatsApp Center</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('leads.index') }}"
                                        aria-current="{{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true"></span>
                                         <span>Lead / Opportunity</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('partners.index') }}"
                                        aria-current="{{ request()->routeIs('partners*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('partners*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('partners*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" aria-hidden="true"></span>
                                         <span>{{ __('Data Partner') }}</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('leads.activities') }}"
                                        aria-current="{{ request()->routeIs('leads.activities') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('leads.activities') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('leads.activities') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400" aria-hidden="true"></span>
                                         <span>{{ __('Log Aktivitas') }}</span>
                                     </a>
                                     @can('monitor-marketing')
                                         <a wire:navigate.hover href="{{ route('leads.monitoring') }}"
                                            aria-current="{{ request()->routeIs('leads.monitoring') ? 'page' : 'false' }}"
-                                           class="{{ $subNavLink }} {{ request()->routeIs('leads.monitoring') ? $navActive : $navInactive }}">
+                                           class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('leads.monitoring') ? $navActive : $navInactive }}">
                                             <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
                                             <span>Monitoring</span>
                                         </a>
                                     @endcan
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
+</div>
+</div>
                         @endcan
 
                         {{-- Sales --}}
                         @canany(['view-sales', 'manage-inside-sales'])
-                            <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="branched"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="sales" data-bm-active="{{ $salesIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive.' branched-active' : $navInactive }}">
+                            <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="sb-group"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="sales">
+                                <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ $salesLanding }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="calendar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                                         <span>Sales</span>
                                     </a>
-                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                    <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
                                             :aria-expanded="open" aria-controls="sidebar-sales-menu"
                                             aria-label="{{ __('Buka/tutup submenu') }}">
-                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </button>
                                 </div>
-                                <div id="sidebar-sales-menu" class="branched-body sidebar-hide mt-1">
-                                    <div class="branched-fold">
-                                        <div class="branched-tree" style="height: {{ 12 + $salesCount * 36 }}px">
-                                            <svg class="branched-lines" width="40" height="{{ 12 + $salesCount * 36 }}" aria-hidden="true">
-                                                <path class="branched-base" d="M 14 0 V {{ 24 + 36 * ($salesCount - 1) - 10 }}" />
-                                                @for ($k = 0; $k < $salesCount; $k++)
-                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $salesIdx ? 0 : $bmLen($k) }}" />
-                                                @endfor
-                                            </svg>
+                                <div id="sidebar-sales-menu" class="sb-sub sidebar-hide">
+                                    <div class="sb-sub-list">
                                     @foreach($salesItems as $item)
                                         <a wire:navigate.hover href="{{ $item['route'] }}"
                                            aria-current="{{ request()->routeIs($item['match']) ? 'page' : 'false' }}"
-                                           class="{{ $subNavLink }} {{ request()->routeIs($item['match']) ? $navActive : $navInactive }}">
+                                           class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs($item['match']) ? $navActive : $navInactive }}">
                                             <span class="h-1.5 w-1.5 shrink-0 rounded-full {{ $item['dot'] }}" aria-hidden="true"></span>
                                             <span>{{ $item['label'] }}</span>
                                         </a>
                                     @endforeach
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
+</div>
+</div>
                         @endcanany
 
                         {{-- Admin: Invoice, PO, Payment --}}
                         @can('view-admin')
-                            <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }" class="branched"{{ $adminActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="admin" data-bm-active="{{ $adminIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $adminActive ? $navActive.' branched-active' : $navInactive }}">
+                            <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }" class="sb-group"{{ $adminActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="admin">
+                                <div class="{{ $navLink }} group w-full {{ $adminActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('admin.invoices.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="folder" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                                         <span>Admin</span>
                                     </a>
-                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                    <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
                                             :aria-expanded="open" aria-controls="sidebar-admin-menu"
                                             aria-label="{{ __('Buka/tutup submenu') }}">
-                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </button>
                                 </div>
-                                <div id="sidebar-admin-menu" class="branched-body sidebar-hide mt-1">
-                                    <div class="branched-fold">
-                                        <div class="branched-tree" style="height: 120px">
-                                            <svg class="branched-lines" width="40" height="120" aria-hidden="true">
-                                                <path class="branched-base" d="M 14 0 V 86" />
-                                                @for ($k = 0; $k < 3; $k++)
-                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $adminIdx ? 0 : $bmLen($k) }}" />
-                                                @endfor
-                                            </svg>
+                                <div id="sidebar-admin-menu" class="sb-sub sidebar-hide">
+                                    <div class="sb-sub-list">
                                     <a wire:navigate.hover href="{{ route('admin.invoices.index') }}"
                                        aria-current="{{ request()->routeIs('admin.invoices.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin.invoices.*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin.invoices.*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
                                         <span>Invoice</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('admin.pos.index') }}"
                                        aria-current="{{ request()->routeIs('admin.pos.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin.pos.*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin.pos.*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" aria-hidden="true"></span>
                                         <span>Purchase Order</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('admin.payments.index') }}"
                                        aria-current="{{ request()->routeIs('admin.payments.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin.payments.*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin.payments.*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
                                         <span>Payment</span>
                                     </a>
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
+</div>
+</div>
                         @endcan
 
                     </div>
@@ -464,71 +400,62 @@
 
                         {{-- Admin Panel (Super Admin only) --}}
                         @can('manage-monitoring')
-                            <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }" class="branched"{{ $adminPanelActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-bm-group="admin-panel" data-bm-active="{{ $adminPanelIdx }}">
-                                <div class="{{ $navLink }} group w-full {{ $adminPanelActive ? $navActive.' branched-active' : $navInactive }}">
+                            <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }" class="sb-group"{{ $adminPanelActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="admin-panel">
+                                <div class="{{ $navLink }} group w-full {{ $adminPanelActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('admin-panel.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="settings" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
                                         <span>Admin Panel</span>
                                     </a>
-                                    <button type="button" class="branched-toggle sidebar-hide" @click="open = !open"
+                                    <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
                                             :aria-expanded="open" aria-controls="sidebar-admin-panel-menu"
                                             aria-label="{{ __('Buka/tutup submenu') }}">
-                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        <svg class="h-4 w-4 transition-transform duration-300" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </button>
                                 </div>
-                                <div id="sidebar-admin-panel-menu" class="branched-body sidebar-hide mt-1">
-                                    <div class="branched-fold">
-                                        <div class="branched-tree" style="height: 228px">
-                                            <svg class="branched-lines" width="40" height="228" aria-hidden="true">
-                                                <path class="branched-base" d="M 14 0 V 194" />
-                                                @for ($k = 0; $k < 6; $k++)
-                                                    <path class="branched-base" d="{{ $bmBranch($k) }}" />
-                                                    <path class="branched-reach" d="{{ $bmReach($k) }}" style="stroke-dasharray: {{ $bmLen($k) }}; stroke-dashoffset: {{ $k === $adminPanelIdx ? 0 : $bmLen($k) }}" />
-                                                @endfor
-                                            </svg>
+                                <div id="sidebar-admin-panel-menu" class="sb-sub sidebar-hide">
+                                    <div class="sb-sub-list">
                                     <a wire:navigate.hover href="{{ route('admin-panel.index') }}"
                                        aria-current="{{ request()->routeIs('admin-panel.index') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.index') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin-panel.index') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
                                         <span>User Management</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('admin-panel.account-managers.index') }}"
                                        aria-current="{{ request()->routeIs('admin-panel.account-managers.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.account-managers.*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin-panel.account-managers.*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
                                         <span>Account Manager</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('admin-panel.work-types.index') }}"
                                        aria-current="{{ request()->routeIs('admin-panel.work-types.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.work-types.*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin-panel.work-types.*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
                                         <span>Work Type</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('admin-panel.document-categories.index') }}"
                                        aria-current="{{ request()->routeIs('admin-panel.document-categories.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.document-categories.*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin-panel.document-categories.*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
                                         <span>Document Category</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('admin-panel.project-statuses.index') }}"
                                        aria-current="{{ request()->routeIs('admin-panel.project-statuses.*') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.project-statuses.*') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin-panel.project-statuses.*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
                                         <span>Project Status</span>
                                     </a>
                                     <a wire:navigate.hover href="{{ route('admin-panel.audit-log') }}"
                                        aria-current="{{ request()->routeIs('admin-panel.audit-log') ? 'page' : 'false' }}"
-                                       class="{{ $subNavLink }} {{ request()->routeIs('admin-panel.audit-log') ? $navActive : $navInactive }}">
+                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('admin-panel.audit-log') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true"></span>
                                         <span>Audit Log</span>
                                     </a>
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
+</div>
+</div>
                         @endcan
                     </div>
                 </section>
