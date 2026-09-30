@@ -297,9 +297,6 @@ function syncSidebarGroups() {
     });
 }
 document.addEventListener('livewire:navigated', () => syncSidebarGroups());
-// Penanda hasil navigate: matikan stagger delay reveal (CSS) agar pindah
-// menu tampil sinkron; full load berikutnya (tanpa class) tetap ber-delay.
-document.addEventListener('livewire:navigated', () => document.documentElement.classList.add('navigated'));
 
 /* ============================================================
    BranchedMenu glide: garis reach meluncur dari posisi lama ke

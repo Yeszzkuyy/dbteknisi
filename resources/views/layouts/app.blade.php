@@ -65,13 +65,25 @@
          sempat mulai dari state awal, bukan langsung final.
          reveal-on: [data-reveal] disembunyikan (opacity 0) HANYA bila JS
          jalan; fallback mandiri di sini memaksa tampil bila script ekor
-         body gagal — cegah dashboard blank putih. --}}
+         body gagal — cegah dashboard blank putih.
+
+         PENTING: navigasi di app ini full page reload (Livewire JS tidak
+         dimuat), jadi animasi reveal akan main ulang tiap pindah menu dan
+         itulah sumber "jebret". Karena itu reveal HANYA pada kunjungan
+         pertama per sesi; kunjungan berikutnya langsung tampil final. --}}
     <script>
         document.documentElement.classList.add('js');
-        document.documentElement.classList.add('reveal-on');
-        setTimeout(function () {
-            try { document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function (el) { el.classList.add('in-view'); }); } catch (e) {}
-        }, 1200);
+        (function () {
+            var seen = false;
+            try { seen = sessionStorage.getItem('ui-revealed') === '1'; } catch (e) {}
+            if (!seen) {
+                document.documentElement.classList.add('reveal-on');
+                try { sessionStorage.setItem('ui-revealed', '1'); } catch (e) {}
+                setTimeout(function () {
+                    try { document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function (el) { el.classList.add('in-view'); }); } catch (e) {}
+                }, 1200);
+            }
+        })();
     </script>
 
     @livewireStyles
@@ -332,16 +344,32 @@
         initRevealSafe();
         // Last-resort: jalan saat parse, tak tergantung initChrome sukses.
         setTimeout(function(){try{forceReveal()}catch(e){}},2000);
-        // Progress bar pindah menu (wire:navigate): hidup saat navigating,
-        // mati saat navigated; failsafe + anti double-bind (morph me-mount ulang).
+        // Progress bar pindah halaman: navigasi di app ini full page reload,
+        // jadi bar dinyalakan saat link internal diklik (bukan event
+        // livewire:navigating yang tidak pernah fire). Failsafe + pageshow
+        // (bfcache) memastikan bar tak pernah menggantung.
         (function(){
             var bar=document.getElementById('navigate-progress');if(!bar||bar.dataset.navBound)return;bar.dataset.navBound='1';
             var failsafe=null;
-            function run(){bar.setAttribute('data-run','');if(failsafe)clearTimeout(failsafe);failsafe=setTimeout(stop,8000);}
+            function run(){bar.setAttribute('data-run','');if(failsafe)clearTimeout(failsafe);failsafe=setTimeout(stop,10000);}
             function stop(){bar.removeAttribute('data-run');if(failsafe){clearTimeout(failsafe);failsafe=null;}}
-            document.addEventListener('livewire:navigating',run);
-            document.addEventListener('livewire:navigated',stop);
+            document.addEventListener('click',function(e){
+                var a=e.target&&e.target.closest?e.target.closest('a[href]'):null;
+                if(!a||a.target||a.hasAttribute('download'))return;
+                var href=a.getAttribute('href')||'';
+                if(!href||href.charAt(0)==='#'||href.indexOf('mailto:')===0||href.indexOf('tel:')===0)return;
+                if(a.origin&&a.origin!==window.location.origin)return;
+                if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0)return;
+                run();
+            },true);
+            // Submit form = navigasi juga (kecuali AJAX internal).
+            document.addEventListener('submit',function(e){
+                var f=e.target;if(!f||f.dataset&&f.dataset.ajax)return;
+                if(f.method&&f.method.toLowerCase()==='post'&&e.defaultPrevented)return;
+                run();
+            },true);
             window.addEventListener('pageshow',stop);
+            stop();
         })();
     </script>
 </body>
