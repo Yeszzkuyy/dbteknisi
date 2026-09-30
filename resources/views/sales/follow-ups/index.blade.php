@@ -27,12 +27,12 @@
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit"
-                        class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
+                        class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2">
                     Filter
                 </button>
                 @if(request()->anyFilled(['search', 'overdue']))
                     <a href="{{ route('sales.follow-ups.index') }}" data-ajax-reset
-                       class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium transition">
+                       class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2">
                         Reset
                     </a>
                 @endif
