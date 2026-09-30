@@ -77,17 +77,16 @@
             var seen = false;
             try { seen = sessionStorage.getItem('ui-revealed') === '1'; } catch (e) {}
             if (!seen) {
-                document.documentElement.classList.add('reveal-on');
-                try { sessionStorage.setItem('ui-revealed', '1'); } catch (e) {}
-                // Animasi staggered sub-menu sidebar hanya di kunjungan pertama.
+                // Kunjungan pertama: animasi reveal + staggered sub-menu sidebar.
                 // Navigasi = full page reload, jadi tanpa penanda ini tiap
                 // pindah menu memutar ulang efek "turun-turun" sub-menu aktif.
-            } else {
-                document.documentElement.classList.add('sidebar-settled');
-            }
+                document.documentElement.classList.add('reveal-on');
+                try { sessionStorage.setItem('ui-revealed', '1'); } catch (e) {}
                 setTimeout(function () {
                     try { document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function (el) { el.classList.add('in-view'); }); } catch (e) {}
                 }, 1200);
+            } else {
+                document.documentElement.classList.add('sidebar-settled');
             }
         })();
     </script>

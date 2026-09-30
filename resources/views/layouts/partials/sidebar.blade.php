@@ -105,7 +105,7 @@
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
                                         <x-icon name="briefcase" class="h-5 w-5 shrink-0" />
                                         <span>Management</span>
-                                        <span class="ml-auto flex shrink-0 items-center gap-1.5">
+                                        <span class="ml-auto flex shrink-0 items-center gap-1.5 sidebar-hide">
                                             <template x-if="$store.notif.unassigned > 0">
                                                 <span class="h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-800" title="{{ __('Ada lead belum di-assign') }}"></span>
                                             </template>
