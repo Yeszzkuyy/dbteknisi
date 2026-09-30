@@ -1,6 +1,6 @@
 {{-- Donut chart SVG murni (pengganti ApexCharts pie/donut).
     Props: :data="[{label, value, color, key?}]", :size="250", :strokeWidth="30",
-    :scroll="false" (true = sweep ditahan sampai ancestor [data-reveal].in-view)
+    :scroll="false" (diterima untuk kompatibilitas; sweep selalu main tiap load)
     Interaksi: hover NONAKTIF (diagram diam); klik kirim CustomEvent
     window donut-select dengan detail {key, label, value}.
 --}}
@@ -91,9 +91,10 @@ $cum = 0.0;
         from { stroke-dashoffset: var(--c); opacity: 0; }
         to { stroke-dashoffset: var(--off); opacity: 1; }
     }
-    /* Mode scroll: sweep ditahan (pause di frame awal = tak kasat mata)
-       sampai ancestor [data-reveal] dapat .in-view dari observer layout */
-    .donut-svg.donut-scroll .donut-seg { animation-play-state: paused; }
+    /* Mode scroll: tidak lagi menahan sweep (animasi donat main tiap load,
+       konsisten dengan bar chart). Aturan dipertahankan agar markup lama
+       dengan :scroll tetap valid. */
+    .donut-svg.donut-scroll .donut-seg { animation-play-state: running; }
     [data-reveal].in-view .donut-svg.donut-scroll .donut-seg { animation-play-state: running; }
     @media (prefers-reduced-motion: reduce) {
         .donut-svg .donut-seg { animation: none; }
