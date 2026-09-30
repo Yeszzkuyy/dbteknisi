@@ -60,6 +60,12 @@ Commit dulu atau `git stash push -m "pesan jelas"`.
 Folder utama (`/var/www/3dyapp`) harus selalu berada di branch `main`.
 Setelah merge ke main: `git pull`, lalu `npm run build` jika ada perubahan CSS/JS.
 
+**Selalu `npm run build` dari `/var/www/3dyapp` (main), JANGAN dari worktree
+divisi.** `public/build` tiap worktree di-symlink ke `public/build` main,
+sehingga build dari worktree basi menimpa CSS/JS website dengan hasil sisiran
+Tailwind atas view lama — kelas yang cuma dipakai view baru ikut terbuang
+dan halaman live berantakan.
+
 ## 6. Jangan commit
 
 - Folder `backups/` (sudah di-gitignore)
