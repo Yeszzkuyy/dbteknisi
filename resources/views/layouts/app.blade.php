@@ -79,6 +79,12 @@
             if (!seen) {
                 document.documentElement.classList.add('reveal-on');
                 try { sessionStorage.setItem('ui-revealed', '1'); } catch (e) {}
+                // Animasi staggered sub-menu sidebar hanya di kunjungan pertama.
+                // Navigasi = full page reload, jadi tanpa penanda ini tiap
+                // pindah menu memutar ulang efek "turun-turun" sub-menu aktif.
+            } else {
+                document.documentElement.classList.add('sidebar-settled');
+            }
                 setTimeout(function () {
                     try { document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function (el) { el.classList.add('in-view'); }); } catch (e) {}
                 }, 1200);
@@ -171,6 +177,18 @@
             html.sidebar-collapsed .sidebar nav button > svg.ml-auto{display:none!important}
             html.sidebar-collapsed .sidebar nav a,
             html.sidebar-collapsed .sidebar nav button{justify-content:center;padding-left:0;padding-right:0}
+            /* gap:0 WAJIB:Utility gap-3 tetap menghitung 12px walau label
+               max-width:0, jadi ikon terdorong ~6px dari tengah rail.
+               Tanpa ini semua ikon menu terlihat tidak simetris. */
+            html.sidebar-collapsed .sidebar nav a,
+            html.sidebar-collapsed .sidebar nav button,
+            html.sidebar-collapsed .sidebar .sb-head,
+            html.sidebar-collapsed .sidebar-user,
+            html.sidebar-collapsed .sidebar-collapse{gap:0}
+            /* Toggle sub-menu tak ada gunanya di rail (sub-menu tersembunyi)
+               dan diameternya bikin header grup tidak simetris. */
+            html.sidebar-collapsed .sidebar .sb-toggle{display:none!important}
+            html.sidebar-collapsed .sidebar .sb-head{padding-left:0;padding-right:0;justify-content:center}
             html.sidebar-collapsed .sidebar nav{padding-left:.5rem;padding-right:.5rem}
             html.sidebar-collapsed .sidebar-logo{padding-left:.5rem;padding-right:.5rem;justify-content:center}
             html.sidebar-collapsed .sidebar-logo img{height:1.75rem}

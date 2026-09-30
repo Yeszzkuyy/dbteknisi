@@ -39,9 +39,12 @@
     border-left: 1px solid var(--sidebar-border);
 }
 
-/* ---------- Item sub-menu: blur + naik, stagger per anak ---------- */
+/* ---------- Item sub-menu: blur + naik, stagger per anak ----------
+   Hanya pada kunjungan pertama per sesi (html:not(.sidebar-settled)).
+   Navigasi di app ini full page reload, jadi tanpa penanda ini tiap
+   pindah menu memutar ulang efek "turun-turun" sub-menu aktif. */
 @media (prefers-reduced-motion: no-preference) {
-    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item {
+    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item {
         animation: sb-sub-in 180ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
     }
 }
@@ -63,13 +66,13 @@
 /* Stagger per anak. Sub-item terbanyak = 8 (grup Teknisi), jadi 8 slot
    cukup; sisanya memakai delay slot terakhir. */
 @media (prefers-reduced-motion: no-preference) {
-    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(1) { animation-delay: var(--sb-stagger-first); }
-    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(2) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger)); }
-    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(3) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 2); }
-    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(4) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 3); }
-    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(5) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 4); }
-    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(6) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 5); }
-    .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(n + 7) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 6); }
+    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(1) { animation-delay: var(--sb-stagger-first); }
+    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(2) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger)); }
+    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(3) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 2); }
+    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(4) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 3); }
+    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(5) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 4); }
+    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(6) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 5); }
+    html:not(.sidebar-settled) .sidebar .sb-group[data-open] > .sb-sub > .sb-sub-list > .sb-sub-item:nth-child(n + 7) { animation-delay: calc(var(--sb-stagger-first) + var(--sb-stagger) * 6); }
 }
 
 /* ---------- Tombol buka/tutup grup ---------- */
@@ -112,9 +115,11 @@
     padding-bottom: 6px;
 }
 
+/* Pakai token tema (bukan accent-300) supaya kontras aman di light mode:
+   accent-300 terlalu pucat di latar terang. */
 .sidebar .sb-sub-item[aria-current='page'] {
-    background: rgb(var(--accent-500) / 0.12);
-    color: rgb(var(--accent-300) / 1);
+    background: var(--nav-active-bg);
+    color: var(--nav-active-text);
 }
 
 /* ---------- Press feedback (whileTap scale 0.98) ---------- */

@@ -1,8 +1,8 @@
 @php
-    $navLink = 'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50';
-    $subNavLink = 'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50';
+    $navLink = 'group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50';
+    $subNavLink = 'group relative flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50';
     $navActive = 'bg-accent-500/15 text-white';
-    $navInactive = 'text-slate-300 hover:bg-white/5 hover:text-white';
+    $navInactive = 'text-slate-300 hover:bg-slate-900/[.04] hover:text-slate-900 dark:hover:bg-white/[.06] dark:hover:text-white';
 
     $dashboardActive = request()->routeIs('dashboard*');
     $customerActive = request()->routeIs('customers*');
@@ -73,13 +73,13 @@
                     <a wire:navigate.hover href="{{ route('dashboard') }}"
                        aria-current="{{ $dashboardActive ? 'page' : 'false' }}"
                        class="{{ $navLink }} {{ $dashboardActive ? $navActive : $navInactive }}">
-                        <x-icon name="grid" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                        <x-icon name="grid" class="h-5 w-5 shrink-0" />
                         <span>Dashboard</span>
                     </a>
                     <a wire:navigate.hover href="{{ route('customers.index') }}"
                        aria-current="{{ $customerActive ? 'page' : 'false' }}"
                        class="{{ $navLink }} {{ $customerActive ? $navActive : $navInactive }}">
-                        <x-icon name="users" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                        <x-icon name="users" class="h-5 w-5 shrink-0" />
                         <span>Customer</span>
                     </a>
                     {{-- AI Assistant SENGAJA full reload (tanpa wire:navigate):
@@ -87,7 +87,7 @@
                     <a href="{{ route('ai.assistant.index') }}"
                        aria-current="{{ request()->routeIs('ai.assistant*') ? 'page' : 'false' }}"
                        class="{{ $navLink }} {{ request()->routeIs('ai.assistant*') ? $navActive : $navInactive }}">
-                        <x-icon name="message" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                        <x-icon name="message" class="h-5 w-5 shrink-0" />
                         <span>AI Assistant</span>
                     </a>
                 </div>
@@ -100,10 +100,10 @@
                         {{-- Management (Management Hub) --}}
                         @can('manage-sales-leads')
                             <div x-data="{ open: {{ $managementActive ? 'true' : 'false' }} }" class="sb-group"{{ $managementActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="management">
-                                <div class="{{ $navLink }} group w-full {{ $managementActive ? $navActive.' sb-active' : $navInactive }}">
+                                <div class="sb-head {{ $navLink }} group w-full {{ $managementActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('manage-sales.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
-                                        <x-icon name="briefcase" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <x-icon name="briefcase" class="h-5 w-5 shrink-0" />
                                         <span>Management</span>
                                         <span class="ml-auto flex shrink-0 items-center gap-1.5">
                                             <template x-if="$store.notif.unassigned > 0">
@@ -162,10 +162,10 @@
                         {{-- Teknisi --}}
                         @can('view-technician')
                             <div x-data="{ open: {{ $technicianActive ? 'true' : 'false' }} }" class="sb-group"{{ $technicianActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="teknisi">
-                                <div class="{{ $navLink }} group w-full {{ $technicianActive ? $navActive.' sb-active' : $navInactive }}">
+                                <div class="sb-head {{ $navLink }} group w-full {{ $technicianActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('teknisi.dashboard') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
-                                        <x-icon name="tools" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <x-icon name="tools" class="h-5 w-5 shrink-0" />
                                         <span>{{ __('Teknisi') }}</span>
                                     </a>
                                     <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
@@ -235,10 +235,10 @@
                         {{-- Marketing --}}
                         @can('view-marketing')
                             <div x-data="{ open: {{ $marketingActive ? 'true' : 'false' }} }" class="sb-group"{{ $marketingActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="marketing">
-                                <div class="{{ $navLink }} group w-full {{ $marketingActive ? $navActive.' sb-active' : $navInactive }}">
+                                <div class="sb-head {{ $navLink }} group w-full {{ $marketingActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('marketing.dashboard') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
-                                        <x-icon name="chart-bar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <x-icon name="chart-bar" class="h-5 w-5 shrink-0" />
                                         <span>Marketing</span>
                                     </a>
                                     <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
@@ -299,10 +299,10 @@
                         {{-- Sales --}}
                         @canany(['view-sales', 'manage-inside-sales'])
                             <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }" class="sb-group"{{ $salesActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="sales">
-                                <div class="{{ $navLink }} group w-full {{ $salesActive ? $navActive.' sb-active' : $navInactive }}">
+                                <div class="sb-head {{ $navLink }} group w-full {{ $salesActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ $salesLanding }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
-                                        <x-icon name="calendar" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <x-icon name="calendar" class="h-5 w-5 shrink-0" />
                                         <span>Sales</span>
                                     </a>
                                     <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
@@ -331,10 +331,10 @@
                         {{-- Admin: Invoice, PO, Payment --}}
                         @can('view-admin')
                             <div x-data="{ open: {{ $adminActive ? 'true' : 'false' }} }" class="sb-group"{{ $adminActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="admin">
-                                <div class="{{ $navLink }} group w-full {{ $adminActive ? $navActive.' sb-active' : $navInactive }}">
+                                <div class="sb-head {{ $navLink }} group w-full {{ $adminActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('admin.invoices.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
-                                        <x-icon name="folder" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <x-icon name="folder" class="h-5 w-5 shrink-0" />
                                         <span>Admin</span>
                                     </a>
                                     <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
@@ -383,7 +383,7 @@
                             <a wire:navigate.hover href="{{ route('trash.index') }}"
                                aria-current="{{ request()->routeIs('trash*') ? 'page' : 'false' }}"
                                class="{{ $navLink }} {{ request()->routeIs('trash*') ? $navActive : $navInactive }}">
-                                <x-icon name="trash" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                <x-icon name="trash" class="h-5 w-5 shrink-0" />
                                 <span>Trash</span>
                             </a>
                         @endcan
@@ -393,7 +393,7 @@
                             <a wire:navigate.hover href="{{ route('knowledge-base.index') }}"
                                aria-current="{{ request()->routeIs('knowledge-base*') ? 'page' : 'false' }}"
                                class="{{ $navLink }} {{ request()->routeIs('knowledge-base*') ? $navActive : $navInactive }}">
-                                <x-icon name="book" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                <x-icon name="book" class="h-5 w-5 shrink-0" />
                                 <span>Knowledge Base</span>
                             </a>
                         @endcan
@@ -401,10 +401,10 @@
                         {{-- Admin Panel (Super Admin only) --}}
                         @can('manage-monitoring')
                             <div x-data="{ open: {{ $adminPanelActive ? 'true' : 'false' }} }" class="sb-group"{{ $adminPanelActive ? 'data-open' : '' }} :data-open="open ? '' : null" data-sb-group="admin-panel">
-                                <div class="{{ $navLink }} group w-full {{ $adminPanelActive ? $navActive.' sb-active' : $navInactive }}">
+                                <div class="sb-head {{ $navLink }} group w-full {{ $adminPanelActive ? $navActive.' sb-active' : $navInactive }}">
                                     <a wire:navigate.hover href="{{ route('admin-panel.index') }}"
                                             class="flex min-w-0 flex-1 items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/50">
-                                        <x-icon name="settings" class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
+                                        <x-icon name="settings" class="h-5 w-5 shrink-0" />
                                         <span>Admin Panel</span>
                                     </a>
                                     <button type="button" class="sb-toggle sidebar-hide" @click="open = !open"
@@ -472,7 +472,7 @@
                 <span class="block truncate text-sm font-semibold text-slate-200">{{ auth()->user()->name }}</span>
                 <span class="mt-0.5 block truncate text-[11px] text-slate-400">{{ \Illuminate\Support\Str::headline($roleName) }}</span>
             </span>
-            <x-icon name="chevron-right" class="sidebar-hide h-4 w-4 shrink-0 text-slate-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-accent-300" />
+                        <x-icon name="chevron-right" class="sidebar-hide h-4 w-4 shrink-0 text-slate-400 transition-colors duration-300 group-hover:text-accent-300" />
         </a>
     </div>
 
