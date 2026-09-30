@@ -46,8 +46,8 @@ class AppServiceProvider extends ServiceProvider
             });
         });
 
-        // Guardrail perintah DB destruktif: backup otomatis + konfirmasi nama DB.
-        // Lihat App\Console\DestructiveCommandGuard & AGENTS.md aturan 8.
+        // Guard perintah DB destruktif: default-deny, langsung ditolak tanpa bypass.
+        // Lihat App\Console\DestructiveCommandGuard.
         Event::listen(CommandStarting::class, function (CommandStarting $event) {
             $connection = (string) ($event->input->getParameterOption('--database', config('database.default')));
             $cfg = config("database.connections.{$connection}", []);
