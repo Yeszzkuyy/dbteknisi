@@ -32,10 +32,10 @@
     flex-direction: column;
     gap: 2px;
     overflow: hidden;
-    /* Padding (bukan margin) untuk jarak vertikal: margin berada di luar
-       box sehingga ikut menambah tinggi track 0fr dan submenu tertutup
-       menyisakan tinggi ~10px. */
-    padding: 4px 0 6px 12px;
+    /* Padding vertikal TIDAK boleh di sini: pada track 0fr sisa padding
+       tetap menambah tinggi terukur (~10px) walau isinya tersembunyi.
+       Jarak vertikal handled oleh gap + padding dalam tiap item. */
+    padding-left: 12px;
     border-left: 1px solid var(--sidebar-border);
 }
 
@@ -107,6 +107,11 @@
 }
 
 /* ---------- Item aktif sub-menu ---------- */
+.sidebar .sb-sub-item {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
 .sidebar .sb-sub-item[aria-current='page'] {
     background: rgb(var(--accent-500) / 0.12);
     color: rgb(var(--accent-300) / 1);
