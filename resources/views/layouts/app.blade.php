@@ -107,11 +107,11 @@
            rail pakai lebar sama supaya konten ikut propulsion.
            ============================================================ */
         :root{
-            --sb-w:280px;
-            --sb-w-rail:76px;
+            --sb-w:16rem;
+            --sb-w-rail:4.25rem;
             --sb-dur:.32s;
             --sb-ease:linear(0.000, 0.100, 0.289, 0.475, 0.629, 0.745, 0.829, 0.887, 0.926, 0.952, 0.969, 0.981, 0.988, 0.992, 0.995);
-            --sb-ease-soft:cubic-bezier(.23,1,.32,1);
+            --sb-ease-soft:cubic-bezier(.16,1,.3,1);
             /* Label: enter lebih lambat (200ms + delay 80ms), exit cepat (120ms) */
             --sb-label-in:200ms;
             --sb-label-in-delay:80ms;
@@ -140,10 +140,10 @@
 
         /* Rail hover: strip tipis di tepi sidebar, muncul garis saat hover.
            Memakai --sb-w-rail (bukan 76px) supaya rail ikut.spring. */
-        .sb-rail{position:absolute;top:0;bottom:0;left:100%;width:12px;z-index:21;cursor:pointer;background:transparent;transition:background-color 200ms ease}
+        .sb-rail{position:absolute;top:0;bottom:0;left:100%;width:1rem;z-index:21;cursor:pointer;background:transparent;transition:background-color 200ms ease}
         .sb-rail:hover,.sb-rail:focus-visible{background:rgb(var(--accent-500)/.07)}
-        .sb-rail::after{content:"";position:absolute;top:50%;left:5px;width:2px;height:34px;margin-top:-17px;border-radius:2px;background:rgb(var(--accent-500)/.5);opacity:0;transition:opacity 200ms ease}
-        .sb-rail:hover::after,.sb-rail:focus-visible::after{opacity:1}
+        .sb-rail::after{content:"";position:absolute;top:50%;left:50%;width:1px;height:34px;margin-top:-17px;margin-left:-.5px;border-radius:2px;background:var(--sidebar-border);opacity:0;transition:opacity 200ms ease,background-color 200ms ease}
+        .sb-rail:hover::after,.sb-rail:focus-visible::after{opacity:1;background:rgb(var(--accent-500)/.5)}
 
         @media(min-width:1024px){
             .sidebar{position:fixed;left:0;top:0;transform:translateX(0)!important;width:var(--sb-w);height:100vh;overflow:hidden}
@@ -202,8 +202,17 @@
         }
         @media(max-width:1023px){
             .app-wrapper{display:flex;min-height:100vh}
-            .sidebar{width:280px}
+            .sidebar{width:18rem}
             .main-content{flex:1}
+        }
+
+        /* Reduced motion: matikan morph lebar + label + stagger (template:
+           morph duration 0). Sub-menu sudah ditangani sidebar-nav.css. */
+        @media(prefers-reduced-motion:reduce){
+            .sidebar,.main-content{transition:none}
+            .sidebar .sidebar-hide,
+            .sidebar nav a > span,
+            .sidebar nav button > span{transition:none}
         }
 
         .dark .bg-white{background-color:var(--card-bg)!important}
@@ -329,11 +338,17 @@
         function initChrome(){
             var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay'),h=document.getElementById('hamburgerBtn');
             if(!s||!o)return;
-            function open(){s.classList.add('open');o.classList.add('active')}
-            function close(){s.classList.remove('open');o.classList.remove('active')}
-            close();
+            function isMobileBar(){return window.innerWidth<1024}
+            var lastFocus=null;
+            var FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+            // Sheet mobile ala template: scroll-lock + inert + fokus masuk,
+            // tutup kembalikan fokus. Desktop (sidebar terlihat) tak disentuh.
+            function open(){s.classList.add('open');o.classList.add('active');if(!isMobileBar())return;lastFocus=document.activeElement;s.setAttribute('role','dialog');s.setAttribute('aria-modal','true');s.removeAttribute('inert');document.body.style.overflow='hidden';var f=s.querySelector(FOCUSABLE);if(f)f.focus({preventScroll:true});}
+            function close(restore){s.classList.remove('open');o.classList.remove('active');if(!isMobileBar())return;s.removeAttribute('role');s.removeAttribute('aria-modal');s.setAttribute('inert','');document.body.style.overflow='';if(restore!==false&&lastFocus&&document.contains(lastFocus))lastFocus.focus({preventScroll:true});}
+            close(false);
+            if(isMobileBar()){s.setAttribute('inert','');}
             if(h&&!h.dataset.bound){h.dataset.bound='1';h.addEventListener('click',function(){s.classList.contains('open')?close():open()});}
-            if(!o.dataset.bound){o.dataset.bound='1';o.addEventListener('click',close);}
+            if(!o.dataset.bound){o.dataset.bound='1';o.addEventListener('click',function(){close();});}
 
             var root=document.documentElement;
             var cb=document.getElementById('sidebarCollapseBtn');
@@ -375,23 +390,33 @@
                 });
             });
 
-            s.querySelectorAll('a,button[type="submit"]').forEach(function(e){if(e.dataset.bound)return;e.dataset.bound='1';e.addEventListener('click',function(){window.innerWidth<1024&&close()})});
+            s.querySelectorAll('a,button[type="submit"]').forEach(function(e){if(e.dataset.bound)return;e.dataset.bound='1';e.addEventListener('click',function(){if(window.innerWidth<1024)close(false)})});
             if(!window.__chromeGlobals){
                 window.__chromeGlobals=true;
                 // ⌘B / Ctrl+B = toggle rail (ala template animated sidebar).
                 document.addEventListener('keydown',function(e){
                     if(e.key.toLowerCase()!=='b'||!(e.metaKey||e.ctrlKey))return;
                     e.preventDefault();
-                    if(window.innerWidth<1024){var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');
+                    if(window.innerWidth<1024){var sb=document.getElementById('sidebar');
                         if(!sb)return;
-                        if(sb.classList.contains('open')){sb.classList.remove('open');ov&&ov.classList.remove('active')}
-                        else{sb.classList.add('open');ov&&ov.classList.add('active')}
+                        sb.classList.contains('open')?close():open();
                         return;}
                     root.classList.toggle('sidebar-collapsed');
                     setCollapsed(root.classList.contains('sidebar-collapsed'));
                 });
-                window.addEventListener('resize',function(){var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');if(window.innerWidth>=1024&&sb){sb.classList.remove('open');ov&&ov.classList.remove('active')}});
-                document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;var sb=document.getElementById('sidebar');if(sb&&sb.classList.contains('open')){sb.classList.remove('open');var ov=document.getElementById('sidebarOverlay');ov&&ov.classList.remove('active')}});
+                window.addEventListener('resize',function(){if(window.innerWidth>=1024){var sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');if(sb){sb.classList.remove('open');sb.removeAttribute('role');sb.removeAttribute('aria-modal');sb.removeAttribute('inert');}if(ov)ov.classList.remove('active');document.body.style.overflow='';}});
+                document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;var sb=document.getElementById('sidebar');if(sb&&sb.classList.contains('open'))close();});
+                // Focus trap sheet mobile ala template (Tab muter di dalam sidebar).
+                document.addEventListener('keydown',function(e){
+                    if(e.key!=='Tab')return;
+                    var sb=document.getElementById('sidebar');
+                    if(!sb||!sb.classList.contains('open')||window.innerWidth>=1024)return;
+                    var f=Array.prototype.slice.call(sb.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(function(el){return el.offsetParent!==null&&!el.closest('.sb-group:not([data-open]) .sb-sub')});
+                    if(!f.length){e.preventDefault();return;}
+                    var first=f[0],last=f[f.length-1];
+                    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+                    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+                });
             }
             var t=document.getElementById('darkToggle');
             if(t&&!t.dataset.bound){t.dataset.bound='1';t.addEventListener('click',function(){
@@ -437,6 +462,49 @@
         }
         function initChromeSafe(){try{initChrome()}catch(e){try{forceReveal()}catch(_){}}}
         function initRevealSafe(){try{initReveal()}catch(e){try{forceReveal()}catch(_){}}}
+        // Sidebar di-persist (Livewire persist): DOM-nya tidak ikut morph, jadi status aktif
+        // (highlight + grup terbuka) harus disinkron manual tiap navigasi.
+        // Hanya class/aria yang disentuh — node tidak diganti, animasi tak replay.
+        // (AI Assistant sengaja full reload; server me-render statusnya segar.)
+        function syncSidebarActive(){
+            var nav=document.getElementById('sidebar-navigation');if(!nav)return;
+            var active=(nav.dataset.navActive||'').split(' ').filter(Boolean);
+            var inactive=(nav.dataset.navInactive||'').split(' ').filter(Boolean);
+            if(!active.length&&!inactive.length)return;
+            var here=window.location.pathname.replace(/\/+$/,'')||'/';
+            function swap(el,on,extra){
+                active.forEach(function(c){el.classList.toggle(c,on);});
+                inactive.forEach(function(c){el.classList.toggle(c,!on);});
+                (extra||'').split(' ').filter(Boolean).forEach(function(c){el.classList.toggle(c,on);});
+                if(el.tagName==='A')el.setAttribute('aria-current',on?'page':'false');
+            }
+            var links=Array.prototype.slice.call(nav.querySelectorAll('a[href]'));
+            var best=null,bestLen=-1;
+            links.forEach(function(a){
+                var p;try{p=new URL(a.href,window.location.origin).pathname.replace(/\/+$/,'')||'/';}catch(e){return;}
+                if(p!==here&&here.indexOf(p+'/')!==0)return;
+                if(p.length>bestLen){bestLen=p.length;best=a;}
+            });
+            links.forEach(function(a){
+                var head=a.closest('.sb-head');
+                if(head)swap(head,false,'sb-active');else swap(a,false);
+            });
+            if(!best)return;
+            var head=best.closest('.sb-head');
+            var item=best.closest('.sb-sub-item');
+            if(item){
+                swap(best,true);
+                var group=item.closest('.sb-group');
+                if(group){
+                    group.setAttribute('data-open','');
+                    try{var scope=window.Alpine?Alpine.$data(group):null;if(scope)scope.open=true;}catch(e){}
+                    var h=group.querySelector('.sb-head');
+                    if(h)swap(h,true,'sb-active');
+                }
+            }else if(head){swap(head,true,'sb-active');}
+            else{swap(best,true);}
+        }
+        document.addEventListener('livewire:navigated',function(){try{syncSidebarActive();}catch(e){}});
         document.addEventListener('DOMContentLoaded',initChromeSafe);
         document.addEventListener('livewire:navigated',initChromeSafe);
         document.addEventListener('DOMContentLoaded',initRevealSafe);

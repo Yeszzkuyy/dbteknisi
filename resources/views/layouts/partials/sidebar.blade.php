@@ -36,6 +36,7 @@
 @endphp
 
 <aside class="relative flex h-full w-full flex-col overflow-hidden">
+@persist('sidebar')
     {{-- Aurora mesh background (dekoratif, di belakang konten) --}}
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
         <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-accent-500/15 blur-3xl"></div>
@@ -65,7 +66,8 @@
     </div>
 
     {{-- Menu --}}
-    <nav id="sidebar-navigation" aria-label="{{ __('Navigasi utama') }}" class="sidebar-nav relative z-10 flex-1 overflow-y-auto px-3 py-4">
+    <nav id="sidebar-navigation" aria-label="{{ __('Navigasi utama') }}" class="sidebar-nav relative z-10 flex-1 overflow-y-auto px-3 py-4"
+         data-nav-active="{{ $navActive }} sb-active" data-nav-inactive="{{ $navInactive }}">
         <div class="space-y-6">
             <section aria-labelledby="sidebar-main-label">
                 <p id="sidebar-main-label" class="sidebar-hide px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Main</p>
@@ -490,4 +492,5 @@
             <span class="sidebar-hide">{{ __('Perkecil') }}</span>
         </button>
     </div>
+@endpersist
 </aside>
