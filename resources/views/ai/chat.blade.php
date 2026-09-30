@@ -9,13 +9,13 @@
     <script>window.chatInit = @json($chatInit);</script>
 
     <div class="ai-page" x-data="officeAssistant()">
-        <aside class="ai-history" :class="historyOpen ? 'is-open' : ''" aria-label="Riwayat percakapan">
+        <aside class="ai-history" :class="historyOpen ? 'is-open' : ''" aria-label="{{ __('Riwayat percakapan') }}">
             <div class="ai-history-head">
                 <div class="ai-history-brand">
                     <span class="ai-history-mark"><x-icon name="message" class="h-4 w-4" /></span>
                     <span>Office Assistant</span>
                 </div>
-                <button type="button" class="ai-icon-button ai-history-close" @click="historyOpen = false" aria-label="Tutup riwayat percakapan">
+                <button type="button" class="ai-icon-button ai-history-close" @click="historyOpen = false" aria-label="{{ __('Tutup riwayat percakapan') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
                     </svg>
@@ -29,10 +29,10 @@
                 <span>New Chat</span>
             </button>
 
-            <div class="ai-history-label">Riwayat chat</div>
+            <div class="ai-history-label">{{ __('Riwayat chat') }}</div>
             <div class="ai-history-list">
                 <div x-show="conversations.length === 0" class="ai-history-empty" x-cloak>
-                    Belum ada percakapan.
+                    {{ __('Belum ada percakapan.') }}
                 </div>
 
                 <template x-for="chat in conversations" :key="chat.id">
@@ -41,7 +41,7 @@
                             <span class="ai-history-title" x-text="chat.title"></span>
                             <span class="ai-history-date" x-text="formatDate(chat.updated_at)"></span>
                         </button>
-                        <button type="button" class="ai-history-more" x-show="editingId !== chat.id" @click.stop="menuId = menuId === chat.id ? null : chat.id" :aria-expanded="menuId === chat.id" aria-label="Aksi percakapan">
+                        <button type="button" class="ai-history-more" x-show="editingId !== chat.id" @click.stop="menuId = menuId === chat.id ? null : chat.id" :aria-expanded="menuId === chat.id" aria-label="{{ __('Aksi percakapan') }}">
                             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
                             </svg>
@@ -57,13 +57,13 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16m-10 4v6m4-6v6M9 7V4h6v3m-9 0 1 13h10l1-13" />
                                 </svg>
-                                Hapus
+                                {{ __('Hapus') }}
                             </button>
                         </div>
                         <div x-show="editingId === chat.id" x-cloak class="ai-history-rename">
-                            <input type="text" x-model="renameDraft" maxlength="100" aria-label="Nama percakapan baru" @keydown.enter.prevent="saveRename(chat)" @keydown.escape="cancelRename">
-                            <button type="button" @click="saveRename(chat)" aria-label="Simpan nama percakapan">✓</button>
-                            <button type="button" @click="cancelRename" aria-label="Batalkan rename">&times;</button>
+                            <input type="text" x-model="renameDraft" maxlength="100" aria-label="{{ __('Nama percakapan baru') }}" @keydown.enter.prevent="saveRename(chat)" @keydown.escape="cancelRename">
+                            <button type="button" @click="saveRename(chat)" aria-label="{{ __('Simpan nama percakapan') }}">✓</button>
+                            <button type="button" @click="cancelRename" aria-label="{{ __('Batalkan rename') }}">&times;</button>
                         </div>
                     </div>
                 </template>
@@ -71,7 +71,7 @@
 
             <div class="ai-history-foot">
                 <span class="ai-status-dot" aria-hidden="true"></span>
-                <span>Data realtime dari sistem</span>
+                <span>{{ __('Data realtime dari sistem') }}</span>
             </div>
         </aside>
 
@@ -80,7 +80,7 @@
         <section class="ai-workspace">
             <header class="ai-chat-header">
                 <div class="ai-chat-heading">
-                    <button type="button" class="ai-icon-button ai-mobile-history" @click="historyOpen = true" aria-label="Buka riwayat percakapan">
+                    <button type="button" class="ai-icon-button ai-mobile-history" @click="historyOpen = true" aria-label="{{ __('Buka riwayat percakapan') }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -88,7 +88,7 @@
                     <span class="ai-chat-icon"><x-icon name="message" class="h-5 w-5" /></span>
                     <div class="min-w-0">
                         <h1>Office Assistant</h1>
-                        <p><span class="ai-status-dot" aria-hidden="true"></span> Asisten AI internal</p>
+                        <p><span class="ai-status-dot" aria-hidden="true"></span> {{ __('Asisten AI internal') }}</p>
                     </div>
                 </div>
                 <button type="button" class="ai-header-new" @click="newChat">
@@ -102,18 +102,18 @@
             <div class="ai-conversation" x-ref="messages" @scroll="onScroll" aria-live="polite">
                 <div x-show="messages.length === 0 && !loadingConversation" class="ai-empty" x-cloak>
                     <div class="ai-empty-mark"><x-icon name="message" class="h-6 w-6" /></div>
-                    <h2>Mulai percakapan</h2>
-                    <p>Tanyakan tentang project, tugas, dokumen, atau data perusahaan.</p>
+                    <h2>{{ __('Mulai percakapan') }}</h2>
+                    <p>{{ __('Tanyakan tentang project, tugas, dokumen, atau data perusahaan.') }}</p>
                     <div class="ai-suggestions">
-                        <button type="button" @click="draft = 'Apa tugas saya yang paling dekat?'; focusInput()">Tugas saya</button>
-                        <button type="button" @click="draft = 'Tampilkan project terbaru saya'; focusInput()">Project terbaru</button>
-                        <button type="button" @click="draft = 'Bagaimana ringkasan penjualan terbaru?'; focusInput()">Ringkasan penjualan</button>
+                        <button type="button" @click="draft = '{{ __('Apa tugas saya yang paling dekat?') }}'; focusInput()">{{ __('Tugas saya') }}</button>
+                        <button type="button" @click="draft = '{{ __('Tampilkan project terbaru saya') }}'; focusInput()">{{ __('Project terbaru') }}</button>
+                        <button type="button" @click="draft = '{{ __('Bagaimana ringkasan penjualan terbaru?') }}'; focusInput()">{{ __('Ringkasan penjualan') }}</button>
                     </div>
                 </div>
 
                 <div x-show="loadingConversation" class="ai-loading-history" x-cloak role="status">
                     <span></span><span></span><span></span>
-                    Memuat percakapan…
+                    {{ __('Memuat percakapan…') }}
                 </div>
 
                 <template x-for="msg in messages" :key="msg.id">
@@ -159,13 +159,13 @@
                     </article>
                 </template>
 
-                <div x-show="busy" class="ai-assistant-row ai-thinking" x-cloak role="status" aria-label="AI sedang berpikir">
+                <div x-show="busy" class="ai-assistant-row ai-thinking" x-cloak role="status" aria-label="{{ __('AI sedang berpikir') }}">
                     <span class="ai-message-avatar"><x-icon name="message" class="h-4 w-4" /></span>
                     <div class="ai-thinking-body"><span></span><span></span><span></span></div>
                 </div>
             </div>
 
-            <button type="button" class="ai-jump" x-show="!atBottom" @click="scrollToBottom(true)" x-cloak aria-label="Kembali ke pesan terbaru">
+            <button type="button" class="ai-jump" x-show="!atBottom" @click="scrollToBottom(true)" x-cloak aria-label="{{ __('Kembali ke pesan terbaru') }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
                 </svg>
@@ -174,10 +174,10 @@
             <div class="ai-composer-area">
                 <div x-show="error" class="ai-error" x-cloak role="alert">
                     <span x-text="error"></span>
-                    <button type="button" @click="error = ''" aria-label="Tutup pesan kesalahan">&times;</button>
+                    <button type="button" @click="error = ''" aria-label="{{ __('Tutup pesan kesalahan') }}">&times;</button>
                 </div>
 
-                <div x-show="attachments.length" class="ai-attachment-preview" x-cloak aria-label="Lampiran terpilih">
+                <div x-show="attachments.length" class="ai-attachment-preview" x-cloak aria-label="{{ __('Lampiran terpilih') }}">
                     <template x-for="(attachment, index) in attachments" :key="attachment.id">
                         <div class="ai-attachment-card">
                             <template x-if="attachment.isImage">
@@ -194,7 +194,7 @@
                                 <strong x-text="attachment.name"></strong>
                                 <small x-text="formatBytes(attachment.size)"></small>
                             </span>
-                            <button type="button" @click="removeAttachment(index)" aria-label="Hapus lampiran">
+                            <button type="button" @click="removeAttachment(index)" aria-label="{{ __('Hapus lampiran') }}">
                                 &times;
                             </button>
                         </div>
@@ -203,7 +203,7 @@
 
                 <form class="ai-composer" @submit.prevent="send">
                     <div class="ai-plus-wrap">
-                        <button type="button" class="ai-composer-button" @click="plusOpen = !plusOpen" :aria-expanded="plusOpen" aria-label="Tambah lampiran atau input suara">
+                        <button type="button" class="ai-composer-button" @click="plusOpen = !plusOpen" :aria-expanded="plusOpen" aria-label="{{ __('Tambah lampiran atau input suara') }}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path stroke-linecap="round" d="M12 5v14m-7-7h14" />
                             </svg>
@@ -215,7 +215,7 @@
                                         <rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9" r="1.5" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 16l4-4 3 3 3-3 8 7" />
                                     </svg>
                                 </span>
-                                <span>Tambahkan gambar</span>
+                                <span>{{ __('Tambahkan gambar') }}</span>
                             </button>
                             <button type="button" @click="$refs.fileInput.click(); plusOpen = false">
                                 <span class="ai-menu-icon is-file">
@@ -223,7 +223,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6" />
                                     </svg>
                                 </span>
-                                <span>Tambahkan file</span>
+                                <span>{{ __('Tambahkan file') }}</span>
                             </button>
                             <button type="button" @click="toggleSpeech(); plusOpen = false" :class="listening ? 'is-listening' : ''">
                                 <span class="ai-menu-icon is-mic">
@@ -231,7 +231,7 @@
                                         <rect x="9" y="3" width="6" height="11" rx="3" /><path stroke-linecap="round" d="M5 11a7 7 0 0014 0M12 18v3m-3 0h6" />
                                     </svg>
                                 </span>
-                                <span x-text="listening ? 'Berhenti merekam' : 'Input suara'"></span>
+                                <span x-text="listening ? '{{ __('Berhenti merekam') }}' : '{{ __('Input suara') }}'"></span>
                             </button>
                         </div>
                     </div>
@@ -239,13 +239,13 @@
                     <input x-ref="imageInput" class="sr-only" type="file" accept="image/jpeg,image/png,image/gif,image/webp" @change="addFiles($event)">
                     <input x-ref="fileInput" class="sr-only" type="file" accept=".pdf,.txt,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx" @change="addFiles($event)">
 
-                    <textarea x-model="draft" x-ref="input" rows="1" placeholder="Tulis pesan untuk Office Assistant…"
-                              aria-label="Tulis pesan untuk Office Assistant"
+                    <textarea x-model="draft" x-ref="input" rows="1" placeholder="{{ __('Tulis pesan untuk Office Assistant…') }}"
+                              aria-label="{{ __('Tulis pesan untuk Office Assistant') }}"
                               @input="resize"
                               @keydown.enter="onEnter($event)"></textarea>
 
-                    <span class="ai-listening" x-show="listening" x-cloak>Mendengarkan…</span>
-                    <button type="submit" class="ai-send" :disabled="busy || (!draft.trim() && !attachments.length)" aria-label="Kirim pesan" :title="busy ? 'Mengirim…' : 'Kirim pesan'">
+                    <span class="ai-listening" x-show="listening" x-cloak>{{ __('Mendengarkan…') }}</span>
+                    <button type="submit" class="ai-send" :disabled="busy || (!draft.trim() && !attachments.length)" aria-label="{{ __('Kirim pesan') }}" :title="busy ? '{{ __('Mengirim…') }}' : '{{ __('Kirim pesan') }}'">
                         <svg x-show="!busy" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                             <path d="M3.4 20.6 21.5 12 3.4 3.4 3.4 10l12.9 2L3.4 14z" />
                         </svg>
@@ -255,7 +255,7 @@
                         </svg>
                     </button>
                 </form>
-                <p class="ai-composer-hint">AI dapat membuat kesalahan. Verifikasi informasi penting dari sistem.</p>
+                <p class="ai-composer-hint">{{ __('AI dapat membuat kesalahan. Verifikasi informasi penting dari sistem.') }}</p>
             </div>
         </section>
     </div>
@@ -512,14 +512,14 @@
                     try {
                         const response = await fetch(this.showUrl.replace('__CONVERSATION__', encodeURIComponent(id)), { headers: this.headers() });
                         const data = await response.json();
-                        if (!response.ok) throw new Error(data.message || 'Percakapan tidak dapat dimuat.');
+                        if (!response.ok) throw new Error(data.message || '{{ __('Percakapan tidak dapat dimuat.') }}');
                         this.conversationId = data.conversation.id;
                         this.messages = data.messages ?? [];
                         this.setUrl(this.conversationId);
                         this.historyOpen = false;
                         this.scrollToBottom(false);
                     } catch (error) {
-                        this.error = error.message || 'Percakapan tidak dapat dimuat.';
+                        this.error = error.message || '{{ __('Percakapan tidak dapat dimuat.') }}';
                     } finally {
                         this.loadingConversation = false;
                     }
@@ -543,28 +543,28 @@
                             body: JSON.stringify({ title }),
                         });
                         const data = await response.json();
-                        if (!response.ok) throw new Error(data.message || 'Nama chat tidak dapat diubah.');
+                        if (!response.ok) throw new Error(data.message || '{{ __('Nama chat tidak dapat diubah.') }}');
                         this.conversations = this.conversations.map(item => item.id === chat.id ? data.conversation : item);
                         this.cancelRename();
                     } catch (error) {
-                        this.error = error.message || 'Nama chat tidak dapat diubah.';
+                        this.error = error.message || '{{ __('Nama chat tidak dapat diubah.') }}';
                     }
                 },
                 async deleteConversation(chat) {
                     if (this.busy) return;
                     this.menuId = null;
-                    if (!window.confirm(`Hapus percakapan "${chat.title}"?`)) return;
+                    if (!window.confirm(`{{ __('Hapus percakapan') }} "${chat.title}"?`)) return;
                     try {
                         const response = await fetch(this.deleteUrl.replace('__CONVERSATION__', encodeURIComponent(chat.id)), {
                             method: 'DELETE',
                             headers: this.headers(),
                         });
                         const data = await response.json();
-                        if (!response.ok || !data.deleted) throw new Error(data.message || 'Percakapan tidak dapat dihapus.');
+                        if (!response.ok || !data.deleted) throw new Error(data.message || '{{ __('Percakapan tidak dapat dihapus.') }}');
                         this.conversations = this.conversations.filter(item => item.id !== chat.id);
                         if (this.conversationId === chat.id) this.newChat();
                     } catch (error) {
-                        this.error = error.message || 'Percakapan tidak dapat dihapus.';
+                        this.error = error.message || '{{ __('Percakapan tidak dapat dihapus.') }}';
                     }
                 },
                 upsertConversation(conversation) {
@@ -574,7 +574,7 @@
                     const files = Array.from(event.target.files ?? []);
                     const available = Math.max(0, 3 - this.attachments.length);
                     const exceeded = files.length > available;
-                    if (exceeded) this.error = 'Maksimal 3 lampiran per pesan.';
+                    if (exceeded) this.error = '{{ __('Maksimal 3 lampiran per pesan.') }}';
                     files.slice(0, available).forEach(file => {
                         this.attachments.push({
                             id: `${file.name}-${file.lastModified}-${Math.random()}`,
@@ -614,7 +614,7 @@
                         return;
                     }
                     if (!this.speechSupported) {
-                        this.error = 'Input suara tidak didukung browser ini. Gunakan Chrome atau Edge terbaru.';
+                        this.error = '{{ __('Input suara tidak didukung browser ini. Gunakan Chrome atau Edge terbaru.') }}';
                         return;
                     }
                     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -629,7 +629,7 @@
                         this.$nextTick(() => this.resize());
                     };
                     this.recognition.onerror = event => {
-                        if (event.error !== 'aborted') this.error = 'Input suara gagal. Silakan coba lagi.';
+                        if (event.error !== 'aborted') this.error = '{{ __('Input suara gagal. Silakan coba lagi.') }}';
                         this.listening = false;
                     };
                     this.recognition.onend = () => {
@@ -655,7 +655,7 @@
                     this.messages.push({
                         id: tempId,
                         role: 'user',
-                        content: text || 'Lampiran dikirim',
+                        content: text || '{{ __('Lampiran dikirim') }}',
                         attachments: visibleAttachments,
                     });
                     this.draft = '';
@@ -676,7 +676,7 @@
                             body: payload,
                         });
                         const data = await response.json();
-                        if (!response.ok) throw new Error(data.message || 'Terjadi kesalahan saat menghubungi AI.');
+                        if (!response.ok) throw new Error(data.message || '{{ __('Terjadi kesalahan saat menghubungi AI.') }}');
                         this.conversationId = data.conversation_id;
                         this.upsertConversation(data.conversation);
                         this.setUrl(this.conversationId);
@@ -686,7 +686,7 @@
                         this.messages = this.messages.filter(message => message.id !== tempId);
                         this.draft = text;
                         this.attachments = pendingAttachments;
-                        this.error = error.message || 'Gagal terhubung ke server. Silakan coba lagi.';
+                        this.error = error.message || '{{ __('Gagal terhubung ke server. Silakan coba lagi.') }}';
                     } finally {
                         this.busy = false;
                         this.focusInput();

@@ -45,7 +45,7 @@ class OfficeAssistantTest extends TestCase
 
         $this->postJson(route('ai.assistant.send'), ['message' => 'Halo'])
             ->assertStatus(422)
-            ->assertJsonPath('message', 'Asisten AI belum aktif karena API key OpenRouter belum dikonfigurasi. Hubungi administrator.');
+            ->assertJsonPath('message', __('Asisten AI belum aktif karena API key OpenRouter belum dikonfigurasi. Hubungi administrator.'));
     }
 
     public function test_message_requires_text(): void
@@ -113,7 +113,7 @@ class OfficeAssistantTest extends TestCase
                 'conversation_id' => $conversationId,
             ])
             ->assertStatus(422)
-            ->assertJsonPath('message', 'Percakapan tidak valid. Silakan mulai percakapan baru.');
+            ->assertJsonPath('message', __('Percakapan tidak valid. Silakan mulai percakapan baru.'));
 
         $this->assertSame(1, Conversation::where('id', $conversationId)->count());
     }
