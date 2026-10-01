@@ -555,15 +555,15 @@ tbody tr { transition: background-color 0.2s ease; }
    mesin. Lapis dalam (chase conic) tetap pakai animate-spin bawaan.
    ============================================================ */
 @keyframes avatar-flicker {
-    0%, 100% { transform: rotate(-5deg) scale(1); opacity: 0.85; }
-    25% { transform: rotate(4deg) scale(1.06); opacity: 1; }
-    50% { transform: rotate(-2deg) scale(0.97); opacity: 0.75; }
-    75% { transform: rotate(6deg) scale(1.03); opacity: 0.95; }
+    0%, 100% { transform: rotate(-3deg) scale(1); opacity: 0.9; }
+    25% { transform: rotate(2deg) scale(1.04); opacity: 1; }
+    50% { transform: rotate(-1deg) scale(0.98); opacity: 0.85; }
+    75% { transform: rotate(3deg) scale(1.02); opacity: 0.95; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
     .avatar-flame {
-        animation: avatar-flicker 1.6s ease-in-out infinite;
+        animation: avatar-flicker 2.2s ease-in-out infinite;
     }
 }
 

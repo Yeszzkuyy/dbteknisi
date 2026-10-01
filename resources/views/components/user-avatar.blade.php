@@ -21,13 +21,14 @@
 
 <span class="relative inline-flex shrink-0 self-center aspect-square items-center justify-center">
 @if ($running)
-    {{-- Lapis luar (api): 3 jilatan conic warna-tema + blur + flicker --}}
+    {{-- Lapis luar (api): 3 jilatan conic warna-tema + blur + flicker.
+         Stop antara bikin transisi melebur, bukan terpotong. --}}
     <span aria-hidden="true"
-          class="avatar-flame absolute -inset-1.5 rounded-full motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_60deg,transparent_110deg,rgb(var(--accent-500))_120deg,rgb(var(--accent-300))_180deg,transparent_230deg,rgb(var(--accent-500))_240deg,rgb(var(--accent-300))_300deg,transparent_350deg)] blur-[3px] shadow-[0_0_18px_4px_rgb(var(--accent-500)/0.5)]"></span>
+          class="avatar-flame absolute -inset-1.5 rounded-full motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_55deg,rgb(var(--accent-300)/0.35)_85deg,transparent_115deg,rgb(var(--accent-500))_120deg,rgb(var(--accent-300))_175deg,rgb(var(--accent-300)/0.35)_205deg,transparent_235deg,rgb(var(--accent-500))_240deg,rgb(var(--accent-300))_295deg,rgb(var(--accent-300)/0.35)_325deg,transparent_355deg)] blur-[4px] shadow-[0_0_18px_4px_rgb(var(--accent-500)/0.45)]"></span>
     {{-- Lapis dalam (chase): dua warna tema saling mengejar (looping).
          Busur lebar + glow kuat agar tetap terlihat di light mode. --}}
     <span aria-hidden="true"
-          class="absolute -inset-1 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_130deg,transparent_175deg,rgb(var(--accent-500))_185deg,rgb(var(--accent-300))_315deg,transparent_360deg)] shadow-[0_0_14px_3px_rgb(var(--accent-500)/0.55)]"></span>
+          class="absolute -inset-1 rounded-full animate-spin [animation-duration:3.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_120deg,rgb(var(--accent-300)/0.35)_150deg,transparent_180deg,rgb(var(--accent-500))_185deg,rgb(var(--accent-300))_305deg,rgb(var(--accent-300)/0.35)_335deg,transparent_360deg)] shadow-[0_0_14px_3px_rgb(var(--accent-500)/0.55)]"></span>
 @endif
 @if ($canZoom)
     <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="80" height="80" loading="lazy" decoding="async"
