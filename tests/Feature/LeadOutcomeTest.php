@@ -138,8 +138,10 @@ class LeadOutcomeTest extends TestCase
     public function test_pipeline_still_works(): void
     {
         $user = $this->marketingUser();
-        $this->makeLead();
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+        $this->makeLead(['assigned_to' => $sales->id]);
 
-        $this->actingAs($user)->get(route('leads.pipeline'))->assertOk();
+        $this->actingAs($sales)->get(route('leads.pipeline'))->assertOk();
     }
 }

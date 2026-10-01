@@ -35,11 +35,11 @@ class LeadPipelineTest extends TestCase
         ], $attributes));
     }
 
-    public function test_pipeline_page_shows_leads_grouped_by_status(): void
+    public function test_pipeline_page_shows_own_leads_grouped_by_status(): void
     {
-        $user = $this->userWithRole('marketing');
-        $this->makeLead(['status' => 'proposal']);
-        $this->makeLead(['status' => 'won']);
+        $user = $this->userWithRole('sales');
+        $this->makeLead(['status' => 'proposal', 'assigned_to' => $user->id]);
+        $this->makeLead(['status' => 'won', 'assigned_to' => $user->id]);
 
         $response = $this->actingAs($user)->get(route('leads.pipeline'))
             ->assertOk()
@@ -48,6 +48,83 @@ class LeadPipelineTest extends TestCase
         $leads = $response->viewData('leads');
         $this->assertSame(1, $leads->where('status', 'proposal')->count());
         $this->assertSame(1, $leads->where('status', 'won')->count());
+    }
+
+    public function test_pipeline_never_mixes_other_sales_customers(): void
+    {
+        $mine = $this->userWithRole('sales');
+        $other = User::factory()->create();
+        $other->assignRole('sales');
+        $this->makeLead(['assigned_to' => $mine->id]);
+
+        $otherCustomer = Customer::create(['name' => 'PT Orang Lain']);
+        Lead::create([
+            'customer_id' => $otherCustomer->id,
+            'pt_group' => 'NTI',
+            'segment' => 'vendor',
+            'status' => 'new',
+            'assigned_to' => $other->id,
+        ]);
+        $this->makeLead(); // tanpa assignee
+
+        $this->actingAs($mine)->get(route('leads.pipeline'))
+            ->assertOk()
+            ->assertSee('PT Pipeline')
+            ->assertDontSee('PT Orang Lain');
+    }
+
+    public function test_non_sales_cannot_open_pipeline(): void
+    {
+        $this->actingAs($this->userWithRole('marketing'))
+            ->get(route('leads.pipeline'))->assertForbidden();
+    }
+
+    public function test_management_sees_no_mixed_customers(): void
+    {
+        // Management pegang semua view-* (matriks role) sehingga boleh buka,
+        // tapi scope own-lead membuat hasilnya kosong (tidak campur).
+        $sales = $this->userWithRole('sales');
+        $this->makeLead(['assigned_to' => $sales->id]);
+
+        $response = $this->actingAs($this->userWithRole('management'))
+            ->get(route('leads.pipeline'))->assertOk();
+        $this->assertSame(0, $response->viewData('leads')->count());
+    }
+
+    public function test_last_week_won_hidden_unless_closed_all(): void
+    {
+        $user = $this->userWithRole('sales');
+        $this->makeLead(['status' => 'won', 'assigned_to' => $user->id, 'closed_at' => now()->subWeek()]);
+        $thisWeek = $this->makeLead(['status' => 'won', 'assigned_to' => $user->id, 'closed_at' => now()]);
+
+        $response = $this->actingAs($user)->get(route('leads.pipeline'))->assertOk();
+        $leads = $response->viewData('leads');
+        $this->assertSame(1, $leads->where('status', 'won')->count());
+        $this->assertTrue($leads->contains($thisWeek));
+
+        $response = $this->actingAs($user)->get(route('leads.pipeline', ['closed' => 'all']))->assertOk();
+        $this->assertSame(2, $response->viewData('leads')->where('status', 'won')->count());
+    }
+
+    public function test_drag_to_won_stamps_closed_at(): void
+    {
+        $user = $this->userWithRole('sales');
+        $lead = $this->makeLead(['assigned_to' => $user->id]);
+        $this->assertNull($lead->closed_at);
+
+        $this->actingAs($user)->patchJson(route('leads.batch-status'), [
+            'changes' => [['lead_id' => $lead->id, 'status' => 'won']],
+        ])->assertOk();
+
+        $fresh = $lead->fresh();
+        $this->assertSame('won', $fresh->status);
+        $this->assertNotNull($fresh->closed_at);
+
+        // Geser balik keluar won -> closed_at dibersihkan.
+        $this->actingAs($user)->patchJson(route('leads.batch-status'), [
+            'changes' => [['lead_id' => $lead->id, 'status' => 'proposal']],
+        ])->assertOk();
+        $this->assertNull($lead->fresh()->closed_at);
     }
 
     public function test_marketing_can_update_lead_status_via_pipeline(): void
