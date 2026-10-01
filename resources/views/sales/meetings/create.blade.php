@@ -29,12 +29,25 @@
                         </label>
                     </div>
 
-                    <div x-show="mode === 'new'" x-cloak>
-                        <label for="customer_name" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Nama Customer / Perusahaan') }} <span class="text-red-500">*</span></label>
-                        <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name') }}"
-                               placeholder="{{ __('cth: PT Maju Bersama, CV Karya Abadi, dll...') }}"
-                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        @error('customer_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <div x-show="mode === 'new'" x-cloak class="space-y-4">
+                        <div>
+                            <label for="customer_name" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Nama Customer / Perusahaan') }} <span class="text-red-500">*</span></label>
+                            <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name') }}"
+                                   placeholder="{{ __('cth: PT Maju Bersama, CV Karya Abadi, dll...') }}"
+                                   class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                            @error('customer_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="pt_group" class="block text-sm font-medium text-slate-700 mb-1">{{ __('PT / Company') }} <span class="text-red-500">*</span></label>
+                            <select name="pt_group" id="pt_group"
+                                    class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                                <option value="">{{ __('-- Pilih PT --') }}</option>
+                                @foreach($ptGroups ?? [] as $pt)
+                                    <option value="{{ $pt }}" @selected(old('pt_group') === $pt)>{{ $pt }}</option>
+                                @endforeach
+                            </select>
+                            @error('pt_group') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                     <div x-show="mode === 'existing'" x-cloak>
