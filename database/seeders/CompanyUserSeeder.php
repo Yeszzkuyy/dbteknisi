@@ -21,10 +21,10 @@ class CompanyUserSeeder extends Seeder
         $users = [
             // [nama, email, [roles...]] — role pertama = kolom role legacy
             ['Victor GM', 'victor@tridayaapp.com', ['ceo']],
-            ['Ardian Widhi Prabowo', 'ardian@tridayaapp.com', ['management']],
-            ['Christina Yoan', 'christina@tridayaapp.com', ['management']],
-            ['Yanita', 'yanita@tridayaapp.com', ['management']],
-            ['Ayu', 'ayu@tridayaapp.com', ['management']],
+            ['Ardian Widhi Prabowo', 'ardian@tridayaapp.com', ['management', 'lead-technician', 'sales']],
+            ['Christina Yoan', 'christina@tridayaapp.com', ['management', 'sales']],
+            ['Yanita', 'yanita@tridayaapp.com', ['management', 'sales']],
+            ['Ayu', 'ayu@tridayaapp.com', ['management', 'sales']],
             ['Syifa', 'syifa@tridayaapp.com', ['lead-marketing']],
             ['Amir', 'amir@tridayaapp.com', ['lead-technician']],
             ['Anggie', 'anggie@tridayaapp.com', ['marketing']],

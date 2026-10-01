@@ -111,6 +111,30 @@ class RoleMatrixTest extends TestCase
         $this->post(route('partners.store'), [])->assertForbidden();
         $this->post(route('sales.follow-ups.store'), [])->assertForbidden();
     }
+    public function test_multi_role_management_sales_works_sales_but_recap_others(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(['management', 'sales']);
+
+        $html = $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->getContent();
+
+        // Sales: menu kerja penuh (own-lead).
+        foreach (['/sales/my-leads', '/sales/meetings', '/sales/follow-ups'] as $link) {
+            $this->assertStringContainsString($link, $html);
+        }
+        // Teknisi & marketing: recap saja.
+        foreach (['/teknisi/dashboard', '/projects', '/marketing/dashboard', '/leads', '/partners'] as $link) {
+            $this->assertStringContainsString($link, $html);
+        }
+        foreach (['/teknisi/surveys', '/whatsapp-center', '/leads/monitoring'] as $link) {
+            $this->assertStringNotContainsString($link, $html);
+        }
+    }
+
     public function test_ceo_and_inside_sales_unchanged(): void
     {
         $this->actingAs($this->loginAs('ceo'));

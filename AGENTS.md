@@ -219,3 +219,25 @@ ls -lh storage/logs/laravel.log
    (`git log main..<branch> --oneline`), merge yang relevan,
    discard sisanya — baru hapus worktree-nya.
 5. Dilarang bikin worktree baru tanpa entry di tabel §1.
+
+## 12. Matriks role (acuan: `RoleAndPermissionSeeder.php`)
+
+| Role | Permission inti | Catatan |
+|---|---|---|
+| `super-admin` | semua | Bypass semua gate |
+| `management` | `manage-sales-leads` + semua `view-*` + `monitor-marketing` | Satu-satunya hub management; sidebar hanya recap divisi |
+| `lead-marketing` | `manage-marketing`, `view-marketing`, `monitor-marketing`, `view-technician` | + read-only teknisi (dok. instalasi) |
+| `marketing` / `sales` / `admin` / `technician` | `manage/view-*` divisinya | `sales` += `view-admin`, `admin` += `view-sales` (saling read-only) |
+| `lead-technician` | teknisi + `monitor-technical`, `view-sales`, `view-admin` | Koordinasi + cek progres divisi lain |
+| `inside-sales` | `manage-inside-sales` | Hanya task sendiri; anakan sales |
+| `prakerin-technician` / `prakerin-admin` | `view-technician` / `view-admin` | Read-only divisinya |
+| `ceo` | semua `view-*` | Read-only, tanpa manage |
+
+Aturan: mutasi selalu di belakang `manage-*`, baca di belakang `view-*`
+— menambah `view-*` ke role tidak pernah membuka aksi tulis.
+**Multi-role didukung**: user boleh pegang 2+ role (mis. management+sales).
+Sidebar tampilkan menu kerja penuh di divisi yang ada `manage-*`-nya,
+recap saja di divisi lain (lihat `$tekRecap/$mktRecap/$salesRecap` di
+`sidebar.blade.php`). Pre-sales = pakai role `sales`, tanpa role baru.
+Purchasing (nanti): route `admin.purchasing.*`, baca `view-admin`,
+tulis `manage-admin` — sales/prakerin-admin otomatis read-only.

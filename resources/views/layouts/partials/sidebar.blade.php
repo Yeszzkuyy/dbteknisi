@@ -33,11 +33,14 @@
     ]));
     // Header grup harus menuju halaman pertama yang boleh dibuka user ini (mis. inside-sales).
     $salesLanding = $salesItems[0]['route'] ?? route('dashboard');
-    // Management murni (hanya manage-sales-leads, tanpa manage-* lain):
-    // tiap grup divisi hanya tampilkan item recap, bukan menu kerja penuh.
-    $isPureManagement = auth()->user()->can('manage-sales-leads')
-        && !auth()->user()->canany(['manage-marketing', 'manage-technician', 'manage-admin', 'manage-sales', 'manage-inside-sales']);
-    if (($isPureManagement ?? false)) {
+    // Hub management (punya manage-sales-leads): tiap grup divisi hanya
+    // tampilkan item recap bila tidak pegang manage-* divisi itu.
+    // Multi-role didukung: sales+management tetap kerja penuh di sales.
+    $isMgmtHub = auth()->user()->can('manage-sales-leads');
+    $tekRecap = $isMgmtHub && !auth()->user()->can('manage-technician');
+    $mktRecap = $isMgmtHub && !auth()->user()->can('manage-marketing');
+    $salesRecap = $isMgmtHub && !auth()->user()->can('manage-sales');
+    if ($salesRecap) {
         $salesItems = array_values(array_filter($salesItems,
             fn ($i) => in_array($i['label'], ['Dashboard', 'Tracker Meeting', 'Follow Up'], true)));
         $salesLanding = $salesItems[0]['route'] ?? route('dashboard');
@@ -207,7 +210,7 @@
                                          <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
                                          <span>{{ __('Jadwal') }}</span>
                                      </a>
-                                     @unless($isPureManagement)
+                                     @unless($tekRecap)
                                      <a wire:navigate.hover href="{{ route('teknisi.surveys.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.surveys*') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.surveys*') ? $navActive : $navInactive }}">
@@ -233,7 +236,7 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
                                          <span>{{ __('Instalasi') }}</span>
                                      </a>
-                                     @unless($isPureManagement)
+                                     @unless($tekRecap)
                                      <a wire:navigate.hover href="{{ route('teknisi.documents.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.documents*') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.documents*') ? $navActive : $navInactive }}">
@@ -271,7 +274,7 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
                                          <span>Dashboard</span>
                                      </a>
-                                     @unless($isPureManagement)
+                                     @unless($mktRecap)
                                      {{-- WhatsApp Center SENGAJA full reload (tanpa wire:navigate):
                                          aplikasi Alpine raksasa + chat state; morph berisiko merusak. --}}
                                     <a href="{{ route('whatsapp-center.index') }}"
@@ -291,9 +294,9 @@
                                        aria-current="{{ request()->routeIs('partners*') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('partners*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" aria-hidden="true"></span>
-                                        <span>{{ __('Data Partner') }}</span>
+                                         <span>{{ __('Data Partner') }}</span>
                                     </a>
-                                    @unless($isPureManagement)
+                                    @unless($mktRecap)
                                     <a wire:navigate.hover href="{{ route('leads.activities') }}"
                                        aria-current="{{ request()->routeIs('leads.activities') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('leads.activities') ? $navActive : $navInactive }}">
@@ -302,7 +305,7 @@
                                      </a>
                                      @endunless
                                      @can('monitor-marketing')
-                                     @unless($isPureManagement)
+                                     @unless($mktRecap)
                                          <a wire:navigate.hover href="{{ route('leads.monitoring') }}"
                                            aria-current="{{ request()->routeIs('leads.monitoring') ? 'page' : 'false' }}"
                                            class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('leads.monitoring') ? $navActive : $navInactive }}">
