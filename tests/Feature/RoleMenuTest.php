@@ -83,10 +83,10 @@ class RoleMenuTest extends TestCase
         $res = $this->actingAs($u)->get('/sales/meetings')->assertOk();
         $html = $res->getContent();
 
-        foreach (['/sales/follow-ups', '/customers', '/trash'] as $link) {
+        foreach (['/sales/follow-ups', '/customers', '/trash', '/admin/invoices'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for sales");
         }
-        foreach (['/admin/invoices', '/leads"', '/monitoring'] as $link) {
+        foreach (['/leads"', '/monitoring'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for sales");
         }
 
@@ -97,7 +97,8 @@ class RoleMenuTest extends TestCase
         // Sales read-only pada Project: lihat boleh, mutasi 403
         $this->actingAs($u)->get('/projects')->assertOk();
         $this->actingAs($u)->get('/teknisi/dashboard')->assertForbidden();
-        $this->actingAs($u)->get('/admin/invoices')->assertForbidden();
+        // Sales read-only pada Admin: lihat boleh, mutasi 403 ( tested di RoleMatrixTest )
+        $this->actingAs($u)->get('/admin/invoices')->assertOk();
     }
 
     public function test_admin_menu_and_access()
@@ -106,10 +107,10 @@ class RoleMenuTest extends TestCase
         $res = $this->actingAs($u)->get('/admin/invoices')->assertOk();
         $html = $res->getContent();
 
-        foreach (['/admin/invoices', '/admin/pos', '/admin/payments', '/trash', '/customers'] as $link) {
+        foreach (['/admin/invoices', '/admin/pos', '/admin/payments', '/trash', '/customers', '/sales/meetings'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for admin");
         }
-        foreach (['/leads"', '/projects"', '/sales/meetings'] as $link) {
+        foreach (['/leads"', '/monitoring'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for admin");
         }
 
@@ -117,7 +118,8 @@ class RoleMenuTest extends TestCase
         $this->actingAs($u)->get('/monitoring')->assertForbidden();
         $this->actingAs($u)->get('/customers')->assertOk();
         $this->actingAs($u)->get('/trash')->assertOk();
-        $this->actingAs($u)->get('/projects')->assertForbidden();
+        // Admin read-only pada Sales & Project: lihat boleh ( tested di RoleMatrixTest )
+        $this->actingAs($u)->get('/projects')->assertOk();
         $this->actingAs($u)->get('/leads')->assertForbidden();
     }
 
