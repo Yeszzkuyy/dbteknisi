@@ -21,7 +21,10 @@
 
 <span class="relative inline-flex shrink-0 self-center aspect-square items-center justify-center">
 @if ($running)
-    {{-- Dua warna tema saling mengejar (looping), mengikuti html[data-theme] + dark mode.
+    {{-- Lapis luar (api): 3 jilatan conic warna-tema + blur + flicker --}}
+    <span aria-hidden="true"
+          class="avatar-flame absolute -inset-1.5 rounded-full motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_60deg,transparent_110deg,rgb(var(--accent-500))_120deg,rgb(var(--accent-300))_180deg,transparent_230deg,rgb(var(--accent-500))_240deg,rgb(var(--accent-300))_300deg,transparent_350deg)] blur-[3px] shadow-[0_0_18px_4px_rgb(var(--accent-500)/0.5)]"></span>
+    {{-- Lapis dalam (chase): dua warna tema saling mengejar (looping).
          Busur lebar + glow kuat agar tetap terlihat di light mode. --}}
     <span aria-hidden="true"
           class="absolute -inset-1 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_130deg,transparent_175deg,rgb(var(--accent-500))_185deg,rgb(var(--accent-300))_315deg,transparent_360deg)] shadow-[0_0_14px_3px_rgb(var(--accent-500)/0.55)]"></span>

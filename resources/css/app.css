@@ -549,6 +549,24 @@ tbody tr { transition: background-color 0.2s ease; }
     }
 }
 
+/* ============================================================
+   Avatar founder: jilatan api warna-tema (lapis luar blur).
+   Irama tak beraturan = kesan lilin tertiup angin, bukan putaran
+   mesin. Lapis dalam (chase conic) tetap pakai animate-spin bawaan.
+   ============================================================ */
+@keyframes avatar-flicker {
+    0%, 100% { transform: rotate(-5deg) scale(1); opacity: 0.85; }
+    25% { transform: rotate(4deg) scale(1.06); opacity: 1; }
+    50% { transform: rotate(-2deg) scale(0.97); opacity: 0.75; }
+    75% { transform: rotate(6deg) scale(1.03); opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .avatar-flame {
+        animation: avatar-flicker 1.6s ease-in-out infinite;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .beam-notif.beam-on::before {
         animation: none;

@@ -23,9 +23,12 @@
                     <button type="button" @click="$refs.avatar.click()"
                             class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                             aria-label="{{ __('Ubah foto profil') }}">
-                        {{-- Border running khusus Yeski: dua warna tema saling mengejar.
-                             Busur lebar + glow kuat agar tetap terlihat di light mode. --}}
+                        {{-- Border running khusus Yeski: lapis luar api + lapis dalam chase.
+                             Warna api ikut tema; busur lebar + glow kuat agar
+                             tetap terlihat di light mode. --}}
                         @if($isYeski)
+                            <span aria-hidden="true" title="{{ __('Founder') }}"
+                                  class="avatar-flame absolute -inset-2 rounded-full motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_60deg,transparent_110deg,rgb(var(--accent-500))_120deg,rgb(var(--accent-300))_180deg,transparent_230deg,rgb(var(--accent-500))_240deg,rgb(var(--accent-300))_300deg,transparent_350deg)] blur-[3px] shadow-[0_0_18px_4px_rgb(var(--accent-500)/0.5)]"></span>
                             <span aria-hidden="true" title="{{ __('Founder') }}"
                                   class="absolute -inset-1.5 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_130deg,transparent_175deg,rgb(var(--accent-500))_185deg,rgb(var(--accent-300))_315deg,transparent_360deg)] shadow-[0_0_14px_3px_rgb(var(--accent-500)/0.55)]"></span>
                         @endif
