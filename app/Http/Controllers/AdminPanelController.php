@@ -116,13 +116,16 @@ class AdminPanelController extends Controller
     
     public function createRole()
     {
-        return view('admin-panel.roles.create', ['permissions' => $this->groupedPermissions()]);
+        return view('admin-panel.roles.create', [
+            'permissions' => $this->groupedPermissions(),
+            'rolePresets' => Role::with('permissions:id,name')->orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     public function storeRole(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name',
+            'name' => 'required|string|max:255|lowercase|unique:roles,name',
             'permissions' => 'array',
         ]);
 
@@ -152,7 +155,7 @@ class AdminPanelController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+            'name' => 'required|string|max:255|lowercase|unique:roles,name,' . $role->id,
             'permissions' => 'array',
         ]);
 

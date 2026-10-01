@@ -16,16 +16,27 @@
                 <input type="text" id="name" name="name" required
                        class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
                        placeholder="{{ __('Contoh: finance, hr, dll') }}">
+                <p class="text-xs text-slate-400 mt-1">{{ __('Huruf kecil tanpa spasi, contoh: finance.') }}</p>
             </div>
 
             <div class="mb-6">
-                <div class="flex items-center justify-between mb-3">
-                    <label class="block text-sm font-medium text-slate-700">Permissions</label>
+                <div class="flex flex-wrap items-end justify-between gap-3 mb-3">
+                    <div>
+                        <label for="role-preset" class="block text-sm font-medium text-slate-700 mb-1">{{ __('Salin dari role yang ada') }}</label>
+                        <select id="role-preset"
+                                class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
+                            <option value="">{{ __('Pilih role...') }}</option>
+                            @foreach($rolePresets as $preset)
+                                <option value="{{ $preset->name }}">{{ $preset->name }} ({{ $preset->permissions->count() }} permission)</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="flex gap-2">
                         <button type="button" id="select-all" class="px-3 py-1 text-xs bg-accent-500 hover:bg-accent-600 text-white">{{ __('Pilih Semua') }}</button>
                         <button type="button" id="deselect-all" class="px-3 py-1 text-xs bg-accent-500 hover:bg-accent-600 text-white">{{ __('Batal Pilih') }}</button>
                     </div>
                 </div>
+                <p class="text-xs text-slate-400 mb-3">{{ __('Acuan matriks resmi: management, lead-marketing, marketing, sales, admin, technician, lead-technician, inside-sales, prakerin-technician, prakerin-admin, ceo.') }}</p>
                 
                 <div class="space-y-4">
                     @foreach($permissions as $group => $perms)
@@ -66,13 +77,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectAll = document.getElementById('select-all');
     const deselectAll = document.getElementById('deselect-all');
     const checkboxes = document.querySelectorAll('input[name="permissions[]"]');
-    
+
     selectAll.addEventListener('click', () => {
         checkboxes.forEach(cb => cb.checked = true);
     });
-    
+
     deselectAll.addEventListener('click', () => {
         checkboxes.forEach(cb => cb.checked = false);
+    });
+
+    // Salin permission dari role resmi yang sudah ada.
+    const preset = document.getElementById('role-preset');
+    const presetPermissions = @json($rolePresets->mapWithKeys(fn ($r) => [$r->name => $r->permissions->pluck('name')]));
+    preset.addEventListener('change', () => {
+        const wanted = new Set(presetPermissions[preset.value] || []);
+        checkboxes.forEach(cb => { cb.checked = wanted.has(cb.value); });
     });
 });
 </script>
