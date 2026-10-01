@@ -5,8 +5,12 @@
             <p class="text-slate-500 mt-1">{{ __('Manajemen User, Role & Permission (Super Admin)') }}</p>
         </div>
         <div class="flex gap-2">
-            <x-icon-button as="a" icon="add" href="{{ route('admin-panel.roles.create') }}" title="Add Role" />
-            <x-icon-button as="a" icon="add" href="{{ route('admin-panel.users.create') }}" title="Add User" />
+            <x-icon-button as="a" href="{{ route('admin-panel.roles.create') }}" title="Add Role">
+                <x-icon name="users" class="h-5 w-5" />
+            </x-icon-button>
+            <x-icon-button as="a" href="{{ route('admin-panel.users.create') }}" title="Add User">
+                <x-icon name="user" class="h-5 w-5" />
+            </x-icon-button>
         </div>
     </div>
 

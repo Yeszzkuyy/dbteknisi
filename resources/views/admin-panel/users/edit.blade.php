@@ -53,7 +53,7 @@
                 <label class="block text-sm font-medium text-slate-700 mb-2">Role(s)</label>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     @foreach($roles as $role)
-                        <label class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 cursor-pointer hover:border-accent-400 hover:bg-accent-50 transition">
+                        <label class="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-200 cursor-pointer hover:border-accent-400 hover:bg-accent-50 dark:hover:bg-accent-500/10 transition">
                             <input type="checkbox" name="roles[]" value="{{ $role->name }}"
                                    {{ $user->hasRole($role->name) ? 'checked' : '' }}
                                    class="w-4 h-4 rounded border-slate-300 text-accent-600 focus:ring-accent-500">

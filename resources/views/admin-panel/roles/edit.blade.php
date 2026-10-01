@@ -7,7 +7,7 @@
         <x-icon-button as="a" icon="back" href="{{ route('admin-panel.index') }}" title="Back" />
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 max-w-3xl">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
         <form method="POST" action="{{ route('admin-panel.roles.update', $role) }}">
             @csrf @method('PUT')
             
@@ -32,7 +32,7 @@
                             <h4 class="font-medium text-slate-800 mb-3 capitalize">{{ $group }}</h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                                 @foreach($perms as $perm)
-                                    <label class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                        <label class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
                                         <input type="checkbox" name="permissions[]" value="{{ $perm->name }}"
                                                {{ $role->hasPermissionTo($perm->name) ? 'checked' : '' }}
                                                class="w-4 h-4 rounded border-slate-300 text-accent-600 focus:ring-accent-500">
