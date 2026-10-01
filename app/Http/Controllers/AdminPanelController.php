@@ -27,7 +27,7 @@ class AdminPanelController extends Controller
     
     public function createUser()
     {
-        $roles = Role::where('name', '!=', 'super-admin')->get();
+        $roles = Role::where('name', '!=', 'super-admin')->orderBy('name')->get();
         return view('admin-panel.users.create', compact('roles'));
     }
 
@@ -38,6 +38,7 @@ class AdminPanelController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'roles' => 'array',
+            'roles.*' => 'exists:roles,name',
         ]);
 
         $user = User::create([
@@ -48,6 +49,8 @@ class AdminPanelController extends Controller
 
         if ($request->filled('roles')) {
             $user->assignRole($request->roles);
+            // Selaraskan kolom role legacy (NOT NULL) dengan role pertama.
+            $user->forceFill(['role' => $request->roles[0]])->save();
         }
 
         return redirect()->route('admin-panel.index')
@@ -56,7 +59,7 @@ class AdminPanelController extends Controller
 
     public function editUser(User $user)
     {
-        $roles = Role::where('name', '!=', 'super-admin')->get();
+        $roles = Role::where('name', '!=', 'super-admin')->orderBy('name')->get();
         return view('admin-panel.users.edit', compact('user', 'roles'));
     }
 
@@ -67,6 +70,7 @@ class AdminPanelController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'roles' => 'array',
+            'roles.*' => 'exists:roles,name',
         ]);
 
         $user->update([
@@ -82,8 +86,11 @@ class AdminPanelController extends Controller
 
         if ($request->has('roles')) {
             $user->syncRoles($request->roles);
+            // Selaraskan kolom role legacy (NOT NULL) dengan role pertama.
+            $user->forceFill(['role' => $request->roles[0] ?? 'guest'])->save();
         } else {
             $user->syncRoles([]);
+            $user->forceFill(['role' => 'guest'])->save();
         }
 
         return redirect()->route('admin-panel.index')
