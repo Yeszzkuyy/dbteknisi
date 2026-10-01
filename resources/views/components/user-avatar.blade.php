@@ -13,16 +13,18 @@
     // Border animasi khusus founder (Yeski) — tampil di semua pemakaian komponen.
     $running = (bool) ($user?->hasAnimatedAvatarBorder() ?? false);
     // Ring + hover glow selalu mengikuti warna tema aktif (accent).
-    // Yeski: ring netral agar efek running terlihat jelas.
-    $ring = $running ? 'ring-slate-900/80' : 'ring-accent-500';
+    // Yeski: ring transparan agar chase conic yang jadi border terlihat,
+    // jelas di light maupun dark mode.
+    $ring = $running ? 'ring-transparent' : 'ring-accent-500';
     $glow = 'hover:shadow-accent-500/50';
 @endphp
 
 <span class="relative inline-flex shrink-0 self-center aspect-square items-center justify-center">
 @if ($running)
-    {{-- Dua warna tema saling mengejar (looping), mengikuti html[data-theme] + dark mode --}}
+    {{-- Dua warna tema saling mengejar (looping), mengikuti html[data-theme] + dark mode.
+         Busur lebar + glow kuat agar tetap terlihat di light mode. --}}
     <span aria-hidden="true"
-          class="absolute -inset-1 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,transparent_100deg,rgb(var(--accent-300))_180deg,transparent_280deg,rgb(var(--accent-500))_360deg)] shadow-[0_0_12px_2px_rgb(var(--accent-500)/0.45)]"></span>
+          class="absolute -inset-1 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_130deg,transparent_175deg,rgb(var(--accent-500))_185deg,rgb(var(--accent-300))_315deg,transparent_360deg)] shadow-[0_0_14px_3px_rgb(var(--accent-500)/0.55)]"></span>
 @endif
 @if ($canZoom)
     <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="80" height="80" loading="lazy" decoding="async"

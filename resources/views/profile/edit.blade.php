@@ -23,15 +23,16 @@
                     <button type="button" @click="$refs.avatar.click()"
                             class="group relative mx-auto block cursor-pointer rounded-full transition duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-800"
                             aria-label="{{ __('Ubah foto profil') }}">
-                        {{-- Border running khusus Yeski: dua warna tema saling mengejar --}}
+                        {{-- Border running khusus Yeski: dua warna tema saling mengejar.
+                             Busur lebar + glow kuat agar tetap terlihat di light mode. --}}
                         @if($isYeski)
                             <span aria-hidden="true" title="{{ __('Founder') }}"
-                                  class="absolute -inset-1.5 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,transparent_100deg,rgb(var(--accent-300))_180deg,transparent_280deg,rgb(var(--accent-500))_360deg)] shadow-[0_0_12px_2px_rgb(var(--accent-500)/0.45)]"></span>
+                                  class="absolute -inset-1.5 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_130deg,transparent_175deg,rgb(var(--accent-500))_185deg,rgb(var(--accent-300))_315deg,transparent_360deg)] shadow-[0_0_14px_3px_rgb(var(--accent-500)/0.55)]"></span>
                         @endif
                         <img x-show="preview" x-cloak :src="preview" alt="{{ __('Foto profil') }}"
-                             class="relative h-24 w-24 rounded-full object-cover ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'ring-slate-900/80' : 'ring-accent-300 dark:ring-accent-700' }}">
+                             class="relative h-24 w-24 rounded-full object-cover ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'ring-transparent' : 'ring-accent-300 dark:ring-accent-700' }}">
                         <div x-show="!preview" x-cloak aria-hidden="true"
-                             class="relative flex h-24 w-24 items-center justify-center rounded-full ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'bg-slate-900 ring-slate-900/80' : 'bg-accent-100 ring-accent-300 dark:bg-accent-900/40 dark:ring-accent-700' }}">
+                             class="relative flex h-24 w-24 items-center justify-center rounded-full ring-4 shadow-lg lg:h-28 lg:w-28 {{ $isYeski ? 'bg-slate-900 ring-transparent' : 'bg-accent-100 ring-accent-300 dark:bg-accent-900/40 dark:ring-accent-700' }}">
                             <span class="text-3xl font-bold lg:text-4xl {{ $isYeski ? 'text-amber-300' : 'text-accent-600 dark:text-accent-300' }}">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                         </div>
 
