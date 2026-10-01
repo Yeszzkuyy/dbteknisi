@@ -215,20 +215,16 @@ class ManageSalesController extends Controller
         ])->values();
         $funnelTotal = $donutSales->sum('value');
 
-        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal'));
+        // Rentang minggu berjalan untuk drill-down "Meeting Minggu Ini".
+        $weekStart = now()->startOfWeek()->toDateString();
+        $weekEnd = now()->endOfWeek()->toDateString();
+
+        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal', 'weekStart', 'weekEnd'));
     }
 
     public function myLeads(Request $request)
     {
-        $leads = Lead::with(['customer', 'partner'])
-            ->withCount(['meetings', 'followUps'])
-            ->where('assigned_to', auth()->id())
-            ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
-                fn ($c) => $c->whereLike('name', $request->search)))
-            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
-            ->when($request->filled('touched'), fn ($q) => $request->touched === 'yes'
-                ? $q->where(fn ($w) => $w->has('meetings')->orHas('followUps'))
-                : $q->whereDoesntHave('meetings')->whereDoesntHave('followUps'))
+        $leads = $this->myLeadsQuery($request)
             ->latest()
             ->paginate(15)
             ->withQueryString();
@@ -236,6 +232,54 @@ class ManageSalesController extends Controller
         $statuses = LeadController::STATUSES;
 
         return view('sales.my-leads', compact('leads', 'statuses'));
+    }
+
+    public function exportMyLeads(Request $request)
+    {
+        $leads = $this->myLeadsQuery($request)
+            ->with(['customer'])
+            ->withMax('followUps as last_follow_up_at', 'follow_up_date')
+            ->orderByDesc('incoming_date')
+            ->get();
+
+        $filename = 'my-leads-'.now()->format('Ymd-Hi').'.csv';
+
+        return response()->streamDownload(function () use ($leads) {
+            $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF"); // BOM agar Excel baca UTF-8.
+            fputcsv($handle, ['Customer', 'PT', 'PIC', 'Telepon', 'Status', 'Kebutuhan', 'Solusi', 'Progres', 'Tgl Masuk', 'Jml Meeting', 'Jml Follow Up', 'Follow Up Terakhir']);
+            foreach ($leads as $lead) {
+                fputcsv($handle, [
+                    $lead->customer?->name ?? '-',
+                    $lead->pt_group ?? '-',
+                    $lead->customer?->contact_person ?? '-',
+                    $lead->customer?->phone ?? $lead->customer?->whatsapp ?? '-',
+                    ucfirst($lead->status),
+                    $lead->kebutuhan ?? '-',
+                    $lead->solusi ?? '-',
+                    $lead->progress_notes ?? '-',
+                    $lead->incoming_date?->format('Y-m-d') ?? '-',
+                    $lead->meetings_count,
+                    $lead->follow_ups_count,
+                    $lead->last_follow_up_at ?? '-',
+                ]);
+            }
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    private function myLeadsQuery(Request $request)
+    {
+        return Lead::with(['customer', 'partner'])
+            ->withCount(['meetings', 'followUps'])
+            ->where('assigned_to', auth()->id())
+            ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
+                fn ($c) => $c->whereLike('name', $request->search)))
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('active'), fn ($q) => $q->whereNotIn('status', ['won', 'lost']))
+            ->when($request->filled('touched'), fn ($q) => $request->touched === 'yes'
+                ? $q->where(fn ($w) => $w->has('meetings')->orHas('followUps'))
+                : $q->whereDoesntHave('meetings')->whereDoesntHave('followUps'));
     }
 
     public function activityLog(Request $request)

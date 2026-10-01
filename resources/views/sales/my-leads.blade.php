@@ -4,7 +4,10 @@
             <h1 class="text-3xl font-bold text-slate-800">My Leads</h1>
             <p class="text-slate-500 mt-1">{{ __('Lead yang di-assign Management kepada Anda') }}</p>
         </div>
-        <x-icon-button as="a" icon="back" href="{{ route('sales.dashboard') }}" title="Dashboard Sales" />
+        <div class="flex gap-2">
+            <x-icon-button as="a" icon="import" href="{{ route('sales.my-leads.export', request()->only(['search', 'status', 'touched', 'active'])) }}" title="Export CSV" />
+            <x-icon-button as="a" icon="back" href="{{ route('sales.dashboard') }}" title="Dashboard Sales" />
+        </div>
     </div>
 
     <form method="GET" action="{{ route('sales.my-leads') }}" class="flex flex-wrap items-end gap-3 mb-4">
@@ -34,7 +37,7 @@
         </div>
         <div class="flex gap-2">
             <x-icon-button icon="filter" type="submit" title="Filter" />
-            @if(request('search') || request('status') || request('touched'))
+            @if(request('search') || request('status') || request('touched') || request('active'))
                 <x-icon-button as="a" icon="reset" href="{{ route('sales.my-leads') }}" title="Reset" />
             @endif
         </div>

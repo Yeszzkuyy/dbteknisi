@@ -11,7 +11,8 @@
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-        <div class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+        <a href="{{ route('sales.my-leads', ['active' => 1]) }}"
+           class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 hover:shadow transition">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-blue-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -22,8 +23,9 @@
                     <x-icon name="briefcase" class="h-5 w-5" />
                 </span>
             </div>
-        </div>
-        <div class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+        </a>
+        <a href="{{ route('sales.my-leads', ['status' => 'won']) }}"
+           class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 hover:shadow transition">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-green-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -34,8 +36,9 @@
                     <x-icon name="check-circle" class="h-5 w-5" />
                 </span>
             </div>
-        </div>
-        <div class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
+        </a>
+        <a href="{{ route('sales.meetings.index', ['date_from' => $weekStart ?? null, 'date_to' => $weekEnd ?? null]) }}"
+           class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 hover:shadow transition">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-indigo-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
                 <div class="min-w-0">
@@ -46,7 +49,7 @@
                     <x-icon name="calendar" class="h-5 w-5" />
                 </span>
             </div>
-        </div>
+        </a>
         <a href="{{ route('sales.follow-ups.index', ['overdue' => 1]) }}"
            class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 hover:shadow transition">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-red-500/5"></div>

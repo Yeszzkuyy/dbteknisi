@@ -374,6 +374,7 @@ Route::middleware('auth')->group(function () {
 
     // Lead milik sales (muncul di menu Sales)
     Route::middleware('permission:view-sales|manage-sales')->get('/sales/dashboard', [ManageSalesController::class, 'dashboard'])->name('sales.dashboard');
+    Route::middleware('permission:view-sales|manage-sales')->get('/sales/my-leads/export', [ManageSalesController::class, 'exportMyLeads'])->name('sales.my-leads.export');
     Route::middleware('permission:view-sales|manage-sales')->get('/sales/my-leads', [ManageSalesController::class, 'myLeads'])->name('sales.my-leads');
 
     // ============================================
