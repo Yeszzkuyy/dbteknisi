@@ -18,6 +18,7 @@ use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficeAssistantController;
 use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\PocController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectDocumentController;
@@ -117,6 +118,9 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('follow-ups', FollowUpController::class)->except(['show']);
         Route::get('follow-ups/{followUp}', [FollowUpController::class, 'show'])->name('follow-ups.show');
+
+        Route::resource('pocs', PocController::class)->except(['show']);
+        Route::get('pocs/{poc}', [PocController::class, 'show'])->name('pocs.show');
         Route::post('follow-ups/{followUp}/complete', [FollowUpController::class, 'complete'])->name('follow-ups.complete');
         Route::post('follow-ups/{followUp}/reopen', [FollowUpController::class, 'reopen'])->name('follow-ups.reopen');
         Route::post('follow-ups/{followUp}/snooze', [FollowUpController::class, 'snooze'])->name('follow-ups.snooze');
@@ -128,6 +132,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:view-sales|manage-sales')->prefix('sales')->name('sales.')->group(function () {
         Route::get('meetings', [MeetingController::class, 'index'])->name('meetings.index');
         Route::get('follow-ups', [FollowUpController::class, 'index'])->name('follow-ups.index');
+        Route::get('pocs', [PocController::class, 'index'])->name('pocs.index');
     });
 
     // ============================================

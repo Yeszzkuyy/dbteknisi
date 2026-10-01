@@ -91,6 +91,24 @@
         </a>
     </div>
 
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mb-6" data-reveal>
+        <div class="flex flex-wrap items-end justify-between gap-2 mb-4">
+            <div>
+                <h2 class="font-semibold text-slate-700 dark:text-slate-200">{{ __('Income Bulan Ini') }}</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400">{{ __('Total invoice bulan :month per PT/company.', ['month' => now()->translatedFormat('F Y')]) }}</p>
+            </div>
+            <p class="text-xl font-extrabold text-slate-800 tabular-nums dark:text-white">Rp {{ number_format($incomeTotal ?? 0, 0, ',', '.') }}</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            @foreach($incomeMonth ?? [] as $pt => $total)
+                <div class="rounded-xl border border-slate-200 dark:border-slate-600 px-4 py-3">
+                    <span class="inline-flex px-1.5 py-0.5 rounded {{ \App\Models\Lead::PT_COLORS[$pt] ?? 'bg-indigo-50 text-indigo-700' }} text-[11px] font-semibold">{{ $pt }}</span>
+                    <p class="mt-1.5 text-sm font-bold text-slate-800 tabular-nums dark:text-slate-100">Rp {{ number_format($total, 0, ',', '.') }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
     @if(($dueFollowUps ?? collect())->isNotEmpty() || ($weekMeetings ?? collect())->isNotEmpty() || ($myTasks ?? collect())->isNotEmpty())
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
             <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 min-w-0">

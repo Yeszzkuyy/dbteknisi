@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\FollowUp;
+use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\Meeting;
@@ -223,7 +224,20 @@ class ManageSalesController extends Controller
         $weekStart = now()->startOfWeek()->toDateString();
         $weekEnd = now()->endOfWeek()->toDateString();
 
-        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal', 'weekStart', 'weekEnd'));
+        // Income bulan berjalan dari invoice admin, dirinci per PT/company.
+        // Sumber sementara (opsi A); diganti rekap admin bila modulnya lengkap.
+        $incomeRows = Invoice::selectRaw('customers.pt_group as pt_group, SUM(invoices.amount) as total')
+            ->join('customers', 'customers.id', '=', 'invoices.customer_id')
+            ->whereMonth('invoices.issue_date', now()->month)
+            ->whereYear('invoices.issue_date', now()->year)
+            ->whereIn('customers.pt_group', Lead::PT_GROUPS)
+            ->groupBy('customers.pt_group')
+            ->pluck('total', 'pt_group');
+        $incomeMonth = collect(Lead::PT_GROUPS)
+            ->mapWithKeys(fn ($pt) => [$pt => (float) ($incomeRows[$pt] ?? 0)]);
+        $incomeTotal = $incomeMonth->sum();
+
+        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal', 'weekStart', 'weekEnd', 'incomeMonth', 'incomeTotal'));
     }
 
     public function myLeads(Request $request)

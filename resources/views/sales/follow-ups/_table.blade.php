@@ -63,6 +63,9 @@
                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
                                     <x-icon name="eye" class="h-4 w-4" />
                                 </a>
+                                <x-icon-button as="a" href="{{ route('sales.meetings.create', array_filter(['customer_id' => $fu->customer_id, 'lead_id' => $fu->lead_id])) }}" title="Create Meeting">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2" /><path d="M3.5 10h17" /><path d="M8 3v4" /><path d="M16 3v4" /></svg>
+                                </x-icon-button>
                                 @can('manage-sales')
                                     @if($fu->completed_at)
                                         <form action="{{ route('sales.follow-ups.reopen', $fu) }}"

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\RespondsAjax;
+use App\Http\Controllers\Concerns\LocksLeadLink;
 use App\Models\Customer;
 use App\Models\FollowUp;
 use App\Models\Lead;
@@ -12,7 +13,7 @@ use Illuminate\Http\Request;
 
 class FollowUpController extends Controller
 {
-    use RespondsAjax;
+    use RespondsAjax, LocksLeadLink;
 
     public function __construct(private SalesService $salesService) {}
 
@@ -58,6 +59,8 @@ class FollowUpController extends Controller
             'next_follow_up_date' => 'nullable|date',
         ]);
 
+        $this->lockLeadLink($validated);
+
         if (!empty($validated['lead_id'])) {
             $lead = Lead::find($validated['lead_id']);
             $validated['customer_id'] = $lead->customer_id;
@@ -96,6 +99,8 @@ class FollowUpController extends Controller
             'follow_up_date' => 'nullable|date',
             'next_follow_up_date' => 'nullable|date',
         ]);
+
+        $this->lockLeadLink($validated);
 
         if (!empty($validated['lead_id'])) {
             $lead = Lead::find($validated['lead_id']);
