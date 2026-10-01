@@ -39,7 +39,7 @@
         && !auth()->user()->canany(['manage-marketing', 'manage-technician', 'manage-admin', 'manage-sales', 'manage-inside-sales']);
     if (($isPureManagement ?? false)) {
         $salesItems = array_values(array_filter($salesItems,
-            fn ($i) => in_array($i['label'], ['Dashboard', 'Pipeline'], true)));
+            fn ($i) => in_array($i['label'], ['Dashboard', 'Tracker Meeting', 'Follow Up'], true)));
         $salesLanding = $salesItems[0]['route'] ?? route('dashboard');
     }
 @endphp
@@ -195,21 +195,20 @@
                                          <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" aria-hidden="true"></span>
                                          <span>{{ __('Dashboard Teknisi') }}</span>
                                      </a>
-                                     @unless($isPureManagement)
                                      <a wire:navigate.hover href="{{ route('projects.index') }}"
-                                       aria-current="{{ request()->routeIs('projects*') ? 'page' : 'false' }}"
-                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('projects*') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
-                                        <span>Project</span>
-                                    </a>
-                                    {{-- Jadwal: kalender re-init tiap livewire:navigated (teknisi-calendar.js) --}}
-                                    <a wire:navigate.hover href="{{ route('teknisi.jadwal') }}"
-                                       aria-current="{{ request()->routeIs('teknisi.jadwal*') ? 'page' : 'false' }}"
-                                       class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.jadwal*') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
-                                        <span>{{ __('Jadwal') }}</span>
-                                    </a>
-                                    <a wire:navigate.hover href="{{ route('teknisi.surveys.index') }}"
+                                        aria-current="{{ request()->routeIs('projects*') ? 'page' : 'false' }}"
+                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('projects*') ? $navActive : $navInactive }}">
+                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true"></span>
+                                         <span>Project</span>
+                                     </a>
+                                     <a wire:navigate.hover href="{{ route('teknisi.jadwal') }}"
+                                        aria-current="{{ request()->routeIs('teknisi.jadwal*') ? 'page' : 'false' }}"
+                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.jadwal*') ? $navActive : $navInactive }}">
+                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
+                                         <span>{{ __('Jadwal') }}</span>
+                                     </a>
+                                     @unless($isPureManagement)
+                                     <a wire:navigate.hover href="{{ route('teknisi.surveys.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.surveys*') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.surveys*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-yellow-400" aria-hidden="true"></span>
@@ -224,16 +223,18 @@
                                     <a wire:navigate.hover href="{{ route('teknisi.request-hargas.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.request-hargas*') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.request-hargas*') ? $navActive : $navInactive }}">
-                                        <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" aria-hidden="true"></span>
-                                        <span>{{ __('Request Harga') }}</span>
-                                    </a>
-                                    <a wire:navigate.hover href="{{ route('teknisi.instalasis.index') }}"
+                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" aria-hidden="true"></span>
+                                         <span>{{ __('Request Harga') }}</span>
+                                     </a>
+                                     @endunless
+                                     <a wire:navigate.hover href="{{ route('teknisi.instalasis.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.instalasis*') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.instalasis*') ? $navActive : $navInactive }}">
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden="true"></span>
-                                        <span>{{ __('Instalasi') }}</span>
-                                    </a>
-                                    <a wire:navigate.hover href="{{ route('teknisi.documents.index') }}"
+                                         <span>{{ __('Instalasi') }}</span>
+                                     </a>
+                                     @unless($isPureManagement)
+                                     <a wire:navigate.hover href="{{ route('teknisi.documents.index') }}"
                                        aria-current="{{ request()->routeIs('teknisi.documents*') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('teknisi.documents*') ? $navActive : $navInactive }}">
                                          <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true"></span>
@@ -279,6 +280,7 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-green-400" aria-hidden="true"></span>
                                         <span>WhatsApp Center</span>
                                     </a>
+                                    @endunless
                                     <a wire:navigate.hover href="{{ route('leads.index') }}"
                                        aria-current="{{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs(['leads.index', 'leads.show', 'leads.edit']) ? $navActive : $navInactive }}">
@@ -291,6 +293,7 @@
                                         <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" aria-hidden="true"></span>
                                         <span>{{ __('Data Partner') }}</span>
                                     </a>
+                                    @unless($isPureManagement)
                                     <a wire:navigate.hover href="{{ route('leads.activities') }}"
                                        aria-current="{{ request()->routeIs('leads.activities') ? 'page' : 'false' }}"
                                        class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('leads.activities') ? $navActive : $navInactive }}">
@@ -299,12 +302,14 @@
                                      </a>
                                      @endunless
                                      @can('monitor-marketing')
-                                        <a wire:navigate.hover href="{{ route('leads.monitoring') }}"
+                                     @unless($isPureManagement)
+                                         <a wire:navigate.hover href="{{ route('leads.monitoring') }}"
                                            aria-current="{{ request()->routeIs('leads.monitoring') ? 'page' : 'false' }}"
                                            class="sb-sub-item {{ $subNavLink }} {{ request()->routeIs('leads.monitoring') ? $navActive : $navInactive }}">
                                             <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" aria-hidden="true"></span>
                                             <span>Monitoring</span>
                                         </a>
+                                     @endunless
                                     @endcan
                                     </div>
 </div>

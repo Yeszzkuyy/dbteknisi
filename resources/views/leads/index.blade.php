@@ -168,7 +168,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-6 py-12 text-center text-slate-500">
-                                {{ __('Belum ada lead.') }} <a href="{{ route('leads.create') }}" class="text-accent-600 hover:underline">{{ __('Tambah lead pertama') }}</a>
+                                {{ __('Belum ada lead.') }} @can('manage-marketing')<a href="{{ route('leads.create') }}" class="text-accent-600 hover:underline">{{ __('Tambah lead pertama') }}</a>@endcan
                             </td>
                         </tr>
                     @endforelse

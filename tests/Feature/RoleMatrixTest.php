@@ -79,6 +79,38 @@ class RoleMatrixTest extends TestCase
         $this->post(route('admin.invoices.store'), [])->assertForbidden();
     }
 
+    public function test_pure_management_sidebar_shows_only_recap_items(): void
+    {
+        $html = $this->actingAs($this->loginAs('management'))
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->getContent();
+
+        foreach ([
+            '/teknisi/dashboard', '/projects', '/teknisi/jadwal', '/teknisi/instalasis',
+            '/marketing/dashboard', '/leads', '/partners',
+            '/sales/dashboard', '/sales/meetings', '/sales/follow-ups',
+        ] as $link) {
+            $this->assertStringContainsString($link, $html, "$link harus terlihat untuk management");
+        }
+
+        foreach ([
+            '/teknisi/surveys', '/teknisi/sizing-projects', '/teknisi/request-hargas',
+            '/teknisi/documents', '/whatsapp-center', '/leads/pipeline',
+            '/sales/my-leads', '/leads/monitoring',
+        ] as $link) {
+            $this->assertStringNotContainsString($link, $html, "$link harus disembunyikan untuk management");
+        }
+    }
+
+    public function test_management_cannot_mutate_listed_menus(): void
+    {
+        $this->actingAs($this->loginAs('management'));
+
+        $this->post(route('teknisi.instalasis.store'), [])->assertForbidden();
+        $this->post(route('partners.store'), [])->assertForbidden();
+        $this->post(route('sales.follow-ups.store'), [])->assertForbidden();
+    }
     public function test_ceo_and_inside_sales_unchanged(): void
     {
         $this->actingAs($this->loginAs('ceo'));
