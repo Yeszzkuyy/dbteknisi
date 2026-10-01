@@ -229,7 +229,6 @@ class ManageSalesController extends Controller
     public function myLeads(Request $request)
     {
         $leads = $this->myLeadsQuery($request)
-            ->latest()
             ->paginate(15)
             ->withQueryString();
 
@@ -243,7 +242,6 @@ class ManageSalesController extends Controller
         $leads = $this->myLeadsQuery($request)
             ->with(['customer'])
             ->withMax('followUps as last_follow_up_at', 'follow_up_date')
-            ->orderByDesc('incoming_date')
             ->get();
 
         $filename = 'my-leads-'.now()->format('Ymd-Hi').'.csv';
@@ -274,7 +272,7 @@ class ManageSalesController extends Controller
 
     private function myLeadsQuery(Request $request)
     {
-        return Lead::with(['customer', 'partner'])
+        $query = Lead::with(['customer', 'partner'])
             ->withCount(['meetings', 'followUps'])
             ->where('assigned_to', auth()->id())
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
@@ -287,6 +285,15 @@ class ManageSalesController extends Controller
             ->when($request->filled('touched'), fn ($q) => $request->touched === 'yes'
                 ? $q->where(fn ($w) => $w->has('meetings')->orHas('followUps'))
                 : $q->whereDoesntHave('meetings')->whereDoesntHave('followUps'));
+
+        // Urutan: terbaru (default), terlama, atau nama customer A-Z.
+        return match ($request->input('sort')) {
+            'oldest' => $query->oldest(),
+            'customer' => $query->orderBy(
+                Customer::select('name')->whereColumn('customers.id', 'leads.customer_id')
+            )->latest('leads.id'),
+            default => $query->latest(),
+        };
     }
 
     public function activityLog(Request $request)

@@ -44,10 +44,30 @@ class SalesDrilldownTest extends TestCase
             ->assertSee(route('sales.my-leads', ['won_month' => 1]), false);
     }
 
+    public function test_my_leads_sort_oldest_and_customer(): void
+    {
+        $sales = $this->loginAsSales();
+        $this->makeLead($sales, 'new', 'PT Zulu');
+        $this->makeLead($sales, 'new', 'PT Alpha');
+
+        $oldest = $this->actingAs($sales)
+            ->get(route('sales.my-leads', ['sort' => 'oldest']))
+            ->assertOk();
+        $this->assertTrue(
+            strpos($oldest->getContent(), 'PT Zulu') < strpos($oldest->getContent(), 'PT Alpha')
+        );
+
+        $byCustomer = $this->actingAs($sales)
+            ->get(route('sales.my-leads', ['sort' => 'customer']))
+            ->assertOk();
+        $this->assertTrue(
+            strpos($byCustomer->getContent(), 'PT Alpha') < strpos($byCustomer->getContent(), 'PT Zulu')
+        );
+    }
     public function test_my_leads_won_month_filter_matches_kpi(): void
     {
         $sales = $this->loginAsSales();
-        $wonThisMonth = $this->makeLead($sales, 'won', 'PT Menang Bulan Ini');
+        $this->makeLead($sales, 'won', 'PT Menang Bulan Ini');
         $wonLastMonth = $this->makeLead($sales, 'won', 'PT Menang Bulan Lalu');
         $wonLastMonth->forceFill(['updated_at' => now()->subMonth()])->saveQuietly();
 

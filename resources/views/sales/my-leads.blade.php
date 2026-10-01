@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">{{ __('Lead yang di-assign Management kepada Anda') }}</p>
         </div>
         <div class="flex gap-2">
-            <x-icon-button as="a" icon="import" href="{{ route('sales.my-leads.export', request()->only(['search', 'status', 'touched', 'active', 'won_month'])) }}" title="Export CSV" />
+            <x-icon-button as="a" icon="import" href="{{ route('sales.my-leads.export', request()->only(['search', 'status', 'touched', 'active', 'won_month', 'sort'])) }}" title="Export CSV" />
             <x-icon-button as="a" icon="back" href="{{ route('sales.dashboard') }}" title="Dashboard Sales" />
         </div>
     </div>
@@ -35,9 +35,18 @@
                 <option value="no" @selected(request('touched') === 'no')>{{ __('Belum disentuh') }}</option>
             </select>
         </div>
+        <div>
+            <label for="my-leads-sort" class="block text-xs font-medium text-slate-500 mb-1">{{ __('Urutkan') }}</label>
+            <select id="my-leads-sort" name="sort" onchange="this.form.submit()"
+                    class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
+                <option value="">{{ __('Terbaru') }}</option>
+                <option value="oldest" @selected(request('sort') === 'oldest')>{{ __('Terlama') }}</option>
+                <option value="customer" @selected(request('sort') === 'customer')>{{ __('Customer A-Z') }}</option>
+            </select>
+        </div>
         <div class="flex gap-2">
             <x-icon-button icon="filter" type="submit" title="Filter" />
-            @if(request('search') || request('status') || request('touched') || request('active') || request('won_month'))
+            @if(request('search') || request('status') || request('touched') || request('active') || request('won_month') || request('sort'))
                 <x-icon-button as="a" icon="reset" href="{{ route('sales.my-leads') }}" title="Reset" />
             @endif
         </div>
