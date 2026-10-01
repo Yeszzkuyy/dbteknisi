@@ -127,6 +127,9 @@
                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
                                     <x-icon name="eye" class="h-4 w-4" />
                                 </a>
+                                <x-icon-button as="a" href="{{ route('sales.follow-ups.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}" title="Create Follow Up">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true"><path d="M4 6a2.5 2.5 0 0 1 2.5-2.5h11A2.5 2.5 0 0 1 20 6v7a2.5 2.5 0 0 1-2.5 2.5H9L4.5 19.5V6z" /><path d="M8 9.5h8M8 12.5h5" /></svg>
+                                </x-icon-button>
                                 <x-dropdown align="right" width="w-52">
                                     <x-slot name="trigger">
                                         <x-icon-button title="{{ __('More actions') }}" tooltip="">
