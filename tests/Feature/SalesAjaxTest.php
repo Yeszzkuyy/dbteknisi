@@ -69,7 +69,9 @@ class SalesAjaxTest extends TestCase
     {
         $sales = $this->loginAsSales();
         $customer = Customer::create(['name' => 'PT Filter Unik']);
-        Meeting::create(['customer_id' => $customer->id, 'meeting_date' => now()]);
+        // created_by diisi seperti jalur produksi (SalesService::createMeeting),
+        // kalau tidak scopeToOwnLeads memang menyembunyikannya dari sales.
+        Meeting::create(['customer_id' => $customer->id, 'meeting_date' => now(), 'created_by' => $sales->id]);
 
         $res = $this->actingAs($sales)->getJson(route('sales.meetings.index', ['search' => 'Filter Unik']));
 
@@ -103,7 +105,7 @@ class SalesAjaxTest extends TestCase
     {
         $sales = $this->loginAsSales();
         $customer = Customer::create(['name' => 'PT FU Filter']);
-        FollowUp::create(['customer_id' => $customer->id, 'description' => 'Sapa ulang']);
+        FollowUp::create(['customer_id' => $customer->id, 'description' => 'Sapa ulang', 'created_by' => $sales->id]);
 
         $res = $this->actingAs($sales)->getJson(route('sales.follow-ups.index', ['search' => 'FU Filter']));
 
