@@ -2,9 +2,13 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">Pipeline Lead</h1>
-            <p class="text-slate-500 mt-1">{{ __('Geser kartu antar kolom untuk mengubah status lead') }}</p>
+            <p class="text-slate-500 mt-1">{{ __('Pipeline milik :name — geser kartu antar kolom untuk mengubah status lead', ['name' => auth()->user()->name]) }}</p>
         </div>
         <div class="flex items-center gap-2">
+            <a href="{{ ($showAllClosed ?? false) ? route('leads.pipeline') : route('leads.pipeline', ['closed' => 'all']) }}"
+               class="px-4 py-2.5 rounded-xl bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-medium transition">
+                {{ ($showAllClosed ?? false) ? __('Minggu ini') : __('Tampilkan semua') }}
+            </a>
             @if(auth()->user()->can('view-marketing') || auth()->user()->can('manage-marketing'))
                 <a href="{{ route('leads.index') }}"
                    class="px-4 py-2.5 rounded-xl bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-medium transition">
@@ -25,6 +29,7 @@
         </div>
     </div>
 
+    @if($leads->isNotEmpty())
     <div class="kanban-board overflow-x-auto pb-4"
          @if(auth()->user()->can('manage-marketing') || auth()->user()->can('manage-sales')) data-editable="1" @endif
          @if(auth()->user()->can('manage-sales') && !auth()->user()->can('manage-marketing')) data-sales-only="1" @endif>
@@ -47,6 +52,9 @@
                             {{ ucfirst($status) }}
                         </span>
                         <span class="text-sm font-semibold text-slate-500" data-count>{{ $columnLeads->count() }}</span>
+                        @if(in_array($status, ['won', 'lost'], true) && !($showAllClosed ?? false))
+                            <span class="ml-1 text-[11px] text-slate-400">{{ __('minggu ini') }}</span>
+                        @endif
                     </div>
                     <div class="kanban-list p-3 space-y-3 min-h-24" data-status="{{ $status }}">
                         @foreach($columnLeads as $lead)
@@ -82,6 +90,12 @@
             @endforeach
         </div>
     </div>
+    @else
+        <div class="rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 px-5 py-12 text-center">
+            <p class="text-sm font-medium text-slate-500">{{ __('Belum ada lead di pipeline Anda.') }}</p>
+            <p class="mt-1 text-xs text-slate-400">{{ __('Lead baru dari Management akan muncul di sini.') }}</p>
+        </div>
+    @endif
 
     @if(auth()->user()->can('manage-marketing') || auth()->user()->can('manage-sales'))
     <script>
