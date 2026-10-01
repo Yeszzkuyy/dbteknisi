@@ -41,7 +41,22 @@ class SalesDrilldownTest extends TestCase
 
         $response->assertOk()
             ->assertSee(route('sales.my-leads', ['active' => 1]), false)
-            ->assertSee(route('sales.my-leads', ['status' => 'won']), false);
+            ->assertSee(route('sales.my-leads', ['won_month' => 1]), false);
+    }
+
+    public function test_my_leads_won_month_filter_matches_kpi(): void
+    {
+        $sales = $this->loginAsSales();
+        $wonThisMonth = $this->makeLead($sales, 'won', 'PT Menang Bulan Ini');
+        $wonLastMonth = $this->makeLead($sales, 'won', 'PT Menang Bulan Lalu');
+        $wonLastMonth->forceFill(['updated_at' => now()->subMonth()])->saveQuietly();
+
+        $response = $this->actingAs($sales)
+            ->get(route('sales.my-leads', ['won_month' => 1]));
+
+        $response->assertOk()
+            ->assertSee('PT Menang Bulan Ini')
+            ->assertDontSee('PT Menang Bulan Lalu');
     }
 
     public function test_my_leads_active_filter_hides_won_and_lost(): void

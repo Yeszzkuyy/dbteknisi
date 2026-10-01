@@ -5,7 +5,7 @@
             <p class="text-slate-500 mt-1">{{ __('Lead yang di-assign Management kepada Anda') }}</p>
         </div>
         <div class="flex gap-2">
-            <x-icon-button as="a" icon="import" href="{{ route('sales.my-leads.export', request()->only(['search', 'status', 'touched', 'active'])) }}" title="Export CSV" />
+            <x-icon-button as="a" icon="import" href="{{ route('sales.my-leads.export', request()->only(['search', 'status', 'touched', 'active', 'won_month'])) }}" title="Export CSV" />
             <x-icon-button as="a" icon="back" href="{{ route('sales.dashboard') }}" title="Dashboard Sales" />
         </div>
     </div>
@@ -37,7 +37,7 @@
         </div>
         <div class="flex gap-2">
             <x-icon-button icon="filter" type="submit" title="Filter" />
-            @if(request('search') || request('status') || request('touched') || request('active'))
+            @if(request('search') || request('status') || request('touched') || request('active') || request('won_month'))
                 <x-icon-button as="a" icon="reset" href="{{ route('sales.my-leads') }}" title="Reset" />
             @endif
         </div>

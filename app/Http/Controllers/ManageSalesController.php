@@ -281,6 +281,9 @@ class ManageSalesController extends Controller
                 fn ($c) => $c->whereLike('name', $request->search)))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->when($request->filled('active'), fn ($q) => $q->whereNotIn('status', ['won', 'lost']))
+            ->when($request->filled('won_month'), fn ($q) => $q->where('status', 'won')
+                ->whereMonth('updated_at', now()->month)
+                ->whereYear('updated_at', now()->year))
             ->when($request->filled('touched'), fn ($q) => $request->touched === 'yes'
                 ? $q->where(fn ($w) => $w->has('meetings')->orHas('followUps'))
                 : $q->whereDoesntHave('meetings')->whereDoesntHave('followUps'));
