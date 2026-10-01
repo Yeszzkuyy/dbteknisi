@@ -24,7 +24,7 @@
     {{-- Lapis luar (api): 3 jilatan conic warna-tema + blur + flicker.
          Stop antara bikin transisi melebur, bukan terpotong. --}}
     <span aria-hidden="true"
-          class="avatar-flame absolute -inset-1.5 rounded-full motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_55deg,rgb(var(--accent-300)/0.35)_85deg,transparent_115deg,rgb(var(--accent-500))_120deg,rgb(var(--accent-300))_175deg,rgb(var(--accent-300)/0.35)_205deg,transparent_235deg,rgb(var(--accent-500))_240deg,rgb(var(--accent-300))_295deg,rgb(var(--accent-300)/0.35)_325deg,transparent_355deg)] blur-[4px] shadow-[0_0_18px_4px_rgb(var(--accent-500)/0.45)]"></span>
+          class="avatar-flame absolute -inset-1 rounded-full motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,rgb(var(--accent-300))_55deg,rgb(var(--accent-300)/0.35)_85deg,transparent_115deg,rgb(var(--accent-500))_120deg,rgb(var(--accent-300))_175deg,rgb(var(--accent-300)/0.35)_205deg,transparent_235deg,rgb(var(--accent-500))_240deg,rgb(var(--accent-300))_295deg,rgb(var(--accent-300)/0.35)_325deg,transparent_355deg)] blur-[2px] shadow-[0_0_10px_2px_rgb(var(--accent-500)/0.45)]"></span>
     {{-- Lapis dalam (chase): dua warna tema saling mengejar (looping).
          Busur lebar + glow kuat agar tetap terlihat di light mode. --}}
     <span aria-hidden="true"
