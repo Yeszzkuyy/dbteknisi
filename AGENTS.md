@@ -17,6 +17,7 @@ ikuti aturan berikut supaya tidak saling menimpa kerjaan.
 | `/var/www/3dyapp-dash` | `feature/general-dashboard` | Dashboard umum |
 | `/var/www/3dyapp-management` | `feature/management` | Management (Activity Log, assign lead) |
 | `/var/www/3dyapp-sec` | `feature/security-hardening` | Security hardening |
+| `/var/www/3dyapp-sales` | `feature/sales-flow` | Sales (dashboard, my-leads, meeting, follow-up) |
 
 Worktree baru juga butuh: `composer install`, symlink `.env`, dan
 `ln -s /var/www/3dyapp/public/build /var/www/3dyapp-<nama>/public/build`.
