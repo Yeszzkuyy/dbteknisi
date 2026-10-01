@@ -34,10 +34,10 @@
         </div>
         <div class="flex gap-2">
             <button type="submit"
-                    class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition">{{ __('Cari') }}</button>
+                    class="px-4 py-2 rounded-lg bg-accent-600 hover:bg-accent-500 text-white text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2">{{ __('Cari') }}</button>
             @if(request('search') || request('status') || request('touched'))
                 <a href="{{ route('sales.my-leads') }}"
-                   class="px-4 py-2 border border-slate-300 text-slate-700 text-sm rounded-lg transition dark:border-slate-600 dark:text-slate-200">{{ __('Reset') }}</a>
+                   class="px-4 py-2 border border-slate-300 text-slate-700 text-sm rounded-lg transition dark:border-slate-600 dark:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2">{{ __('Reset') }}</a>
             @endif
         </div>
     </form>

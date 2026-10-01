@@ -12,31 +12,31 @@
                     <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Aksi') }}</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
+            <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600">
                 @forelse($followUps as $fu)
-                    <tr class="hover:bg-slate-50 transition">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
                         <td class="px-6 py-4">
-                            <span class="font-semibold text-slate-800">{{ $fu->customer?->name ?? '-' }}</span>
+                            <span class="font-semibold text-slate-800 dark:text-slate-100">{{ $fu->customer?->name ?? '-' }}</span>
                             @if($fu->type)
-                                <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-indigo-50 text-indigo-700">{{ \App\Models\FollowUp::typeLabel($fu->type) }}</span>
+                                <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">{{ \App\Models\FollowUp::typeLabel($fu->type) }}</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-slate-600 max-w-xs truncate">
+                        <td class="px-6 py-4 text-slate-600 dark:text-slate-300 max-w-xs truncate">
                             {{ Str::limit($fu->description, 100) }}
                         </td>
-                        <td class="px-6 py-4 text-slate-600">
+                        <td class="px-6 py-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
                             {{ $fu->meeting ? $fu->meeting->meeting_date->format('d M Y') : '-' }}
                         </td>
-                        <td class="px-6 py-4 text-slate-600">
+                        <td class="px-6 py-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
                             {{ $fu->follow_up_date ? $fu->follow_up_date->format('d M Y') : '-' }}
                             @if($fu->follow_up_date && $fu->follow_up_date->isBefore(today()))
-                                <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-red-100 text-red-700">{{ __('Terlambat') }}</span>
+                                <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">{{ __('Terlambat') }}</span>
                             @endif
                             @if($fu->next_follow_up_date)
                                 <span class="block mt-1 text-[11px] text-slate-500">{{ __('Berikutnya:') }} {{ $fu->next_follow_up_date->format('d M Y') }}</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-slate-600">{{ $fu->creator?->name ?? '-' }}</td>
+                        <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $fu->creator?->name ?? '-' }}</td>
                         <td class="px-6 py-4">
                             <div class="flex justify-end gap-2">
                                 @php
@@ -57,14 +57,14 @@
                                 <a href="{{ route('sales.follow-ups.show', $fu) }}"
                                    title="{{ __('Lihat detail follow up') }}"
                                    aria-label="{{ __('Lihat detail follow up') }} {{ $fu->customer?->name }}"
-                                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-50 text-accent-700 transition hover:bg-accent-100 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
+                                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
                                     <x-icon name="eye" class="h-4 w-4" />
                                 </a>
                                 @can('manage-sales')
                                     <a href="{{ route('sales.follow-ups.edit', $fu) }}"
                                        title="{{ __('Edit follow up') }}"
                                        aria-label="{{ __('Edit follow up') }} {{ $fu->customer?->name }}"
-                                       class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-100 text-accent-700 transition hover:bg-accent-200 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20">
+                                       class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700 transition hover:bg-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">
                                         <x-icon name="edit" class="h-4 w-4" />
                                     </a>
                                     <form action="{{ route('sales.follow-ups.destroy', $fu) }}"
@@ -83,14 +83,20 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="py-16 text-center text-slate-400">{{ __('Belum ada follow up.') }}</td>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-300">
+                                <x-icon name="chat" class="h-6 w-6" />
+                            </span>
+                            <p class="mt-4 text-sm font-medium text-slate-500">{{ __('Belum ada follow up.') }}</p>
+                            <p class="mt-1 text-xs text-slate-400">{{ __('Catat follow up pertama dari tombol di atas.') }}</p>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
     @if($followUps->hasPages())
-        <div class="p-4 border-t border-slate-200">
+        <div class="p-4 border-t border-slate-200 dark:border-slate-600">
             {{ $followUps->links() }}
         </div>
     @endif
