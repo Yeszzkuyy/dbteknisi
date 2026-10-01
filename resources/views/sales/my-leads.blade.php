@@ -33,11 +33,9 @@
             </select>
         </div>
         <div class="flex gap-2">
-            <button type="submit"
-                    class="px-4 py-2 rounded-lg bg-accent-600 hover:bg-accent-500 text-white text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2">{{ __('Cari') }}</button>
+            <x-icon-button icon="filter" type="submit" title="Filter" />
             @if(request('search') || request('status') || request('touched'))
-                <a href="{{ route('sales.my-leads') }}"
-                   class="px-4 py-2 border border-slate-300 text-slate-700 text-sm rounded-lg transition dark:border-slate-600 dark:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2">{{ __('Reset') }}</a>
+                <x-icon-button as="a" icon="reset" href="{{ route('sales.my-leads') }}" title="Reset" />
             @endif
         </div>
     </form>
@@ -112,18 +110,16 @@
                                     );
                                 @endphp
                                 <a href="{{ route('leads.show', $lead) }}"
-                                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold transition">
-                                    {{ __('Detail') }}
+                                   title="{{ __('View details') }}"
+                                   aria-label="{{ __('View details') }} {{ $lead->customer?->name }}"
+                                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
+                                    <x-icon name="eye" class="h-4 w-4" />
                                 </a>
                                 <x-dropdown align="right" width="w-52">
                                     <x-slot name="trigger">
-                                        <button type="button" aria-label="{{ __('Aksi lainnya') }}"
-                                                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-semibold transition dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500">
-                                            {{ __('Lainnya') }}
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                            </svg>
-                                        </button>
+                                        <x-icon-button title="{{ __('More actions') }}" tooltip="">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true"><circle cx="5" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="19" cy="12" r="1.6" /></svg>
+                                        </x-icon-button>
                                     </x-slot>
                                     <x-slot name="content">
                                         @if($leadWaLink)
