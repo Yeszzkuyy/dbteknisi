@@ -28,6 +28,7 @@
         "dompurify": "^3.4.15",
         "marked": "^18.0.11",
         "motion": "^13.4.2",
+        "ogl": "^1.0.11",
         "react": "^19.3.0",
         "react-dom": "^19.3.0",
         "sortablejs": "^1.15.7"

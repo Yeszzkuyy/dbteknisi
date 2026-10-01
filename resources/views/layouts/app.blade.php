@@ -12,7 +12,7 @@
     <title>{{ config('app.name', 'Tridaya App') }}</title>
 
     <link rel="icon" type="image/png" sizes="64x64" href="{{ asset('favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/logo/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/Logo3dydark.png') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|exo-2:500,600,700,800&display=swap" rel="stylesheet" />
@@ -215,6 +215,13 @@
             .sidebar nav button > span{transition:none}
         }
 
+        /* Penanda halaman aktif di navbar: fade+geser halus tiap navigasi.
+           Dipicu ulang via JS (livewire:navigated); hanya elemen aktif. */
+        @media(prefers-reduced-motion:no-preference){
+            @keyframes nav-active-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+            .nav-active-swap{animation:nav-active-in 250ms ease-out}
+        }
+
         .dark .bg-white{background-color:var(--card-bg)!important}
         .dark #darkToggle .bg-white{background-color:#fff!important}
         .dark .bg-slate-50{background-color:var(--card-bg)!important}
@@ -399,7 +406,7 @@
                 try{localStorage.setItem('sidebar-collapsed',v?'1':'0')}catch(e){}
                 var btn=document.getElementById('sidebarCollapseBtn');
                 if(btn){btn.setAttribute('aria-expanded',String(!v));btn.setAttribute('aria-label',v?@json(__('Perluas sidebar')):@json(__('Perkecil sidebar')))}
-                syncTitles();
+            syncTitles();
             }
             syncTitles();
             if(cb&&!cb.dataset.bound){cb.dataset.bound='1';cb.addEventListener('click',function(){
@@ -541,6 +548,17 @@
             else{swap(best,true);}
         }
         document.addEventListener('livewire:navigated',function(){try{syncSidebarActive();}catch(e){}});
+        // Penanda aktif navbar (breadcrumb + badge halaman): mainkan ulang
+        // animasi fade tiap navigasi. Hanya elemen penanda — sisa navbar diam.
+        document.addEventListener('livewire:navigated',function(){
+            try{
+                document.querySelectorAll('.app-header nav[aria-label="Breadcrumb"],.app-header .app-header-badge').forEach(function(el){
+                    el.classList.remove('nav-active-swap');
+                    void el.offsetWidth;
+                    el.classList.add('nav-active-swap');
+                });
+            }catch(e){}
+        });
         document.addEventListener('DOMContentLoaded',initChromeSafe);
         document.addEventListener('livewire:navigated',initChromeSafe);
         document.addEventListener('DOMContentLoaded',initRevealSafe);
