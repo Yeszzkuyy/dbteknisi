@@ -94,6 +94,29 @@ from-transparent via-white/50 to-transparent transition-transform duration-700 e
 group-hover:translate-x-full`) + `transition-all duration-300 hover:scale-105
 hover:shadow-lg active:scale-95` (tombol utama tambah `hover:shadow-accent-500/40 hover:brightness-110`).
 
+**Bentuk tombol (wajib):** hanya **Save** (submit utama) dan **Cancel**
+(batal di form) yang boleh berupa tombol teks. Semua aksi lain **wajib
+icon-only** via `<x-icon-button>` — jangan tulis ulang, cukup
+`as`/`icon`/`title` (`href` bila link, `type="submit"` bila submit):
+
+```blade
+<x-icon-button icon="filter" type="submit" title="Filter" />
+<x-icon-button as="a" icon="reset" href="..." title="Reset" />
+<x-icon-button as="a" icon="back" href="..." title="Back" />
+<x-icon-button as="a" icon="add" href="..." title="Add" />
+```
+
+Aksi baris tabel (detail/edit/delete/WA) juga icon-only: kotak pastel
+`h-10 w-10 rounded-lg` sesuai warna tabel di atas + `title` dan
+`aria-label` (contoh: `title="View details"`). Dilarang tombol teks
+macam "Cari", "Lihat", "+ Catat ..." — ganti icon-only.
+
+**Bahasa tombol (wajib):** default **Inggris** via `__('...')`
+(`title="Filter"` bukan "Saring", `title="Reset"` bukan "Atur Ulang",
+`title="Back"` bukan "Kembali"). Teks Indonesia hanya lewat file
+terjemahan, jangan hardcode di view. View lama yang masih Indonesia
+dirapikan bertahap setiap menyentuh file itu.
+
 **Larangan:** jangan pakai `bg-slate-*`, `bg-gray-*`, atau `bg-white` sebagai
 background tombol — CSS dark-mode global mengoverride kelas tersebut sehingga
 tombol menyatu dengan background.
