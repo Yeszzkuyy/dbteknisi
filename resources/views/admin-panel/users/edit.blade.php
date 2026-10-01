@@ -4,10 +4,7 @@
             <h1 class="text-3xl font-bold text-slate-800">Edit User: {{ $user->name }}</h1>
             <p class="text-slate-500 mt-1">{{ __('Perbarui informasi user dan role') }}</p>
         </div>
-        <a href="{{ route('admin-panel.index') }}"
-           class="px-4 py-2 bg-accent-400 text-white rounded-xl hover:bg-accent-500 transition">
-            {{ __('Kembali') }}
-        </a>
+        <x-icon-button as="a" icon="back" href="{{ route('admin-panel.index') }}" title="Back" />
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
