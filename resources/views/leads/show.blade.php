@@ -32,10 +32,12 @@
                     </button>
                 </form>
             @endcan
-            <a href="{{ route('leads.pipeline') }}"
-               class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium transition">
-                {{ __('Kembali ke Pipeline') }}
-            </a>
+            @if(auth()->user()->can('view-sales') || auth()->user()->can('manage-sales'))
+                <a href="{{ route('leads.pipeline') }}"
+                   class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium transition">
+                    {{ __('Kembali ke Pipeline') }}
+                </a>
+            @endif
             <a href="{{ (auth()->user()->can('view-marketing') || auth()->user()->can('manage-marketing')) ? route('leads.index') : route('sales.my-leads') }}"
                class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
                 {{ __('Kembali') }}

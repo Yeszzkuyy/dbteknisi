@@ -65,22 +65,30 @@ class LeadController extends Controller
         return view('leads.index', compact('leads', 'statuses', 'sources', 'ptGroups'));
     }
 
-    public function pipeline()
+    public function pipeline(Request $request)
     {
         $this->authorize('viewAny', Lead::class);
 
-        $query = Lead::with(['customer', 'assignee', 'partner'])->orderByDesc('incoming_date');
+        // Pipeline selalu milik 1 sales: hanya lead yang di-assign ke viewer,
+        // tanpa pengecualian role (customer tidak campur antar sales).
+        $leads = Lead::with(['customer', 'assignee', 'partner'])
+            ->where('assigned_to', $request->user()->id)
+            ->orderByDesc('incoming_date')
+            ->get();
 
-        // Sales biasa hanya melihat pipeline lead miliknya sendiri.
-        $user = request()->user();
-        if ($user && $user->hasRole('sales') && !$user->can('manage-marketing') && !$user->can('manage-sales-leads')) {
-            $query->where('assigned_to', $user->id);
+        // Kolom won/lost hanya tampilkan yang ditutup minggu berjalan agar
+        // tidak menumpuk, kecuali ?closed=all. Data lama tanpa closed_at
+        // pakai updated_at sebagai fallback.
+        $showAllClosed = $request->input('closed') === 'all';
+        $weekStart = now()->startOfWeek();
+        if (!$showAllClosed) {
+            $leads = $leads->filter(fn ($lead) => !in_array($lead->status, ['won', 'lost'], true)
+                || ($lead->closed_at ?? $lead->updated_at)?->gte($weekStart))->values();
         }
 
-        $leads = $query->get();
         $statuses = self::STATUSES;
 
-        return view('leads.pipeline', compact('leads', 'statuses'));
+        return view('leads.pipeline', compact('leads', 'statuses', 'showAllClosed', 'weekStart'));
     }
 
     private function authorizeLeadStatus(Lead $lead): void
@@ -110,6 +118,8 @@ class LeadController extends Controller
                 $payload['lost_reason'] = null;
                 $payload['lost_note'] = null;
             }
+            // closed_at = kapan deal ditutup (acuan filter mingguan pipeline).
+            $payload['closed_at'] = in_array($validated['status'], ['won', 'lost'], true) ? now() : null;
             $lead->update($payload);
 
             $this->logActivity($lead, 'status_changed', [
@@ -140,6 +150,7 @@ class LeadController extends Controller
                     $payload['lost_reason'] = null;
                     $payload['lost_note'] = null;
                 }
+                $payload['closed_at'] = in_array($change['status'], ['won', 'lost'], true) ? now() : null;
                 $lead->update($payload);
 
                 $this->logActivity($lead, 'status_changed', [

@@ -304,8 +304,8 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:monitor-marketing')
         ->name('leads.monitoring');
 
-    // Pipeline dipakai Marketing & Sales (sales di-scope ke own lead di controller/policy).
-    Route::middleware('permission:view-marketing|manage-marketing|view-sales|manage-sales|manage-technician|manage-admin')->group(function () {
+    // Pipeline khusus Sales, selalu terkunci ke lead milik viewer (1 sales = 1 tampilan).
+    Route::middleware('permission:view-sales|manage-sales')->group(function () {
         Route::get('/leads/pipeline', [LeadController::class, 'pipeline'])->name('leads.pipeline');
     });
 
