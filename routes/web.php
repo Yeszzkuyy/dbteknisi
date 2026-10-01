@@ -117,6 +117,9 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('follow-ups', FollowUpController::class)->except(['show']);
         Route::get('follow-ups/{followUp}', [FollowUpController::class, 'show'])->name('follow-ups.show');
+        Route::post('follow-ups/{followUp}/complete', [FollowUpController::class, 'complete'])->name('follow-ups.complete');
+        Route::post('follow-ups/{followUp}/reopen', [FollowUpController::class, 'reopen'])->name('follow-ups.reopen');
+        Route::post('follow-ups/{followUp}/snooze', [FollowUpController::class, 'snooze'])->name('follow-ups.snooze');
 
         // Follow Up create with optional pre-selected customer/meeting
         Route::get('follow-ups/create/{customer?}', [FollowUpController::class, 'create'])->name('follow-ups.create-with-customer');

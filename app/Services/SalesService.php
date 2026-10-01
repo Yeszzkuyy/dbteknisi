@@ -89,8 +89,10 @@ class SalesService
 
         // overdue: 1 = jatuh tempo (< hari ini, kompatibel link lama),
         // today = hari ini, upcoming = setelah hari ini.
+        // Selesai tidak ikut hitungan jatuh tempo / hari ini / mendatang.
         if (!empty($filters['overdue'])) {
-            $query->whereNotNull('follow_up_date');
+            $query->whereNull('completed_at')
+                ->whereNotNull('follow_up_date');
             if ($filters['overdue'] === 'today') {
                 $query->whereDate('follow_up_date', today());
             } elseif ($filters['overdue'] === 'upcoming') {
@@ -131,6 +133,50 @@ class SalesService
     public function deleteFollowUp(FollowUp $followUp): void
     {
         $followUp->delete();
+    }
+
+    public function completeFollowUp(FollowUp $followUp): FollowUp
+    {
+        $followUp->forceFill(['completed_at' => now()])->save();
+        $this->logFollowUpActivity($followUp, 'followup_completed');
+
+        return $followUp;
+    }
+
+    public function reopenFollowUp(FollowUp $followUp): FollowUp
+    {
+        $followUp->forceFill(['completed_at' => null])->save();
+
+        return $followUp;
+    }
+
+    public function snoozeFollowUp(FollowUp $followUp, int $days): FollowUp
+    {
+        $base = $followUp->follow_up_date && $followUp->follow_up_date->isFuture()
+            ? $followUp->follow_up_date
+            : today();
+
+        $followUp->forceFill([
+            'follow_up_date' => $base->copy()->addDays($days),
+            'reminder_sent_at' => null, // Ingatkan lagi setelah ditunda.
+        ])->save();
+        $this->logFollowUpActivity($followUp, 'followup_snoozed', ['days' => $days]);
+
+        return $followUp;
+    }
+
+    private function logFollowUpActivity(FollowUp $followUp, string $action, ?array $changes = null): void
+    {
+        if (empty($followUp->lead_id)) {
+            return;
+        }
+
+        LeadActivity::create([
+            'lead_id' => $followUp->lead_id,
+            'user_id' => auth()->id(),
+            'action' => $action,
+            'changes' => $changes,
+        ]);
     }
 
     public function getCustomerMeetings(Customer $customer)

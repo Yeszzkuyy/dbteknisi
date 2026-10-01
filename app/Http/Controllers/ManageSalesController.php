@@ -170,17 +170,21 @@ class ManageSalesController extends Controller
             'meetings_week' => Meeting::where($ownActivity)
                 ->whereBetween('meeting_date', [now()->startOfWeek(), now()->endOfWeek()])->count(),
             'overdue' => FollowUp::where($ownActivity)
+                ->whereNull('completed_at')
                 ->whereNotNull('follow_up_date')
                 ->whereDate('follow_up_date', '<', today())->count(),
             'followups_today' => FollowUp::where($ownActivity)
+                ->whereNull('completed_at')
                 ->whereDate('follow_up_date', today())->count(),
             'followups_upcoming' => FollowUp::where($ownActivity)
+                ->whereNull('completed_at')
                 ->whereNotNull('follow_up_date')
                 ->whereDate('follow_up_date', '>', today())->count(),
         ];
 
         $dueFollowUps = FollowUp::with('customer')
             ->where($ownActivity)
+            ->whereNull('completed_at')
             ->whereNotNull('follow_up_date')
             ->whereDate('follow_up_date', '<=', today()->addWeek())
             ->orderBy('follow_up_date')

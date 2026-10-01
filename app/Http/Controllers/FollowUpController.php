@@ -115,6 +115,32 @@ class FollowUpController extends Controller
         return $this->ajaxOrRedirect($request, 'sales.follow-ups.index', __('Follow up berhasil dihapus.'));
     }
 
+    public function complete(Request $request, FollowUp $followUp)
+    {
+        $this->salesService->completeFollowUp($followUp);
+
+        return $this->ajaxOrRedirect($request, 'sales.follow-ups.index',
+            __('Follow up selesai.'), ['redirect' => route('sales.follow-ups.index')]);
+    }
+
+    public function reopen(Request $request, FollowUp $followUp)
+    {
+        $this->salesService->reopenFollowUp($followUp);
+
+        return $this->ajaxOrRedirect($request, 'sales.follow-ups.index',
+            __('Follow up dibuka lagi.'), ['redirect' => route('sales.follow-ups.index')]);
+    }
+
+    public function snooze(Request $request, FollowUp $followUp)
+    {
+        $validated = $request->validate(['days' => 'required|in:1,3,7']);
+
+        $this->salesService->snoozeFollowUp($followUp, (int) $validated['days']);
+
+        return redirect()->route('sales.follow-ups.index')
+            ->with('success', __('Follow up ditunda.'));
+    }
+
     private function leadOptions(?int $customerId = null)
     {
         $query = Lead::with('customer')->latest()->limit(100);

@@ -14,11 +14,14 @@
             </thead>
             <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-600">
                 @forelse($followUps as $fu)
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition {{ $fu->completed_at ? 'opacity-60' : '' }}">
                         <td class="px-6 py-4">
                             <span class="font-semibold text-slate-800 dark:text-slate-100">{{ $fu->customer?->name ?? '-' }}</span>
                             @if($fu->type)
                                 <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">{{ \App\Models\FollowUp::typeLabel($fu->type) }}</span>
+                            @endif
+                            @if($fu->completed_at)
+                                <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">{{ __('Done') }}</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-slate-600 dark:text-slate-300 max-w-xs truncate">
@@ -29,7 +32,7 @@
                         </td>
                         <td class="px-6 py-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
                             {{ $fu->follow_up_date ? $fu->follow_up_date->format('d M Y') : '-' }}
-                            @if($fu->follow_up_date && $fu->follow_up_date->isBefore(today()))
+                            @if(!$fu->completed_at && $fu->follow_up_date && $fu->follow_up_date->isBefore(today()))
                                 <span class="ml-1 inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">{{ __('Terlambat') }}</span>
                             @endif
                             @if($fu->next_follow_up_date)
@@ -61,6 +64,51 @@
                                     <x-icon name="eye" class="h-4 w-4" />
                                 </a>
                                 @can('manage-sales')
+                                    @if($fu->completed_at)
+                                        <form action="{{ route('sales.follow-ups.reopen', $fu) }}"
+                                              method="POST" class="inline-flex" data-ajax>
+                                            @csrf
+                                            <button type="submit"
+                                                    title="{{ __('Reopen follow up') }}"
+                                                    aria-label="{{ __('Reopen follow up') }} {{ $fu->customer?->name }}"
+                                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700 transition hover:bg-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20">
+                                                <x-icon name="restore" class="h-4 w-4" />
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('sales.follow-ups.complete', $fu) }}"
+                                              method="POST" class="inline-flex" data-ajax>
+                                            @csrf
+                                            <button type="submit"
+                                                    title="{{ __('Mark as done') }}"
+                                                    aria-label="{{ __('Mark as done') }} {{ $fu->customer?->name }}"
+                                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-700 transition hover:bg-green-200 dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
+                                                <x-icon name="check-circle" class="h-4 w-4" />
+                                            </button>
+                                        </form>
+                                        <x-dropdown align="right" width="w-44">
+                                            <x-slot name="trigger">
+                                                <button type="button"
+                                                        title="{{ __('Snooze follow up') }}"
+                                                        aria-label="{{ __('Snooze follow up') }} {{ $fu->customer?->name }}"
+                                                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100 text-yellow-700 transition hover:bg-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-300 dark:hover:bg-yellow-500/20">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true"><circle cx="12" cy="12" r="8.5" /><path stroke-linecap="round" d="M12 7.5V12l3 2" /></svg>
+                                                </button>
+                                            </x-slot>
+                                            <x-slot name="content">
+                                                @foreach([1, 3, 7] as $days)
+                                                    <form action="{{ route('sales.follow-ups.snooze', $fu) }}" method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="days" value="{{ $days }}">
+                                                        <button type="submit"
+                                                                class="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:bg-slate-700 transition duration-150 ease-in-out">
+                                                            {{ $days === 1 ? __('Tomorrow') : __('+ :days days', ['days' => $days]) }}
+                                                        </button>
+                                                    </form>
+                                                @endforeach
+                                            </x-slot>
+                                        </x-dropdown>
+                                    @endif
                                     <a href="{{ route('sales.follow-ups.edit', $fu) }}"
                                        title="{{ __('Edit follow up') }}"
                                        aria-label="{{ __('Edit follow up') }} {{ $fu->customer?->name }}"
