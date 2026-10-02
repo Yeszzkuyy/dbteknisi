@@ -14,6 +14,7 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadTaskController;
 use App\Http\Controllers\ManageSalesController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\MeetingDraftController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficeAssistantController;
@@ -127,6 +128,11 @@ Route::middleware('auth')->group(function () {
 
         // Follow Up create with optional pre-selected customer/meeting
         Route::get('follow-ups/create/{customer?}', [FollowUpController::class, 'create'])->name('follow-ups.create-with-customer');
+
+        // AI daily meeting drafts (generate → approve/discard)
+        Route::post('meeting-drafts', [MeetingDraftController::class, 'generate'])->name('meeting-drafts.generate');
+        Route::post('meeting-drafts/{meetingDraft}/approve', [MeetingDraftController::class, 'approve'])->name('meeting-drafts.approve');
+        Route::post('meeting-drafts/{meetingDraft}/discard', [MeetingDraftController::class, 'discard'])->name('meeting-drafts.discard');
     });
 
     Route::middleware('permission:view-sales|manage-sales')->prefix('sales')->name('sales.')->group(function () {
