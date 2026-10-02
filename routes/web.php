@@ -55,8 +55,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::post('/settings/appearance', [SettingsController::class, 'appearance'])->name('settings.appearance');
     Route::get('/settings/advanced', [SettingsController::class, 'advanced'])
-        ->middleware('password.confirm:password.confirm,1')
         ->name('settings.advanced');
+    Route::post('/settings/advanced/confirm', [SettingsController::class, 'confirmAdvanced'])
+        ->middleware('throttle:10,1')
+        ->name('settings.advanced.confirm');
 
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
     Route::get('/notifications/status', [NotificationController::class, 'status'])->name('notifications.status');
