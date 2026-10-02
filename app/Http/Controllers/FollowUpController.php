@@ -9,6 +9,7 @@ use App\Models\FollowUp;
 use App\Models\Lead;
 use App\Models\Meeting;
 use App\Services\SalesService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class FollowUpController extends Controller
@@ -138,9 +139,16 @@ class FollowUpController extends Controller
 
     public function snooze(Request $request, FollowUp $followUp)
     {
-        $validated = $request->validate(['days' => 'required|in:1,3,7']);
+        $validated = $request->validate([
+            'days' => 'required_without:date|integer|min:1|max:60',
+            'date' => 'required_without:days|date|after_or_equal:today',
+        ]);
 
-        $this->salesService->snoozeFollowUp($followUp, (int) $validated['days']);
+        if (isset($validated['date'])) {
+            $this->salesService->rescheduleFollowUp($followUp, Carbon::parse($validated['date']));
+        } else {
+            $this->salesService->snoozeFollowUp($followUp, (int) $validated['days']);
+        }
 
         return redirect()->route('sales.follow-ups.index')
             ->with('success', __('Follow up ditunda.'));
