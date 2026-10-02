@@ -121,7 +121,7 @@
                                class="flex items-start gap-3 min-w-0 flex-1 px-4 py-2.5">
                                 <span class="mt-1.5 h-2 w-2 rounded-full shrink-0" :class="n.read ? 'bg-slate-300 dark:bg-zinc-600' : 'bg-red-500'"></span>
                                 <span class="min-w-0">
-                                    <span class="block text-sm text-slate-700 dark:text-slate-200"><strong x-text="n.title || '{{ __('Lead baru') }}'"></strong>: <strong x-text="n.customer"></strong></span>
+                                    <span class="block text-sm text-slate-700 dark:text-slate-200"><strong x-text="n.title || '{{ __('New lead') }}'"></strong>: <strong x-text="n.customer"></strong></span>
                                     <template x-if="n.preview">
                                         <span class="block text-xs text-slate-500 dark:text-slate-400 truncate" x-text="n.preview"></span>
                                     </template>

@@ -368,6 +368,14 @@ class ManageSalesController extends Controller
             ->get()
             ->filter(fn ($n) => ($n->data['lead_id'] ?? null) == $lead->id)
             ->each->delete();
+
+        // Bersihkan notif assign basi milik sales lain (mis. reassign):
+        // bell tiap sales hanya berisi lead miliknya sendiri.
+        DatabaseNotification::where('type', LeadAssignedNotification::class)
+            ->get()
+            ->filter(fn ($n) => ($n->data['lead_id'] ?? null) == $lead->id
+                && (int) $n->notifiable_id !== (int) $lead->assigned_to)
+            ->each->delete();
     }
 
     private function logActivity(Lead $lead, string $action, ?array $changes = null): void
