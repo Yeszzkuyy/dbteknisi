@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\RespondsAjax;
 use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\Meeting;
+use App\Models\MeetingDraft;
 use App\Services\SalesService;
 use Illuminate\Http\Request;
 
@@ -19,8 +20,14 @@ class MeetingController extends Controller
     {
         $meetings = $this->salesService->getMeetings($request->only(['search', 'date_from', 'date_to', 'customer_id', 'lead_id']));
         $customers = Customer::orderBy('name')->get(['id', 'name']);
+        $leads = $this->leadOptions(null);
+        $drafts = MeetingDraft::pending()->ownedBy(auth()->id())
+            ->with(['customer:id,name', 'lead:id,customer_id,status'])
+            ->latest()
+            ->limit(5)
+            ->get();
 
-        return $this->ajaxPartial($request, 'sales.meetings._table', compact('meetings'), 'sales.meetings.index');
+        return $this->ajaxPartial($request, 'sales.meetings._table', compact('meetings', 'drafts', 'customers', 'leads'), 'sales.meetings.index');
     }
 
     public function create(Request $request)
