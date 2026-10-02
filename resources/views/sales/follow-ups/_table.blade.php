@@ -41,12 +41,22 @@
                         </td>
                         <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $fu->creator?->name ?? '-' }}</td>
                         <td class="px-6 py-4">
-                            <div class="flex justify-end">
+                            <div class="flex items-center justify-end gap-2">
                                 @php
                                     $fuWaMessage = 'Halo ' . ($fu->customer?->contact_person ?: ($fu->customer?->name ?? ''))
                                         . ', izin follow up "' . Str::limit($fu->description, 60) . '".';
                                     $fuWaLink = $fu->customer?->waLink($fuWaMessage);
                                 @endphp
+                                @if($fuWaLink)
+                                    <a href="{{ $fuWaLink }}" target="_blank"
+                                       title="{{ __('Follow Up via WA') }}"
+                                       aria-label="{{ __('Follow up via WhatsApp') }} {{ $fu->customer?->name }}"
+                                       class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-700 transition hover:bg-green-200 dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
+                                            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m5.83 14.12c-.25.7-1.45 1.33-2.02 1.42-.52.08-1.17.12-1.89-.12-.44-.15-1-.39-1.71-.75-3.03-1.39-5-4.63-5.15-4.84-.15-.21-1.23-1.64-1.23-3.13 0-1.49.78-2.22 1.06-2.52.28-.3.61-.38.81-.38l.58.01c.19.01.44-.07.69.53.25.61.86 2.11.94 2.26.08.15.13.33.03.53-.1.2-.15.33-.3.51l-.45.53c-.15.15-.31.31-.13.61.18.3.8 1.32 1.71 2.14 1.18 1.06 2.17 1.39 2.48 1.55.3.15.48.13.66-.08l1.1-1.28c.2-.26.42-.22.71-.13.3.09 1.9.9 2.23 1.06.38.2.53.44.5.65-.27.69-.52.98-.73 1.23"/>
+                                        </svg>
+                                    </a>
+                                @endif
                                 <x-dropdown align="right" width="w-56">
                                     <x-slot name="trigger">
                                         <button type="button"
@@ -57,20 +67,21 @@
                                         </button>
                                     </x-slot>
                                     <x-slot name="content">
-                                        @if($fuWaLink)
-                                            <a href="{{ $fuWaLink }}" target="_blank"
-                                               class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-4 w-4 shrink-0 text-green-600 dark:text-green-400" aria-hidden="true">
-                                                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m5.83 14.12c-.25.7-1.45 1.33-2.02 1.42-.52.08-1.17.12-1.89-.12-.44-.15-1-.39-1.71-.75-3.03-1.39-5-4.63-5.15-4.84-.15-.21-1.23-1.64-1.23-3.13 0-1.49.78-2.22 1.06-2.52.28-.3.61-.38.81-.38l.58.01c.19.01.44-.07.69.53.25.61.86 2.11.94 2.26.08.15.13.33.03.53-.1.2-.15.33-.3.51l-.45.53c-.15.15-.31.31-.13.61.18.3.8 1.32 1.71 2.14 1.18 1.06 2.17 1.39 2.48 1.55.3.15.48.13.66-.08l1.1-1.28c.2-.26.42-.22.71-.13.3.09 1.9.9 2.23 1.06.38.2.53.44.5.65-.27.69-.52.98-.73 1.23"/>
-                                                </svg>
-                                                {{ __('Follow up via WhatsApp') }}
-                                            </a>
-                                        @endif
+                                        <p class="px-4 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('General') }}</p>
                                         <a href="{{ route('sales.follow-ups.show', $fu) }}"
                                            class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
                                             <x-icon name="eye" class="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-300" />
                                             {{ __('Lihat detail follow up') }}
                                         </a>
+                                        @can('manage-sales')
+                                            <a href="{{ route('sales.follow-ups.edit', $fu) }}"
+                                               class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+                                                <x-icon name="edit" class="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-300" />
+                                                {{ __('Edit follow up') }}
+                                            </a>
+                                        @endcan
+                                        <div class="my-1 border-t border-slate-200 dark:border-slate-600"></div>
+                                        <p class="px-4 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('Actions') }}</p>
                                         <a href="{{ route('sales.meetings.create', array_filter(['customer_id' => $fu->customer_id, 'lead_id' => $fu->lead_id])) }}"
                                            class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
                                             <x-icon name="calendar" class="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
@@ -97,6 +108,8 @@
                                                         {{ __('Mark as done') }}
                                                     </button>
                                                 </form>
+                                                <div class="my-1 border-t border-slate-200 dark:border-slate-600"></div>
+                                                <p class="px-4 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('Reschedule') }}</p>
                                                 @foreach([1, 3, 7] as $days)
                                                     <form action="{{ route('sales.follow-ups.snooze', $fu) }}" method="POST">
                                                         @csrf
@@ -109,17 +122,13 @@
                                                     </form>
                                                 @endforeach
                                             @endif
-                                            <a href="{{ route('sales.follow-ups.edit', $fu) }}"
-                                               class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
-                                                <x-icon name="edit" class="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-300" />
-                                                {{ __('Edit follow up') }}
-                                            </a>
+                                            <div class="my-1 border-t border-slate-200 dark:border-slate-600"></div>
                                             <form action="{{ route('sales.follow-ups.destroy', $fu) }}"
                                                   method="POST" data-ajax data-ajax-remove="tr" onsubmit="return confirm('{{ __('Hapus follow up ini?') }}')">
                                                 @csrf @method('DELETE')
                                                 <button type="submit"
-                                                        class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
-                                                    <x-icon name="trash" class="h-4 w-4 shrink-0 text-red-600 dark:text-red-300" />
+                                                        class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
+                                                    <x-icon name="trash" class="h-4 w-4 shrink-0" />
                                                     {{ __('Hapus follow up') }}
                                                 </button>
                                             </form>
