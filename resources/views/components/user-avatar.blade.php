@@ -25,13 +25,13 @@
           class="absolute -inset-1 rounded-full animate-spin [animation-duration:2.5s] motion-reduce:animate-none bg-[conic-gradient(from_0deg,rgb(var(--accent-500))_0deg,transparent_100deg,rgb(var(--accent-300))_180deg,transparent_280deg,rgb(var(--accent-500))_360deg)] shadow-[0_0_12px_2px_rgb(var(--accent-500)/0.45)]"></span>
 @endif
 @if ($canZoom)
-    <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="80" height="80" loading="lazy" decoding="async"
+    <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="40" height="40" loading="lazy" decoding="async"
          x-on:click="$dispatch('view-avatar', { src: @js($photoUrl), name: @js($user->name ?? '') })"
          class="{{ $size }} rounded-full aspect-square object-cover shrink-0 cursor-zoom-in transition ring-2 {{ $ring }} hover:shadow-lg {{ $glow }} {{ $class }} relative"
          title="Lihat foto profil" role="button" tabindex="0"
          x-on:keydown.enter="$dispatch('view-avatar', { src: @js($photoUrl), name: @js($user->name ?? '') })">
 @elseif($photoUrl)
-    <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="80" height="80" loading="lazy" decoding="async"
+    <img src="{{ $photoUrl }}" alt="{{ $user->name }}" width="40" height="40" loading="lazy" decoding="async"
          class="{{ $size }} rounded-full aspect-square object-cover shrink-0 ring-2 {{ $ring }} {{ $class }} relative">
 @else
     <div class="{{ $size }} rounded-full {{ $colors[$color] }} flex items-center justify-center shrink-0 ring-2 {{ $ring }} {{ $class }} relative">
