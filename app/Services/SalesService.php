@@ -6,6 +6,7 @@ use App\Models\Meeting;
 use App\Models\FollowUp;
 use App\Models\Customer;
 use App\Models\LeadActivity;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class SalesService
@@ -161,6 +162,17 @@ class SalesService
             'reminder_sent_at' => null, // Ingatkan lagi setelah ditunda.
         ])->save();
         $this->logFollowUpActivity($followUp, 'followup_snoozed', ['days' => $days]);
+
+        return $followUp;
+    }
+
+    public function rescheduleFollowUp(FollowUp $followUp, Carbon $date): FollowUp
+    {
+        $followUp->forceFill([
+            'follow_up_date' => $date->copy()->startOfDay(),
+            'reminder_sent_at' => null, // Ingatkan lagi setelah dijadwal ulang.
+        ])->save();
+        $this->logFollowUpActivity($followUp, 'followup_snoozed', ['date' => $date->toDateString()]);
 
         return $followUp;
     }

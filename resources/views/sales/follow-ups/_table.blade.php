@@ -57,7 +57,7 @@
                                         </svg>
                                     </a>
                                 @endif
-                                <x-dropdown align="right" width="w-56">
+                                <x-dropdown align="right" width="w-52">
                                     <x-slot name="trigger">
                                         <button type="button"
                                                 title="{{ __('Aksi') }}"
@@ -67,23 +67,21 @@
                                         </button>
                                     </x-slot>
                                     <x-slot name="content">
-                                        <p class="px-4 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('General') }}</p>
                                         <a href="{{ route('sales.follow-ups.show', $fu) }}"
-                                           class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+                                           class="flex w-full items-center gap-3 px-4 py-1.5 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
                                             <x-icon name="eye" class="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-300" />
                                             {{ __('Lihat detail follow up') }}
                                         </a>
                                         @can('manage-sales')
                                             <a href="{{ route('sales.follow-ups.edit', $fu) }}"
-                                               class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+                                               class="flex w-full items-center gap-3 px-4 py-1.5 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
                                                 <x-icon name="edit" class="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-300" />
                                                 {{ __('Edit follow up') }}
                                             </a>
                                         @endcan
                                         <div class="my-1 border-t border-slate-200 dark:border-slate-600"></div>
-                                        <p class="px-4 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('Actions') }}</p>
                                         <a href="{{ route('sales.meetings.create', array_filter(['customer_id' => $fu->customer_id, 'lead_id' => $fu->lead_id])) }}"
-                                           class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+                                           class="flex w-full items-center gap-3 px-4 py-1.5 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
                                             <x-icon name="calendar" class="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
                                             {{ __('Create Meeting') }}
                                         </a>
@@ -93,7 +91,7 @@
                                                       method="POST" data-ajax>
                                                     @csrf
                                                     <button type="submit"
-                                                            class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+                                                            class="flex w-full items-center gap-3 px-4 py-1.5 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
                                                         <x-icon name="restore" class="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
                                                         {{ __('Reopen follow up') }}
                                                     </button>
@@ -103,31 +101,47 @@
                                                       method="POST" data-ajax>
                                                     @csrf
                                                     <button type="submit"
-                                                            class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+                                                            class="flex w-full items-center gap-3 px-4 py-1.5 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
                                                         <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-green-600 dark:text-green-300" />
                                                         {{ __('Mark as done') }}
                                                     </button>
                                                 </form>
                                                 <div class="my-1 border-t border-slate-200 dark:border-slate-600"></div>
-                                                <p class="px-4 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ __('Reschedule') }}</p>
-                                                @foreach([1, 3, 7] as $days)
-                                                    <form action="{{ route('sales.follow-ups.snooze', $fu) }}" method="POST">
-                                                        @csrf
-                                                        <input type="hidden" name="days" value="{{ $days }}">
-                                                        <button type="submit"
-                                                                class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-300" aria-hidden="true"><circle cx="12" cy="12" r="8.5" /><path stroke-linecap="round" d="M12 7.5V12l3 2" /></svg>
-                                                            {{ $days === 1 ? __('Tomorrow') : __('+ :days days', ['days' => $days]) }}
-                                                        </button>
-                                                    </form>
-                                                @endforeach
+                                                <div @click.stop x-data="{ openResched: false }">
+                                                    <button type="button" @click="openResched = !openResched"
+                                                            class="flex w-full items-center gap-3 px-4 py-1.5 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-300" aria-hidden="true"><circle cx="12" cy="12" r="8.5" /><path stroke-linecap="round" d="M12 7.5V12l3 2" /></svg>
+                                                        <span class="flex-1">{{ __('Reschedule') }}</span>
+                                                        <x-icon name="chevron-right" class="h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200" ::class="openResched && 'rotate-90'" />
+                                                    </button>
+                                                    <div x-show="openResched" class="space-y-2 px-4 pb-2 pt-1">
+                                                        <form action="{{ route('sales.follow-ups.snooze', $fu) }}" method="POST" class="flex items-center gap-2">
+                                                            @csrf
+                                                            <span class="text-sm text-slate-500 dark:text-slate-400">+</span>
+                                                            <input type="number" name="days" min="1" max="60" value="3" required
+                                                                   aria-label="{{ __('Reschedule') }}"
+                                                                   class="h-8 w-16 rounded-lg border-slate-300 bg-white text-center text-sm text-slate-800 focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200">
+                                                            <span class="text-xs text-slate-500 dark:text-slate-400">days</span>
+                                                            <button type="submit"
+                                                                    class="inline-flex h-8 items-center rounded-lg bg-accent-600 px-3 text-xs font-semibold text-white transition hover:bg-accent-500">OK</button>
+                                                        </form>
+                                                        <form action="{{ route('sales.follow-ups.snooze', $fu) }}" method="POST" class="flex items-center gap-2">
+                                                            @csrf
+                                                            <input type="date" name="date" min="{{ date('Y-m-d') }}" required
+                                                                   aria-label="{{ __('Reschedule') }}"
+                                                                   class="h-8 min-w-0 flex-1 rounded-lg border-slate-300 bg-white text-sm text-slate-800 focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200">
+                                                            <button type="submit"
+                                                                    class="inline-flex h-8 shrink-0 items-center rounded-lg bg-accent-600 px-3 text-xs font-semibold text-white transition hover:bg-accent-500">OK</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             @endif
                                             <div class="my-1 border-t border-slate-200 dark:border-slate-600"></div>
                                             <form action="{{ route('sales.follow-ups.destroy', $fu) }}"
                                                   method="POST" data-ajax data-ajax-remove="tr" onsubmit="return confirm('{{ __('Hapus follow up ini?') }}')">
                                                 @csrf @method('DELETE')
                                                 <button type="submit"
-                                                        class="flex w-full items-center gap-3 px-4 py-2 text-start text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
+                                                        class="flex w-full items-center gap-3 px-4 py-1.5 text-start text-sm font-medium text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10">
                                                     <x-icon name="trash" class="h-4 w-4 shrink-0" />
                                                     {{ __('Hapus follow up') }}
                                                 </button>
