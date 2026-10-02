@@ -29,7 +29,6 @@
                 <p class="mt-1 text-slate-500">{{ __('Preferensi aplikasi Anda') }}</p>
             </div>
             <div class="flex items-center gap-3">
-                <span id="settings-saved" class="hidden text-xs font-medium text-green-600 dark:text-green-400"></span>
                 <x-icon-button as="a" icon="back" href="{{ route('dashboard') }}" title="{{ __('Kembali') }}" />
             </div>
         </div>
@@ -214,7 +213,6 @@
             (function () {
                 var form = document.getElementById('settings-form');
                 if (!form) return;
-                var status = document.getElementById('settings-saved');
                 var timer = null;
                 var localeInput = form.querySelector('[name="locale"]');
                 var lastLocale = localeInput ? localeInput.value : null;
@@ -231,13 +229,6 @@
                             if (!res.ok) throw new Error();
                             return res.json();
                         }).then(function () {
-                            if (status) {
-                                var t = new Date();
-                                var hh = String(t.getHours()).padStart(2, '0');
-                                var mm = String(t.getMinutes()).padStart(2, '0');
-                                status.textContent = '{{ __('Tersimpan otomatis') }} ✓ ' + hh + ':' + mm;
-                                status.classList.remove('hidden');
-                            }
                             var locale = localeInput ? localeInput.value : null;
                             if (locale && locale !== lastLocale) {
                                 lastLocale = locale;
