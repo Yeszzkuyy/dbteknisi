@@ -657,8 +657,10 @@ tbody tr { transition: background-color 0.2s ease; }
 /* ============================================================
    Kartu status: center terhadap AREA KONTEN (bukan viewport),
    kompensasi sidebar 280px (76px saat collapse) di desktop.
-   Overlay submit (#gs-submit-overlay) mulai di bawah navbar
-   (h-16 mobile, sm:h-20) agar sidebar + navbar tetap terang.
+   Overlay submit (#gs-submit-overlay): full dari tepi kiri viewport
+   (redup tembus sampai area sidebar, sidebar tetap terang di atasnya
+   karena z-index-nya lebih tinggi) dan mulai di bawah navbar
+   (h-16 mobile, sm:h-20).
    ============================================================ */
 .status-card-backdrop {
     left: 0;
@@ -666,6 +668,7 @@ tbody tr { transition: background-color 0.2s ease; }
 
 #gs-submit-overlay {
     top: 64px;
+    left: 0;
 }
 
 @media (min-width: 640px) {
