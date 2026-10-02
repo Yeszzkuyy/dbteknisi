@@ -29,6 +29,7 @@ $icons = [
     'restore' => '<path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" />',
 
     'chevron-right' => '<path d="M9 5l7 7-7 7" />',
+    'chevron-down' => '<path d="M6 9l6 6 6-6" />',
 
     'logout' => '<path d="M15 4H8a2 2 0 00-2 2v12a2 2 0 002 2h7" /><path d="M19 12H9" /><path d="M15 8l4 4-4 4" />',
 

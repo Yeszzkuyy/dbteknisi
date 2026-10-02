@@ -63,7 +63,7 @@
                                                 title="{{ __('Aksi') }}"
                                                 aria-label="{{ __('Aksi') }} {{ $fu->customer?->name }}"
                                                 class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
-                                            <x-icon name="dots" class="h-4 w-4" />
+                                            <x-icon name="chevron-down" class="h-4 w-4" />
                                         </button>
                                     </x-slot>
                                     <x-slot name="content">
