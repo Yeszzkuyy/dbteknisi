@@ -10,49 +10,46 @@
         </div>
     </div>
 
-    <form method="GET" action="{{ route('sales.my-leads') }}" class="flex flex-wrap items-end gap-3 mb-4">
-        <div class="w-full sm:w-auto sm:flex-1 sm:min-w-48 sm:max-w-xs">
-            <label for="my-leads-search" class="block text-xs font-medium text-slate-500 mb-1">{{ __('Cari customer') }}</label>
-            <input id="my-leads-search" type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Cari customer...') }}"
-                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
-        </div>
-        <div>
-            <label for="my-leads-status" class="block text-xs font-medium text-slate-500 mb-1">{{ __('Status') }}</label>
-            <select id="my-leads-status" name="status" onchange="this.form.submit()"
-                    class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
-                <option value="">{{ __('Semua Status') }}</option>
-                @foreach($statuses ?? [] as $status)
-                    <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div>
-            <label for="my-leads-touched" class="block text-xs font-medium text-slate-500 mb-1">{{ __('Aktivitas') }}</label>
-            <select id="my-leads-touched" name="touched" onchange="this.form.submit()"
-                    class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
-                <option value="">{{ __('Semua Aktivitas') }}</option>
-                <option value="yes" @selected(request('touched') === 'yes')>{{ __('Sudah disentuh') }}</option>
-                <option value="no" @selected(request('touched') === 'no')>{{ __('Belum disentuh') }}</option>
-            </select>
-        </div>
-        <div>
-            <label for="my-leads-sort" class="block text-xs font-medium text-slate-500 mb-1">{{ __('Urutkan') }}</label>
-            <select id="my-leads-sort" name="sort" onchange="this.form.submit()"
-                    class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500">
-                <option value="">{{ __('Terbaru') }}</option>
-                <option value="oldest" @selected(request('sort') === 'oldest')>{{ __('Terlama') }}</option>
-                <option value="customer" @selected(request('sort') === 'customer')>{{ __('Customer A-Z') }}</option>
-            </select>
-        </div>
-        <div class="flex gap-2">
-            <x-icon-button icon="filter" type="submit" title="Filter" />
-            @if(request('search') || request('status') || request('touched') || request('active') || request('won_month') || request('sort'))
-                <x-icon-button as="a" icon="reset" href="{{ route('sales.my-leads') }}" title="Reset" />
-            @endif
-        </div>
-    </form>
-
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600">
+        <div class="p-5 border-b dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-t-2xl">
+            <form method="GET" action="{{ route('sales.my-leads') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                @if(request()->filled('active'))
+                    <input type="hidden" name="active" value="{{ request('active') }}">
+                @endif
+                @if(request()->filled('won_month'))
+                    <input type="hidden" name="won_month" value="{{ request('won_month') }}">
+                @endif
+                <div>
+                    <label for="my-leads-search" class="text-sm font-medium text-slate-500">{{ __('Cari customer') }}</label>
+                    <input id="my-leads-search" type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Cari customer...') }}"
+                           class="mt-1 w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-slate-500">{{ __('Status') }}</label>
+                    <x-glide-select name="status" class="mt-1" :label="__('Status')"
+                        :options="collect($statuses ?? [])->map(fn ($s) => ['value' => $s, 'label' => ucfirst($s)])->all()"
+                        :value="request('status', '')" :empty-label="__('Semua Status')" autosubmit />
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-slate-500">{{ __('Aktivitas') }}</label>
+                    <x-glide-select name="touched" class="mt-1" :label="__('Aktivitas')"
+                        :options="[['value' => 'yes', 'label' => __('Sudah disentuh')], ['value' => 'no', 'label' => __('Belum disentuh')]]"
+                        :value="request('touched', '')" :empty-label="__('Semua Aktivitas')" autosubmit />
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-slate-500">{{ __('Urutkan') }}</label>
+                    <x-glide-select name="sort" class="mt-1" :label="__('Urutkan')"
+                        :options="[['value' => 'oldest', 'label' => __('Terlama')], ['value' => 'customer', 'label' => __('Customer A-Z')]]"
+                        :value="request('sort', '')" :empty-label="__('Terbaru')" autosubmit />
+                </div>
+                <div class="sm:col-span-2 lg:col-span-1 flex items-end gap-2">
+                    <x-icon-button icon="filter" type="submit" title="Filter" />
+                    @if(request('search') || request('status') || request('touched') || request('active') || request('won_month') || request('sort'))
+                        <x-icon-button as="a" icon="reset" href="{{ route('sales.my-leads') }}" title="Reset" />
+                    @endif
+                </div>
+            </form>
+        </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
                 <thead class="bg-slate-50 dark:bg-slate-700">
@@ -75,6 +72,13 @@
                                 </div>
                                 <div class="mt-1 text-[11px] text-slate-500 whitespace-nowrap">
                                     {{ $lead->meetings_count }} {{ __('meeting') }} • {{ $lead->follow_ups_count }} {{ __('follow up') }}
+                                </div>
+                                <div class="mt-1">
+                                    @if($lead->has_done_fu)
+                                        <span class="inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">{{ __('Done') }}</span>
+                                    @else
+                                        <span class="inline-flex px-1.5 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">{{ __('Belum FU') }}</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-center">
@@ -121,29 +125,43 @@
                                         __('Halo :name, izin follow up penawaran kami.', ['name' => $lead->customer?->contact_person ?: ($lead->customer?->name ?? '')])
                                     );
                                 @endphp
-                                <a href="{{ route('leads.show', $lead) }}"
-                                   title="{{ __('View details') }}"
-                                   aria-label="{{ __('View details') }} {{ $lead->customer?->name }}"
-                                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
-                                    <x-icon name="eye" class="h-4 w-4" />
-                                </a>
-                                <x-icon-button as="a" href="{{ route('sales.follow-ups.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}" title="Create Follow Up">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true"><path d="M4 6a2.5 2.5 0 0 1 2.5-2.5h11A2.5 2.5 0 0 1 20 6v7a2.5 2.5 0 0 1-2.5 2.5H9L4.5 19.5V6z" /><path d="M8 9.5h8M8 12.5h5" /></svg>
-                                </x-icon-button>
-                                <x-dropdown align="right" width="w-52">
-                                    <x-slot name="trigger">
-                                        <x-icon-button title="{{ __('More actions') }}" tooltip="">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true"><circle cx="5" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="19" cy="12" r="1.6" /></svg>
-                                        </x-icon-button>
-                                    </x-slot>
-                                    <x-slot name="content">
-                                        @if($leadWaLink)
-                                            <x-dropdown-link href="{{ $leadWaLink }}" target="_blank">{{ __('Chat WhatsApp') }}</x-dropdown-link>
-                                        @endif
-                                        <x-dropdown-link href="{{ route('sales.meetings.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}">{{ __('Buat Meeting') }}</x-dropdown-link>
-                                        <x-dropdown-link href="{{ route('sales.follow-ups.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}">{{ __('Buat Follow Up') }}</x-dropdown-link>
-                                    </x-slot>
-                                </x-dropdown>
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ route('leads.show', $lead) }}"
+                                       title="{{ __('View details') }}"
+                                       aria-label="{{ __('View details') }} {{ $lead->customer?->name }}"
+                                       class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
+                                        <x-icon name="eye" class="h-4 w-4" />
+                                    </a>
+                                    @if($leadWaLink)
+                                        <a href="{{ $leadWaLink }}" target="_blank"
+                                           title="{{ __('Chat WhatsApp') }}"
+                                           aria-label="{{ __('Chat WhatsApp') }} {{ $lead->customer?->name }}"
+                                           class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-4 h-4" aria-hidden="true">
+                                                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m5.83 14.12c-.25.7-1.45 1.33-2.02 1.42-.52.08-1.17.12-1.89-.12-.44-.15-1-.39-1.71-.75-3.03-1.39-5-4.63-5.15-4.84-.15-.21-1.23-1.64-1.23-3.13 0-1.49.78-2.22 1.06-2.52.28-.3.61-.38.81-.38l.58.01c.19.01.44-.07.69.53.25.61.86 2.11.94 2.26.08.15.13.33.03.53-.1.2-.15.33-.3.51l-.45.53c-.15.15-.31.31-.13.61.18.3.8 1.32 1.71 2.14 1.18 1.06 2.17 1.39 2.48 1.55.3.15.48.13.66-.08l1.1-1.28c.2-.26.42-.22.71-.13.3.09 1.9.9 2.23 1.06.38.2.53.44.5.65-.27.69-.52.98-.73 1.23"/>
+                                            </svg>
+                                        </a>
+                                    @endif
+                                    @if($lead->has_done_fu)
+                                        <span title="{{ __('Done') }}" aria-label="{{ __('Done') }} {{ $lead->customer?->name }}"
+                                              class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-300">
+                                            <x-icon name="check-circle" class="h-4 w-4" />
+                                        </span>
+                                    @else
+                                        <a href="{{ route('sales.follow-ups.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}"
+                                           title="{{ __('Create Follow Up') }}"
+                                           aria-label="{{ __('Create Follow Up') }} {{ $lead->customer?->name }}"
+                                           class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 transition dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20">
+                                            <x-icon name="chat" class="h-4 w-4" />
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('sales.meetings.create', ['customer_id' => $lead->customer_id, 'lead_id' => $lead->id]) }}"
+                                       title="{{ __('Create Meeting') }}"
+                                       aria-label="{{ __('Create Meeting') }} {{ $lead->customer?->name }}"
+                                       class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 transition dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">
+                                        <x-icon name="calendar" class="h-4 w-4" />
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @empty
