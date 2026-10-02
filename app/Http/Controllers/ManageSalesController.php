@@ -288,6 +288,7 @@ class ManageSalesController extends Controller
     {
         $query = Lead::with(['customer', 'partner'])
             ->withCount(['meetings', 'followUps'])
+            ->withExists(['followUps as has_done_fu' => fn ($q) => $q->whereNotNull('completed_at')])
             ->where('assigned_to', auth()->id())
             ->when($request->filled('search'), fn ($q) => $q->whereHas('customer',
                 fn ($c) => $c->whereLike('name', $request->search)))
