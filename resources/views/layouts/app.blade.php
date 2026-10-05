@@ -615,6 +615,7 @@
             }catch(e){}
         })();
     </script>
+    @include('components.ai-assistant')
     @livewireScripts
 </body>
 </html>
