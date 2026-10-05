@@ -217,7 +217,6 @@
 @keyframes ai-glow { 0%,100% { box-shadow: 0 10px 25px -5px rgb(var(--accent-600) / .35); } 50% { box-shadow: 0 10px 34px -5px rgb(var(--accent-600) / .6); } }
 @keyframes ai-antenna-blink { 0%,88%,100% { opacity: 1; } 92%,96% { opacity: 0.25; } }
 .ai-eyes { animation: ai-blink 5s infinite; transform-origin: center; transform-box: fill-box; }
-@keyframes ai-float { 0%,100% { translate: 0 0; } 50% { translate: 0 -3px; } }
 @keyframes ai-blink { 0%,93%,100% { transform: scaleY(1); } 95.5% { transform: scaleY(0.08); } }
 .ai-dot { width: 7px; height: 7px; border-radius: 9999px; background: rgb(var(--accent-500)); animation: ai-typing 1.2s infinite ease-in-out; }
 .ai-dot:nth-child(2) { animation-delay: .15s; } .ai-dot:nth-child(3) { animation-delay: .3s; }
@@ -290,11 +289,12 @@ function aiAssistant(uid, sendUrl) {
             return `left:${p.left}px;top:${p.top}px;`;
         },
         greetingStyle() {
+            const vw = window.innerWidth, GAP = 12, W = 240;
             const p = this.triggerPos();
-            const right = window.innerWidth - p.left < 260;
-            return right
-                ? `left:${Math.max(p.left - 228, 8)}px;top:${Math.max(p.top - 64, 8)}px;`
-                : `left:${p.left + SIZE + 8}px;top:${Math.max(p.top - 12, 8)}px;`;
+            if (vw - p.left < W + GAP + 8) {
+                return `left:${Math.max(p.left - W - GAP, 8)}px;top:${Math.max(p.top - 64, 8)}px;`;
+            }
+            return `left:${Math.min(p.left + SIZE + 8, vw - W - 8)}px;top:${Math.max(p.top - 12, 8)}px;`;
         },
         chatStyle() {
             const vw = window.innerWidth, vh = window.innerHeight;
@@ -339,7 +339,9 @@ function aiAssistant(uid, sendUrl) {
         dragCancel() { this.dragging = false; },
         guardClick() {
             // Telan klik native yang menyusul pointerup habis drag.
+            // Klik genuine (termasuk keyboard Enter/Space) tetap membuka chat.
             if (this.suppressClick) { this.suppressClick = false; return; }
+            this.openChat();
         },
         onScroll() {},
         scrollBottom() {
