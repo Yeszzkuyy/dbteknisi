@@ -33,14 +33,14 @@
             </g>
             <path d="M20 33.5c1.2 1.4 2.5 2 4 2s2.8-.6 4-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
-        <span x-show="greeting && !greetedDismiss" class="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5" aria-hidden="true">
+        <span x-show="greeting" class="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5" aria-hidden="true">
             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75 motion-reduce:animate-none"></span>
             <span class="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-white bg-amber-400 dark:border-slate-900"></span>
         </span>
     </button>
 
     {{-- Greeting bubble --}}
-    <div x-show="greeting && !open && !greetedDismiss"
+    <div x-show="greeting && !open"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 translate-y-1"
          x-transition:enter-end="opacity-100 translate-y-0"
@@ -239,20 +239,32 @@
 <script>
 function aiAssistant(uid, sendUrl) {
     const SIZE = 56, MARGIN = 24, CHAT_W = 380, CHAT_H = 560;
+    const GREET_EVERY = 5 * 60 * 1000, GREET_FIRST_DELAY = 4000, GREET_TICK = 30000;
     return {
         uid, sendUrl, open: false, busy: false, error: '',
-        messages: [], draft: '', greeting: false, greetedDismiss: false,
+        messages: [], draft: '', greeting: false,
         pos: null, dragging: false, moved: false, suppressClick: false, sx: 0, sy: 0, ox: 0, oy: 0,
         quickActions: @js([__('Ringkasan pekerjaan saya'), __('Cari customer'), __('Cek tugas saya')]),
         convKey() { return '3dy.ai.conv.' + this.uid; },
         posKey() { return '3dy.ai.pos.' + this.uid; },
+        greetKey() { return '3dy.ai.greetAt.' + this.uid; },
+        lastGreet() { try { return +(localStorage.getItem(this.greetKey()) || 0); } catch (e) { return 0; } },
+        stampGreet() { try { localStorage.setItem(this.greetKey(), String(Date.now())); } catch (e) {} },
+        showGreeting() { if (this.open) return; this.greeting = true; this.stampGreet(); },
         init() {
             try {
                 const saved = JSON.parse(sessionStorage.getItem(this.posKey()) || 'null');
                 if (saved && typeof saved.left === 'number') this.pos = saved;
             } catch (e) {}
             try { this.convId = localStorage.getItem(this.convKey()) || null; } catch (e) { this.convId = null; }
-            setTimeout(() => { if (!this.open) this.greeting = true; }, 4000);
+            // Sapaan pertama setelah jeda singkat; berikutnya tiap 5 menit (X = snooze 5 menit).
+            if (Date.now() - this.lastGreet() >= GREET_EVERY) {
+                setTimeout(() => this.showGreeting(), GREET_FIRST_DELAY);
+            }
+            setInterval(() => {
+                if (document.hidden) return;
+                if (Date.now() - this.lastGreet() >= GREET_EVERY) this.showGreeting();
+            }, GREET_TICK);
             document.addEventListener('visibilitychange', () => {
                 document.querySelector('.ai-assistant-root')?.classList.toggle('ai-paused', document.hidden);
             });
@@ -295,8 +307,8 @@ function aiAssistant(uid, sendUrl) {
             this.$nextTick(() => { this.scrollBottom(false); this.$refs.input?.focus({ preventScroll: true }); });
         },
         minimize() { this.open = false; },
-        closeChat() { this.open = false; this.greetedDismiss = true; this.greeting = false; },
-        dismissGreeting() { this.greeting = false; this.greetedDismiss = true; },
+        closeChat() { this.open = false; this.greeting = false; this.stampGreet(); },
+        dismissGreeting() { this.greeting = false; this.stampGreet(); },
         dragStart(e) {
             this.dragging = true; this.moved = false;
             this.sx = e.clientX; this.sy = e.clientY;
