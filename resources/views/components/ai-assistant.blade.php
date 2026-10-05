@@ -261,13 +261,18 @@ function aiAssistant(uid, sendUrl) {
             if (Date.now() - this.lastGreet() >= GREET_EVERY) {
                 setTimeout(() => this.showGreeting(), GREET_FIRST_DELAY);
             }
-            setInterval(() => {
+            // Dedupe global: init bisa jalan ulang habis morph/navigasi Livewire —
+            // timer & listener lama dimatikan dulu agar tak menumpuk.
+            if (window.__aiGreetTimer) clearInterval(window.__aiGreetTimer);
+            window.__aiGreetTimer = setInterval(() => {
                 if (document.hidden) return;
                 if (Date.now() - this.lastGreet() >= GREET_EVERY) this.showGreeting();
             }, GREET_TICK);
-            document.addEventListener('visibilitychange', () => {
+            if (window.__aiVisHandler) document.removeEventListener('visibilitychange', window.__aiVisHandler);
+            window.__aiVisHandler = () => {
                 document.querySelector('.ai-assistant-root')?.classList.toggle('ai-paused', document.hidden);
-            });
+            };
+            document.addEventListener('visibilitychange', window.__aiVisHandler);
         },
         convId: null,
         triggerPos() {
