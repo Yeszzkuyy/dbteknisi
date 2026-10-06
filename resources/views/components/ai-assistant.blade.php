@@ -243,7 +243,7 @@ function aiAssistant(uid, sendUrl) {
     return {
         uid, sendUrl, open: false, busy: false, error: '',
         messages: [], draft: '', greeting: false,
-        pos: null, dragging: false, moved: false, suppressClick: false, sx: 0, sy: 0, ox: 0, oy: 0,
+        pos: null, dragging: false, moved: false, suppressUntil: 0, sx: 0, sy: 0, ox: 0, oy: 0,
         quickActions: @js([__('Ringkasan pekerjaan saya'), __('Cari customer'), __('Cek tugas saya')]),
         convKey() { return '3dy.ai.conv.' + this.uid; },
         posKey() { return '3dy.ai.pos.' + this.uid; },
@@ -336,18 +336,19 @@ function aiAssistant(uid, sendUrl) {
             const dx = (e.clientX ?? this.sx) - this.sx, dy = (e.clientY ?? this.sy) - this.sy;
             const dragged = this.moved || Math.hypot(dx, dy) > 10;
             if (!dragged) return;
-            this.suppressClick = true;
-            // Auto-bersih: kalau klik sintetis tak pernah datang, jangan kunci klik berikutnya.
-            clearTimeout(this.__suppressT);
-            this.__suppressT = setTimeout(() => { this.suppressClick = false; this.moved = false; }, 350);
+            // Cap waktu anti klik-sintetis susulan — tanpa timer, jadi tanpa race:
+            // klik drag yang datang cepat ATAU lambat (>350ms di HP/WebView) tetap tertelan.
+            // moved dibiarkan menempel sampai gesture berikutnya (di-reset di dragStart).
+            this.suppressUntil = Date.now() + 600;
             try { sessionStorage.setItem(this.posKey(), JSON.stringify(this.triggerPos())); } catch (err) {}
         },
         dragCancel() { this.dragging = false; },
-        guardClick() {
-            // Telan klik sintetis yang menyusul pointerup habis drag.
-            // Klik genuine + keyboard Enter/Space (tanpa pointer) tetap membuka chat.
-            if (this.suppressClick || this.moved || this.dragging) { this.suppressClick = false; this.moved = false; return; }
-            this.moved = false;
+        guardClick(e) {
+            // Keyboard Enter/Space (detail 0, tanpa pointer) selalu boleh membuka —
+            // flag basi dari drag sebelumnya tidak boleh memblokirnya.
+            if (e && e.detail === 0) { this.openChat(); return; }
+            // Telan klik mouse/sentuh apa pun yang tiba setelah drag.
+            if (this.dragging || this.moved || Date.now() < this.suppressUntil) return;
             this.openChat();
         },
         onScroll() {},
