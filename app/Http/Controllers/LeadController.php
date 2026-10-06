@@ -214,20 +214,20 @@ class LeadController extends Controller
             'conversion' => ($won + $lost) > 0 ? (int) round($won / ($won + $lost) * 100) : 0,
         ];
 
-        // ponytail: grouping source di PHP agar portabel antar driver (MySQL/Postgres/SQLite)
+        // Agregat di SQL; COALESCE/NULLIF portabel MySQL/Postgres/SQLite.
         $perSource = Lead::whereDate('incoming_date', '>=', $dateFrom)->whereDate('incoming_date', '<=', $dateTo)
-            ->pluck('source')
-            ->map(fn ($source) => ($source === null || $source === '') ? 'lainnya' : $source)
-            ->countBy()
-            ->map(fn ($total, $source) => (object) ['source' => $source, 'total' => $total])
-            ->values()
-            ->sortByDesc('total')
+            ->selectRaw("COALESCE(NULLIF(source, ''), 'lainnya') as source, count(*) as total")
+            ->groupBy('source')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($row) => (object) ['source' => $row->source ?? 'lainnya', 'total' => (int) $row->total])
             ->values();
 
-        // ponytail: tren per bulan dikelompokkan di PHP (portabel antar driver DB); pindah ke SQL native kalau datanya jutaan
+        // Agregat per bulan di SQL; substr(YYYY-MM-DD, 1, 7) portabel antar driver.
         $trendQuery = Lead::whereDate('incoming_date', '>=', $dateFrom)->whereDate('incoming_date', '<=', $dateTo)
-            ->pluck('incoming_date')
-            ->countBy(fn ($date) => $date->format('Y-m'));
+            ->selectRaw('substr(incoming_date, 1, 7) as ym, count(*) as total')
+            ->groupBy('ym')
+            ->pluck('total', 'ym');
 
         $months = max(0, now()->parse($dateFrom)->diffInMonths(now()->parse($dateTo)));
         $trend = $months < 1
