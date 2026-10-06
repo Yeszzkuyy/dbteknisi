@@ -127,6 +127,24 @@ class SecureFile implements ValidationRule
         );
     }
 
+    public static function knowledgeBase(): self
+    {
+        // Tanpa html/htm: konten RAG dikutip kembali AI, HTML = XSS persisten.
+        return new self(
+            ['pdf', 'txt', 'md', 'csv', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
+            [
+                'application/pdf',
+                'text/plain', 'text/markdown', 'text/csv',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            ],
+        );
+    }
+
     /**
      * Bersihkan nama file untuk keperluan display/link:
      * buang path & karakter kontrol, jaga nama asli agar tetap terbaca.
