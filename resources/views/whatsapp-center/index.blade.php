@@ -324,7 +324,7 @@
             <div class="relative">
                 <button type="button" class="wa-account-select" @click="accountMenu = !accountMenu" :aria-expanded="accountMenu">
                     <span class="flex min-w-0 items-center gap-2">
-                        <span class="wa-status-dot" :class="accountStatusClass(activeAccount)"></span>
+                        <span class="wa-status-dot" :class="accountStatusClass(activeAccount)" :title="accountStatusTitle(activeAccount)"></span>
                         <span class="min-w-0">
                             <span class="block truncate text-xs font-semibold" style="color:var(--wa-ink)" x-text="activeAccount?.name || '{{ __('Pilih akun WhatsApp') }}'"></span>
                             <span class="block truncate text-[11px]" style="color:var(--wa-muted)" x-text="activeAccount?.phone_number || activeAccount?.account_code || ''"></span>
@@ -335,7 +335,7 @@
                 <div x-show="accountMenu" @click.away="accountMenu = false" class="wa-account-menu" x-transition>
                     <template x-for="account in accounts" :key="account.id">
                         <button type="button" class="wa-menu-item" @click="setAccount(account)">
-                            <span class="wa-status-dot" :class="accountStatusClass(account)"></span>
+                            <span class="wa-status-dot" :class="accountStatusClass(account)" :title="accountStatusTitle(account)"></span>
                             <span class="min-w-0 flex-1">
                                 <span class="block truncate" x-text="account.name"></span>
                                 <span class="block truncate text-[11px]" style="color:var(--wa-muted)" x-text="account.phone_number || account.account_code"></span>
@@ -647,6 +647,7 @@
                 if (!this.activeAccount) return;
                 this.loadConversations();
                 this.refreshStatus();
+                this.accounts.forEach((account) => this.checkAccountConnection(account));
                 this.pollTimer = setInterval(() => {
                     this.refreshStatus();
                     this.loadConversations(true);
@@ -707,7 +708,7 @@
                 this.view = 'chats';
                 this.mobileChat = false;
                 this.loadConversations();
-                this.refreshStatus();
+                this.refreshStatus().finally(() => this.checkAccountConnection(account));
             },
 
             accountStatusClass(account) {
@@ -734,9 +735,33 @@
                     const data = await response.json();
                     data.forEach((status) => {
                         const account = this.accounts.find((item) => item.id === status.id);
-                        if (account) account.gateway_status = status.gateway_status;
+                        if (!account) return;
+                        if (status.has_credentials !== undefined) account.has_credentials = status.has_credentials;
+                        if (!account._live) account.gateway_status = status.gateway_status;
                     });
                 } catch (error) {}
+            },
+
+            // Cek koneksi live SATU kali per akun Meta (bukan polling):
+            // route check-status memukul Graph API, dibatasi manual agar hemat rate limit.
+            async checkAccountConnection(account) {
+                if (!account || account.gateway_type !== 'meta' || !account.has_credentials || account._live) return;
+                try {
+                    const response = await fetch('{{ route('whatsapp-center.check-status', ['account' => ':id']) }}'.replace(':id', account.id), { headers: { Accept: 'application/json' } });
+                    if (!response.ok) return;
+                    const data = await response.json();
+                    account.gateway_status = data.gateway_status;
+                    account.connection_detail = data.detail;
+                    account._live = true;
+                } catch (error) {}
+            },
+
+            accountStatusTitle(account) {
+                if (!account?.has_credentials) return '{{ __('Belum dikonfigurasi — isi kredensial gateway') }}';
+                if (account.gateway_status === 'authorized') return '{{ __('Terhubung ke Meta') }}';
+                if (account.connection_detail) return account.connection_detail;
+                if (account.gateway_status) return account.gateway_status;
+                return '{{ __('Mengecek koneksi...') }}';
             },
 
             async loadConversations(silent = false) {

@@ -38,6 +38,7 @@ class WhatsAppCenterController extends Controller
             'phone_number' => $a->phone_number,
             'gateway_type' => $a->gateway_type,
             'gateway_status' => $a->gateway_status,
+            'has_credentials' => filled($a->gateway_instance) && filled($a->gateway_token),
         ])->values();
 
         return view('whatsapp-center.index', compact('accounts', 'accountTabs'));
@@ -51,6 +52,7 @@ class WhatsAppCenterController extends Controller
                 'account_code' => $account->account_code,
                 'unread' => $this->unreadCount($account),
                 'gateway_status' => $account->gateway_status,
+                'has_credentials' => filled($account->gateway_instance) && filled($account->gateway_token),
             ];
         });
 
@@ -69,14 +71,18 @@ class WhatsAppCenterController extends Controller
             ]);
         }
 
-        $state = $this->gateway->getState($account);
-        $status = $state;
+        $check = $this->gateway->checkMetaConnection($account);
+        $status = $check['status'];
 
         if ($status !== $account->gateway_status) {
             $account->update(['gateway_status' => $status]);
         }
 
-        return response()->json(['gateway_status' => $status]);
+        return response()->json([
+            'gateway_status' => $status,
+            'connected' => $check['connected'],
+            'detail' => $check['detail'],
+        ]);
     }
 
     public function conversations(WhatsappAccount $account)
@@ -605,6 +611,8 @@ class WhatsAppCenterController extends Controller
                 ->first();
 
             if (! $account) {
+                Log::warning('Webhook Meta untuk phone_number_id tak dikenal.', ['phone_number_id' => $phoneNumberId]);
+
                 return response()->json(['error' => 'rejected'], 422);
             }
 
