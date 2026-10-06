@@ -655,19 +655,23 @@ tbody tr { transition: background-color 0.2s ease; }
 }
 
 /* ============================================================
-   Kartu status: center terhadap AREA KONTEN (bukan viewport),
-   kompensasi sidebar 280px (76px saat collapse) di desktop.
+   Backdrop kartu status + overlay submit: full selebar viewport
+   (redup tembus sampai area sidebar, sidebar tetap terang di atasnya
+   karena z-index-nya lebih tinggi).
+   Overlay submit (#gs-submit-overlay) mulai di bawah navbar
+   (h-16 mobile, sm:h-20).
    ============================================================ */
 .status-card-backdrop {
     left: 0;
 }
 
-@media (min-width: 1024px) {
-    .status-card-backdrop {
-        left: 280px;
-    }
+#gs-submit-overlay {
+    top: 64px;
+    left: 0;
+}
 
-    html.sidebar-collapsed .status-card-backdrop {
-        left: 76px;
+@media (min-width: 640px) {
+    #gs-submit-overlay {
+        top: 80px;
     }
 }

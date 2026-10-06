@@ -237,7 +237,8 @@ class OfficeAssistantController extends Controller
                 continue;
             }
 
-            Storage::disk($attachment['disk'] ?? 'local')->delete($path);
+            // Paksa disk local: nama disk dari payload tidak dipercaya.
+            Storage::disk('local')->delete($path);
         }
 
         foreach ($attachments as $path) {

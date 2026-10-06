@@ -18,7 +18,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'unread' => $request->user()->unreadNotifications()->count(),
-            'unassigned' => Lead::whereNull('assigned_to')->count(),
+            'unassigned' => \Illuminate\Support\Facades\Cache::remember('leads:unassigned-count', 60, fn () => Lead::whereNull('assigned_to')->count()),
             'items' => $items,
         ]);
     }

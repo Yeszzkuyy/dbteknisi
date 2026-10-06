@@ -97,10 +97,10 @@ function showSubmitOverlay(form) {
         return;
     }
     const dark = document.documentElement.classList.contains('dark');
-    // ponytail: left TIDAK di-set inline agar offset sidebar dari CSS (.status-card-backdrop) berlaku
+    // ponytail: left + top TIDAK di-set inline agar offset sidebar (CSS
+    // .status-card-backdrop) dan tinggi navbar (CSS #gs-submit-overlay) berlaku
     Object.assign(el.style, {
         position: 'fixed',
-        top: '0',
         right: '0',
         bottom: '0',
         display: 'flex',

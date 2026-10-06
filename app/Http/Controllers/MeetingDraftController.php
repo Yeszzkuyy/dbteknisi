@@ -56,10 +56,10 @@ class MeetingDraftController extends Controller
 
         $validated = $request->validate([
             'participants' => 'nullable|string|max:500',
-            'user_needs' => 'nullable|string',
-            'user_complaints' => 'nullable|string',
-            'existing_system' => 'nullable|string',
-            'notes' => 'nullable|string',
+            'user_needs' => 'nullable|string|max:2000',
+            'user_complaints' => 'nullable|string|max:2000',
+            'existing_system' => 'nullable|string|max:2000',
+            'notes' => 'nullable|string|max:2000',
         ]);
 
         $this->salesService->createMeeting([

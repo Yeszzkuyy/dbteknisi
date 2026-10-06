@@ -1,0 +1,319 @@
+{{-- 3DY AI Chat V2: floating assistant baru (pengganti ai-assistant lama).
+      Tanpa drag, tanpa pointer gesture, tanpa document-level listener.
+      Berbicara ke endpoint existing POST ai.assistant.send. File lama
+      components/ai-assistant.blade.php dipertahankan tapi tidak di-mount. --}}
+@auth
+@php($v2Convos = auth()->user()->conversations()->latest('updated_at')->take(20)->get(['id', 'title', 'updated_at'])->map(fn ($c) => ['id' => $c->id, 'title' => $c->title ?: __('Percakapan baru'), 'updated_at' => $c->updated_at?->toISOString()])->values()->all())
+@persist('ai-chat-v2')
+<div x-data="aiChatV2(@js(auth()->id()), @js(route('ai.assistant.send')), @js(url('/ai/assistant/conversations')), @js($v2Convos))"
+     x-init="init()"
+     class="ai-chat-v2-root"
+     @keydown.escape.window="minimize()">
+    {{-- Launcher (fixed, tidak draggable — klik membuka) --}}
+    <button type="button"
+            x-show="!open"
+            x-transition:enter="transition ease-out duration-150"
+            x-transition:enter-start="opacity-0 scale-90"
+            x-transition:enter-end="opacity-100 scale-100"
+            @click="openChat()"
+            :aria-expanded="open"
+            aria-label="{{ __('Buka 3DY AI') }}"
+            class="fixed bottom-6 right-6 z-[1000] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-accent-400 via-accent-600 to-accent-700 text-white shadow-xl shadow-accent-600/40 ring-4 ring-accent-500/20 transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 active:scale-95 motion-reduce:transform-none">
+        <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" /></svg>
+    </button>
+
+    {{-- Chat window --}}
+    <div x-show="open"
+         x-transition:enter="transition ease-out duration-150"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="fixed bottom-24 right-4 z-[1000] flex h-[560px] max-h-[calc(100dvh-8rem)] w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800"
+         role="dialog" aria-modal="false" aria-label="3DY AI">
+        {{-- Header --}}
+        <div class="flex items-center gap-2.5 border-b border-slate-200 bg-gradient-to-r from-accent-700 via-accent-600 to-accent-500 px-4 py-3 text-white dark:border-slate-700">
+            <span class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /></svg>
+                <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75 motion-reduce:animate-none"></span>
+                    <span class="relative inline-flex h-3 w-3 rounded-full border-2 border-accent-600 bg-green-400"></span>
+                </span>
+            </span>
+            <span class="min-w-0 flex-1 leading-tight">
+                <span class="block truncate text-sm font-bold">3DY AI</span>
+                <span class="block truncate text-xs text-white/80" x-text="activeTitle()">{{ __('Online') }}</span>
+            </span>
+            <button type="button" @click="toggleList()" aria-label="{{ __('Daftar percakapan') }}" title="{{ __('Daftar percakapan') }}"
+                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
+            </button>
+            <button type="button" @click="newChat()" :disabled="busy" aria-label="{{ __('Percakapan baru') }}" title="{{ __('Percakapan baru') }}"
+                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 disabled:opacity-40">
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14" /></svg>
+            </button>
+            <button type="button" @click="minimize()" aria-label="{{ __('Minimize chat') }}"
+                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14" /></svg>
+            </button>
+            <button type="button" @click="closeChat()" aria-label="{{ __('Tutup chat') }}"
+                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+            </button>
+        </div>
+
+        {{-- Messages --}}
+        <div x-show="!showList" x-ref="msgs"
+             class="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 px-4 py-4 dark:bg-slate-900/60"
+             aria-live="polite" aria-label="{{ __('Riwayat percakapan') }}">
+            <template x-if="!messages.length && !busy">
+                <div class="py-6 text-center">
+                    <p class="whitespace-pre-line text-sm font-semibold text-slate-700 dark:text-slate-200">{{ __("👋 Halo! Saya 3DY AI.\nAda yang bisa saya bantu?") }}</p>
+                    <div class="mt-4 flex flex-wrap justify-center gap-2">
+                        <template x-for="q in quicks" :key="q">
+                            <button type="button" @click="sendQuick(q)" :disabled="busy"
+                                    class="rounded-full border border-accent-500/40 bg-accent-50 px-3 py-1.5 text-xs font-semibold text-accent-700 transition hover:-translate-y-0.5 hover:bg-accent-100 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 disabled:opacity-50 dark:bg-accent-500/10 dark:text-accent-300 dark:hover:bg-accent-500/20"
+                                    x-text="q"></button>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            <template x-for="m in messages" :key="m.id">
+                <div :class="m.role === 'user' ? 'flex justify-end' : 'flex items-end justify-start gap-2'">
+                    <template x-if="m.role !== 'user'">
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-400 to-accent-700 text-white" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /></svg>
+                        </span>
+                    </template>
+                    <div :class="m.role === 'user'
+                            ? 'max-w-[80%] rounded-2xl rounded-br-md bg-accent-600 px-3.5 py-2.5 text-sm text-white'
+                            : 'max-w-[85%] rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'">
+                        <template x-if="m.role === 'user'">
+                            <p class="whitespace-pre-wrap break-words" x-text="m.content"></p>
+                        </template>
+                        <template x-if="m.role !== 'user'">
+                            <div class="aiv2-md break-words" x-html="renderMarkdown(m.content)"></div>
+                        </template>
+                        <p class="mt-1 text-right text-[10px] leading-none opacity-60" x-text="m.time"></p>
+                    </div>
+                </div>
+            </template>
+            <template x-if="busy">
+                <div class="flex items-end justify-start gap-2">
+                    <div class="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800" role="status" aria-label="{{ __('AI sedang mengetik') }}">
+                        <span class="aiv2-dot"></span><span class="aiv2-dot"></span><span class="aiv2-dot"></span>
+                    </div>
+                </div>
+            </template>
+            <template x-if="error">
+                <div class="rounded-xl border border-red-300 bg-red-50 px-3.5 py-2.5 text-xs text-red-700 dark:border-red-800 dark:bg-red-500/10 dark:text-red-300" role="alert">
+                    <p x-text="error"></p>
+                    <button type="button" @click="retry()" :disabled="busy || !lastUserText"
+                            class="mt-2 rounded-lg bg-red-100 px-3 py-1.5 font-semibold text-red-700 transition hover:bg-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 disabled:opacity-50 dark:bg-red-500/20 dark:text-red-200">
+                        {{ __('Coba lagi') }}
+                    </button>
+                </div>
+            </template>
+        </div>
+
+        {{-- Conversation list --}}
+        <div x-show="showList"
+             class="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-slate-50 px-3 py-3 dark:bg-slate-900/60"
+             aria-label="{{ __('Daftar percakapan') }}">
+            <button type="button" @click="newChat()" :disabled="busy || loadingConvo"
+                    class="w-full rounded-xl bg-accent-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-accent-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 disabled:opacity-50">
+                {{ __('+ Percakapan baru') }}
+            </button>
+            <template x-if="loadingConvo">
+                <div class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800" role="status" aria-label="{{ __('Memuat percakapan...') }}">
+                    <span class="aiv2-dot"></span><span class="aiv2-dot"></span><span class="aiv2-dot"></span>
+                </div>
+            </template>
+            <template x-for="c in convos" :key="c.id">
+                <button type="button" @click="openConversation(c.id)" :disabled="busy || loadingConvo"
+                        :class="c.id === conversationId
+                            ? 'border-accent-500 bg-accent-50 dark:bg-accent-500/10'
+                            : 'border-slate-200 bg-white hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700/60'"
+                        class="w-full truncate rounded-xl border px-3 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 disabled:opacity-50">
+                    <span class="block truncate text-sm font-semibold text-slate-700 dark:text-slate-200" x-text="c.title"></span>
+                </button>
+            </template>
+            <template x-if="!convos.length && !loadingConvo">
+                <p class="py-4 text-center text-xs text-slate-500 dark:text-slate-400">{{ __('Belum ada percakapan.') }}</p>
+            </template>
+        </div>
+
+        {{-- Input --}}
+        <div x-show="!showList" class="border-t border-slate-200 bg-white px-3.5 py-3 dark:border-slate-700 dark:bg-slate-800">
+            <div class="flex items-end gap-2">
+                <textarea x-ref="input" x-model="draft" rows="1" maxlength="2000"
+                          @input="resize()" @keydown.enter="onEnter($event)"
+                          :placeholder="busy ? '{{ __('Menunggu jawaban...') }}' : '{{ __('Tulis pesan...') }}'"
+                          aria-label="{{ __('Tulis pesan untuk 3DY AI') }}"
+                          class="max-h-[120px] min-h-[40px] flex-1 resize-none rounded-xl border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200"></textarea>
+                <button type="button" @click="send()" :disabled="!canSend()"
+                        aria-label="{{ __('Kirim pesan') }}"
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-600 text-white shadow-sm transition hover:bg-accent-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
+                    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4 20-7z" /></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.aiv2-dot { width: 7px; height: 7px; border-radius: 9999px; background: rgb(var(--accent-500)); animation: aiv2-typing 1.2s infinite ease-in-out; }
+.aiv2-dot:nth-child(2) { animation-delay: .15s; } .aiv2-dot:nth-child(3) { animation-delay: .3s; }
+@keyframes aiv2-typing { 0%,60%,100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-4px); opacity: 1; } }
+.aiv2-md { font-size: .875rem; line-height: 1.5; }
+.aiv2-md p { margin: .25rem 0; } .aiv2-md p:first-child { margin-top: 0; } .aiv2-md p:last-child { margin-bottom: 0; }
+.aiv2-md ul, .aiv2-md ol { margin: .25rem 0; padding-left: 1.1rem; } .aiv2-md ul { list-style: disc; } .aiv2-md ol { list-style: decimal; }
+.aiv2-md code { font-size: .8em; background: rgb(148 163 184 / .18); border-radius: .3rem; padding: .05rem .3rem; }
+.aiv2-md pre { overflow-x: auto; background: rgb(15 23 42 / .9); color: #e2e8f0; border-radius: .6rem; padding: .6rem .75rem; margin: .4rem 0; font-size: .78rem; }
+.aiv2-md pre code { background: transparent; padding: 0; }
+.aiv2-md a { color: rgb(var(--accent-600)); text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { .aiv2-dot { animation: none !important; } }
+</style>
+
+<script>
+function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
+    return {
+        uid, sendUrl, showUrl, open: false, busy: false, error: '',
+        messages: [], draft: '', conversationId: null, lastUserText: '',
+        convos: initialConvos || [], showList: false, loadingConvo: false,
+        __inited: false,
+        quicks: @js([__('Jelaskan data server saya'), __('Bantu analisis masalah'), __('Buatkan kode Laravel'), __('Jelaskan konsep jaringan')]),
+        key() { return '3dy.ai.v2.conv.' + this.uid; },
+        init() {
+            // Idempoten: aman bila x-init jalan ulang habis morph Livewire.
+            if (this.__inited) return;
+            this.__inited = true;
+            try { this.conversationId = localStorage.getItem(this.key()) || null; } catch (e) { this.conversationId = null; }
+            // ID simpanan yang sudah tak ada di daftar (mis. dihapus dari halaman AI) dibuang.
+            if (this.conversationId && !this.convos.some(c => c.id === this.conversationId)) {
+                this.conversationId = null;
+                try { localStorage.removeItem(this.key()); } catch (e) {}
+            }
+        },
+        activeTitle() {
+            const c = this.convos.find(c => c.id === this.conversationId);
+            return c ? c.title : @js(__('Online'));
+        },
+        toggleList() { this.showList = !this.showList; },
+        touchConvo(c) {
+            if (!c || !c.id) return;
+            this.convos = [{
+                id: c.id,
+                title: c.title || @js(__('Percakapan baru')),
+                updated_at: c.updated_at ?? null,
+            }, ...this.convos.filter(x => x.id !== c.id)].slice(0, 20);
+        },
+        async openConversation(id) {
+            if (this.busy || this.loadingConvo || !id) return;
+            if (id === this.conversationId && this.messages.length) { this.showList = false; return; }
+            this.loadingConvo = true; this.error = '';
+            try {
+                const res = await fetch(this.showUrl + '/' + encodeURIComponent(id), { headers: this.headers() });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || ('HTTP ' + res.status));
+                this.touchConvo(data.conversation);
+                this.conversationId = (data.conversation && data.conversation.id) || id;
+                try { localStorage.setItem(this.key(), this.conversationId); } catch (e) {}
+                this.messages = (data.messages ?? []).map((m, i) => ({
+                    id: m.id ?? ('m' + Date.now() + i),
+                    role: m.role,
+                    content: m.content ?? '',
+                    time: '',
+                }));
+                this.lastUserText = '';
+                this.showList = false;
+                this.scrollBottom();
+            } catch (e) {
+                this.error = e?.message || @js(__('Gagal memuat percakapan.'));
+                this.showList = false;
+            } finally {
+                this.loadingConvo = false;
+            }
+        },
+        openChat() {
+            this.open = true; this.error = '';
+            this.$nextTick(() => { this.scrollBottom(); this.$refs.input?.focus({ preventScroll: true }); });
+        },
+        minimize() { this.open = false; },
+        closeChat() { this.open = false; },
+        newChat() {
+            this.messages = []; this.error = ''; this.lastUserText = '';
+            this.conversationId = null; this.showList = false;
+            try { localStorage.removeItem(this.key()); } catch (e) {}
+        },
+        scrollBottom() {
+            this.$nextTick(() => { const el = this.$refs.msgs; if (el) el.scrollTop = el.scrollHeight; });
+        },
+        resize() {
+            const el = this.$refs.input; if (!el) return;
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        },
+        onEnter(e) {
+            if (e.isComposing) return;
+            if (e.shiftKey) return;
+            e.preventDefault(); this.send();
+        },
+        canSend() { return this.draft.trim().length > 0 && !this.busy && !this.loadingConvo; },
+        nowTime() {
+            const t = new Date();
+            return String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
+        },
+        renderMarkdown(content) {
+            try {
+                return window.DOMPurify.sanitize(window.marked.parse(content ?? '', { breaks: true }));
+            } catch (e) {
+                const el = document.createElement('span');
+                el.textContent = content ?? '';
+                return el.innerHTML;
+            }
+        },
+        sendQuick(text) { if (this.busy || this.loadingConvo) return; this.draft = text; this.send(); },
+        retry() { if (this.busy || this.loadingConvo || !this.lastUserText) return; this.draft = this.lastUserText; this.send(); },
+        headers() {
+            return {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+            };
+        },
+        async send() {
+            const text = this.draft.trim();
+            if (!text || this.busy || this.loadingConvo) return;
+            this.draft = ''; this.error = '';
+            this.lastUserText = text;
+            this.$nextTick(() => this.resize());
+            this.messages.push({ id: Date.now(), role: 'user', content: text, time: this.nowTime() });
+            this.scrollBottom();
+            this.busy = true;
+            try {
+                const body = new FormData();
+                body.append('message', text);
+                if (this.conversationId) body.append('conversation_id', this.conversationId);
+                const res = await fetch(this.sendUrl, { method: 'POST', body, headers: this.headers() });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || ('HTTP ' + res.status));
+                if (data.conversation_id) {
+                    this.conversationId = data.conversation_id;
+                    try { localStorage.setItem(this.key(), this.conversationId); } catch (e) {}
+                }
+                if (data.conversation) this.touchConvo(data.conversation);
+                this.messages.push({ id: Date.now() + 1, role: 'assistant', content: data.message ?? '', time: this.nowTime() });
+            } catch (e) {
+                this.error = e?.message || @js(__('Maaf, terjadi masalah saat menghubungi AI. Silakan coba lagi.'));
+            } finally {
+                this.busy = false;
+                this.scrollBottom();
+            }
+        },
+    };
+}
+</script>
+@endpersist
+@endauth

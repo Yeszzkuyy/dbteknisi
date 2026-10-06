@@ -1,10 +1,9 @@
 
 
 import AlpineBundle from 'alpinejs';
-import Sortable from 'sortablejs';
-import ApexCharts from 'apexcharts';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { mountLoginGalaxy } from './galaxy.js';
 
 // Satu copy Alpine untuk seluruh app: Livewire menyuntik Alpine miliknya
 // sendiri (window.Alpine) + start saat DOMContentLoaded. Start ganda dari
@@ -13,8 +12,6 @@ import DOMPurify from 'dompurify';
 // Livewire absen, dan start manual hanya dalam kasus fallback itu.
 const Alpine = window.Alpine ?? AlpineBundle;
 window.Alpine = Alpine;
-window.Sortable = Sortable;
-window.ApexCharts = ApexCharts;
 window.marked = marked;
 window.DOMPurify = DOMPurify;
 
@@ -184,18 +181,41 @@ document.addEventListener('alpine:init', () => {
         toastTimer: null,
         init() {
             if (window.notifInit === undefined) return;
+            if (this.timer) clearInterval(this.timer);
+            this.sessionExpired = false;
             this.refresh();
-            this.timer = setInterval(() => this.refresh(), 5000);
+            this.timer = setInterval(() => this.refresh(), 15000);
             document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) this.refresh();
+                if (!document.hidden && !this.sessionExpired) this.refresh();
             });
-            window.addEventListener('focus', () => this.refresh());
+            window.addEventListener('focus', () => {
+                if (!this.sessionExpired) this.refresh();
+            });
         },
         async refresh() {
-            if (window.notifInit === undefined) return;
+            if (window.notifInit === undefined || this.sessionExpired || document.hidden) return;
             try {
-                const res = await fetch('/notifications/status');
+                const res = await fetch('/notifications/status', {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                if (res.status === 401) {
+                    this.sessionExpired = true;
+                    if (this.timer) {
+                        clearInterval(this.timer);
+                        this.timer = null;
+                    }
+                    if (!document.hidden) {
+                        window.toast('Sesi berakhir, silakan login ulang.', false, {
+                            label: 'Login ulang',
+                            href: '/login',
+                        });
+                    }
+                    return;
+                }
+                const contentType = res.headers.get('content-type') || '';
+                if (!res.ok || !contentType.includes('application/json')) return;
                 const data = await res.json();
+                if (typeof data?.unread !== 'number') return;
                 if (data.unread > this.unread) this.showToast();
                 this.unread = data.unread;
                 this.unassigned = data.unassigned;
@@ -314,10 +334,17 @@ document.addEventListener('livewire:navigated', () => syncSidebarGroups());
    - 422: kotak error inline di atas form. Gagal total: submit biasa.
    - Diabaikan bila event sudah di-cancel (mis. confirm() batal).
    ============================================================ */
-window.toast = function (message, ok = true) {
+window.toast = function (message, ok = true, action = null) {
     const el = document.createElement('div');
     el.className = 'fixed bottom-6 right-6 z-[100] flex items-center gap-2 px-5 py-3 rounded-xl shadow-lg text-white transition-opacity ' + (ok ? 'bg-green-600' : 'bg-red-600');
     el.textContent = message;
+    if (action && action.href && action.label) {
+        const a = document.createElement('a');
+        a.href = action.href;
+        a.textContent = action.label;
+        a.className = 'font-bold underline underline-offset-2 whitespace-nowrap';
+        el.appendChild(a);
+    }
     document.body.appendChild(el);
     setTimeout(() => {
         el.style.opacity = '0';
@@ -426,4 +453,11 @@ document.addEventListener('submit', async (e) => {
 
 /* Sidebar grup buka/tutup mengikuti halaman aktif; transisi buka-tutup
    sepenuhnya CSS (sidebar-nav.css). Tidak ada lagi garis bercabang SVG. */
+
+/* Galaxy starfield — hanya di halaman yang menyediakan #galaxy (login). */
+if (document.getElementById('galaxy')) {
+    try {
+        mountLoginGalaxy();
+    } catch (e) {}
+}
 

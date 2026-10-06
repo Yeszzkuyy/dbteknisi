@@ -91,6 +91,8 @@
                         @endforelse
                     </tbody>
                 </table>
+            <div class="mt-4">{{ $projects->links() }}</div>
+            <div class="mt-4">{{ $customers->links() }}</div>
             </div>
         </div>
 

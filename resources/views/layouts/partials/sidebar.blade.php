@@ -6,6 +6,7 @@
 
     $dashboardActive = request()->routeIs('dashboard*');
     $customerActive = request()->routeIs('customers*');
+    $monitoringActive = request()->routeIs('monitoring.index');
     $managementActive = request()->routeIs('manage-sales*') || request()->routeIs('manage.*');
     $technicianActive = request()->routeIs('projects*') || request()->routeIs('teknisi.*');
     $marketingActive = (request()->routeIs(['leads*', 'partners*', 'marketing.dashboard', 'whatsapp-center*']) && !request()->routeIs('leads.pipeline'));
@@ -99,6 +100,15 @@
                         <x-icon name="users" class="h-5 w-5 shrink-0" />
                         <span>Customer</span>
                     </a>
+                    {{-- Monitoring lintas divisi: management, ceo, super-admin (via Gate::before) --}}
+                    @can('view-monitoring')
+                        <a wire:navigate.hover href="{{ route('monitoring.index') }}"
+                           aria-current="{{ $monitoringActive ? 'page' : 'false' }}"
+                           class="{{ $navLink }} {{ $monitoringActive ? $navActive : $navInactive }}">
+                            <x-icon name="chart-bar" class="h-5 w-5 shrink-0" />
+                            <span>Monitoring</span>
+                        </a>
+                    @endcan
                     {{-- AI Assistant SENGAJA full reload (tanpa wire:navigate):
                          halaman chat stateful; morph berisiko merusak riwayat/ketikan. --}}
                     <a href="{{ route('ai.assistant.index') }}"

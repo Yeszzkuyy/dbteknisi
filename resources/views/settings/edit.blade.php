@@ -29,7 +29,6 @@
                 <p class="mt-1 text-slate-500">{{ __('Preferensi aplikasi Anda') }}</p>
             </div>
             <div class="flex items-center gap-3">
-                <span id="settings-saved" class="hidden text-xs font-medium text-green-600 dark:text-green-400"></span>
                 <x-icon-button as="a" icon="back" href="{{ route('dashboard') }}" title="{{ __('Kembali') }}" />
             </div>
         </div>
@@ -214,7 +213,6 @@
             (function () {
                 var form = document.getElementById('settings-form');
                 if (!form) return;
-                var status = document.getElementById('settings-saved');
                 var timer = null;
                 var localeInput = form.querySelector('[name="locale"]');
                 var lastLocale = localeInput ? localeInput.value : null;
@@ -231,13 +229,6 @@
                             if (!res.ok) throw new Error();
                             return res.json();
                         }).then(function () {
-                            if (status) {
-                                var t = new Date();
-                                var hh = String(t.getHours()).padStart(2, '0');
-                                var mm = String(t.getMinutes()).padStart(2, '0');
-                                status.textContent = '{{ __('Tersimpan otomatis') }} ✓ ' + hh + ':' + mm;
-                                status.classList.remove('hidden');
-                            }
                             var locale = localeInput ? localeInput.value : null;
                             if (locale && locale !== lastLocale) {
                                 lastLocale = locale;
@@ -251,18 +242,17 @@
             })();
         </script>
 
-        {{-- Area lanjutan (digerbang password) --}}
-        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-600 dark:bg-slate-800">
-            <header>
-                <h2 class="text-lg font-bold text-slate-800">{{ __('Lanjutan') }}</h2>
-                <p class="mt-1 text-sm text-slate-500">{{ __('Ganti password dan hapus akun. Area ini dilindungi konfirmasi password.') }}</p>
-            </header>
-
-            <a href="{{ route('settings.advanced') }}"
-               class="mt-5 inline-flex items-center gap-2 rounded-xl bg-accent-50 px-5 py-2.5 text-sm font-semibold text-accent-700 transition hover:bg-accent-100">
-                <x-icon name="settings" class="h-4 w-4" />
-                {{ __('Buka Pengaturan Lanjutan') }}
-            </a>
-        </section>
+        {{-- Area lanjutan (digerbang password) — kartu link full-width --}}
+        <a href="{{ route('settings.advanced') }}"
+           class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-accent-400 hover:shadow-lg dark:border-slate-600 dark:bg-slate-800">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-700 dark:bg-accent-500/10 dark:text-accent-400">
+                <x-icon name="settings" class="h-5 w-5" />
+            </span>
+            <span class="min-w-0 flex-1">
+                <span class="block text-sm font-bold text-slate-800 dark:text-white">{{ __('Pengaturan Lanjutan') }}</span>
+                <span class="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">{{ __('Ganti password dan hapus akun. Area ini dilindungi konfirmasi password.') }}</span>
+            </span>
+            <x-icon name="chevron-right" class="h-5 w-5 shrink-0 text-slate-400 transition group-hover:translate-x-1 group-hover:text-accent-600 dark:group-hover:text-accent-400" />
+        </a>
     </div>
 </x-app-layout>

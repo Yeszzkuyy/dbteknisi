@@ -65,7 +65,7 @@
                 ? __('Dashboard')
                 : ($sectionLabels[$activeSection] ?? ucwords(str_replace(['-', '_'], ' ', $activeSection)));
         @endphp
-        <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-accent-500/10 px-3 py-1.5 text-xs font-semibold text-accent-700 sm:inline-flex dark:bg-accent-400/10 dark:text-accent-300">
+        <span class="app-header-badge hidden shrink-0 items-center gap-1.5 rounded-full bg-accent-500/10 px-3 py-1.5 text-xs font-semibold text-accent-700 sm:inline-flex dark:bg-accent-400/10 dark:text-accent-300">
             <x-icon :name="$sectionIcon" class="h-3.5 w-3.5" />
             {{ $sectionLabel }}
         </span>
