@@ -109,4 +109,19 @@ class Lead extends Model
     {
         return $this->hasMany(LeadTask::class);
     }
+
+    public function salesSchedules()
+    {
+        return $this->hasMany(SalesSchedule::class);
+    }
+
+    public function technicalRequests()
+    {
+        return $this->hasMany(TechnicalRequest::class);
+    }
+
+    public function proposals()
+    {
+        return $this->hasMany(Proposal::class);
+    }
 }
