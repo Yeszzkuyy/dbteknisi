@@ -19,15 +19,15 @@ class SurveyController extends Controller
             $query->where('project_id', $request->project_id);
         }
 
-        $surveys = $query->get();
-        $projects = Project::with('customer')->orderBy('project_name')->get();
+        $surveys = $query->paginate(15)->withQueryString();
+        $projects = Project::with('customer:id,name')->orderBy('project_name')->limit(200)->get(['id', 'project_name', 'customer_id']);
 
         return view('teknisi.surveys.index', compact('surveys', 'projects'));
     }
 
     public function create(Request $request)
     {
-        $projects = Project::with('customer')->orderBy('project_name')->get();
+        $projects = Project::with('customer:id,name')->orderBy('project_name')->limit(200)->get(['id', 'project_name', 'customer_id']);
         $selectedProject = $request->query('project_id');
 
         return view('teknisi.surveys.create', compact('projects', 'selectedProject'));
@@ -62,7 +62,7 @@ class SurveyController extends Controller
 
     public function edit(Survey $survey)
     {
-        $projects = Project::with('customer')->orderBy('project_name')->get();
+        $projects = Project::with('customer:id,name')->orderBy('project_name')->limit(200)->get(['id', 'project_name', 'customer_id']);
 
         return view('teknisi.surveys.edit', compact('survey', 'projects'));
     }

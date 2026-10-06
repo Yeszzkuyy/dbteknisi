@@ -128,6 +128,7 @@
                     @endforelse
                 </tbody>
             </table>
+        <div class="mt-4">{{ $instalasis->links() }}</div>
         </div>
     </div>
 </div>

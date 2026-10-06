@@ -95,29 +95,56 @@ class WhatsAppCenterController extends Controller
 
         $blocked = $this->foreignOwnedSenderNumbers($account);
 
-        $rows = WhatsappMessage::where('whatsapp_account_id', $account->id)
-            ->orderBy('id')
-            ->get()
+        // 1 query: pesan terakhir per pengirim (eager lead, tanpa N+1).
+        $latestIds = WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->selectRaw('max(id) as id')
             ->groupBy('sender_number')
-            ->map(function ($messages, $sender) use ($preferences, $conversations, $account, $blocked) {
-                if (in_array($this->normalizeNumber((string) $sender), $blocked, true)) {
+            ->pluck('id');
+        $lasts = WhatsappMessage::whereIn('id', $latestIds)
+            ->with('lead:id')
+            ->orderByDesc('id')
+            ->get();
+
+        $unreads = $this->senderUnreads($account);
+
+        // Kandidat customer sekali per request (bukan per pengirim).
+        $byNumber = [];
+        foreach (Customer::whereNotNull('whatsapp')->orWhereNotNull('phone')->get(['id', 'whatsapp', 'phone']) as $candidate) {
+            foreach ([$candidate->whatsapp, $candidate->phone] as $number) {
+                $normalized = $this->normalizeNumber((string) $number);
+                if ($normalized !== '' && ! isset($byNumber[$normalized])) {
+                    $byNumber[$normalized] = $candidate->id;
+                }
+            }
+        }
+        $senders = $lasts->map(fn ($m) => $this->normalizeNumber((string) $m->sender_number))->filter()->unique()->values();
+        $matchedIds = $senders->map(fn ($n) => $byNumber[$n] ?? null)->filter()->unique()->values()->all();
+        $customersById = Customer::whereIn('id', $matchedIds)->get()->keyBy('id');
+
+        $rows = $lasts
+            ->map(function ($last) use ($preferences, $conversations, $account, $blocked, $unreads, $byNumber, $customersById) {
+                $sender = (string) $last->sender_number;
+                if (in_array($this->normalizeNumber($sender), $blocked, true)) {
                     return null;
                 }
-                $last = $messages->last();
-                $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
-                $lead = $messages->whereNotNull('lead_id')->first()?->lead;
+                $customer = isset($byNumber[$this->normalizeNumber($sender)])
+                    ? ($customersById[$byNumber[$this->normalizeNumber($sender)]] ?? null)
+                    : null;
+                if ($customer && $customer->whatsapp_account_id && (int) $customer->whatsapp_account_id !== (int) $account->id) {
+                    $customer = null;
+                }
                 $preference = $preferences->get($sender);
-                $conversation = $conversations->get((string) $sender);
+                $conversation = $conversations->get($sender);
 
                 return [
-                    'sender_number' => (string) $sender,
+                    'sender_number' => $sender,
                     'sender_name' => $last->sender_name ?? 'Kontak WA',
                     'last_message' => $last->message_body,
                     'last_direction' => $last->direction,
                     'last_at' => $last->created_at->toIso8601String(),
-                    'unread' => $messages->where('direction', 'inbound')->where('id', '>', $lastOutboundId)->whereNull('read_at')->count(),
-                    'customer' => $this->visibleCustomer($account, $sender),
-                    'lead_id' => $lead?->id,
+                    'unread' => (int) ($unreads[$sender] ?? 0),
+                    'customer' => $customer,
+                    'lead_id' => $last->lead?->id,
                     'is_pinned' => (bool) $preference?->is_pinned,
                     'is_muted' => (bool) $preference?->is_muted,
                     'is_archived' => (bool) $preference?->is_archived,
@@ -132,6 +159,27 @@ class WhatsAppCenterController extends Controller
             ->values();
 
         return response()->json($rows);
+    }
+
+    /**
+     * Hitungan unread eksak per pengirim dalam 1 query: inbound yang
+     * belum dibaca dan datang setelah balasan outbound terakhir.
+     */
+    private function senderUnreads(WhatsappAccount $account): \Illuminate\Support\Collection
+    {
+        $perSender = WhatsappMessage::where('whatsapp_account_id', $account->id)
+            ->selectRaw("sender_number, max(case when direction = 'outbound' then id else 0 end) as last_out")
+            ->groupBy('sender_number');
+
+        return WhatsappMessage::from('whatsapp_messages as m')
+            ->joinSub($perSender, 't', 't.sender_number', '=', 'm.sender_number')
+            ->where('m.whatsapp_account_id', $account->id)
+            ->where('m.direction', 'inbound')
+            ->whereNull('m.read_at')
+            ->whereColumn('m.id', '>', 't.last_out')
+            ->selectRaw('m.sender_number, count(*) as c')
+            ->groupBy('m.sender_number')
+            ->pluck('c', 'sender_number');
     }
 
     public function messages(Request $request, WhatsappAccount $account, string $sender)
@@ -805,19 +853,9 @@ class WhatsAppCenterController extends Controller
     {
         $blocked = $this->foreignOwnedSenderNumbers($account);
 
-        return WhatsappMessage::where('whatsapp_account_id', $account->id)
-            ->where('direction', 'inbound')
-            ->orderBy('id')
-            ->get()
-            ->groupBy('sender_number')
-            ->sum(function ($messages) use ($blocked) {
-                if (in_array($this->normalizeNumber((string) $messages->first()->sender_number), $blocked, true)) {
-                    return 0;
-                }
-                $lastOutboundId = $messages->where('direction', 'outbound')->last()?->id ?? 0;
-
-                return $messages->where('id', '>', $lastOutboundId)->whereNull('read_at')->count();
-            });
+        return (int) $this->senderUnreads($account)
+            ->reject(fn ($count, $sender) => in_array($this->normalizeNumber((string) $sender), $blocked, true))
+            ->sum();
     }
 
     private function findCustomer(string $number): ?Customer

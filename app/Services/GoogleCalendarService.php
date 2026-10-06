@@ -14,6 +14,7 @@ use Google\Service\Calendar\EventDateTime;
 use Google\Service\Calendar\EventReminder;
 use Google\Service\Calendar\EventReminders;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -26,13 +27,16 @@ class GoogleCalendarService
      */
     public function isApiReachable(): bool
     {
-        try {
-            $this->upcomingEvents(1);
+        // Hasil live call di-cache 5 menit: dipanggil tiap render jadwal.
+        return Cache::remember('gcal:reachable', 300, function () {
+            try {
+                $this->upcomingEvents(1);
 
-            return true;
-        } catch (\Throwable) {
-            return false;
-        }
+                return true;
+            } catch (\Throwable) {
+                return false;
+            }
+        });
     }
 
     /**
@@ -57,19 +61,17 @@ class GoogleCalendarService
 
         $url = 'https://www.googleapis.com/calendar/v3/calendars/'.urlencode(config('services.google-calendar.calendar_id')).'/events';
 
-        Log::info('Google API request', ['url' => $url, 'params' => array_diff_key($params, ['key' => ''])]);
-
         try {
-            $response = Http::get($url, $params);
+            // Timeout + retry: jangan gantung worker bila Google lambat.
+            $response = Http::timeout(10)->retry(1, 200)->get($url, $params);
 
             $response->throw();
 
             $items = $response->json('items', []);
 
-            Log::info('Google API response', [
+            Log::debug('Google API response', [
                 'status' => $response->status(),
                 'total_items' => count($items),
-                'event_ids' => array_column($items, 'id'),
             ]);
 
             return collect($items)
@@ -127,14 +129,7 @@ class GoogleCalendarService
                 continue;
             }
 
-            Log::info('Google sync: event.id diterima', ['id' => $id, 'title' => $event['title']]);
-
             $schedule = TechnicianSchedule::withTrashed()->where('google_event_id', $id)->first();
-
-            Log::info('Google sync: google_event_id dicari di database', [
-                'google_event_id' => $id,
-                'found' => (bool) $schedule,
-            ]);
 
             if (! $event['start'] && ! $event['end']) {
                 $stats['skipped']++;
@@ -161,14 +156,14 @@ class GoogleCalendarService
                 if ($schedule->trashed()) {
                     $schedule->restore();
                     $stats['restored']++;
-                    Log::info('Google sync: jadwal trash direstore', ['id' => $schedule->id, 'google_event_id' => $id]);
+                    Log::debug('Google sync: jadwal trash direstore', ['id' => $schedule->id, 'google_event_id' => $id]);
                 }
                 $stats['updated']++;
-                Log::info('Google sync: UPDATE jadwal', ['id' => $schedule->id, 'google_event_id' => $id]);
+                Log::debug('Google sync: UPDATE jadwal', ['id' => $schedule->id, 'google_event_id' => $id]);
             } else {
                 TechnicianSchedule::create($data);
                 $stats['created']++;
-                Log::info('Google sync: INSERT jadwal baru', ['google_event_id' => $id]);
+                Log::debug('Google sync: INSERT jadwal baru', ['google_event_id' => $id]);
             }
         }
 

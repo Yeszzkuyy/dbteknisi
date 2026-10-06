@@ -263,6 +263,38 @@ class LeadFormTest extends TestCase
         $this->assertSame('Korban', Customer::find($victim->id)->contact_person);
     }
 
+    public function test_import_batches_rows_and_reports_per_row_errors(): void
+    {
+        $marketing = $this->marketingUser();
+        $sales = \App\Models\User::factory()->create();
+        $sales->assignRole('sales');
+
+        $path = tempnam(sys_get_temp_dir(), 'imp').'.csv';
+        $handle = fopen($path, 'w');
+        fputcsv($handle, ['nama_perusahaan', 'pt', 'segment', 'sales']);
+        fputcsv($handle, ['PT Impor Satu', 'NTI', 'vendor', $sales->name]);
+        fputcsv($handle, ['PT Impor Dua', 'XXX', 'vendor', '']);
+        fputcsv($handle, ['', 'NTI', 'vendor', '']);
+        fputcsv($handle, ['PT Impor Satu', 'NTI', 'vendor', 'Tidak Ada']);
+        fclose($handle);
+
+        $file = new \Illuminate\Http\UploadedFile($path, 'leads.csv', 'text/csv', null, true);
+
+        $this->actingAs($marketing)->post(route('leads.import.execute'), ['file' => $file])
+            ->assertRedirect();
+
+        // 2 sukses (duplikat company dipakai ulang), 2 gagal (pt invalid + nama kosong).
+        $this->assertSame(1, \App\Models\Customer::where('name', 'PT Impor Satu')->count());
+        $this->assertSame(2, \App\Models\Lead::whereHas('customer', fn ($q) => $q->where('name', 'PT Impor Satu'))->count());
+        $this->assertNull(\App\Models\Customer::where('name', 'PT Impor Dua')->first());
+
+        $assigned = \App\Models\Lead::whereHas('customer', fn ($q) => $q->where('name', 'PT Impor Satu'))->orderBy('id')->first();
+        $this->assertSame($sales->id, (int) $assigned->assigned_to);
+
+        $unassigned = \App\Models\Lead::whereHas('customer', fn ($q) => $q->where('name', 'PT Impor Satu'))->orderByDesc('id')->first();
+        $this->assertNull($unassigned->assigned_to);
+    }
+
     public function test_segment_is_required_and_validated(): void
     {
         $customer = Customer::create(['name' => 'PT Lama']);

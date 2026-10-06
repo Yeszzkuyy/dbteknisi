@@ -21,10 +21,11 @@ class TrashController extends Controller
             ? $this->allTrash($request)
             : $this->ownTrash();
 
+        // 1 query union distinct, bukan 2 pluck penuh + merge di PHP.
+        $deletedBy = Customer::onlyTrashed()->select('deleted_by')->whereNotNull('deleted_by')
+            ->union(Project::onlyTrashed()->select('deleted_by')->whereNotNull('deleted_by'));
         $users = $isSuperAdmin
-            ? User::whereIn('id', Customer::onlyTrashed()->pluck('deleted_by')
-                ->merge(Project::onlyTrashed()->pluck('deleted_by'))
-                ->filter()->unique())->orderBy('name')->get(['id', 'name'])
+            ? User::whereIn('id', $deletedBy)->orderBy('name')->get(['id', 'name'])
             : null;
 
         return view('trash.index', compact('customers', 'projects', 'users', 'isSuperAdmin'));
@@ -35,8 +36,8 @@ class TrashController extends Controller
         $userId = auth()->id();
 
         return [
-            Customer::onlyTrashed()->where('deleted_by', $userId)->latest('deleted_at')->get(),
-            Project::onlyTrashed()->where('deleted_by', $userId)->latest('deleted_at')->get(),
+            Customer::onlyTrashed()->where('deleted_by', $userId)->latest('deleted_at')->paginate(15, ['*'], 'customers_page')->withQueryString(),
+            Project::onlyTrashed()->where('deleted_by', $userId)->latest('deleted_at')->paginate(15, ['*'], 'projects_page')->withQueryString(),
         ];
     }
 
@@ -50,7 +51,10 @@ class TrashController extends Controller
             $projectQuery->where('deleted_by', $request->integer('user'));
         }
 
-        return [$customerQuery->get(), $projectQuery->get()];
+        return [
+            $customerQuery->paginate(15, ['*'], 'customers_page')->withQueryString(),
+            $projectQuery->paginate(15, ['*'], 'projects_page')->withQueryString(),
+        ];
     }
 
     public function restoreCustomer(int $id)

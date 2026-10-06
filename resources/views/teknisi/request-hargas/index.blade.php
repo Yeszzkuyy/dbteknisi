@@ -130,6 +130,7 @@
                         @endforelse
                     </tbody>
                 </table>
+        <div class="mt-4">{{ $requestHargas->links() }}</div>
             </div>
         </div>
     </div>

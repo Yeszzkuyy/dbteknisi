@@ -29,12 +29,13 @@ class KnowledgeBaseController extends Controller
                 fn ($query) => $query->where('status', $request->query('status'))
             )
             ->latest()
-            ->get();
+            ->paginate(15)
+            ->withQueryString();
 
         return view('knowledge-base.index', [
             'documents' => $documents,
             'categories' => KnowledgeBaseCategory::cases(),
-            'projects' => Project::orderBy('project_name')->get(),
+            'projects' => Project::orderBy('project_name')->limit(200)->get(['id', 'project_name']),
             'filters' => $request->only(['category', 'status']),
         ]);
     }
