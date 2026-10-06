@@ -139,6 +139,7 @@
                     @endforelse
                 </tbody>
             </table>
+        <div class="mt-4">{{ $sizings->links() }}</div>
         </div>
     </div>
 </div>

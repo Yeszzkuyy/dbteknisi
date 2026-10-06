@@ -96,6 +96,7 @@
         <div id="customer-table">
             @include('customers._list')
         </div>
+        <div class="mt-4">{{ $customers->links() }}</div>
     </div>
 
 </x-app-layout>

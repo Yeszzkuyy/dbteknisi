@@ -24,7 +24,8 @@ class CustomerController extends Controller
             })
             ->when($request->filled('pt_group'), fn ($query) => $query->where('pt_group', $request->string('pt_group')))
             ->latest()
-            ->get();
+            ->paginate(15)
+            ->withQueryString();
 
         $ptGroups = Lead::PT_GROUPS;
 
