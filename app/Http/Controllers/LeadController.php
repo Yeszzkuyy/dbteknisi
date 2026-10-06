@@ -439,7 +439,7 @@ class LeadController extends Controller
     {
         $this->authorize('view', $lead);
 
-        $lead->load(['customer', 'partner', 'assignee', 'tasks.assignee', 'activities.user', 'customer.projects.documents', 'meetings.creator', 'followUps.creator']);
+        $lead->load(['customer', 'partner', 'assignee', 'tasks.assignee', 'activities.user', 'customer.projects.documents', 'meetings.creator', 'followUps.creator', 'salesSchedules.assignee', 'technicalRequests.requester', 'technicalRequests.technician', 'proposals.creator']);
         $documents = $lead->customer ? $lead->customer->projects->flatMap->documents : collect();
         $projectStatuses = ProjectStatus::orderBy('sort_order')->get(['id', 'name']);
         $workTypes = WorkType::orderBy('name')->get(['id', 'name']);
@@ -463,7 +463,18 @@ class LeadController extends Controller
             'url' => $canOpenDetail ? route('sales.follow-ups.show', $f) : null,
         ]))->sortByDesc('date')->values();
 
-        return view('leads.show', compact('lead', 'documents', 'projectStatuses', 'workTypes', 'timeline'));
+        // Sales flow: jadwal (upcoming/past), technical request, proposal milik lead ini.
+        $upcomingSchedules = $lead->salesSchedules
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->sortBy('start_at')->values();
+        $pastSchedules = $lead->salesSchedules
+            ->where(fn ($s) => in_array($s->status, ['completed', 'cancelled']) || ($s->start_at && $s->start_at->isPast()))
+            ->sortByDesc('start_at')->values();
+        $techRequests = $lead->technicalRequests->sortByDesc('created_at')->values();
+        $activeTechRequest = $techRequests->first(fn ($r) => ! in_array($r->status, ['completed', 'cancelled', 'rejected']));
+        $proposalsList = $lead->proposals->sortByDesc('created_at')->values();
+
+        return view('leads.show', compact('lead', 'documents', 'projectStatuses', 'workTypes', 'timeline', 'upcomingSchedules', 'pastSchedules', 'techRequests', 'activeTechRequest', 'proposalsList'));
     }
 
     public function edit(Lead $lead)

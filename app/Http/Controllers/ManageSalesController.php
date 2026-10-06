@@ -237,7 +237,25 @@ class ManageSalesController extends Controller
             ->mapWithKeys(fn ($pt) => [$pt => (float) ($incomeRows[$pt] ?? 0)]);
         $incomeTotal = $incomeMonth->sum();
 
-        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal', 'weekStart', 'weekEnd', 'incomeMonth', 'incomeTotal'));
+        // Ringkasan agenda sales milik sendiri (jadwal saya: PIC/creator/lead saya).
+        $ownSchedules = fn ($q) => $q->where(function ($w) {
+            $w->where('sales_schedules.assigned_to', auth()->id())
+                ->orWhere('sales_schedules.created_by', auth()->id())
+                ->orWhereHas('lead', fn ($l) => $l->where('assigned_to', auth()->id()));
+        });
+        $scheduleSummary = [
+            'today' => \App\Models\SalesSchedule::where($ownSchedules)
+                ->whereDate('start_at', today())->whereNotIn('status', ['completed', 'cancelled'])->count(),
+            'upcoming' => \App\Models\SalesSchedule::where($ownSchedules)
+                ->where('start_at', '>=', now()->startOfDay())->whereNotIn('status', ['completed', 'cancelled'])->count(),
+            'completed' => \App\Models\SalesSchedule::where($ownSchedules)->where('status', 'completed')->count(),
+            'cancelled' => \App\Models\SalesSchedule::where($ownSchedules)->where('status', 'cancelled')->count(),
+        ];
+        $scheduleTypes = \App\Models\SalesSchedule::where($ownSchedules)
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->selectRaw('type, count(*) as total')->groupBy('type')->pluck('total', 'type');
+
+        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal', 'weekStart', 'weekEnd', 'incomeMonth', 'incomeTotal', 'scheduleSummary', 'scheduleTypes'));
     }
 
     public function myLeads(Request $request)

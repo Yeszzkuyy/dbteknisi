@@ -26,8 +26,11 @@ use App\Http\Controllers\ProjectDocumentController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectSupportController;
 use App\Http\Controllers\ProjectTaskController;
+use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\PushSubscriptionController;
+use App\Http\Controllers\SalesScheduleController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TechnicalRequestController;
 use App\Http\Controllers\TechnicianDashboardController;
 use App\Http\Controllers\TechnicianScheduleController;
 use App\Http\Controllers\TrashController;
@@ -133,6 +136,52 @@ Route::middleware('auth')->group(function () {
         Route::post('meeting-drafts', [MeetingDraftController::class, 'generate'])->name('meeting-drafts.generate');
         Route::post('meeting-drafts/{meetingDraft}/approve', [MeetingDraftController::class, 'approve'])->name('meeting-drafts.approve');
         Route::post('meeting-drafts/{meetingDraft}/discard', [MeetingDraftController::class, 'discard'])->name('meeting-drafts.discard');
+    });
+
+    // ============================================
+    // SALES FLOW — Jadwal Sales, Technical Request, Proposal
+    // Tulis: sales & inside-sales. Aksi teknisi di blok manage-technician.
+    // ============================================
+    Route::middleware('permission:manage-sales|manage-inside-sales')->prefix('sales')->name('sales.')->group(function () {
+        Route::get('schedules/create', [SalesScheduleController::class, 'create'])->name('schedules.create');
+        Route::post('schedules', [SalesScheduleController::class, 'store'])->name('schedules.store');
+        Route::get('schedules/{schedule}/edit', [SalesScheduleController::class, 'edit'])->name('schedules.edit');
+        Route::put('schedules/{schedule}', [SalesScheduleController::class, 'update'])->name('schedules.update');
+        Route::post('schedules/{schedule}/complete', [SalesScheduleController::class, 'complete'])->name('schedules.complete');
+        Route::post('schedules/{schedule}/cancel', [SalesScheduleController::class, 'cancel'])->name('schedules.cancel');
+
+        Route::get('technical-requests/create', [TechnicalRequestController::class, 'create'])->name('technical-requests.create');
+        Route::post('technical-requests', [TechnicalRequestController::class, 'store'])->name('technical-requests.store');
+        Route::post('technical-requests/{technicalRequest}/cancel', [TechnicalRequestController::class, 'cancel'])->name('technical-requests.cancel');
+
+        Route::get('proposals/create', [ProposalController::class, 'create'])->name('proposals.create');
+        Route::post('proposals', [ProposalController::class, 'store'])->name('proposals.store');
+        Route::get('proposals/{proposal}/edit', [ProposalController::class, 'edit'])->name('proposals.edit');
+        Route::put('proposals/{proposal}', [ProposalController::class, 'update'])->name('proposals.update');
+        Route::post('proposals/{proposal}/ready', [ProposalController::class, 'markReady'])->name('proposals.ready');
+        Route::post('proposals/{proposal}/send', [ProposalController::class, 'send'])->name('proposals.send');
+        Route::post('proposals/{proposal}/viewed', [ProposalController::class, 'markViewed'])->name('proposals.viewed');
+        Route::post('proposals/{proposal}/revise', [ProposalController::class, 'revise'])->name('proposals.revise');
+        Route::post('proposals/{proposal}/respond', [ProposalController::class, 'respond'])->name('proposals.respond');
+        Route::post('proposals/{proposal}/cancel', [ProposalController::class, 'cancel'])->name('proposals.cancel');
+    });
+
+    Route::middleware('permission:view-sales|manage-sales|manage-inside-sales|manage-technician')->prefix('sales')->name('sales.')->group(function () {
+        Route::get('schedules', [SalesScheduleController::class, 'index'])->name('schedules.index');
+        Route::get('schedules/{schedule}', [SalesScheduleController::class, 'show'])->name('schedules.show');
+        Route::get('technical-requests/{technicalRequest}', [TechnicalRequestController::class, 'show'])->name('technical-requests.show');
+        Route::get('technical-requests/{technicalRequest}/attachment', [TechnicalRequestController::class, 'downloadAttachment'])->name('technical-requests.attachment');
+        Route::get('proposals', [ProposalController::class, 'index'])->name('proposals.index');
+        Route::get('proposals/{proposal}', [ProposalController::class, 'show'])->name('proposals.show');
+        Route::get('proposals/{proposal}/preview', [ProposalController::class, 'preview'])->name('proposals.preview');
+    });
+
+    Route::middleware('permission:manage-technician')->prefix('sales')->name('sales.')->group(function () {
+        Route::post('technical-requests/{technicalRequest}/review', [TechnicalRequestController::class, 'review'])->name('technical-requests.review');
+        Route::post('technical-requests/{technicalRequest}/assign', [TechnicalRequestController::class, 'assign'])->name('technical-requests.assign');
+        Route::post('technical-requests/{technicalRequest}/progress', [TechnicalRequestController::class, 'progress'])->name('technical-requests.progress');
+        Route::post('technical-requests/{technicalRequest}/result', [TechnicalRequestController::class, 'result'])->name('technical-requests.result');
+        Route::post('technical-requests/{technicalRequest}/complete', [TechnicalRequestController::class, 'complete'])->name('technical-requests.complete');
     });
 
     Route::middleware('permission:view-sales|manage-sales')->prefix('sales')->name('sales.')->group(function () {
