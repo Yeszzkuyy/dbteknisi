@@ -1394,6 +1394,35 @@ class WhatsAppCenterTest extends TestCase
         $this->assertTrue($waniSenders->contains('6281234567890'));
     }
 
+    public function test_conversations_unread_counts_inbound_after_last_outbound(): void
+    {
+        $account = $this->makeAccount();
+        $user = $this->marketingUser($account->id);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id, 'sender_number' => '6281111111111',
+            'sender_name' => 'A', 'message_body' => 'satu', 'direction' => 'inbound',
+        ]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id, 'sender_number' => '6281111111111',
+            'sender_name' => 'Tim', 'message_body' => 'balasan', 'direction' => 'outbound',
+        ]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id, 'sender_number' => '6281111111111',
+            'sender_name' => 'A', 'message_body' => 'dua', 'direction' => 'inbound',
+        ]);
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id, 'sender_number' => '6282222222222',
+            'sender_name' => 'B', 'message_body' => 'halo', 'direction' => 'inbound', 'read_at' => now(),
+        ]);
+
+        $rows = collect($this->actingAs($user)->getJson(route('whatsapp-center.conversations', $account))->assertOk()->json())
+            ->keyBy('sender_number');
+
+        $this->assertSame(1, $rows['6281111111111']['unread']);
+        $this->assertSame(0, $rows['6282222222222']['unread']);
+    }
+
     public function test_contacts_hides_foreign_owned_even_with_local_history(): void
     {
         $wani = $this->makeAccount('wa_wani');
