@@ -3,8 +3,9 @@
       Berbicara ke endpoint existing POST ai.assistant.send. File lama
       components/ai-assistant.blade.php dipertahankan tapi tidak di-mount. --}}
 @auth
+@php($v2Convos = auth()->user()->conversations()->latest('updated_at')->take(20)->get(['id', 'title', 'updated_at'])->map(fn ($c) => ['id' => $c->id, 'title' => $c->title ?: __('Percakapan baru'), 'updated_at' => $c->updated_at?->toISOString()])->values()->all())
 @persist('ai-chat-v2')
-<div x-data="aiChatV2(@js(auth()->id()), @js(route('ai.assistant.send')))"
+<div x-data="aiChatV2(@js(auth()->id()), @js(route('ai.assistant.send')), @js(url('/ai/assistant/conversations')), @js($v2Convos))"
      x-init="init()"
      class="ai-chat-v2-root"
      @keydown.escape.window="minimize()">
@@ -42,8 +43,12 @@
             </span>
             <span class="min-w-0 flex-1 leading-tight">
                 <span class="block truncate text-sm font-bold">3DY AI</span>
-                <span class="block text-xs text-white/80">{{ __('Online') }}</span>
+                <span class="block truncate text-xs text-white/80" x-text="activeTitle()">{{ __('Online') }}</span>
             </span>
+            <button type="button" @click="toggleList()" aria-label="{{ __('Daftar percakapan') }}" title="{{ __('Daftar percakapan') }}"
+                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
+            </button>
             <button type="button" @click="newChat()" :disabled="busy" aria-label="{{ __('Percakapan baru') }}" title="{{ __('Percakapan baru') }}"
                     class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 disabled:opacity-40">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14" /></svg>
@@ -59,7 +64,7 @@
         </div>
 
         {{-- Messages --}}
-        <div x-ref="msgs"
+        <div x-show="!showList" x-ref="msgs"
              class="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 px-4 py-4 dark:bg-slate-900/60"
              aria-live="polite" aria-label="{{ __('Riwayat percakapan') }}">
             <template x-if="!messages.length && !busy">
@@ -112,8 +117,35 @@
             </template>
         </div>
 
+        {{-- Conversation list --}}
+        <div x-show="showList"
+             class="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-slate-50 px-3 py-3 dark:bg-slate-900/60"
+             aria-label="{{ __('Daftar percakapan') }}">
+            <button type="button" @click="newChat()" :disabled="busy || loadingConvo"
+                    class="w-full rounded-xl bg-accent-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-accent-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 disabled:opacity-50">
+                {{ __('+ Percakapan baru') }}
+            </button>
+            <template x-if="loadingConvo">
+                <div class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800" role="status" aria-label="{{ __('Memuat percakapan...') }}">
+                    <span class="aiv2-dot"></span><span class="aiv2-dot"></span><span class="aiv2-dot"></span>
+                </div>
+            </template>
+            <template x-for="c in convos" :key="c.id">
+                <button type="button" @click="openConversation(c.id)" :disabled="busy || loadingConvo"
+                        :class="c.id === conversationId
+                            ? 'border-accent-500 bg-accent-50 dark:bg-accent-500/10'
+                            : 'border-slate-200 bg-white hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700/60'"
+                        class="w-full truncate rounded-xl border px-3 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 disabled:opacity-50">
+                    <span class="block truncate text-sm font-semibold text-slate-700 dark:text-slate-200" x-text="c.title"></span>
+                </button>
+            </template>
+            <template x-if="!convos.length && !loadingConvo">
+                <p class="py-4 text-center text-xs text-slate-500 dark:text-slate-400">{{ __('Belum ada percakapan.') }}</p>
+            </template>
+        </div>
+
         {{-- Input --}}
-        <div class="border-t border-slate-200 bg-white px-3.5 py-3 dark:border-slate-700 dark:bg-slate-800">
+        <div x-show="!showList" class="border-t border-slate-200 bg-white px-3.5 py-3 dark:border-slate-700 dark:bg-slate-800">
             <div class="flex items-end gap-2">
                 <textarea x-ref="input" x-model="draft" rows="1" maxlength="2000"
                           @input="resize()" @keydown.enter="onEnter($event)"
@@ -145,10 +177,11 @@
 </style>
 
 <script>
-function aiChatV2(uid, sendUrl) {
+function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
     return {
-        uid, sendUrl, open: false, busy: false, error: '',
+        uid, sendUrl, showUrl, open: false, busy: false, error: '',
         messages: [], draft: '', conversationId: null, lastUserText: '',
+        convos: initialConvos || [], showList: false, loadingConvo: false,
         __inited: false,
         quicks: @js([__('Jelaskan data server saya'), __('Bantu analisis masalah'), __('Buatkan kode Laravel'), __('Jelaskan konsep jaringan')]),
         key() { return '3dy.ai.v2.conv.' + this.uid; },
@@ -157,6 +190,51 @@ function aiChatV2(uid, sendUrl) {
             if (this.__inited) return;
             this.__inited = true;
             try { this.conversationId = localStorage.getItem(this.key()) || null; } catch (e) { this.conversationId = null; }
+            // ID simpanan yang sudah tak ada di daftar (mis. dihapus dari halaman AI) dibuang.
+            if (this.conversationId && !this.convos.some(c => c.id === this.conversationId)) {
+                this.conversationId = null;
+                try { localStorage.removeItem(this.key()); } catch (e) {}
+            }
+        },
+        activeTitle() {
+            const c = this.convos.find(c => c.id === this.conversationId);
+            return c ? c.title : @js(__('Online'));
+        },
+        toggleList() { this.showList = !this.showList; },
+        touchConvo(c) {
+            if (!c || !c.id) return;
+            this.convos = [{
+                id: c.id,
+                title: c.title || @js(__('Percakapan baru')),
+                updated_at: c.updated_at ?? null,
+            }, ...this.convos.filter(x => x.id !== c.id)].slice(0, 20);
+        },
+        async openConversation(id) {
+            if (this.busy || this.loadingConvo || !id) return;
+            if (id === this.conversationId && this.messages.length) { this.showList = false; return; }
+            this.loadingConvo = true; this.error = '';
+            try {
+                const res = await fetch(this.showUrl + '/' + encodeURIComponent(id), { headers: this.headers() });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || ('HTTP ' + res.status));
+                this.touchConvo(data.conversation);
+                this.conversationId = (data.conversation && data.conversation.id) || id;
+                try { localStorage.setItem(this.key(), this.conversationId); } catch (e) {}
+                this.messages = (data.messages ?? []).map((m, i) => ({
+                    id: m.id ?? ('m' + Date.now() + i),
+                    role: m.role,
+                    content: m.content ?? '',
+                    time: '',
+                }));
+                this.lastUserText = '';
+                this.showList = false;
+                this.scrollBottom();
+            } catch (e) {
+                this.error = e?.message || @js(__('Gagal memuat percakapan.'));
+                this.showList = false;
+            } finally {
+                this.loadingConvo = false;
+            }
         },
         openChat() {
             this.open = true; this.error = '';
@@ -166,7 +244,7 @@ function aiChatV2(uid, sendUrl) {
         closeChat() { this.open = false; },
         newChat() {
             this.messages = []; this.error = ''; this.lastUserText = '';
-            this.conversationId = null;
+            this.conversationId = null; this.showList = false;
             try { localStorage.removeItem(this.key()); } catch (e) {}
         },
         scrollBottom() {
@@ -182,7 +260,7 @@ function aiChatV2(uid, sendUrl) {
             if (e.shiftKey) return;
             e.preventDefault(); this.send();
         },
-        canSend() { return this.draft.trim().length > 0 && !this.busy; },
+        canSend() { return this.draft.trim().length > 0 && !this.busy && !this.loadingConvo; },
         nowTime() {
             const t = new Date();
             return String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
@@ -196,8 +274,8 @@ function aiChatV2(uid, sendUrl) {
                 return el.innerHTML;
             }
         },
-        sendQuick(text) { if (this.busy) return; this.draft = text; this.send(); },
-        retry() { if (this.busy || !this.lastUserText) return; this.draft = this.lastUserText; this.send(); },
+        sendQuick(text) { if (this.busy || this.loadingConvo) return; this.draft = text; this.send(); },
+        retry() { if (this.busy || this.loadingConvo || !this.lastUserText) return; this.draft = this.lastUserText; this.send(); },
         headers() {
             return {
                 'Accept': 'application/json',
@@ -207,7 +285,7 @@ function aiChatV2(uid, sendUrl) {
         },
         async send() {
             const text = this.draft.trim();
-            if (!text || this.busy) return;
+            if (!text || this.busy || this.loadingConvo) return;
             this.draft = ''; this.error = '';
             this.lastUserText = text;
             this.$nextTick(() => this.resize());
@@ -225,6 +303,7 @@ function aiChatV2(uid, sendUrl) {
                     this.conversationId = data.conversation_id;
                     try { localStorage.setItem(this.key(), this.conversationId); } catch (e) {}
                 }
+                if (data.conversation) this.touchConvo(data.conversation);
                 this.messages.push({ id: Date.now() + 1, role: 'assistant', content: data.message ?? '', time: this.nowTime() });
             } catch (e) {
                 this.error = e?.message || @js(__('Maaf, terjadi masalah saat menghubungi AI. Silakan coba lagi.'));
