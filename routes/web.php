@@ -469,4 +469,5 @@ require __DIR__.'/auth.php';
 // Webhook gateway WhatsApp (dipanggil provider/gateway). CSRF dikecualikan
 // di bootstrap/app.php lewat validateCsrfTokens(except: ['api/whatsapp/webhook']).
 Route::get('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'verifyWebhook']);
-Route::post('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'webhook']);
+Route::post('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'webhook'])
+    ->middleware('throttle:60,1');
