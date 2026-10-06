@@ -258,8 +258,13 @@ function aiAssistant(uid, sendUrl) {
             } catch (e) {}
             try { this.convId = localStorage.getItem(this.convKey()) || null; } catch (e) { this.convId = null; }
             // Sapaan pertama setelah jeda singkat; berikutnya tiap 5 menit (X = snooze 5 menit).
+            // Guard ganda (__greetT + cek ulang lastGreet): dismiss/open/close di tengah
+            // jeda tidak boleh dihidupkan lagi oleh timer yang sudah dipersenjatai.
+            clearTimeout(this.__greetT);
             if (Date.now() - this.lastGreet() >= GREET_EVERY) {
-                setTimeout(() => this.showGreeting(), GREET_FIRST_DELAY);
+                this.__greetT = setTimeout(() => {
+                    if (Date.now() - this.lastGreet() >= GREET_EVERY) this.showGreeting();
+                }, GREET_FIRST_DELAY);
             }
             // Dedupe global: init bisa jalan ulang habis morph/navigasi Livewire —
             // timer & listener lama dimatikan dulu agar tak menumpuk.
@@ -309,12 +314,13 @@ function aiAssistant(uid, sendUrl) {
             return `left:${left}px;top:${top}px;width:${w}px;height:${h}px;`;
         },
         openChat() {
+            clearTimeout(this.__greetT);
             this.open = true; this.greeting = false; this.error = '';
             this.$nextTick(() => { this.scrollBottom(false); this.$refs.input?.focus({ preventScroll: true }); });
         },
         minimize() { this.open = false; },
-        closeChat() { this.open = false; this.greeting = false; this.stampGreet(); },
-        dismissGreeting() { this.greeting = false; this.stampGreet(); },
+        closeChat() { clearTimeout(this.__greetT); this.open = false; this.greeting = false; this.stampGreet(); },
+        dismissGreeting() { clearTimeout(this.__greetT); this.greeting = false; this.stampGreet(); },
         dragStart(e) {
             this.dragging = true; this.moved = false;
             this.sx = e.clientX; this.sy = e.clientY;
