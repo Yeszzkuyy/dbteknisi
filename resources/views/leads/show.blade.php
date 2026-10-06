@@ -45,6 +45,37 @@
         </div>
     </div>
 
+    @php
+        $canSalesWrite = auth()->user()?->can('manage-sales') || auth()->user()?->can('manage-inside-sales');
+        $techRequests = $techRequests ?? collect();
+        $activeTechRequest = $activeTechRequest ?? null;
+        $proposalsList = $proposalsList ?? collect();
+        $completedTechRequest = $techRequests->first(fn ($r) => $r->status === 'completed');
+        $sentProposal = $proposalsList->first(fn ($p) => in_array($p->status, ['sent', 'viewed']));
+        $upcomingSchedules = $upcomingSchedules ?? collect();
+        $pastSchedules = $pastSchedules ?? collect();
+    @endphp
+    @if($canSalesWrite)
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+            <x-icon-button as="a" icon="add" href="{{ route('sales.schedules.create', ['lead_id' => $lead->id]) }}" title="{{ __('Add schedule') }}" />
+            @if($activeTechRequest)
+                <a href="{{ route('sales.technical-requests.show', $activeTechRequest) }}"
+                   class="px-3 py-2 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 font-medium transition">
+                    {{ \App\Models\TechnicalRequest::statusLabel($activeTechRequest->status) }} • {{ $activeTechRequest->title }}
+                </a>
+            @else
+                <x-icon-button as="a" icon="add" href="{{ route('sales.technical-requests.create', ['lead_id' => $lead->id]) }}" title="{{ __('Request technical team') }}" />
+            @endif
+            <x-icon-button as="a" icon="add" href="{{ route('sales.proposals.create', ['lead_id' => $lead->id]) }}" title="{{ $completedTechRequest ? __('Add proposal (technical result ready)') : __('Add proposal') }}" />
+            @if($sentProposal)
+                <a href="{{ route('sales.proposals.show', $sentProposal) }}"
+                   class="px-3 py-2 text-xs rounded-lg bg-green-100 hover:bg-green-200 text-green-800 font-medium transition">
+                    {{ $sentProposal->proposal_number }} • {{ \App\Models\Proposal::statusLabel($sentProposal->status) }}
+                </a>
+            @endif
+        </div>
+    @endif
+
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                     <div>
@@ -386,6 +417,98 @@
                             </div>
                         @empty
                             <p class="text-slate-500">{{ __('Belum ada inside sales task untuk lead ini.') }}</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="mt-1 pt-1 border-t" id="section-technical">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Technical Request') }}</label>
+                        @if($canSalesWrite && !$activeTechRequest)
+                            <a href="{{ route('sales.technical-requests.create', ['lead_id' => $lead->id]) }}"
+                               class="px-3 py-1.5 text-xs rounded-lg bg-green-100 hover:bg-green-200 text-green-700 font-medium transition">{{ __('+ Request Tim Teknis') }}</a>
+                        @endif
+                    </div>
+                    <div class="mt-3 space-y-2">
+                        @forelse($techRequests as $tech)
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
+                                <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-amber-100 text-amber-800">
+                                    {{ \App\Models\TechnicalRequest::statusLabel($tech->status) }}
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-slate-800 dark:text-slate-100 line-clamp-2">{{ $tech->title }}</p>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ \App\Models\TechnicalRequest::typeLabel($tech->request_type) }}
+                                        @if($tech->technician) • {{ $tech->technician->name }} @endif
+                                    </p>
+                                    @if($tech->status === 'completed' && $tech->technical_result)
+                                        <p class="mt-1 text-xs text-slate-600 dark:text-slate-300 line-clamp-2">{{ $tech->technical_result }}</p>
+                                    @endif
+                                </div>
+                                <a href="{{ route('sales.technical-requests.show', $tech) }}"
+                                   class="shrink-0 px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">{{ __('Detail') }}</a>
+                            </div>
+                        @empty
+                            <p class="text-slate-500">{{ __('Belum ada technical request untuk lead ini.') }}</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="mt-1 pt-1 border-t" id="section-schedule">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Jadwal Sales') }}</label>
+                        @if($canSalesWrite)
+                            <a href="{{ route('sales.schedules.create', ['lead_id' => $lead->id]) }}"
+                               class="px-3 py-1.5 text-xs rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium transition">{{ __('+ Jadwal') }}</a>
+                        @endif
+                    </div>
+                    <div class="mt-3 space-y-2">
+                        @php $allSchedules = $upcomingSchedules->concat($pastSchedules); @endphp
+                        @forelse($allSchedules as $schedule)
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
+                                <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-blue-100 text-blue-800">
+                                    {{ \App\Models\SalesSchedule::typeLabel($schedule->type) }}
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-slate-800 dark:text-slate-100 line-clamp-2">{{ $schedule->title }}</p>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        {{ $schedule->start_at?->format('d M Y H:i') ?? '-' }}
+                                        • {{ __('PIC') }}: {{ $schedule->assignee?->name ?? '-' }}
+                                        • {{ \App\Models\SalesSchedule::statusLabel($schedule->status) }}
+                                    </p>
+                                </div>
+                                <a href="{{ route('sales.schedules.show', $schedule) }}"
+                                   class="shrink-0 px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">{{ __('Detail') }}</a>
+                            </div>
+                        @empty
+                            <p class="text-slate-500">{{ __('Belum ada jadwal untuk lead ini.') }}</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="mt-1 pt-1 border-t" id="section-proposal">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Penawaran') }}</label>
+                        @if($canSalesWrite)
+                            <a href="{{ route('sales.proposals.create', ['lead_id' => $lead->id]) }}"
+                               class="px-3 py-1.5 text-xs rounded-lg bg-green-100 hover:bg-green-200 text-green-700 font-medium transition">{{ __('+ Penawaran') }}</a>
+                        @endif
+                    </div>
+                    <div class="mt-3 space-y-2">
+                        @forelse($proposalsList as $proposal)
+                            <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
+                                <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-slate-200 text-slate-700 dark:bg-slate-600 dark:text-slate-200">
+                                    {{ \App\Models\Proposal::statusLabel($proposal->status) }}
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-slate-800 dark:text-slate-100 line-clamp-2">{{ $proposal->proposal_number }}</p>
+                                    <p class="mt-1 text-xs text-slate-500">Rp {{ number_format($proposal->grand_total, 0, ',', '.') }}</p>
+                                </div>
+                                <a href="{{ route('sales.proposals.show', $proposal) }}"
+                                   class="shrink-0 px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">{{ __('Detail') }}</a>
+                            </div>
+                        @empty
+                            <p class="text-slate-500">{{ __('Belum ada penawaran untuk lead ini.') }}</p>
                         @endforelse
                     </div>
                 </div>
