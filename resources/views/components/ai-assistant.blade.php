@@ -65,7 +65,7 @@
                 <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
             </button>
         </div>
-        <button type="button" @click="openChat()"
+        <button type="button" @click.stop="openChat()"
                 class="mt-2.5 w-full rounded-xl bg-accent-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-accent-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400">
             {{ __('Mulai chat') }}
         </button>
