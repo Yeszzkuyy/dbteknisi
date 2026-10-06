@@ -103,6 +103,23 @@ class LeadController extends Controller
         abort(403);
     }
 
+    /**
+     * Target assignment harus user divisi yang memang memegang lead
+     * (sales/marketing), bukan id sembarang lintas divisi.
+     */
+    private function guardSalesAssignee(mixed $assignedTo): void
+    {
+        if (empty($assignedTo)) {
+            return;
+        }
+
+        $assignee = User::find($assignedTo);
+
+        if (! $assignee?->hasAnyRole(['sales', 'marketing'])) {
+            abort(422, __('Target assignment harus user Sales atau Marketing.'));
+        }
+    }
+
     public function updateStatus(Request $request, Lead $lead)
     {
         $this->authorizeLeadStatus($lead);
@@ -378,6 +395,8 @@ class LeadController extends Controller
             'attachments.*' => ['file', 'max:10240', \App\Rules\SecureFile::documents()],
         ]);
 
+        $this->guardSalesAssignee($validated['assigned_to'] ?? null);
+
         if ($validated['customer_mode'] === 'new') {
             $validated['customer_id'] = Customer::create([
                 'name' => $validated['customer_name'],
@@ -390,11 +409,12 @@ class LeadController extends Controller
                 'contact_person' => $validated['customer_contact_person'] ?? null,
             ])->id;
         } else {
+            $customer = Customer::withTrashed()->findOrFail($validated['customer_id']);
             $customerSync = ['pt_group' => $validated['pt_group']];
             if (!empty($validated['customer_contact_person'])) {
                 $customerSync['contact_person'] = $validated['customer_contact_person'];
             }
-            Customer::withTrashed()->whereKey($validated['customer_id'])->update($customerSync);
+            $customer->update($customerSync);
         }
 
         unset(
@@ -507,6 +527,8 @@ class LeadController extends Controller
             'attachments.*' => ['file', 'max:10240', \App\Rules\SecureFile::documents()],
         ]);
 
+        $this->guardSalesAssignee($validated['assigned_to'] ?? null);
+
         if ($validated['customer_mode'] === 'new') {
             $validated['customer_id'] = Customer::create([
                 'name' => $validated['customer_name'],
@@ -530,7 +552,15 @@ class LeadController extends Controller
             ], fn ($value) => $value !== null);
 
             if ($customerData) {
-                Customer::withTrashed()->whereKey($validated['customer_id'])->update($customerData);
+                $customer = Customer::withTrashed()->findOrFail($validated['customer_id']);
+
+                // Pindah lead ke customer lain = butuh hak tulis customer.
+                // Touch-up customer yang sama tetap boleh (alur marketing).
+                if ((int) $customer->id !== (int) $lead->customer_id) {
+                    $this->authorize('update', $customer);
+                }
+
+                $customer->update($customerData);
             }
         }
 
@@ -728,14 +758,11 @@ class LeadController extends Controller
     {
         $this->authorize('view', $lead);
 
-        if ($document->lead_id !== $lead->id || !Storage::disk('private')->exists($document->file_path)) {
+        if ($document->lead_id !== $lead->id) {
             abort(404);
         }
 
-        return response()->file(Storage::disk('private')->path($document->file_path), [
-            'Content-Type' => $document->mime_type ?? 'application/octet-stream',
-            'Content-Disposition' => 'inline; filename="'.$document->file_name.'"',
-        ]);
+        return \App\Rules\SecureFile::fileResponse('private', $document->file_path, $document->file_name);
     }
 
     public function downloadAttachment(Lead $lead, LeadDocument $document)
@@ -778,7 +805,7 @@ class LeadController extends Controller
             $lead->documents()->create([
                 'file_name' => \App\Rules\SecureFile::sanitizeName($file->getClientOriginalName()),
                 'file_path' => $path,
-                'mime_type' => $file->getClientMimeType(),
+                'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
             ]);
         }
     }
@@ -794,7 +821,7 @@ class LeadController extends Controller
             $lead->documents()->create([
                 'file_name' => \App\Rules\SecureFile::sanitizeName($file->getClientOriginalName()),
                 'file_path' => $path,
-                'mime_type' => $file->getClientMimeType(),
+                'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
             ]);
         }
     }
@@ -835,30 +862,8 @@ class LeadController extends Controller
             abort(404);
         }
 
-        if (!Storage::disk('private')->exists($document->file_path)) {
-            abort(404, 'File tidak ditemukan.');
-        }
-
-        $filePath = Storage::disk('private')->path($document->file_path);
-
-        $mimeType = $document->mime_type ?? mime_content_type($filePath);
-        $extension = strtolower(pathinfo($document->file_name, PATHINFO_EXTENSION));
-
-        $inlineTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'mp4', 'webm', 'ogg', 'mp3', 'wav'];
-
-        if (in_array($extension, $inlineTypes)) {
-            return response()->file($filePath, [
-                'Content-Type' => $mimeType,
-                'Content-Disposition' => 'inline; filename="' . $document->file_name . '"'
-            ]);
-        }
-
-        $officeTypes = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
-        if (in_array($extension, $officeTypes)) {
-            return Storage::disk('private')->download($document->file_path, $document->file_name);
-        }
-
-        return Storage::disk('private')->download($document->file_path, $document->file_name);
+        // MIME dari isi file + hanya tipe aman yang inline (svg ikut download).
+        return \App\Rules\SecureFile::fileResponse('private', $document->file_path, $document->file_name);
     }
 
     public function downloadDocument(Lead $lead, ProjectDocument $document)
