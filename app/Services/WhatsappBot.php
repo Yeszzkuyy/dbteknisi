@@ -261,14 +261,14 @@ class WhatsappBot
 
     public function generateReply(WhatsappAccount $account, string $sender): ?string
     {
-        $transcript = $this->transcript($account, $sender, 15);
+        $input = $this->buildReplyInput($account, $sender);
 
-        if ($transcript === '') {
+        if ($input === '') {
             return null;
         }
 
         try {
-            $text = trim((string) (new WhatsappSalesBot)->prompt($transcript));
+            $text = trim((string) (new WhatsappSalesBot)->prompt($input));
         } catch (Throwable $e) {
             Log::error('WhatsappBot generateReply gagal: '.$e->getMessage());
 
@@ -276,6 +276,21 @@ class WhatsappBot
         }
 
         return $text !== '' ? mb_substr($text, 0, 1000) : self::FALLBACK_REPLY;
+    }
+
+    /**
+     * Transkrip + instruksi tambahan tim marketing (sapaan/format kebutuhan
+     * per akun, diisi lewat Pengaturan Bot di WhatsApp Center).
+     */
+    public function buildReplyInput(WhatsappAccount $account, string $sender): string
+    {
+        $transcript = $this->transcript($account, $sender, 15);
+
+        if (filled($account->bot_instructions)) {
+            $transcript .= ($transcript === '' ? '' : "\n\n").'Instruksi tambahan dari tim marketing: '.trim((string) $account->bot_instructions);
+        }
+
+        return $transcript;
     }
 
     private function notifyHandoff(WhatsappAccount $account, string $sender, string $reason, string $preview): void

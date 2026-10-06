@@ -372,6 +372,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{account}/contacts', [WhatsAppCenterController::class, 'saveContact'])->name('contact-save');
             Route::post('/{account}/simulate', [WhatsAppCenterController::class, 'simulate'])->name('simulate');
             Route::put('/{account}/credentials', [WhatsAppCenterController::class, 'updateCredentials'])->name('credentials');
+            Route::put('/{account}/bot-settings', [WhatsAppCenterController::class, 'updateBotSettings'])->name('bot-settings');
         });
     });
 

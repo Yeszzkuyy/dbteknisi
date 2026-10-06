@@ -706,6 +706,25 @@ class WhatsAppCenterController extends Controller
             ->with('success', 'Kredensial gateway disimpan.');
     }
 
+    /**
+     * Pengaturan sapaan/instruksi bot per akun — boleh diubah tim marketing
+     * (manage-marketing), tidak seperti kredensial gateway yang terbatas pengelola.
+     */
+    public function updateBotSettings(Request $request, WhatsappAccount $account)
+    {
+        $this->authorizeAccount($account);
+        $this->authorize('manage-marketing');
+
+        $validated = $request->validate([
+            'bot_instructions' => 'nullable|string|max:2000',
+        ]);
+
+        $account->update(['bot_instructions' => $validated['bot_instructions'] ?? null]);
+
+        return redirect()->route('whatsapp-center.index')
+            ->with('success', 'Pengaturan bot disimpan.');
+    }
+
     private function handleIncoming(WhatsappAccount $account, array $payload): JsonResponse
     {
         $messageData = data_get($payload, 'messageData', []);
