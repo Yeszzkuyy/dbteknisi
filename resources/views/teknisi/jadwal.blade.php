@@ -32,9 +32,9 @@
         </div>
     </div>
 
-    {{-- Calendar --}}
+    {{-- Calendar (min-height menahan CLS sampai event selesai dimuat) --}}
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-4">
-        <div id="teknisi-calendar" class="teknisi-calendar" data-events-url="{{ route('teknisi.kalender.events') }}"></div>
+        <div id="teknisi-calendar" class="teknisi-calendar" style="min-height:480px" data-events-url="{{ route('teknisi.kalender.events') }}"></div>
     </div>
 </div>
 

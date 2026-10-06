@@ -363,6 +363,9 @@
                         aria-hidden="true"
                         loading="eager"
                         decoding="async"
+                        fetchpriority="high"
+                        width="1024"
+                        height="1024"
                     >
                 </picture>
             </aside>
