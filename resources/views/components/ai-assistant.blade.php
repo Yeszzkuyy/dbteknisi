@@ -328,7 +328,15 @@ function aiAssistant(uid, sendUrl) {
             e.currentTarget.setPointerCapture?.(e.pointerId);
         },
         dragMove(e) {
-            if (!this.dragging) return;
+            if (!this.dragging) {
+                // Pengaman terbukti-runtime: pointermove tiba dengan tombol utama
+                // ditekan di atas trigger tetapi dragStart() terlewat (pointerdown
+                // tak ter-dispatch ke tombol) — mulai drag dari titik ini agar
+                // geser tetap memindah logo dan klik susulannya tetap tertelan.
+                // Hover biasa (buttons 0) tetap diabaikan seperti sebelumnya.
+                if ((e.buttons & 1) && e.target?.closest?.('.ai-mascot-btn')) this.dragStart(e);
+                return;
+            }
             if (Math.hypot(e.clientX - this.sx, e.clientY - this.sy) > 10) this.moved = true;
             if (!this.moved) return;
             this.pos = { left: this.ox + e.clientX - this.sx, top: this.oy + e.clientY - this.sy };
