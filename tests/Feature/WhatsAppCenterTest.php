@@ -1433,6 +1433,21 @@ class WhatsAppCenterTest extends TestCase
         ]);
     }
 
+    public function test_gateway_token_encrypted_at_rest_but_readable_via_model(): void
+    {
+        $account = $this->makeAccount('wa_nti');
+        $account->update(['gateway_token' => 'token-rahasia-123']);
+
+        $raw = \Illuminate\Support\Facades\DB::table('whatsapp_accounts')
+            ->where('id', $account->id)->value('gateway_token');
+
+        // Di DB tersimpan envelope terenkripsi (tanpa serialisasi,
+        // sesuai cast 'encrypted'), bukan plaintext.
+        $this->assertNotSame('token-rahasia-123', $raw);
+        $this->assertStringStartsWith('eyJ', $raw);
+        $this->assertSame('token-rahasia-123', $account->fresh()->gateway_token);
+    }
+
     public function test_meta_webhook_rejects_missing_signature_when_secret_set(): void
     {
         config(['whatsapp.meta.app_secret' => 'test-app-secret']);
