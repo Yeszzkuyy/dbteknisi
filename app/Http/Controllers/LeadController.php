@@ -886,6 +886,85 @@ class LeadController extends Controller
         return view('leads.import');
     }
 
+    /**
+     * Normalisasi 1 baris import (murni, tanpa query).
+     *
+     * @return array{row:int, company:string, sales:mixed, customer_attrs:array, lead_attrs:array}
+     */
+    private function normalizeImportRow(array $data): array
+    {
+        $companyName = $data['nama_perusahaan'] ?? $data['company'] ?? $data['perusahaan'] ?? null;
+        if (empty($companyName) || ! is_string($companyName)) {
+            throw new \Exception('Nama perusahaan kosong');
+        }
+        $companyName = trim($companyName);
+
+        $ptGroup = $data['pt'] ?? $data['pt_group'] ?? 'NTI';
+        if (! in_array($ptGroup, Lead::PT_GROUPS, true)) {
+            throw new \Exception("PT grup '{$ptGroup}' tidak valid");
+        }
+
+        $segment = $data['segment'] ?? 'other';
+        if (! in_array($segment, self::SEGMENTS, true)) {
+            throw new \Exception("Segment '{$segment}' tidak valid");
+        }
+
+        $source = $data['source'] ?? $data['masuk_by'] ?? null;
+        if ($source !== null && $source !== '' && ! in_array($source, self::SOURCES, true)) {
+            throw new \Exception("Source '{$source}' tidak valid");
+        }
+
+        $incomingDate = $data['tanggal'] ?? $data['date'] ?? $data['incoming_date'] ?? now()->toDateString();
+        try {
+            $incomingDate = \Illuminate\Support\Carbon::parse($incomingDate)->toDateString();
+        } catch (\Throwable) {
+            $incomingDate = now()->toDateString();
+        }
+
+        return [
+            'company' => $companyName,
+            'sales' => $data['sales'] ?? $data['assigned_to'] ?? null,
+            'customer_attrs' => [
+                'name' => $companyName,
+                'company' => $companyName,
+                'pt_group' => $ptGroup,
+                'address' => $data['alamat'] ?? $data['address'] ?? null,
+                'phone' => $data['telp'] ?? $data['phone'] ?? $data['telepon'] ?? null,
+                'whatsapp' => $data['wa'] ?? $data['whatsapp'] ?? null,
+                'email' => $data['email'] ?? null,
+                'contact_person' => $data['pic'] ?? $data['contact_person'] ?? null,
+            ],
+            'lead_attrs' => [
+                'pt_group' => $ptGroup,
+                'segment' => $segment,
+                'source' => $source ?: null,
+                'kebutuhan' => $data['kebutuhan'] ?? null,
+                'solusi' => $data['solusi'] ?? null,
+                'progress_notes' => $data['progress'] ?? $data['followup'] ?? null,
+                'notes' => $data['catatan'] ?? $data['notes'] ?? null,
+                'incoming_date' => $incomingDate,
+            ],
+        ];
+    }
+
+    /**
+     * Cocokkan kolom sales ke user: id eksak dulu, lalu nama eksak
+     * (case-insensitive). Tanpa LIKE fuzzy — salah assign lebih buruk
+     * daripada tidak assign.
+     */
+    private function resolveImportAssignee(mixed $salesVal, array $usersById, array $usersByNameLower): mixed
+    {
+        if (empty($salesVal)) {
+            return null;
+        }
+
+        if (is_numeric($salesVal) && isset($usersById[(int) $salesVal])) {
+            return (int) $salesVal;
+        }
+
+        return $usersByNameLower[mb_strtolower(trim((string) $salesVal))] ?? null;
+    }
+
     public function import(Request $request)
     {
         $request->validate([
@@ -916,6 +995,8 @@ class LeadController extends Controller
             $headers = array_map(fn ($h) => strtolower(trim(str_replace([' ', "\t"], '_', $h))), $rows[0]);
             $results = ['success' => 0, 'failed' => 0, 'errors' => []];
 
+            // Pass 1: normalisasi + validasi per baris (tanpa query).
+            $parsed = [];
             for ($i = 1; $i < count($rows); $i++) {
                 $row = $rows[$i];
                 if (empty(array_filter($row)) || count($row) < count($headers)) continue;
@@ -924,61 +1005,60 @@ class LeadController extends Controller
                 $rowNum = $i + 1;
 
                 try {
-                    $companyName = $data['nama_perusahaan'] ?? $data['company'] ?? $data['perusahaan'] ?? null;
-                    if (empty($companyName)) {
-                        throw new \Exception('Nama perusahaan kosong');
-                    }
-
-                    $ptGroup = $data['pt'] ?? $data['pt_group'] ?? 'NTI';
-
-                    $customer = Customer::firstOrCreate(
-                        ['name' => trim($companyName)],
-                        [
-                            'company' => trim($companyName),
-                            'pt_group' => $ptGroup,
-                            'address' => $data['alamat'] ?? $data['address'] ?? null,
-                            'phone' => $data['telp'] ?? $data['phone'] ?? $data['telepon'] ?? null,
-                            'whatsapp' => $data['wa'] ?? $data['whatsapp'] ?? null,
-                            'email' => $data['email'] ?? null,
-                            'contact_person' => $data['pic'] ?? $data['contact_person'] ?? null,
-                        ]
-                    );
-
-                    if (empty($customer->pt_group)) {
-                        $customer->update(['pt_group' => $ptGroup]);
-                    }
-
-                    $incomingDate = $data['tanggal'] ?? $data['date'] ?? $data['incoming_date'] ?? now()->toDateString();
-                    if (!strtotime($incomingDate)) $incomingDate = now()->toDateString();
-
-                    $assignedTo = null;
-                    $salesVal = $data['sales'] ?? $data['assigned_to'] ?? null;
-                    if ($salesVal) {
-                        $salesUser = User::where('name', 'like', "%{$salesVal}%")->first()
-                            ?? User::find($salesVal);
-                        $assignedTo = $salesUser?->id;
-                    }
-
-                    Lead::create([
-                        'customer_id' => $customer->id,
-                        'pt_group' => $ptGroup,
-                        'segment' => $data['segment'] ?? 'other',
-                        'source' => $data['source'] ?? $data['masuk_by'] ?? null,
-                        'kebutuhan' => $data['kebutuhan'] ?? null,
-                        'solusi' => $data['solusi'] ?? null,
-                        'progress_notes' => $data['progress'] ?? $data['followup'] ?? null,
-                        'notes' => $data['catatan'] ?? $data['notes'] ?? null,
-                        'incoming_date' => $incomingDate,
-                        'assigned_to' => $assignedTo,
-                        'status' => 'new',
-                    ]);
-
-                    $results['success']++;
+                    $parsed[] = $this->normalizeImportRow($data) + ['row' => $rowNum];
                 } catch (\Exception $e) {
                     $results['failed']++;
                     $results['errors'][] = "Baris {$rowNum}: {$e->getMessage()}";
                 }
             }
+
+            // Preload sekali: user (id + nama eksak) dan customer yang sudah ada.
+            $usersById = User::pluck('id', 'id')->all();
+            $usersByName = User::pluck('id', 'name')->all();
+            $usersByNameLower = [];
+            foreach ($usersByName as $name => $id) {
+                $usersByNameLower[mb_strtolower($name)] = $id;
+            }
+            $wantedNames = collect($parsed)->pluck('company')->unique()->values()->all();
+            $customerIds = Customer::whereIn('name', $wantedNames)->pluck('id', 'name')->all();
+
+            $now = now();
+            $leadsBatch = [];
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($parsed, &$customerIds, &$leadsBatch, &$results, $usersById, $usersByNameLower, $now) {
+                // Customer baru: bulk insert sekaligus, bukan firstOrCreate per baris.
+                $newNames = collect($parsed)->pluck('company')->unique()->reject(fn ($n) => isset($customerIds[$n]))->values();
+                if ($newNames->isNotEmpty()) {
+                    $byName = collect($parsed)->keyBy('company');
+                    Customer::insert($newNames->map(fn ($name) => array_merge(
+                        $byName[$name]['customer_attrs'],
+                        ['created_at' => $now, 'updated_at' => $now]
+                    ))->all());
+                    $customerIds += Customer::whereIn('name', $newNames->all())->pluck('id', 'name')->all();
+                }
+
+                foreach ($parsed as $item) {
+                    $customerId = $customerIds[$item['company']] ?? null;
+                    if (! $customerId) {
+                        $results['failed']++;
+                        $results['errors'][] = "Baris {$item['row']}: customer gagal disimpan";
+                        continue;
+                    }
+
+                    $leadsBatch[] = array_merge($item['lead_attrs'], [
+                        'customer_id' => $customerId,
+                        'assigned_to' => $this->resolveImportAssignee($item['sales'], $usersById, $usersByNameLower),
+                        'status' => 'new',
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+                    $results['success']++;
+                }
+
+                foreach (array_chunk($leadsBatch, 500) as $chunk) {
+                    Lead::insert($chunk);
+                }
+            });
 
             return back()->with('import_results', $results);
         } catch (\Exception $e) {
