@@ -71,7 +71,7 @@ class ManageSalesController extends Controller
             'kebutuhan' => 'nullable|string|max:2000',
             'solusi' => 'nullable|string|max:2000',
             'progress_notes' => 'nullable|string|max:2000',
-            'notes' => 'nullable',
+            'notes' => 'nullable|string|max:5000',
             'pt_group' => 'nullable|in:NTI,MGK,TPS,WANI',
             'assigned_to' => 'nullable|exists:users,id',
         ]);
@@ -265,15 +265,17 @@ class ManageSalesController extends Controller
             fwrite($handle, "\xEF\xBB\xBF"); // BOM agar Excel baca UTF-8.
             fputcsv($handle, ['Customer', 'PT', 'PIC', 'Telepon', 'Status', 'Kebutuhan', 'Solusi', 'Progres', 'Tgl Masuk', 'Jml Meeting', 'Jml Follow Up', 'Follow Up Terakhir']);
             foreach ($leads as $lead) {
+                // Cegah CSV formula injection: sel yang diawali = + - @ dinetralkan.
+                $safe = fn ($value) => is_string($value) && preg_match('/^[=+\-@]/', $value) ? "'".$value : $value;
                 fputcsv($handle, [
-                    $lead->customer?->name ?? '-',
-                    $lead->pt_group ?? '-',
-                    $lead->customer?->contact_person ?? '-',
-                    $lead->customer?->phone ?? $lead->customer?->whatsapp ?? '-',
-                    ucfirst($lead->status),
-                    $lead->kebutuhan ?? '-',
-                    $lead->solusi ?? '-',
-                    $lead->progress_notes ?? '-',
+                    $safe($lead->customer?->name ?? '-'),
+                    $safe($lead->pt_group ?? '-'),
+                    $safe($lead->customer?->contact_person ?? '-'),
+                    $safe($lead->customer?->phone ?? $lead->customer?->whatsapp ?? '-'),
+                    $safe(ucfirst($lead->status)),
+                    $safe($lead->kebutuhan ?? '-'),
+                    $safe($lead->solusi ?? '-'),
+                    $safe($lead->progress_notes ?? '-'),
                     $lead->incoming_date?->format('Y-m-d') ?? '-',
                     $lead->meetings_count,
                     $lead->follow_ups_count,
