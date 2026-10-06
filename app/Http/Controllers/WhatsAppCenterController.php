@@ -505,9 +505,12 @@ class WhatsAppCenterController extends Controller
         $token = $request->query('hub_verify_token');
         $challenge = $request->query('hub_challenge');
 
-        if ($mode === 'subscribe'
+        $expected = (string) config('whatsapp.meta.verify_token');
+
+        if ($expected !== ''
+            && $mode === 'subscribe'
             && $token
-            && hash_equals(config('whatsapp.meta.verify_token'), $token)) {
+            && hash_equals($expected, $token)) {
             return response($challenge);
         }
 
@@ -634,6 +637,9 @@ class WhatsAppCenterController extends Controller
         $text = null;
         if (data_get($msg, 'type') === 'text') {
             $text = data_get($msg, 'text.body');
+        } else {
+            // Non-teks (gambar/audio/dokumen) tetap dicatat agar percakapan muncul di list.
+            $text = '[Pesan '.data_get($msg, 'type', 'media').' diterima — belum didukung, minta pengirim kirim teks.]';
         }
 
         if ($text === null) {
@@ -670,10 +676,15 @@ class WhatsAppCenterController extends Controller
             'bot_enabled' => 'nullable|boolean',
         ]);
 
-        $account->update(array_merge($validated, [
-            'bot_enabled' => $request->boolean('bot_enabled'),
-            'gateway_status' => null,
-        ]));
+        // Token kosong = tidak diubah (input password sengaja tidak di-prefill di form).
+        $account->update(array_merge(
+            [
+                'gateway_instance' => $validated['gateway_instance'] ?? null,
+                'bot_enabled' => $request->boolean('bot_enabled'),
+                'gateway_status' => null,
+            ],
+            filled($validated['gateway_token'] ?? null) ? ['gateway_token' => $validated['gateway_token']] : []
+        ));
 
         if ($state = $this->gateway->getState($account)) {
             $account->update(['gateway_status' => $state]);
@@ -837,7 +848,8 @@ class WhatsAppCenterController extends Controller
         return WhatsappAccount::where('is_active', true)
             ->when(
                 ! $user->hasRole('super-admin') && ! $user->hasPermissionTo('manage-sales-leads'),
-                fn ($q) => $q->where('assigned_to', $user->id)
+                // Akun tanpa pemilik = pool bersama, terlihat semua marketing.
+                fn ($q) => $q->where(fn ($qq) => $qq->where('assigned_to', $user->id)->orWhereNull('assigned_to'))
             )
             ->orderBy('account_code');
     }

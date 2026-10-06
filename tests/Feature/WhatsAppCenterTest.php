@@ -225,12 +225,17 @@ class WhatsAppCenterTest extends TestCase
     {
         $mine = $this->makeAccount('wa_nti');
         $other = $this->makeAccount('wa_mgk');
+        $shared = $this->makeAccount('wa_tps');
         $user = $this->marketingUser($mine->id);
+        $stranger = User::factory()->create();
+        $stranger->assignRole('marketing');
+        $other->update(['assigned_to' => $stranger->id]);
 
         $response = $this->actingAs($user)->get(route('whatsapp-center.index'))->assertOk();
 
         $accounts = collect($response->viewData('accounts'));
         $this->assertTrue($accounts->contains('id', $mine->id));
+        $this->assertTrue($accounts->contains('id', $shared->id));
         $this->assertFalse($accounts->contains('id', $other->id));
     }
 
@@ -239,6 +244,9 @@ class WhatsAppCenterTest extends TestCase
         $mine = $this->makeAccount('wa_nti');
         $other = $this->makeAccount('wa_mgk');
         $user = $this->marketingUser($mine->id);
+        $stranger = User::factory()->create();
+        $stranger->assignRole('marketing');
+        $other->update(['assigned_to' => $stranger->id]);
 
         $this->actingAs($user)->get(route('whatsapp-center.conversations', $other))->assertForbidden();
     }
@@ -497,6 +505,63 @@ class WhatsAppCenterTest extends TestCase
         $this->actingAs($user)
             ->put(route('whatsapp-center.credentials', $account), ['gateway_instance' => '999'])
             ->assertForbidden();
+    }
+
+    public function test_blank_token_keeps_existing_gateway_token(): void
+    {
+        $account = $this->makeAccount();
+        $account->update(['gateway_instance' => '1101', 'gateway_token' => 'tok-lama']);
+        $admin = User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        Http::fake(['api.green-api.com/*' => Http::response(['stateInstance' => 'authorized'])]);
+
+        $this->actingAs($admin)
+            ->put(route('whatsapp-center.credentials', $account), [
+                'gateway_instance' => '1101',
+                'gateway_token' => '',
+            ])
+            ->assertRedirect();
+
+        $this->assertSame('tok-lama', $account->fresh()->gateway_token);
+    }
+
+    public function test_verify_webhook_with_empty_config_returns_403_not_500(): void
+    {
+        config(['whatsapp.meta.verify_token' => '']);
+
+        $this->get('/api/whatsapp/webhook?hub_mode=subscribe&hub_verify_token=x&hub_challenge=12345')
+            ->assertForbidden();
+    }
+
+    public function test_meta_webhook_stores_placeholder_for_non_text_message(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_ID_1']);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'changes' => [[
+                    'value' => [
+                        'metadata' => ['phone_number_id' => 'PHONE_ID_1'],
+                        'messages' => [[
+                            'id' => 'META-IMG-1',
+                            'from' => '6281234567890',
+                            'type' => 'image',
+                            'image' => ['id' => 'media-1'],
+                            'timestamp' => now()->timestamp,
+                        ]],
+                    ],
+                ]],
+            ]],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'direction' => 'inbound',
+        ]);
     }
 
     public function test_green_api_webhook_stores_extended_text_message(): void
