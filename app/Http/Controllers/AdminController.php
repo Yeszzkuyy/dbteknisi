@@ -211,11 +211,12 @@ class AdminController extends Controller
 
     public function paymentsProof(Payment $payment)
     {
-        if (!$payment->proof_file || !Storage::disk('private')->exists($payment->proof_file)) {
+        if (!$payment->proof_file) {
             abort(404, __('File bukti tidak ditemukan.'));
         }
 
-        return Storage::disk('private')->response($payment->proof_file);
+        // MIME dari isi file + nosniff (bukti hanya jpg/png/pdf).
+        return \App\Rules\SecureFile::fileResponse('private', $payment->proof_file, basename($payment->proof_file));
     }
 
     public function paymentsDestroy(Payment $payment)
