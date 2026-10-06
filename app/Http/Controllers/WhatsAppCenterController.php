@@ -547,7 +547,11 @@ class WhatsAppCenterController extends Controller
         $secret = (string) config('whatsapp.meta.app_secret');
 
         if ($secret === '') {
-            Log::warning('Webhook Meta tanpa verifikasi signature (META_WA_APP_SECRET belum diset).');
+            try {
+                Log::warning('Webhook Meta tanpa verifikasi signature (META_WA_APP_SECRET belum diset).');
+            } catch (\Throwable) {
+                // ponytail: best-effort — logging gagal (mis. izin file) tak boleh menggagalkan webhook.
+            }
 
             return;
         }
