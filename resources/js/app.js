@@ -2,7 +2,6 @@
 
 import AlpineBundle from 'alpinejs';
 import Sortable from 'sortablejs';
-import ApexCharts from 'apexcharts';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { mountLoginGalaxy } from './galaxy.js';
@@ -15,7 +14,6 @@ import { mountLoginGalaxy } from './galaxy.js';
 const Alpine = window.Alpine ?? AlpineBundle;
 window.Alpine = Alpine;
 window.Sortable = Sortable;
-window.ApexCharts = ApexCharts;
 window.marked = marked;
 window.DOMPurify = DOMPurify;
 
