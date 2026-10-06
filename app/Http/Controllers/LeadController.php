@@ -223,9 +223,15 @@ class LeadController extends Controller
             ->map(fn ($row) => (object) ['source' => $row->source ?? 'lainnya', 'total' => (int) $row->total])
             ->values();
 
-        // Agregat per bulan di SQL; substr(YYYY-MM-DD, 1, 7) portabel antar driver.
+        // Agregat per bulan di SQL; ekspresi bulan beda per driver
+        // (substr(date) jalan di SQLite tapi tidak di Postgres).
+        $monthExpr = match (\Illuminate\Support\Facades\DB::getDriverName()) {
+            'pgsql' => "to_char(incoming_date, 'YYYY-MM')",
+            'mysql' => "DATE_FORMAT(incoming_date, '%Y-%m')",
+            default => 'substr(incoming_date, 1, 7)',
+        };
         $trendQuery = Lead::whereDate('incoming_date', '>=', $dateFrom)->whereDate('incoming_date', '<=', $dateTo)
-            ->selectRaw('substr(incoming_date, 1, 7) as ym, count(*) as total')
+            ->selectRaw("{$monthExpr} as ym, count(*) as total")
             ->groupBy('ym')
             ->pluck('total', 'ym');
 

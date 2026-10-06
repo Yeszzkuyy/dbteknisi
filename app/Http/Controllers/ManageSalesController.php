@@ -253,35 +253,37 @@ class ManageSalesController extends Controller
 
     public function exportMyLeads(Request $request)
     {
-        $leads = $this->myLeadsQuery($request)
-            ->with(['customer'])
-            ->withMax('followUps as last_follow_up_at', 'follow_up_date')
-            ->get();
-
         $filename = 'my-leads-'.now()->format('Ymd-Hi').'.csv';
 
-        return response()->streamDownload(function () use ($leads) {
+        // Streaming per 1000 baris (chunkById + eager per chunk):
+        // memori tetap datar berapa pun jumlah lead.
+        return response()->streamDownload(function () use ($request) {
             $handle = fopen('php://output', 'w');
             fwrite($handle, "\xEF\xBB\xBF"); // BOM agar Excel baca UTF-8.
             fputcsv($handle, ['Customer', 'PT', 'PIC', 'Telepon', 'Status', 'Kebutuhan', 'Solusi', 'Progres', 'Tgl Masuk', 'Jml Meeting', 'Jml Follow Up', 'Follow Up Terakhir']);
-            foreach ($leads as $lead) {
-                // Cegah CSV formula injection: sel yang diawali = + - @ dinetralkan.
-                $safe = fn ($value) => is_string($value) && preg_match('/^[=+\-@]/', $value) ? "'".$value : $value;
-                fputcsv($handle, [
-                    $safe($lead->customer?->name ?? '-'),
-                    $safe($lead->pt_group ?? '-'),
-                    $safe($lead->customer?->contact_person ?? '-'),
-                    $safe($lead->customer?->phone ?? $lead->customer?->whatsapp ?? '-'),
-                    $safe(ucfirst($lead->status)),
-                    $safe($lead->kebutuhan ?? '-'),
-                    $safe($lead->solusi ?? '-'),
-                    $safe($lead->progress_notes ?? '-'),
-                    $lead->incoming_date?->format('Y-m-d') ?? '-',
-                    $lead->meetings_count,
-                    $lead->follow_ups_count,
-                    $lead->last_follow_up_at ?? '-',
-                ]);
-            }
+            $this->myLeadsQuery($request)
+                ->with(['customer'])
+                ->withMax('followUps as last_follow_up_at', 'follow_up_date')
+                ->chunk(1000, function ($leads) use ($handle) {
+                    foreach ($leads as $lead) {
+                        // Cegah CSV formula injection: sel yang diawali = + - @ dinetralkan.
+                        $safe = fn ($value) => is_string($value) && preg_match('/^[=+\-@]/', $value) ? "'".$value : $value;
+                        fputcsv($handle, [
+                            $safe($lead->customer?->name ?? '-'),
+                            $safe($lead->pt_group ?? '-'),
+                            $safe($lead->customer?->contact_person ?? '-'),
+                            $safe($lead->customer?->phone ?? $lead->customer?->whatsapp ?? '-'),
+                            $safe(ucfirst($lead->status)),
+                            $safe($lead->kebutuhan ?? '-'),
+                            $safe($lead->solusi ?? '-'),
+                            $safe($lead->progress_notes ?? '-'),
+                            $lead->incoming_date?->format('Y-m-d') ?? '-',
+                            $lead->meetings_count,
+                            $lead->follow_ups_count,
+                            $lead->last_follow_up_at ?? '-',
+                        ]);
+                    }
+                });
             fclose($handle);
         }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }

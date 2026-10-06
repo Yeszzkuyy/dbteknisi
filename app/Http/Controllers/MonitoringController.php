@@ -278,10 +278,18 @@ class MonitoringController extends Controller
 
     private function getAllStatuses(): array
     {
+        // Daftar status project berubah jarang: cache 1 jam
+        // (invalidasi di ProjectStatusController).
+        $teknisi = \Illuminate\Support\Facades\Cache::remember(
+            'master:project-statuses',
+            3600,
+            fn () => \App\Models\ProjectStatus::orderBy('sort_order')->pluck('name')->all()
+        );
+
         return [
             'marketing' => ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'],
             'sales' => ['meeting', 'followup'],
-            'teknisi' => \App\Models\ProjectStatus::orderBy('sort_order')->pluck('name')->all(),
+            'teknisi' => $teknisi,
             'admin' => ['unpaid', 'paid', 'cancelled', 'draft', 'diproses', 'selesai', 'dibatalkan'],
         ];
     }
