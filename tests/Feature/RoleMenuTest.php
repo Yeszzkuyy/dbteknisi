@@ -20,6 +20,22 @@ class RoleMenuTest extends TestCase
     }
 
     /**
+     * Menu Monitoring lintas divisi hanya untuk management, ceo, super-admin.
+     */
+    public function test_monitoring_menu_visible_only_for_management_ceo_super_admin(): void
+    {
+        foreach (['management', 'ceo', 'super-admin'] as $role) {
+            $html = $this->actingAs($this->loginAs($role))->get(route('dashboard'))->getContent();
+            $this->assertStringContainsString(route('monitoring.index'), $html, "menu Monitoring harus tampil untuk {$role}");
+        }
+
+        foreach (['marketing', 'sales', 'technician', 'admin'] as $role) {
+            $html = $this->actingAs($this->loginAs($role))->get(route('dashboard'))->getContent();
+            $this->assertStringNotContainsString(route('monitoring.index'), $html, "menu Monitoring harus sembunyi untuk {$role}");
+        }
+    }
+
+    /**
      * Header grup sidebar: label berupa link navigasi + tombol chevron
      * toggle buka/tutup (@click="open = !open", aria-controls ke menu).
      * Lipatan juga tetap mengikuti halaman aktif via JS.
