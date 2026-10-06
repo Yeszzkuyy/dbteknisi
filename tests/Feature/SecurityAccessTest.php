@@ -142,6 +142,35 @@ class SecurityAccessTest extends TestCase
     }
 
     /**
+     * H5: Bukti transfer hanya manage-admin. Sales (view-admin) ditolak
+     * di proof, tapi tetap boleh lihat halaman show (read-only recap).
+     */
+    public function test_payment_proof_sales_forbidden_but_show_allowed(): void
+    {
+        $customer = Customer::create(['name' => 'PT Bukti Sales']);
+        $invoice = \App\Models\Invoice::create([
+            'invoice_number' => 'INV-003',
+            'customer_id' => $customer->id,
+            'amount' => 75000,
+            'status' => 'unpaid',
+            'issue_date' => now()->toDateString(),
+        ]);
+        Storage::fake('private');
+        Storage::disk('private')->put('payments/bukti3.jpg', "\xFF\xD8\xFF fake-jpeg");
+
+        $payment = Payment::create([
+            'invoice_id' => $invoice->id,
+            'amount' => 75000,
+            'payment_date' => now()->toDateString(),
+            'proof_file' => 'payments/bukti3.jpg',
+        ]);
+
+        $sales = $this->loginAs('sales');
+        $this->actingAs($sales)->get(route('admin.payments.proof', $payment))->assertForbidden();
+        $this->actingAs($sales)->get(route('admin.payments.show', $payment))->assertOk();
+    }
+
+    /**
      * Super admin tetap melewati semua policy (Gate::before).
      */
     public function test_super_admin_can_download_any_project_document(): void

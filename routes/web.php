@@ -74,7 +74,10 @@ Route::middleware('auth')->group(function () {
     // AI ASSISTANT (OfficeAssistant)
     // ============================================
     Route::get('/ai/assistant', [OfficeAssistantController::class, 'index'])->name('ai.assistant.index');
-    Route::post('/ai/assistant', [OfficeAssistantController::class, 'send'])->name('ai.assistant.send');
+    // LLM berbayar + upload 30MB: throttle agar tidak di-spam.
+    Route::post('/ai/assistant', [OfficeAssistantController::class, 'send'])
+        ->middleware('throttle:30,1')
+        ->name('ai.assistant.send');
     Route::get('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'showConversation'])->name('ai.assistant.conversations.show');
     Route::patch('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'renameConversation'])->name('ai.assistant.conversations.rename');
     Route::delete('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'destroyConversation'])->name('ai.assistant.conversations.destroy');
@@ -267,6 +270,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/payments/create', [AdminController::class, 'paymentsCreate'])->name('payments.create');
         Route::post('/payments', [AdminController::class, 'paymentsStore'])->name('payments.store');
         Route::delete('/payments/{payment}', [AdminController::class, 'paymentsDestroy'])->name('payments.destroy');
+        // Bukti transfer memuat nomor rekening — hanya manage-admin (bukan view-only).
+        Route::get('/payments/{payment}/proof', [AdminController::class, 'paymentsProof'])->name('payments.proof');
     });
 
     Route::middleware('permission:view-admin|manage-admin')->prefix('admin')->name('admin.')->group(function () {
@@ -276,7 +281,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/pos/{purchaseOrder}', [AdminController::class, 'posShow'])->name('pos.show');
         Route::get('/payments', [AdminController::class, 'paymentsIndex'])->name('payments.index');
         Route::get('/payments/{payment}', [AdminController::class, 'paymentsShow'])->name('payments.show');
-        Route::get('/payments/{payment}/proof', [AdminController::class, 'paymentsProof'])->name('payments.proof');
     });
 
     // ============================================
@@ -289,7 +293,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
         Route::get('/leads/import', [LeadController::class, 'importForm'])->name('leads.import');
-        Route::post('/leads/import', [LeadController::class, 'import'])->name('leads.import.execute');
+        // Parse xlsx di memori: throttle agar tidak di-DoS.
+        Route::post('/leads/import', [LeadController::class, 'import'])
+            ->middleware('throttle:6,1')
+            ->name('leads.import.execute');
 
         // Data Partner (supplier, vendor, kontraktor, partner, distributor)
         Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
