@@ -1432,4 +1432,82 @@ class WhatsAppCenterTest extends TestCase
             'direction' => 'outbound',
         ]);
     }
+
+    public function test_gateway_token_encrypted_at_rest_but_readable_via_model(): void
+    {
+        $account = $this->makeAccount('wa_nti');
+        $account->update(['gateway_token' => 'token-rahasia-123']);
+
+        $raw = \Illuminate\Support\Facades\DB::table('whatsapp_accounts')
+            ->where('id', $account->id)->value('gateway_token');
+
+        // Di DB tersimpan envelope terenkripsi (tanpa serialisasi,
+        // sesuai cast 'encrypted'), bukan plaintext.
+        $this->assertNotSame('token-rahasia-123', $raw);
+        $this->assertStringStartsWith('eyJ', $raw);
+        $this->assertSame('token-rahasia-123', $account->fresh()->gateway_token);
+    }
+
+    public function test_meta_webhook_rejects_missing_signature_when_secret_set(): void
+    {
+        config(['whatsapp.meta.app_secret' => 'test-app-secret']);
+
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_ID_1']);
+
+        $this->postJson('/api/whatsapp/webhook', [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'changes' => [[
+                    'value' => [
+                        'metadata' => ['phone_number_id' => 'PHONE_ID_1'],
+                        'messages' => [[
+                            'id' => 'META-SPOOF',
+                            'from' => '6281234567890',
+                            'type' => 'text',
+                            'text' => ['body' => 'Palsu'],
+                            'timestamp' => now()->timestamp,
+                        ]],
+                    ],
+                ]],
+            ]],
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('whatsapp_messages', ['wa_message_id' => 'META-SPOOF']);
+    }
+
+    public function test_meta_webhook_accepts_valid_signature_when_secret_set(): void
+    {
+        config(['whatsapp.meta.app_secret' => 'test-app-secret']);
+
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_ID_1']);
+
+        $payload = [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'changes' => [[
+                    'value' => [
+                        'metadata' => ['phone_number_id' => 'PHONE_ID_1'],
+                        'messages' => [[
+                            'id' => 'META-SIG-OK',
+                            'from' => '6281234567890',
+                            'type' => 'text',
+                            'text' => ['body' => 'Asli'],
+                            'timestamp' => now()->timestamp,
+                        ]],
+                    ],
+                ]],
+            ]],
+        ];
+        $content = json_encode($payload);
+        $signature = 'sha256='.hash_hmac('sha256', $content, 'test-app-secret');
+
+        $this->call('POST', '/api/whatsapp/webhook', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X-Hub-Signature-256' => $signature,
+        ], $content)->assertOk();
+
+        $this->assertDatabaseHas('whatsapp_messages', ['wa_message_id' => 'META-SIG-OK']);
+    }
 }

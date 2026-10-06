@@ -88,10 +88,11 @@ class LeadFormTest extends TestCase
 
     public function test_store_creates_lead_with_customer_details(): void
     {
-        $this->seed(RoleAndPermissionSeeder::class);
+        // marketingUser() sudah seed; seed ganda akan me-wipe assignment role.
+        $marketing = $this->marketingUser();
         $sales = User::factory()->create();
         $sales->assignRole('sales');
-        $this->actingAs($this->marketingUser())
+        $this->actingAs($marketing)
             ->post(route('leads.store'), [
                 'customer_mode' => 'new',
                 'customer_name' => 'PT Uji Coba',
@@ -216,6 +217,50 @@ class LeadFormTest extends TestCase
             ->assertDontSee('@can(', false)
             ->assertDontSee('@csrf', false)
             ->assertDontSee('<?php(', false);
+    }
+
+    public function test_assign_to_cross_division_user_rejected(): void
+    {
+        $marketing = $this->marketingUser();
+        $technician = User::factory()->create();
+        $technician->assignRole('technician');
+
+        $this->actingAs($marketing)->post(route('leads.store'), [
+            'customer_mode' => 'new',
+            'customer_name' => 'PT Salah Assign',
+            'pt_group' => 'NTI',
+            'segment' => 'vendor',
+            'incoming_date' => now()->toDateString(),
+            'assigned_to' => $technician->id,
+        ])->assertStatus(422);
+
+        $this->assertNull(Lead::whereHas('customer', fn ($q) => $q->where('name', 'PT Salah Assign'))->first());
+    }
+
+    public function test_move_lead_to_other_customer_requires_customer_permission(): void
+    {
+        $user = $this->marketingUser();
+        $mine = Customer::create(['name' => 'PT Milikku', 'contact_person' => 'Saya']);
+        $victim = Customer::create(['name' => 'PT Korban', 'contact_person' => 'Korban']);
+        $lead = Lead::create([
+            'customer_id' => $mine->id,
+            'pt_group' => 'NTI',
+            'segment' => 'vendor',
+            'incoming_date' => now()->toDateString(),
+            'status' => 'new',
+        ]);
+
+        $this->actingAs($user)->put(route('leads.update', $lead), [
+            'customer_mode' => 'existing',
+            'customer_id' => $victim->id,
+            'customer_name' => 'PT Korban Diambil',
+            'pt_group' => 'NTI',
+            'segment' => 'vendor',
+            'incoming_date' => now()->toDateString(),
+        ])->assertForbidden();
+
+        $this->assertSame($mine->id, $lead->fresh()->customer_id);
+        $this->assertSame('Korban', Customer::find($victim->id)->contact_person);
     }
 
     public function test_segment_is_required_and_validated(): void

@@ -16,6 +16,7 @@ use App\Services\WhatsappBot;
 use App\Services\WhatsappGateway;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 
@@ -470,10 +471,36 @@ class WhatsAppCenterController extends Controller
         $payload = $request->json()->all();
 
         if (data_get($payload, 'entry.0.changes.0.value')) {
+            $this->verifyMetaSignature($request);
+
             return $this->handleMetaNotification($payload);
         }
 
         return $this->handleNotification($payload);
+    }
+
+    /**
+     * Verifikasi HMAC X-Hub-Signature-256 dari Meta memakai app secret.
+     * Dilewati bila META_WA_APP_SECRET kosong (dev/test) dengan peringatan log.
+     * Green API tidak menandatangani webhook sehingga perlindungannya
+     * berupa throttle route + akun is_active + error generik di bawah.
+     */
+    private function verifyMetaSignature(Request $request): void
+    {
+        $secret = (string) config('whatsapp.meta.app_secret');
+
+        if ($secret === '') {
+            Log::warning('Webhook Meta tanpa verifikasi signature (META_WA_APP_SECRET belum diset).');
+
+            return;
+        }
+
+        $signature = (string) $request->header('X-Hub-Signature-256', '');
+        $expected = 'sha256='.hash_hmac('sha256', $request->getContent(), $secret);
+
+        if (! hash_equals($expected, $signature)) {
+            abort(403, 'Forbidden.');
+        }
     }
 
     /**
@@ -489,11 +516,13 @@ class WhatsAppCenterController extends Controller
 
         $instance = data_get($payload, 'instanceData.idInstance');
         $account = $instance
-            ? WhatsappAccount::where('gateway_instance', $instance)->first()
+            ? WhatsappAccount::where('gateway_instance', $instance)
+                ->where('is_active', true)
+                ->first()
             : null;
 
         if (! $account) {
-            return response()->json(['error' => 'unknown instance'], 422);
+            return response()->json(['error' => 'rejected'], 422);
         }
 
         return match ($type) {
@@ -516,7 +545,7 @@ class WhatsAppCenterController extends Controller
             $phoneNumberId = data_get($value, 'metadata.phone_number_id');
 
             if (! $phoneNumberId) {
-                return response()->json(['error' => 'missing phone_number_id'], 422);
+                return response()->json(['error' => 'rejected'], 422);
             }
 
             $account = WhatsappAccount::where('gateway_type', WhatsappAccount::GATEWAY_META)
@@ -525,7 +554,7 @@ class WhatsAppCenterController extends Controller
                 ->first();
 
             if (! $account) {
-                return response()->json(['error' => 'unknown account'], 422);
+                return response()->json(['error' => 'rejected'], 422);
             }
 
             foreach (data_get($value, 'statuses', []) as $status) {
@@ -675,10 +704,12 @@ class WhatsAppCenterController extends Controller
             'wa_message_id' => 'nullable|string',
         ])->validate();
 
-        $account = WhatsappAccount::where('account_code', $validated['account_code'])->first();
+        $account = WhatsappAccount::where('account_code', $validated['account_code'])
+            ->where('is_active', true)
+            ->first();
 
         if (! $account) {
-            return response()->json(['error' => 'unknown account'], 422);
+            return response()->json(['error' => 'rejected'], 422);
         }
 
         if (! empty($validated['wa_message_id'])

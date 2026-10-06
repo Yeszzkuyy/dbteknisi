@@ -53,15 +53,15 @@ class CustomerController extends Controller
         $this->authorize('create', Customer::class);
 
         $validated = $request->validate([
-            'name' => 'required',
-            'contact_person' => 'nullable',
-            'company' => 'nullable',
+            'name' => 'required|string|max:255',
+            'contact_person' => 'nullable|string|max:255',
+            'company' => 'nullable|string|max:255',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
-            'address' => 'nullable',
-            'phone' => 'nullable',
-            'whatsapp' => 'nullable',
-            'email' => 'nullable|email',
-            'notes' => 'nullable',
+            'address' => 'nullable|string|max:1000',
+            'phone' => 'nullable|string|max:50',
+            'whatsapp' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
+            'notes' => 'nullable|string|max:5000',
             'status' => 'nullable|in:lead,deal,instalasi,selesai',
         ]);
 
@@ -113,15 +113,15 @@ class CustomerController extends Controller
         $this->authorize('update', $customer);
 
         $validated = $request->validate([
-            'name' => 'required',
-            'contact_person' => 'nullable',
-            'company' => 'nullable',
+            'name' => 'required|string|max:255',
+            'contact_person' => 'nullable|string|max:255',
+            'company' => 'nullable|string|max:255',
             'pt_group' => 'required|in:'.implode(',', Lead::PT_GROUPS),
-            'address' => 'nullable',
-            'phone' => 'nullable',
-            'whatsapp' => 'nullable',
-            'email' => 'nullable|email',
-            'notes' => 'nullable',
+            'address' => 'nullable|string|max:1000',
+            'phone' => 'nullable|string|max:50',
+            'whatsapp' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
+            'notes' => 'nullable|string|max:5000',
             'status' => 'nullable|in:lead,deal,instalasi,selesai',
         ]);
 

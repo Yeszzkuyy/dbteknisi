@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Preferensi bahasa per-user (Profil > Setting > Bahasa).
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\SetSecurityHeaders::class,
         ]);
 
         // Percayai proxy (nginx/ngrok) agar Laravel melihat skema https asli
