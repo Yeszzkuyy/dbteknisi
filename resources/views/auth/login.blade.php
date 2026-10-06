@@ -464,9 +464,6 @@
                     </button>
                 </form>
 
-                @if (Route::has('register'))
-                    <p class="foot" style="--i:5">Not registered yet? <a class="login-link" href="{{ route('register') }}">Create an account</a></p>
-                @endif
             </div>
         </section>
     </main>

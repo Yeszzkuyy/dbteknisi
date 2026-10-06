@@ -128,21 +128,11 @@ class RoleAndPermissionSeeder extends Seeder
             }
         }
 
-        // === 4. Buat 1 akun Super Admin baru (placeholder) ===
-        $superAdminUser = User::firstOrCreate(
-            ['email' => 'superadmin@dbteknisi.com'],
-            [
-                'name' => 'Super Admin',
-                'password' => bcrypt('gantiPassword123'),
-            ]
-        );
-        $superAdminUser->assignRole('super-admin');
-
-        // === 5. Kembalikan super-admin ke user yang punya kolom role=super-admin ===
+        // === 4. Kembalikan super-admin ke user yang punya kolom role=super-admin ===
         User::where('role', 'super-admin')->get()
             ->each(fn (User $u) => $u->assignRole('super-admin'));
 
-        // === 6. Kembalikan super-admin yang hilang akibat wipe (kolom role=guest tapi tadinya super-admin) ===
+        // === 5. Kembalikan super-admin yang hilang akibat wipe (kolom role=guest tapi tadinya super-admin) ===
         User::whereIn('id', $prevSuperAdmins)->get()
             ->each(fn (User $u) => $u->hasRole('super-admin') ?: $u->assignRole('super-admin'));
     }
