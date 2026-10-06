@@ -210,5 +210,6 @@
         }
     });
     </script>
+    @vite(['resources/js/pipeline-dnd.js'])
     @endif
 </x-app-layout>

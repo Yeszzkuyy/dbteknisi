@@ -1,7 +1,6 @@
 
 
 import AlpineBundle from 'alpinejs';
-import Sortable from 'sortablejs';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { mountLoginGalaxy } from './galaxy.js';
@@ -13,7 +12,6 @@ import { mountLoginGalaxy } from './galaxy.js';
 // Livewire absen, dan start manual hanya dalam kasus fallback itu.
 const Alpine = window.Alpine ?? AlpineBundle;
 window.Alpine = Alpine;
-window.Sortable = Sortable;
 window.marked = marked;
 window.DOMPurify = DOMPurify;
 
