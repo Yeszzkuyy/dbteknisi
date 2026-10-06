@@ -11,10 +11,10 @@
        as      : button | a            (default: button)
        href    : url, wajib bila as=a
        type    : submit | button ...    (default: button)
-       icon    : filter | reset | leads | add | import | back
-                                       (filter & reset = GIF animasi putih;
-                                        lainnya SVG statis; kosongkan + isi slot
-                                        untuk ikon sendiri)
+        icon    : filter | reset | leads | add | import | back
+                                        (filter & reset = PNG statis;
+                                         lead aksi tabel = SVG; kosongkan + isi slot
+                                         untuk ikon sendiri)
        variant : filter | reset         (default: ngikut icon; atur manual bila pakai slot)
        size    : md (= h-10 w-10) | lg (= h-11 w-11, ala tombol Cari customer)
        title   : tooltip + title/aria-label
@@ -58,7 +58,7 @@ $paths = [
     'back' => '<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />',
 ];
 
-// filter & reset = GIF animasi (putih, untuk bg solid) + PNG statis saat tidak hover
+// filter & reset = PNG statis (GIF hover dihapus demi hemat ~140KB per tombol)
 $gifIcons = ['filter' => 'filter', 'reset' => 'reset'];
 @endphp
 
@@ -69,10 +69,8 @@ $gifIcons = ['filter' => 'filter', 'reset' => 'reset'];
             @if($slot->isNotEmpty())
                 {{ $slot }}
             @elseif(isset($gifIcons[$icon]))
-                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.png') }}" alt="" loading="lazy"
-                     class="block h-5 w-5 group-hover:hidden" />
-                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.gif') }}" alt="" loading="lazy"
-                     class="hidden h-5 w-5 group-hover:block" />
+                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.png') }}" alt="" loading="lazy" decoding="async" width="20" height="20"
+                     class="block h-5 w-5" />
             @elseif(isset($paths[$icon]))
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true">{!! $paths[$icon] !!}</svg>
             @endif
@@ -84,10 +82,8 @@ $gifIcons = ['filter' => 'filter', 'reset' => 'reset'];
             @if($slot->isNotEmpty())
                 {{ $slot }}
             @elseif(isset($gifIcons[$icon]))
-                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.png') }}" alt="" loading="lazy"
-                     class="block h-5 w-5 group-hover:hidden" />
-                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.gif') }}" alt="" loading="lazy"
-                     class="hidden h-5 w-5 group-hover:block" />
+                <img src="{{ asset('icons/' . $gifIcons[$icon] . '.png') }}" alt="" loading="lazy" decoding="async" width="20" height="20"
+                     class="block h-5 w-5" />
             @elseif(isset($paths[$icon]))
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true">{!! $paths[$icon] !!}</svg>
             @endif
