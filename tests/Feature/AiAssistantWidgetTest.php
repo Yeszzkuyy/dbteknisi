@@ -17,15 +17,15 @@ class AiAssistantWidgetTest extends TestCase
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('aiAssistant(', false)
-            ->assertSee('3DY Assistant', false);
+            ->assertSee('aiChatV2(', false)
+            ->assertSee('3DY AI', false);
     }
 
     public function test_widget_is_hidden_for_guests(): void
     {
         $this->get(route('login'))
             ->assertOk()
-            ->assertDontSee('aiAssistant(', false);
+            ->assertDontSee('aiChatV2(', false);
     }
 
     public function test_existing_send_endpoint_still_accepts_text_message(): void
