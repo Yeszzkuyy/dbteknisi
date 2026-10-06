@@ -38,6 +38,7 @@ class WhatsAppCenterController extends Controller
             'phone_number' => $a->phone_number,
             'gateway_type' => $a->gateway_type,
             'gateway_status' => $a->gateway_status,
+            'has_credentials' => filled($a->gateway_instance) && filled($a->gateway_token),
         ])->values();
 
         return view('whatsapp-center.index', compact('accounts', 'accountTabs'));
@@ -51,6 +52,7 @@ class WhatsAppCenterController extends Controller
                 'account_code' => $account->account_code,
                 'unread' => $this->unreadCount($account),
                 'gateway_status' => $account->gateway_status,
+                'has_credentials' => filled($account->gateway_instance) && filled($account->gateway_token),
             ];
         });
 
@@ -69,14 +71,18 @@ class WhatsAppCenterController extends Controller
             ]);
         }
 
-        $state = $this->gateway->getState($account);
-        $status = $state;
+        $check = $this->gateway->checkMetaConnection($account);
+        $status = $check['status'];
 
         if ($status !== $account->gateway_status) {
             $account->update(['gateway_status' => $status]);
         }
 
-        return response()->json(['gateway_status' => $status]);
+        return response()->json([
+            'gateway_status' => $status,
+            'connected' => $check['connected'],
+            'detail' => $check['detail'],
+        ]);
     }
 
     public function conversations(WhatsappAccount $account)
@@ -505,9 +511,12 @@ class WhatsAppCenterController extends Controller
         $token = $request->query('hub_verify_token');
         $challenge = $request->query('hub_challenge');
 
-        if ($mode === 'subscribe'
+        $expected = (string) config('whatsapp.meta.verify_token');
+
+        if ($expected !== ''
+            && $mode === 'subscribe'
             && $token
-            && hash_equals(config('whatsapp.meta.verify_token'), $token)) {
+            && hash_equals($expected, $token)) {
             return response($challenge);
         }
 
@@ -538,7 +547,11 @@ class WhatsAppCenterController extends Controller
         $secret = (string) config('whatsapp.meta.app_secret');
 
         if ($secret === '') {
-            Log::warning('Webhook Meta tanpa verifikasi signature (META_WA_APP_SECRET belum diset).');
+            try {
+                Log::warning('Webhook Meta tanpa verifikasi signature (META_WA_APP_SECRET belum diset).');
+            } catch (\Throwable) {
+                // ponytail: best-effort — logging gagal (mis. izin file) tak boleh menggagalkan webhook.
+            }
 
             return;
         }
@@ -602,6 +615,8 @@ class WhatsAppCenterController extends Controller
                 ->first();
 
             if (! $account) {
+                Log::warning('Webhook Meta untuk phone_number_id tak dikenal.', ['phone_number_id' => $phoneNumberId]);
+
                 return response()->json(['error' => 'rejected'], 422);
             }
 
@@ -634,6 +649,9 @@ class WhatsAppCenterController extends Controller
         $text = null;
         if (data_get($msg, 'type') === 'text') {
             $text = data_get($msg, 'text.body');
+        } else {
+            // Non-teks (gambar/audio/dokumen) tetap dicatat agar percakapan muncul di list.
+            $text = '[Pesan '.data_get($msg, 'type', 'media').' diterima — belum didukung, minta pengirim kirim teks.]';
         }
 
         if ($text === null) {
@@ -670,10 +688,15 @@ class WhatsAppCenterController extends Controller
             'bot_enabled' => 'nullable|boolean',
         ]);
 
-        $account->update(array_merge($validated, [
-            'bot_enabled' => $request->boolean('bot_enabled'),
-            'gateway_status' => null,
-        ]));
+        // Token kosong = tidak diubah (input password sengaja tidak di-prefill di form).
+        $account->update(array_merge(
+            [
+                'gateway_instance' => $validated['gateway_instance'] ?? null,
+                'bot_enabled' => $request->boolean('bot_enabled'),
+                'gateway_status' => null,
+            ],
+            filled($validated['gateway_token'] ?? null) ? ['gateway_token' => $validated['gateway_token']] : []
+        ));
 
         if ($state = $this->gateway->getState($account)) {
             $account->update(['gateway_status' => $state]);
@@ -837,7 +860,8 @@ class WhatsAppCenterController extends Controller
         return WhatsappAccount::where('is_active', true)
             ->when(
                 ! $user->hasRole('super-admin') && ! $user->hasPermissionTo('manage-sales-leads'),
-                fn ($q) => $q->where('assigned_to', $user->id)
+                // Akun tanpa pemilik = pool bersama, terlihat semua marketing.
+                fn ($q) => $q->where(fn ($qq) => $qq->where('assigned_to', $user->id)->orWhereNull('assigned_to'))
             )
             ->orderBy('account_code');
     }
