@@ -26,6 +26,7 @@ class WhatsappAccount extends Model
         'assigned_to',
         'is_active',
         'bot_enabled',
+        'bot_instructions',
     ];
 
     protected $casts = [

@@ -238,6 +238,7 @@ class WhatsAppCenterTest extends TestCase
         $this->assertTrue($accounts->contains('id', $mine->id));
         $this->assertTrue($accounts->contains('id', $shared->id));
         $this->assertFalse($accounts->contains('id', $other->id));
+        $response->assertSee('Pengaturan Bot');
     }
 
     public function test_user_cannot_access_account_belonging_to_others(): void
@@ -506,6 +507,58 @@ class WhatsAppCenterTest extends TestCase
         $this->actingAs($user)
             ->put(route('whatsapp-center.credentials', $account), ['gateway_instance' => '999'])
             ->assertForbidden();
+    }
+
+    public function test_marketing_user_can_update_bot_settings(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+        $user = $this->marketingUser($account->id);
+
+        $this->actingAs($user)
+            ->put(route('whatsapp-center.bot-settings', $account), [
+                'bot_instructions' => 'Sapa dengan ramah, gali kebutuhan + jumlah + lokasi.',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('whatsapp_accounts', [
+            'id' => $account->id,
+            'bot_instructions' => 'Sapa dengan ramah, gali kebutuhan + jumlah + lokasi.',
+        ]);
+    }
+
+    public function test_sales_user_cannot_update_bot_settings(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+        $user = User::factory()->create();
+        $user->assignRole('sales');
+        $account->update(['assigned_to' => $user->id]);
+
+        $this->actingAs($user)
+            ->put(route('whatsapp-center.bot-settings', $account), ['bot_instructions' => 'Halo'])
+            ->assertForbidden();
+    }
+
+    public function test_reply_input_appends_marketing_instructions(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Halo mau tanya',
+            'direction' => 'inbound',
+        ]);
+
+        $bot = app(WhatsappBot::class);
+
+        $this->assertStringNotContainsString('Instruksi tambahan', $bot->buildReplyInput($account, '6281234567890'));
+
+        $account->update(['bot_instructions' => 'Sapa dengan nama.']);
+
+        $input = $bot->buildReplyInput($account->fresh(), '6281234567890');
+        $this->assertStringContainsString('Customer: Halo mau tanya', $input);
+        $this->assertStringContainsString('Instruksi tambahan dari tim marketing: Sapa dengan nama.', $input);
     }
 
     public function test_blank_token_keeps_existing_gateway_token(): void
