@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Ai\Agents\WhatsappSalesBot;
 use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\User;
@@ -538,27 +539,15 @@ class WhatsAppCenterTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_reply_input_appends_marketing_instructions(): void
+    public function test_agent_instructions_include_extra_when_given(): void
     {
-        $account = $this->makeAccount('wa_wani');
+        $plain = (string) (new WhatsappSalesBot)->instructions();
+        $this->assertStringNotContainsString('INSTRUKSI TAMBAHAN', $plain);
 
-        WhatsappMessage::create([
-            'whatsapp_account_id' => $account->id,
-            'sender_number' => '6281234567890',
-            'sender_name' => 'Rina',
-            'message_body' => 'Halo mau tanya',
-            'direction' => 'inbound',
-        ]);
-
-        $bot = app(WhatsappBot::class);
-
-        $this->assertStringNotContainsString('Instruksi tambahan', $bot->buildReplyInput($account, '6281234567890'));
-
-        $account->update(['bot_instructions' => 'Sapa dengan nama.']);
-
-        $input = $bot->buildReplyInput($account->fresh(), '6281234567890');
-        $this->assertStringContainsString('Customer: Halo mau tanya', $input);
-        $this->assertStringContainsString('Instruksi tambahan dari tim marketing: Sapa dengan nama.', $input);
+        $custom = (string) (new WhatsappSalesBot('Sapa dengan nama.'))->instructions();
+        $this->assertStringContainsString('INSTRUKSI TAMBAHAN PEMILIK AKUN', $custom);
+        $this->assertStringContainsString('Sapa dengan nama.', $custom);
+        $this->assertStringContainsString('Tujuan utamamu MENGUMPULKAN KEBUTUHAN', $custom);
     }
 
     public function test_blank_token_keeps_existing_gateway_token(): void
