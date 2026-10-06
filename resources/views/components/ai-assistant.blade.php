@@ -71,8 +71,9 @@
         </button>
     </div>
 
-    {{-- Chat window --}}
+    {{-- Chat window (klik di luar = minimize, tanpa perlu klik logo) --}}
     <div x-show="open"
+         @click.outside="minimize()"
          x-transition:enter="transition ease-out duration-150"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -329,18 +330,24 @@ function aiAssistant(uid, sendUrl) {
         dragEnd(e) {
             if (!this.dragging) return;
             this.dragging = false;
-            // Keputusan berbasis jarak rilis (airtight walau move events hilang):
-            // geser > 10px = drag, jangan pernah buka chat.
-            const dragged = this.moved || Math.hypot(e.clientX - this.sx, e.clientY - this.sy) > 10;
-            if (!dragged) { this.openChat(); return; }
+            // Satu-satunya pembuka chat adalah guardClick(). pointerup TIDAK pernah
+            // membuka — geser > 10px = drag murni, jangan pernah buka chat.
+            // Cek jarak saat rilis agar tetap aman walau pointermove hilang (touch).
+            const dx = (e.clientX ?? this.sx) - this.sx, dy = (e.clientY ?? this.sy) - this.sy;
+            const dragged = this.moved || Math.hypot(dx, dy) > 10;
+            if (!dragged) return;
             this.suppressClick = true;
+            // Auto-bersih: kalau klik sintetis tak pernah datang, jangan kunci klik berikutnya.
+            clearTimeout(this.__suppressT);
+            this.__suppressT = setTimeout(() => { this.suppressClick = false; this.moved = false; }, 350);
             try { sessionStorage.setItem(this.posKey(), JSON.stringify(this.triggerPos())); } catch (err) {}
         },
         dragCancel() { this.dragging = false; },
         guardClick() {
-            // Telan klik native yang menyusul pointerup habis drag.
-            // Klik genuine (termasuk keyboard Enter/Space) tetap membuka chat.
-            if (this.suppressClick) { this.suppressClick = false; return; }
+            // Telan klik sintetis yang menyusul pointerup habis drag.
+            // Klik genuine + keyboard Enter/Space (tanpa pointer) tetap membuka chat.
+            if (this.suppressClick || this.moved || this.dragging) { this.suppressClick = false; this.moved = false; return; }
+            this.moved = false;
             this.openChat();
         },
         onScroll() {},
