@@ -377,4 +377,17 @@ class SecurityAccessTest extends TestCase
     {
         $this->get('/storage/leads/1/apapun.pdf')->assertNotFound();
     }
+
+    /**
+     * Setiap respons web membawa header keamanan dasar.
+     */
+    public function test_security_headers_present(): void
+    {
+        $response = $this->get('/login');
+
+        $response->assertOk();
+        $response->assertHeader('X-Content-Type-Options', 'nosniff');
+        $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
+        $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    }
 }
