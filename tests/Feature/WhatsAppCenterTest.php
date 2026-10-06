@@ -12,6 +12,7 @@ use App\Services\WhatsappBot;
 use App\Services\WhatsappGateway;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -1125,6 +1126,39 @@ class WhatsAppCenterTest extends TestCase
 
         Http::assertSent(fn ($request) => str_contains($request->url(), '/messages')
             && $request['to'] === '6281234567890');
+    }
+
+    public function test_bot_replies_even_when_lock_fails(): void
+    {
+        $account = $this->makeAccount('wa_wani');
+        $account->update(['gateway_instance' => 'PHONE_ID_1', 'gateway_token' => 'tok-meta', 'bot_enabled' => true]);
+
+        WhatsappMessage::create([
+            'whatsapp_account_id' => $account->id,
+            'sender_number' => '6281234567890',
+            'sender_name' => 'Rina',
+            'message_body' => 'Halo mau tanya CCTV',
+            'direction' => 'inbound',
+        ]);
+
+        Http::fake([
+            'graph.facebook.com/*' => Http::response(['messages' => [['id' => 'wamid.1']]]),
+        ]);
+
+        $lock = \Mockery::mock();
+        $lock->shouldReceive('acquire')->andThrow(new \RuntimeException('lock dir gone'));
+        $lock->shouldReceive('release')->never();
+        Cache::shouldReceive('lock')->andReturn($lock);
+
+        $bot = $this->fakeBot(reply: 'Halo, ada yang bisa dibantu?');
+
+        $this->assertSame(1, $bot->replyPending());
+
+        $this->assertDatabaseHas('whatsapp_messages', [
+            'whatsapp_account_id' => $account->id,
+            'direction' => 'outbound',
+            'is_bot' => true,
+        ]);
     }
 
     private function fakeBot(string $reply = 'Halo, butuh berapa unit dan brandnya?', ?string $summary = null): WhatsappBot
