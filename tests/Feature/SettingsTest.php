@@ -204,6 +204,39 @@ class SettingsTest extends TestCase
         $this->assertSame('baru@example.com', $user->email);
     }
 
+    public function test_layout_renders_dark_class_from_server_when_theme_is_dark(): void
+    {
+        // Regresi: morph wire:navigate menghapus class 'dark' client bila HTML
+        // server tidak memuatnya — semua menu SPA balik light. Server wajib
+        // me-render class dark agar morph mempertahankannya.
+        $user = User::factory()->create();
+        $user->preferences = array_merge($user->preferences ?? [], ['theme' => 'dark']);
+        $user->save();
+
+        $html = $this->actingAs($user)
+            ->get(route('settings.edit'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertMatchesRegularExpression('/<html[^>]*data-mode="dark"/', $html);
+        $this->assertMatchesRegularExpression('/<html[^>]*class="dark"/', $html);
+    }
+
+    public function test_layout_omits_dark_class_when_theme_is_light(): void
+    {
+        $user = User::factory()->create();
+        $user->preferences = array_merge($user->preferences ?? [], ['theme' => 'light']);
+        $user->save();
+
+        $html = $this->actingAs($user)
+            ->get(route('settings.edit'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertMatchesRegularExpression('/<html[^>]*data-mode="light"/', $html);
+        $this->assertDoesNotMatchRegularExpression('/<html[^>]*class="dark"/', $html);
+    }
+
     public function test_locale_preference_switches_app_language(): void
     {
         $user = User::factory()->create();
