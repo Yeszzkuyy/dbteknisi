@@ -32,7 +32,7 @@ class DivisionAccessTest extends TestCase
         foreach (['/teknisi/jadwal', '/customers', '/trash'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for teknisi");
         }
-        foreach (['/leads"', '/admin/invoices', '/sales/meetings', '/monitoring'] as $link) {
+        foreach (['/leads"', '/admin/invoices', '/sales/follow-ups', '/monitoring'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for teknisi");
         }
 
@@ -48,10 +48,10 @@ class DivisionAccessTest extends TestCase
     public function test_sales_menu_and_access()
     {
         $u = $this->loginAs('sales');
-        $res = $this->actingAs($u)->get('/sales/meetings')->assertOk();
+        $res = $this->actingAs($u)->get('/sales/follow-ups')->assertOk();
         $html = $res->getContent();
 
-        foreach (['/customers', '/trash', '/projects', '/admin/invoices'] as $link) {
+        foreach (['/sales/follow-ups', '/customers', '/trash', '/projects', '/admin/invoices'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for sales");
         }
         foreach (['/leads"'] as $link) {
@@ -89,7 +89,7 @@ class DivisionAccessTest extends TestCase
         $res = $this->actingAs($u)->get('/admin/invoices')->assertOk();
         $html = $res->getContent();
 
-        foreach (['/admin/invoices', '/trash', '/customers', '/sales/meetings'] as $link) {
+        foreach (['/admin/invoices', '/trash', '/customers', '/sales/follow-ups'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for admin");
         }
         foreach (['/leads"', '/monitoring'] as $link) {

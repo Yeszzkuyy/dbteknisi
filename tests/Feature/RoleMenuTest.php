@@ -79,7 +79,7 @@ class RoleMenuTest extends TestCase
             $this->assertStringContainsString($link, $html, "$link should be visible for teknisi");
         }
         // tersembunyi
-        foreach (['/leads"', '/admin/invoices', '/sales/meetings', '/monitoring'] as $link) {
+        foreach (['/leads"', '/admin/invoices', '/sales/follow-ups', '/monitoring'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for teknisi");
         }
 
@@ -148,7 +148,7 @@ class RoleMenuTest extends TestCase
         foreach (['/partners', '/customers', '/trash'] as $link) {
             $this->assertStringContainsString($link, $html, "$link should be visible for marketing");
         }
-        foreach (['/admin/invoices', '/projects"', '/sales/meetings', '/monitoring'] as $link) {
+        foreach (['/admin/invoices', '/projects"', '/sales/follow-ups', '/monitoring'] as $link) {
             $this->assertStringNotContainsString($link, $html, "$link should be hidden for marketing");
         }
 
