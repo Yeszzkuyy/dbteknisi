@@ -83,8 +83,9 @@ class PollProductCrawl implements ShouldQueue
         }
 
         ProductSource::whereKey($this->originSourceId)->update([
-            'status' => $added > 0 ? ProductSource::STATUS_PROCESSING : ProductSource::STATUS_FAILED,
-            'error' => $added > 0 ? null : 'Crawl selesai tanpa halaman produk.',
+            'source_type' => ProductSource::TYPE_CATALOG,
+            'status' => $added > 0 ? ProductSource::STATUS_PROCESSING : ProductSource::STATUS_NEEDS_REVIEW,
+            'error' => $added > 0 ? null : 'Crawl selesai tanpa halaman produk yang jelas.',
         ]);
     }
 

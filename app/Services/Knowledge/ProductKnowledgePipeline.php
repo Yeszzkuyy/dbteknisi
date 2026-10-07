@@ -38,7 +38,9 @@ class ProductKnowledgePipeline
                 ->first();
         }
 
-        if (!$found && $brand && $name) {
+        // Nama saja hanya bila tak ada model: dua model beda = produk beda,
+        // walau namanya sama (mis. satu seri, beda tipe).
+        if (!$found && $brand && $name && !$model) {
             $found = Product::whereRaw('LOWER(brand) = ?', [mb_strtolower($brand)])
                 ->whereRaw('LOWER(name) = ?', [mb_strtolower($name)])
                 ->first();
@@ -114,6 +116,44 @@ class ProductKnowledgePipeline
         });
 
         return false;
+    }
+
+    /**
+     * Temukan link halaman produk dalam satu host: buang diri sendiri,
+     * aset, dan halaman non-produk (blog/kontak/bantuan/dll).
+     *
+     * @return string[]
+     */
+    public function discoverProductLinks(string $pageUrl, array $links): array
+    {
+        $host = strtolower((string) parse_url($pageUrl, PHP_URL_HOST));
+        $self = rtrim(mb_strtolower($pageUrl), '/');
+        $found = [];
+
+        foreach ($links as $link) {
+            if (!is_string($link) || !str_starts_with($link, 'http')) {
+                continue;
+            }
+            $linkHost = strtolower((string) parse_url($link, PHP_URL_HOST));
+            if ($host === '' || $linkHost !== $host) {
+                continue;
+            }
+            if (rtrim(mb_strtolower($link), '/') === $self) {
+                continue;
+            }
+            $path = mb_strtolower((string) parse_url($link, PHP_URL_PATH));
+            if (preg_match('/\.(css|js|png|jpe?g|gif|svg|webp|ico|woff2?|mp4|zip)(\?|$)/', $path)) {
+                continue;
+            }
+            if (preg_match('#/(blog|news|contact|about|support|help|login|cart|checkout|privacy|terms|sitemap)#', $path)) {
+                continue;
+            }
+            $found[] = strtok($link, '#');
+        }
+
+        $found = array_values(array_unique($found));
+
+        return array_slice($found, 0, (int) config('knowledge.firecrawl.crawl_limit'));
     }
 
     public function detectSourceType(string $url): string
