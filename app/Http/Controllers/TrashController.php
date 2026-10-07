@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\Project;
 use App\Models\User;
+use App\Support\PtAccess;
 use Illuminate\Http\Request;
 
 class TrashController extends Controller
@@ -112,6 +113,8 @@ class TrashController extends Controller
         } else {
             $customerIds = $this->ownedCustomerIds($user->id);
             $projectIds = $this->ownedProjectIds($user->id);
+            $customerIds = $this->ptWritableCustomerIds($user, $customerIds);
+            $projectIds = $this->ptWritableProjectIds($user, $projectIds);
         }
 
         // Customer dulu (cascade DB ikut membersihkan anaknya),
@@ -199,6 +202,31 @@ class TrashController extends Controller
             $customerByProject,
             fn ($customerId) => ($ownerMap[$customerId] ?? null) === $userId
         ));
+    }
+
+    /**
+     * Saring id customer: hanya yang PT-nya boleh ditulis user.
+     */
+    private function ptWritableCustomerIds($user, array $ids): array
+    {
+        if (!$ids) {
+            return [];
+        }
+        $pts = Customer::onlyTrashed()->whereIn('id', $ids)->pluck('pt_group', 'id')->all();
+        return array_values(array_filter($ids, fn ($id) => PtAccess::canWritePt($user, $pts[$id] ?? null)));
+    }
+
+    /**
+     * Saring id project: ikut PT customer-nya.
+     */
+    private function ptWritableProjectIds($user, array $ids): array
+    {
+        if (!$ids) {
+            return [];
+        }
+        $cbp = Project::onlyTrashed()->whereIn('id', $ids)->pluck('customer_id', 'id')->all();
+        $pts = Customer::withTrashed()->whereIn('id', array_values(array_unique($cbp)))->pluck('pt_group', 'id')->all();
+        return array_values(array_filter($ids, fn ($id) => PtAccess::canWritePt($user, $pts[$cbp[$id]] ?? null)));
     }
 
     /**

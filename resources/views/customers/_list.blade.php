@@ -72,7 +72,7 @@
                                 <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                             </a>
 
-                            @can('manage-sales')
+                            @can('update', $customer)
                                 <a href="{{ route('customers.edit', $customer) }}"
                                    title="{{ __('Edit customer') }}"
                                    aria-label="{{ __('Edit customer') }} {{ $customer->name }}"
@@ -83,7 +83,7 @@
                                 </a>
                             @endcan
 
-                            @can('manage-sales')
+                            @can('delete', $customer)
                                 <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline-flex" onsubmit="return confirm('{{ __('Hapus customer ini?') }}')">
                                     @csrf
                                     @method('DELETE')
