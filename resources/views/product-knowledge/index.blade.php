@@ -32,7 +32,7 @@
         </div>
 
         {{-- Batch results --}}
-        @if($batchSources->isNotEmpty())
+        @if($batchSources->isNotEmpty() || $duplicateRows->isNotEmpty())
             <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden mb-6">
                 <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700">
                     <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200">{{ __('Import Results') }}</h2>
@@ -62,6 +62,21 @@
                                     <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $source->product?->brand ?? '-' }}</td>
                                     <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $source->product?->model ?? '-' }}</td>
                                     <td class="px-6 py-4"><x-status-badge :color="match($source->status) { 'published' => 'green', 'success' => 'green', 'failed' => 'red', 'needs_review' => 'orange', 'duplicate' => 'slate', default => 'blue' }">{{ ucfirst(str_replace('_', ' ', $source->status)) }}</x-status-badge></td>
+                                </tr>
+                            @endforeach
+                            @foreach($duplicateRows as $source)
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition">
+                                    <td class="px-6 py-4 text-xs font-mono text-slate-600 dark:text-slate-300 break-all max-w-md">{{ $source->url }}</td>
+                                    <td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-100">
+                                        @if($source->product)
+                                            <a href="{{ route('product-knowledge.show', $source->product) }}" class="text-accent-600 hover:text-accent-700">{{ $source->product->displayName() }}</a>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $source->product?->brand ?? '-' }}</td>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $source->product?->model ?? '-' }}</td>
+                                    <td class="px-6 py-4"><x-status-badge color="slate">Duplicate</x-status-badge></td>
                                 </tr>
                             @endforeach
                         </tbody>

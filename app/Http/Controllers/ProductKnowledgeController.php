@@ -36,9 +36,16 @@ class ProductKnowledgeController extends Controller
             ? ProductSource::with('product')->where('batch_id', $request->string('batch'))->latest()->get()
             : collect();
 
+        // URL duplikat: tampilkan baris aslinya (read-only, tanpa ubah apa pun).
+        $duplicateUrls = session('duplicateUrls', []);
+        $duplicateRows = $duplicateUrls
+            ? ProductSource::with('product')->whereIn('url', $duplicateUrls)->latest()->get()
+            : collect();
+
         return view('product-knowledge.index', [
             'products' => $products,
             'batchSources' => $batchSources,
+            'duplicateRows' => $duplicateRows,
             'batchId' => (string) $request->string('batch'),
             'filters' => $request->only(['q', 'status', 'category']),
         ]);
@@ -82,11 +89,32 @@ class ProductKnowledgeController extends Controller
         }
 
         $batchId = (string) Str::uuid();
+        $duplicates = [];
 
         foreach ($urls as $url) {
             $existing = ProductSource::where('url', $url)->first();
+
             if ($existing) {
-                $existing->forceFill(['status' => ProductSource::STATUS_DUPLICATE, 'batch_id' => $batchId])->save();
+                // Masih antre/diproses (mis. paste ganda se-batch): lewati diam-diam.
+                if (!$existing->product_id && in_array($existing->status, [
+                    ProductSource::STATUS_QUEUED, ProductSource::STATUS_PROCESSING,
+                ], true)) {
+                    continue;
+                }
+
+                // Pernah gagal: coba lagi, bukan duplicate.
+                if ($existing->status === ProductSource::STATUS_FAILED) {
+                    $existing->forceFill([
+                        'status' => ProductSource::STATUS_QUEUED,
+                        'error' => null,
+                        'batch_id' => $batchId,
+                    ])->save();
+                    ImportProductSource::dispatch($existing->id);
+                    continue;
+                }
+
+                // Sudah beres: catat duplicate untuk laporan saja, baris asli tak disentuh.
+                $duplicates[] = $url;
                 continue;
             }
 
@@ -100,7 +128,8 @@ class ProductKnowledgeController extends Controller
         }
 
         return redirect()->route('product-knowledge.index', ['batch' => $batchId])
-            ->with('success', __(':count URL masuk antrean import.', ['count' => count($urls)]));
+            ->with('success', __(':count URL masuk antrean import.', ['count' => count($urls)]))
+            ->with('duplicateUrls', $duplicates);
     }
 
     public function show(Product $product)
