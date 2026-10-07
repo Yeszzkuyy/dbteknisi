@@ -140,7 +140,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => $customer->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'assigned_to' => $salesA->id,
             'incoming_date' => now()->toDateString(),
         ]);
@@ -171,7 +171,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => $customer->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'assigned_to' => $sales->id,
             'incoming_date' => now()->toDateString(),
         ]);
@@ -196,7 +196,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Notif Lagi'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'incoming_date' => now()->toDateString(),
         ]);
 
@@ -217,7 +217,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Baca Hapus'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'incoming_date' => now()->toDateString(),
         ]);
         $management->notify(new NewLeadNotification($lead));
@@ -248,7 +248,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Milik Orang'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'incoming_date' => now()->toDateString(),
         ]);
         $owner->notify(new NewLeadNotification($lead));
@@ -272,7 +272,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Notif JSON'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'incoming_date' => now()->toDateString(),
         ]);
         $management->notify(new NewLeadNotification($lead));
@@ -294,7 +294,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Assign Hapus Notif'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'incoming_date' => now()->toDateString(),
         ]);
         $management->notify(new NewLeadNotification($lead));
@@ -314,7 +314,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Notif My Leads'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'assigned_to' => $sales->id,
             'incoming_date' => now()->toDateString(),
         ]);
@@ -335,7 +335,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Notif Lama'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'assigned_to' => $sales->id,
             'incoming_date' => now()->toDateString(),
         ]);
@@ -368,7 +368,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Reassign Notif'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'assigned_to' => $salesA->id,
             'incoming_date' => now()->toDateString(),
         ]);
@@ -394,7 +394,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Basi Notif'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'assigned_to' => $salesA->id,
             'incoming_date' => now()->toDateString(),
         ]);
@@ -414,7 +414,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Nyasar Notif'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'incoming_date' => now()->toDateString(),
         ]);
         // Baris NewLead (untuk management) yang nyasar ke sales.
@@ -436,7 +436,7 @@ class LeadNotificationTest extends TestCase
             'customer_id' => Customer::create(['name' => 'PT Link Notif'])->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'incoming_date' => now()->toDateString(),
         ]);
 

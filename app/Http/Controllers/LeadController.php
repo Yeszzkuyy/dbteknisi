@@ -26,7 +26,7 @@ class LeadController extends Controller
 {
     public const SEGMENTS = ['end_user', 'vendor', 'system_integrator', 'kontraktor', 'gov', 'principle', 'distributor', 'other'];
     public const SOURCES = ['whatsapp', 'email', 'telpon', 'canvasing', 'event', 'website', 'referral', 'social_media', 'other'];
-    public const STATUSES = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
+    public const STATUSES = ['cool', 'warm', 'hot', 'won', 'lost'];
 
     public static function label(string $value): string
     {
@@ -264,10 +264,9 @@ class LeadController extends Controller
         //  Laravel menelan @php(...) inline sebagai pembuka blok bila ada
         //  @endphp lain di file yang sama.)
         $statusPalette = [
-            'new' => '#3b82f6',
-            'contacted' => '#eab308',
-            'qualified' => '#a855f7',
-            'proposal' => '#f97316',
+            'cool' => '#3b82f6',
+            'warm' => '#eab308',
+            'hot' => '#f97316',
             'won' => '#22c55e',
             'lost' => '#ef4444',
         ];
@@ -435,7 +434,7 @@ class LeadController extends Controller
             $validated['attachments'],
         );
 
-        $validated['status'] ??= 'new';
+        $validated['status'] ??= 'cool';
 
         $lead = Lead::create($validated);
         $this->saveAttachments($request, $lead);
@@ -734,7 +733,7 @@ class LeadController extends Controller
 
     public function monitoring()
     {
-        $statuses = ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'];
+        $statuses = ['cool', 'warm', 'hot', 'won', 'lost'];
 
         $groups = collect([
             'Marketing' => User::role('marketing')->orderBy('name')->get(['id', 'name']),
@@ -1065,7 +1064,7 @@ class LeadController extends Controller
                     $leadsBatch[] = array_merge($item['lead_attrs'], [
                         'customer_id' => $customerId,
                         'assigned_to' => $this->resolveImportAssignee($item['sales'], $usersById, $usersByNameLower),
-                        'status' => 'new',
+                        'status' => 'cool',
                         'created_at' => $now,
                         'updated_at' => $now,
                     ]);

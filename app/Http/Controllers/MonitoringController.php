@@ -287,7 +287,7 @@ class MonitoringController extends Controller
         );
 
         return [
-            'marketing' => ['new', 'contacted', 'qualified', 'proposal', 'won', 'lost'],
+            'marketing' => ['cool', 'warm', 'hot', 'won', 'lost'],
             'sales' => ['meeting', 'followup'],
             'teknisi' => $teknisi,
             'admin' => ['unpaid', 'paid', 'cancelled', 'draft', 'diproses', 'selesai', 'dibatalkan'],
