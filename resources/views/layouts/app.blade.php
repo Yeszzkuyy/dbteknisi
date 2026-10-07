@@ -1,9 +1,13 @@
 @php
     $themePref = auth()->check() ? auth()->user()->preference('theme', 'system') : 'system';
     $accentPref = auth()->check() ? auth()->user()->preference('accent', 'ocean') : 'ocean';
+    // Class dark dirender dari server agar morph wire:navigate tidak menghapusnya
+    // (HTML server tanpa class = class 'dark' client terbuang -> balik light).
+    // Mode system tak bisa diputuskan di server (butuh matchMedia) — dikoreksi JS di bawah.
+    $initialDark = $themePref === 'dark';
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-mode="{{ $themePref }}" data-theme="{{ $accentPref }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-mode="{{ $themePref }}" data-theme="{{ $accentPref }}" class="{{ $initialDark ? 'dark' : '' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,27 +22,34 @@
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|exo-2:500,600,700,800&display=swap" rel="stylesheet" />
 
     <script>
-        (function () {
-            var pref = @json($themePref);
-            var stored = localStorage.getItem('appearance-mode');
-            var mode = stored || pref;
-            if (!mode) mode = pref;
+        // Sumber kebenaran: localStorage (ditulis tiap ganti tema) fallback ke
+        // data-mode server. Dijalankan saat full load DAN tiap livewire:navigated
+        // (navigasi SPA tidak me-reload <head>, morph justru bisa menghapus
+        // class 'dark' client karena respons server tak memuatnya untuk mode system).
+        window.__applyAppearance = function () {
+            var root = document.documentElement;
+            var pref = root.getAttribute('data-mode') || @json($themePref);
+            var stored = null;
+            try { stored = localStorage.getItem('appearance-mode'); } catch (e) {}
+            var mode = stored || pref || 'system';
             // Migrasi dari key lama 'dark-mode' bila belum pakai appearance-mode
             if (!stored) {
-                var legacy = localStorage.getItem('dark-mode');
+                var legacy = null;
+                try { legacy = localStorage.getItem('dark-mode'); } catch (e) {}
                 if (legacy === 'true') mode = 'dark';
                 else if (legacy === 'false') mode = 'light';
             }
-            var accentStored = localStorage.getItem('appearance-accent');
-            var accent = accentStored || @json($accentPref);
+            var accent = @json($accentPref);
+            try { accent = localStorage.getItem('appearance-accent') || accent; } catch (e) {}
             var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme:dark)').matches);
-            var root = document.documentElement;
             root.classList.toggle('dark', dark);
             root.setAttribute('data-mode', mode);
             root.setAttribute('data-theme', accent);
             window.__appearanceMode = mode;
             window.__appearanceAccent = accent;
-        })();
+        };
+        window.__applyAppearance();
+        document.addEventListener('livewire:navigated', function () { window.__applyAppearance(); });
     </script>
 
     <script>
@@ -461,16 +472,10 @@
                     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
                 });
             }
-            var t=document.getElementById('darkToggle');
-            if(t&&!t.dataset.bound){t.dataset.bound='1';t.addEventListener('click',function(){
-                var root=document.documentElement;
-                var dark=!root.classList.contains('dark');
-                root.classList.toggle('dark',dark);
-                var mode=dark?'dark':'light';
-                root.setAttribute('data-mode',mode);
-                try{localStorage.setItem('appearance-mode',mode);localStorage.setItem('dark-mode',dark)}catch(e){}
-                window.dispatchEvent(new CustomEvent('appearance:change'));
-            });}
+            // Toggle tema header sudah dihapus dari UI: satu-satunya sumber
+            // perubahan tema adalah Settings ($store.appearance, persist server).
+            // Blok #darkToggle lama dihapus agar tak ada penulis localStorage-only
+            // yang divergen dari preferensi server bila tombol ditambah lagi.
             var nav=document.getElementById('sidebar-navigation');
             if(nav){
                 nav.scrollTop=+(sessionStorage.getItem('sidebar-scroll')||0);
