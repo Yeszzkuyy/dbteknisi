@@ -59,14 +59,14 @@
             <button type="button" x-show="customerId" @mousedown.prevent="clearCustomer()"
                     title="{{ __('Change customer') }}" aria-label="{{ __('Change customer') }}"
                     class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-lg leading-none text-slate-400 hover:text-red-500 transition">&times;</button>
-            <div x-show="open" x-cloak
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-75"
-                 x-transition:leave-start="opacity-100 scale-100"
-                 x-transition:leave-end="opacity-0 scale-95"
-                 class="absolute z-20 mt-1 w-full origin-top bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700">
+            <style>
+                /* Motion dropdown disamakan glider: pop 180ms in / 120ms out. */
+                .fu-combo-menu { opacity: 0; transform: scale(.95); transform-origin: top; transition: opacity 180ms cubic-bezier(.23,1,.32,1), transform 180ms cubic-bezier(.23,1,.32,1); pointer-events: none; }
+                .fu-combo-menu[data-open="1"] { opacity: 1; transform: none; pointer-events: auto; }
+                .fu-combo-menu[data-open="0"] { transition-duration: 120ms, 120ms; }
+            </style>
+            <div x-cloak :data-open="open ? '1' : '0'"
+                 class="fu-combo-menu absolute z-20 mt-1 w-full bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700">
                 <template x-for="[id, label] in customerEntries" :key="id">
                     <button type="button" @mousedown.prevent="pickCustomer(id, label)"
                             class="w-full text-left px-4 py-2.5 text-sm hover:bg-accent-50 dark:hover:bg-accent-500/10 text-slate-700 dark:text-slate-200 transition"

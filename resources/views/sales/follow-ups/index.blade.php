@@ -37,6 +37,12 @@
         </form>
     </div>
 
+    {{-- Follow Ups section --}}
+    <div class="mb-8" id="followups">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">{{ __('Follow Ups') }}</h2>
+        @include('sales.follow-ups._table')
+    </div>
+
     {{-- Meetings section --}}
     <div class="mb-8" id="meetings">
         <div class="flex items-center justify-between mb-4">
@@ -83,24 +89,18 @@
                     @csrf
                     <div>
                         <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Customer') }}</label>
-                        <x-searchable-select
-                            name="customer_id"
-                            :options="($customers ?? collect())->mapWithKeys(fn ($c) => [$c->id => $c->name])->all()"
-                            :selected="old('customer_id')"
+                        <x-glide-select name="customer_id" label="Customer"
+                            :options="$duCustomers ?? []"
+                            :value="old('customer_id', '')"
                             placeholder="{{ __('Type customer name to search...') }}"
-                        />
-                        @error('customer_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                            required :error="$errors->first('customer_id')" />
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Related Lead (optional)') }}</label>
-                        <select name="lead_id" class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                            <option value="">{{ __('No specific lead') }}</option>
-                            @foreach($leads ?? [] as $lead)
-                                <option value="{{ $lead->id }}" @selected(old('lead_id') == $lead->id)>
-                                    {{ $lead->customer->name ?? 'Lead #'.$lead->id }} — {{ ucfirst($lead->status) }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-glide-select name="lead_id" label="Related lead"
+                            :options="$duLeads ?? []"
+                            :value="old('lead_id', '')"
+                            :empty-label="__('No specific lead')" />
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('What happened today? (one sentence)') }}</label>
@@ -161,9 +161,4 @@
         @include('sales.meetings._table', ['meetings' => $meetings ?? []])
     </div>
 
-    {{-- Follow Ups section --}}
-    <div>
-        <h2 class="text-lg font-semibold text-slate-800 mb-4">{{ __('Follow Ups') }}</h2>
-        @include('sales.follow-ups._table')
-    </div>
 </x-app-layout>

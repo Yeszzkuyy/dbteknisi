@@ -39,7 +39,17 @@ class FollowUpController extends Controller
             ->limit(5)
             ->get();
 
-        return $this->ajaxPartial($request, 'sales.follow-ups._table', compact('followUps'), 'sales.follow-ups.index');
+        // Opsi siap-pakai untuk glider di blok Daily Update (scoped PT).
+        $duCustomers = collect($this->customerOptions(auth()->user()))
+            ->map(fn ($label, $id) => ['value' => (string) $id, 'label' => $label])->values()->all();
+        $duLeads = $leads->map(fn ($lead) => [
+            'value' => (string) $lead->id,
+            'label' => ($lead->customer->name ?? 'Lead #'.$lead->id).' — '.ucfirst($lead->status),
+        ])->all();
+
+        return $this->ajaxPartial($request, 'sales.follow-ups._table',
+            compact('followUps', 'meetings', 'customers', 'leads', 'drafts', 'duCustomers', 'duLeads'),
+            'sales.follow-ups.index');
     }
 
     public function create(Request $request)
