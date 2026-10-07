@@ -38,9 +38,11 @@ class ProductKnowledgeTest extends TestCase
     {
         Http::fake([
             'api.firecrawl.dev/v1/scrape' => function () use (&$markdown, $links) {
+                // Padding > listing_threshold agar jalur halaman-produk, bukan crawl.
+                $body = $markdown."\n\n".str_repeat('Konten resmi produk. ', 40);
                 return Http::response([
                     'success' => true,
-                    'data' => ['markdown' => $markdown, 'metadata' => [], 'links' => $links],
+                    'data' => ['markdown' => $body, 'metadata' => [], 'links' => $links],
                 ]);
             },
             'openrouter.ai/*' => Http::response([
@@ -118,7 +120,7 @@ class ProductKnowledgeTest extends TestCase
                     return Http::response(['error' => 'boom'], 500);
                 }
 
-                return Http::response(['success' => true, 'data' => ['markdown' => 'ok', 'metadata' => [], 'links' => []]]);
+                return Http::response(['success' => true, 'data' => ['markdown' => 'ok '.str_repeat('konten resmi. ', 60), 'metadata' => [], 'links' => []]]);
             },
             'openrouter.ai/*' => Http::response(['choices' => [['message' => ['content' => json_encode([
                 'brand' => 'B', 'name' => 'N', 'model' => 'M', 'sku' => null,
@@ -179,7 +181,7 @@ class ProductKnowledgeTest extends TestCase
         $this->actingAs($this->admin());
         Http::fake([
             'api.firecrawl.dev/v1/scrape' => Http::response([
-                'success' => true, 'data' => ['markdown' => 'halo dunia', 'metadata' => [], 'links' => []],
+                'success' => true, 'data' => ['markdown' => 'halo dunia '.str_repeat('konten resmi. ', 60), 'metadata' => [], 'links' => []],
             ]),
             'openrouter.ai/*' => Http::response(['choices' => [['message' => ['content' => json_encode([
                 'brand' => null, 'name' => null, 'model' => null, 'sku' => null,

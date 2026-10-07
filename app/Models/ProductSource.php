@@ -9,6 +9,7 @@ class ProductSource extends Model
     public const TYPE_PRODUCT_PAGE = 'product_page';
     public const TYPE_DATASHEET = 'datasheet';
     public const TYPE_DOCUMENTATION = 'documentation';
+    public const TYPE_CATALOG = 'catalog';
 
     public const STATUS_QUEUED = 'queued';
     public const STATUS_PROCESSING = 'processing';

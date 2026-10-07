@@ -26,6 +26,33 @@ class ImportProductSource implements ShouldQueue
         public int $depth = 0,
     ) {}
 
+    /**
+     * Katalog: tanpa Product record (jangan gabung banyak model),
+     * sebar satu source per halaman produk yang ditemukan.
+     */
+    protected function importAsCatalog(ProductSource $source, ProductKnowledgePipeline $pipeline, array $links): void
+    {
+        foreach ($links as $url) {
+            if (ProductSource::where('url', $url)->exists()) {
+                continue;
+            }
+
+            $child = ProductSource::create([
+                'url' => $url,
+                'source_type' => $pipeline->detectSourceType($url),
+                'status' => ProductSource::STATUS_QUEUED,
+                'batch_id' => $source->batch_id,
+            ]);
+            ImportProductSource::dispatch($child->id, 1);
+        }
+
+        $source->forceFill([
+            'source_type' => ProductSource::TYPE_CATALOG,
+            'status' => ProductSource::STATUS_SUCCESS,
+            'last_fetched_at' => now(),
+        ])->save();
+    }
+
     public function handle(
         FirecrawlService $firecrawl,
         ProductExtractor $extractor,
@@ -42,12 +69,24 @@ class ImportProductSource implements ShouldQueue
             $scraped = $firecrawl->scrape($source->url);
             $markdown = $pipeline->cleanContent($scraped['markdown']);
 
-            // Halaman listing/katalog tipis -> crawl anaknya (maks 1 tingkat).
-            if ($this->depth === 0 && mb_strlen($markdown) < config('knowledge.firecrawl.listing_threshold') && $scraped['links']) {
-                $crawlId = $firecrawl->crawlStart($source->url);
-                PollProductCrawl::dispatch($crawlId, (string) $source->batch_id, $source->id)->delay(now()->addMinutes(2));
+            // 1 URL bisa = banyak produk: temukan link produk se-host dulu.
+            if ($this->depth === 0) {
+                $links = $pipeline->discoverProductLinks($source->url, $scraped['links']);
 
-                return;
+                if (count($links) >= 2) {
+                    $this->importAsCatalog($source, $pipeline, $links);
+
+                    return;
+                }
+
+                // Tak ada link produk tapi konten tipis -> mungkin listing JS -> crawl.
+                // Satu link = tetap anggap halaman produk (1 URL = 1 produk).
+                if ($links === [] && mb_strlen($markdown) < config('knowledge.firecrawl.listing_threshold')) {
+                    $crawlId = $firecrawl->crawlStart($source->url);
+                    PollProductCrawl::dispatch($crawlId, (string) $source->batch_id, $source->id)->delay(now()->addMinutes(2));
+
+                    return;
+                }
             }
 
             $extracted = $extractor->extract($markdown);
