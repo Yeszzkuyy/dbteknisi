@@ -148,19 +148,63 @@ class ProductKnowledgeTest extends TestCase
         $this->assertEquals(2, ProductSource::count());
     }
 
-    public function test_duplicate_url(): void
+    public function test_double_paste_same_batch_processed_once(): void
+    {
+        $this->actingAs($this->admin());
+        $md = 'konten ganda';
+        $this->scrapeFake($md);
+
+        // Antrean sync: job langsung jalan saat POST.
+        $this->post(route('product-knowledge.import'), [
+            'urls' => "https://vendor.com/ganda\nhttps://vendor.com/ganda\n",
+        ])->assertRedirect();
+
+        // Satu baris, diproses normal (bukan duplicate).
+        $this->assertEquals(1, ProductSource::count());
+        $source = ProductSource::first();
+        $this->assertNotEquals(ProductSource::STATUS_DUPLICATE, $source->status);
+        $this->assertNotNull($source->product_id);
+    }
+
+    public function test_reimport_processed_url_shows_duplicate_without_touching(): void
     {
         $this->actingAs($this->admin());
         $md = 'konten';
         $this->scrapeFake($md);
 
         $this->importUrls(['https://vendor.com/dup']);
+        $originalStatus = ProductSource::first()->status;
         $this->assertEquals(1, ProductSource::count());
 
         $this->post(route('product-knowledge.import'), ['urls' => 'https://vendor.com/dup'])
-            ->assertRedirect();
+            ->assertRedirect()
+            ->assertSessionHas('duplicateUrls', ['https://vendor.com/dup']);
+
+        // Baris asli tak tersentuh.
         $this->assertEquals(1, ProductSource::count());
-        $this->assertEquals(ProductSource::STATUS_DUPLICATE, ProductSource::first()->status);
+        $this->assertEquals($originalStatus, ProductSource::first()->status);
+    }
+
+    public function test_reimport_failed_url_retries(): void
+    {
+        $this->actingAs($this->admin());
+        $failed = ProductSource::create([
+            'url' => 'https://vendor.com/gagal-dulu',
+            'status' => ProductSource::STATUS_FAILED,
+            'error' => 'boom',
+            'batch_id' => 'lama',
+        ]);
+
+        $md = 'konten pulih';
+        $this->scrapeFake($md);
+
+        $this->post(route('product-knowledge.import'), ['urls' => 'https://vendor.com/gagal-dulu'])
+            ->assertRedirect();
+
+        // Baris sama dipakai ulang + diproses (sync), bukan duplicate.
+        $this->assertEquals(1, ProductSource::where('url', 'https://vendor.com/gagal-dulu')->count());
+        $this->assertNotEquals(ProductSource::STATUS_DUPLICATE, $failed->fresh()->status);
+        $this->assertNotNull($failed->fresh()->product_id);
     }
 
     public function test_same_product_different_source_appends(): void

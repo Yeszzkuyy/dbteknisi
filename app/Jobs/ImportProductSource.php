@@ -102,7 +102,7 @@ class ImportProductSource implements ShouldQueue
         ProductKnowledgePipeline $pipeline,
     ): void {
         $source = ProductSource::find($this->sourceId);
-        if (!$source || in_array($source->status, [ProductSource::STATUS_DUPLICATE], true)) {
+        if (!$source) {
             return;
         }
 
