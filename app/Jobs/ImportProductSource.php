@@ -122,6 +122,25 @@ class ImportProductSource implements ShouldQueue
                     return;
                 }
 
+                // Konten tak berubah: tanpa produk/dokumen baru (hindari yatim).
+                if ($source->content_hash === $pipeline->contentHash($markdown) && $source->product_id) {
+                    $source->forceFill(['last_fetched_at' => now()]);
+                    $linked = $source->product;
+                    if ($linked && $linked->status === Product::STATUS_PUBLISHED) {
+                        $source->forceFill(['status' => ProductSource::STATUS_PUBLISHED]);
+                    } elseif ($linked && $linked->status === Product::STATUS_REJECTED) {
+                        $source->forceFill([
+                            'status' => ProductSource::STATUS_NEEDS_REVIEW,
+                            'error' => 'Produk terkait pernah ditolak admin.',
+                        ]);
+                    } else {
+                        $source->forceFill(['status' => ProductSource::STATUS_NEEDS_REVIEW]);
+                    }
+                    $source->save();
+
+                    return;
+                }
+
                 // Tak ada link produk tapi konten tipis -> mungkin listing JS -> crawl.
                 // Satu link = tetap anggap halaman produk (1 URL = 1 produk).
                 if ($links === [] && mb_strlen($markdown) < config('knowledge.firecrawl.listing_threshold')) {

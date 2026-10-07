@@ -66,7 +66,7 @@ class ProductKnowledgePipeline
      */
     public function storeDocument(ProductSource $source, Product $product, array $extracted, string $markdown): bool
     {
-        $hash = hash('sha256', $this->normalize($markdown));
+        $hash = $this->contentHash($markdown);
 
         if ($source->content_hash === $hash) {
             $source->forceFill(['last_fetched_at' => now()])->save();
@@ -227,6 +227,11 @@ class ProductKnowledgePipeline
     protected function normalize(string $markdown): string
     {
         return mb_strtolower(trim((string) preg_replace('/\s+/', ' ', $markdown)));
+    }
+
+    public function contentHash(string $markdown): string
+    {
+        return hash('sha256', $this->normalize($markdown));
     }
 
     /**

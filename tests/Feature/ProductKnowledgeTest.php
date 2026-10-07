@@ -295,8 +295,11 @@ class ProductKnowledgeTest extends TestCase
         [$source] = $this->importUrls(['https://vendor.com/product/7']);
         $this->assertEquals(1, $source->fresh()->product->documents()->count());
 
-        // Fetch ulang isi sama -> tanpa dokumen baru.
+        $productsBefore = Product::count();
+
+        // Fetch ulang isi sama -> tanpa dokumen baru, tanpa produk yatim.
         ImportProductSource::dispatchSync($source->fresh()->id);
+        $this->assertEquals($productsBefore, Product::count());
         $this->assertEquals(1, $source->fresh()->product->documents()->count());
         $this->assertEquals(ProductSource::STATUS_PUBLISHED, $source->fresh()->status);
     }
