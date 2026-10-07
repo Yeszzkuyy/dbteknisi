@@ -525,4 +525,73 @@ class ProductKnowledgeTest extends TestCase
         $this->expectException(\RuntimeException::class);
         app(\App\Services\Knowledge\ProductExtractor::class)->extract('konten');
     }
+
+    public function test_delete_product_cascades(): void
+    {
+        $admin = $this->admin();
+        $this->actingAs($admin);
+        $md = 'konten hapus';
+        $this->scrapeFake($md);
+        [$source] = $this->importUrls(['https://vendor.com/hapus']);
+        $product = $source->fresh()->product;
+        $docId = $product->documents()->first()->id;
+
+        $this->delete(route('product-knowledge.destroy', $product))->assertRedirect();
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        $this->assertDatabaseMissing('product_sources', ['id' => $source->id]);
+        $this->assertDatabaseMissing('knowledge_documents', ['id' => $docId]);
+        $this->assertEquals(0, \App\Models\KnowledgeChunk::where('document_id', $docId)->count());
+    }
+
+    public function test_delete_source_keeps_product(): void
+    {
+        $admin = $this->admin();
+        $this->actingAs($admin);
+        $md = 'konten source';
+        $this->scrapeFake($md);
+        [$source] = $this->importUrls(['https://vendor.com/source-hapus']);
+        $product = $source->fresh()->product;
+
+        $this->delete(route('product-knowledge.sources.destroy', $source))->assertRedirect();
+        $this->assertDatabaseMissing('product_sources', ['id' => $source->id]);
+        $this->assertNotNull(Product::find($product->id));
+    }
+
+    public function test_non_admin_cannot_delete(): void
+    {
+        Artisan::call('db:seed', ['--class' => 'RoleAndPermissionSeeder']);
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+        $product = Product::create(['name' => 'X']);
+
+        $this->actingAs($sales)->delete(route('product-knowledge.destroy', $product))->assertForbidden();
+        $this->assertNotNull(Product::find($product->id));
+    }
+
+    public function test_description_auto_filled_and_manual_kept(): void
+    {
+        $this->actingAs($this->admin());
+        Http::fake([
+            'api.firecrawl.dev/v2/scrape' => Http::response(['success' => true, 'data' => [
+                'markdown' => 'Printer bagus. '.str_repeat('konten resmi. ', 60),
+                'metadata' => [], 'links' => [],
+            ]]),
+            'openrouter.ai/*' => Http::response(['choices' => [['message' => ['content' => json_encode([
+                'brand' => 'Vendor', 'name' => 'Printer', 'model' => 'PX200', 'sku' => null,
+                'category' => 'Printer', 'description' => null, 'specifications' => 'A4, 20ppm.',
+            ])]]]]),
+        ]);
+
+        [$source] = $this->importUrls(['https://vendor.com/desc']);
+        $product = $source->fresh()->product;
+
+        // Deskripsi tersusun otomatis dari fakta.
+        $this->assertStringContainsString('PX200', (string) $product->description);
+        $this->assertStringContainsString('Vendor', (string) $product->description);
+
+        // Deskripsi manual tidak ditimpa fetch ulang.
+        $product->forceFill(['description' => 'Manual'])->save();
+        ImportProductSource::dispatchSync($source->fresh()->id);
+        $this->assertEquals('Manual', $product->fresh()->description);
+    }
 }

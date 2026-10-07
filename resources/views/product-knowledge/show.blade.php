@@ -29,6 +29,11 @@
                         </form>
                     @endif
                 @endif
+                <button type="button" x-data="" title="Delete product" aria-label="Delete product"
+                        @click="$dispatch('open-modal', 'confirm-destroy-product')"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                    <x-icon name="trash" class="h-5 w-5" />
+                </button>
                 <x-icon-button as="a" icon="back" href="{{ route('product-knowledge.index') }}" title="Back" />
             </div>
         </div>
@@ -96,6 +101,14 @@
                             @if($source->error)<p class="text-xs text-red-600 mt-1">{{ $source->error }}</p>@endif
                         </div>
                         <x-status-badge :color="match($source->status) { 'published' => 'green', 'success' => 'green', 'failed' => 'red', 'needs_review' => 'orange', 'duplicate' => 'slate', default => 'blue' }">{{ ucfirst(str_replace('_', ' ', $source->status)) }}</x-status-badge>
+                        <form action="{{ route('product-knowledge.sources.destroy', $source) }}" method="POST" onsubmit="return confirm('{{ __('Hapus source ini permanen? Dokumennya ikut terhapus.') }}')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" title="Delete source" aria-label="Delete source"
+                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                <x-icon name="trash" class="h-5 w-5" />
+                            </button>
+                        </form>
                         <form action="{{ route('product-knowledge.refetch', $source) }}" method="POST">
                             @csrf
                             <button type="submit" title="Refetch" aria-label="Refetch"
@@ -118,5 +131,25 @@
                 <div class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap max-h-96 overflow-y-auto">{{ $doc->content }}</div>
             </section>
         @endif
+    </div>
+        <x-modal name="confirm-destroy-product" maxWidth="md">
+            <div class="p-6">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">{{ __('Delete product permanently?') }}</h3>
+                <p class="text-sm text-slate-500 mt-1">{{ __('Sources, documents, dan knowledge produk ini ikut terhapus selamanya.') }}</p>
+                <div class="mt-6 flex justify-end gap-2">
+                    <button type="button" @click="$dispatch('close')"
+                            class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-white text-sm font-medium transition-colors duration-200">
+                        {{ __('Cancel') }}
+                    </button>
+                    <form action="{{ route('product-knowledge.destroy', $product) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium transition-colors duration-200">
+                            {{ __('Yes, delete permanently') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </x-modal>
     </div>
 </x-app-layout>

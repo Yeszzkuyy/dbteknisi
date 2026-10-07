@@ -175,6 +175,7 @@ class ImportProductSource implements ShouldQueue
                 'url' => $source->url,
             ]);
             [$product, ] = $pipeline->matchOrCreateProduct($extracted);
+            $pipeline->ensureDescription($product, $extracted);
 
             if ($pipeline->storeDocument($source, $product, $extracted, $markdown)) {
                 // Konten sama: tanpa versi baru.

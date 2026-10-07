@@ -194,6 +194,29 @@ class ProductKnowledgeController extends Controller
             ->with('success', __('Produk ditolak, tidak masuk pencarian AI.'));
     }
 
+    public function destroy(Product $product): RedirectResponse
+    {
+        $this->authorize('manage-admin');
+
+        $name = $product->displayName();
+        foreach ($product->sources()->pluck('id') as $sourceId) {
+            ProductSource::whereKey($sourceId)->delete();
+        }
+        $product->delete();
+
+        return redirect()->route('product-knowledge.index')
+            ->with('success', __('Product ":name" dihapus permanen.', ['name' => $name]));
+    }
+
+    public function destroySource(ProductSource $source): RedirectResponse
+    {
+        $this->authorize('manage-admin');
+
+        $source->delete();
+
+        return back()->with('success', __('Source dihapus permanen.'));
+    }
+
     public function refetch(ProductSource $source): RedirectResponse
     {
         $this->authorize('manage-admin');

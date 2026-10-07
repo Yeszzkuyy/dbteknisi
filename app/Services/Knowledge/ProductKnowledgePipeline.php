@@ -56,7 +56,7 @@ class ProductKnowledgePipeline
             'model' => $model,
             'sku' => $sku,
             'category' => $extracted['category'],
-            'description' => $extracted['description'],
+            'description' => $extracted['description'] ?? $this->buildDescription($extracted, $brand, $name, $model),
             'status' => Product::STATUS_REVIEW,
         ]), true];
     }
@@ -116,6 +116,39 @@ class ProductKnowledgePipeline
         });
 
         return false;
+    }
+
+    /**
+     * Susun deskripsi otomatis dari fakta yang ada (bila ekstraksi tak memberi).
+     * Murni dari konten: nama/model/brand/kategori + potongan spesifikasi.
+     */
+    public function buildDescription(array $extracted, ?string $brand, ?string $name, ?string $model): ?string
+    {
+        $title = trim(collect([$name ?? 'Produk', $model])->filter()->join(' '));
+        $head = $title.(filled($brand) ? ' dari '.$brand : '')
+            .(filled($extracted['category'] ?? null) ? ' ('.$extracted['category'].')' : '');
+
+        $specs = trim((string) ($extracted['specifications'] ?? ''));
+        $body = $specs !== '' ? mb_substr(preg_replace('/\s+/', ' ', $specs) ?? '', 0, 400) : null;
+
+        $text = $body ? $head.'. '.$body : $head.'.';
+
+        return mb_strlen($text) > 20 ? $text : null;
+    }
+
+    /**
+     * Isi deskripsi yang masih kosong (jangan timpa isi manual/ada).
+     */
+    public function ensureDescription(Product $product, array $extracted): void
+    {
+        if (filled($product->description)) {
+            return;
+        }
+
+        $fallback = $this->buildDescription($extracted, $product->brand, $product->name, $product->model);
+        if ($fallback) {
+            $product->forceFill(['description' => $fallback])->save();
+        }
     }
 
     /**
