@@ -86,7 +86,13 @@
         @endif
 
         {{-- Product list --}}
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden"
+             x-data="{ selected: [], pageIds: {{ $products->pluck('id')->toJson() }} }"
+             x-init="$watch('selected', () => { const el = $refs.selectAll; if (el) el.indeterminate = selected.length > 0 && selected.length < pageIds.length; })">
+            <form id="bulk-destroy-form" action="{{ route('product-knowledge.bulk-destroy') }}" method="POST">
+                @csrf
+                @method('DELETE')
+            </form>
             <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 flex flex-wrap items-center gap-3">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-slate-200 mr-auto">{{ __('Products') }}</h2>
                 <form method="GET" action="{{ route('product-knowledge.index') }}" class="flex flex-wrap items-center gap-2">
@@ -108,6 +114,14 @@
                 <table class="min-w-full">
                     <thead class="bg-slate-50 dark:bg-slate-700">
                         <tr>
+                            <th class="w-12 px-4 py-4">
+                                <label class="inline-flex cursor-pointer items-center justify-center p-2" title="Select all" aria-label="Select all">
+                                    <input type="checkbox" x-ref="selectAll" form="bulk-destroy-form" disabled
+                                           :checked="selected.length === pageIds.length && pageIds.length > 0"
+                                           @click="selected = ($event.target.checked ? [...pageIds] : [])"
+                                           class="h-5 w-5 rounded accent-accent-600" />
+                                </label>
+                            </th>
                             <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Product') }}</th>
                             <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">Brand</th>
                             <th class="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-200">{{ __('Category') }}</th>
@@ -117,7 +131,13 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-600">
                         @forelse($products as $product)
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition">
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition" :class="selected.includes({{ $product->id }}) && 'bg-accent-50 dark:bg-accent-500/10'">
+                                <td class="w-12 px-4 py-4">
+                                    <label class="inline-flex cursor-pointer items-center justify-center p-2" title="{{ __('Select') }} {{ $product->displayName() }}" aria-label="{{ __('Select') }} {{ $product->displayName() }}">
+                                        <input type="checkbox" name="ids[]" value="{{ $product->id }}" form="bulk-destroy-form" x-model.number="selected"
+                                               class="h-5 w-5 rounded accent-accent-600" />
+                                    </label>
+                                </td>
                                 <td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-100">
                                     <a href="{{ route('product-knowledge.show', $product) }}" class="text-accent-600 hover:text-accent-700">{{ $product->displayName() }}</a>
                                 </td>
@@ -128,7 +148,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-16 text-center text-slate-400">{{ __('Belum ada produk. Paste URL resmi di atas.') }}</td>
+                                <td colspan="6" class="py-16 text-center text-slate-400">{{ __('Belum ada produk. Paste URL resmi di atas.') }}</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -136,5 +156,46 @@
             </div>
             <div class="px-6 py-4">{{ $products->links() }}</div>
         </div>
+
+        {{-- Bulk action bar --}}
+        <div x-show="selected.length > 0" x-transition
+             class="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 pb-[env(safe-area-inset-bottom)]"
+             role="toolbar" aria-label="Bulk actions">
+            <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 shadow-xl dark:border-slate-600 dark:bg-slate-800">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    <span x-text="selected.length"></span> {{ __('selected') }}
+                </span>
+                <button type="button" x-data="" title="Delete selected" aria-label="Delete selected"
+                        @click="$dispatch('open-modal', 'confirm-bulk-destroy')"
+                        class="inline-flex h-10 items-center gap-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 px-4 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95">
+                    <x-icon name="trash" class="h-5 w-5" />
+                    {{ __('Delete') }}
+                </button>
+                <button type="button" @click="selected = []" title="Clear selection" aria-label="Clear selection"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 text-slate-500 hover:bg-white dark:border-slate-600 dark:text-slate-300 transition-all duration-300 hover:scale-105 active:scale-95">
+                    <span class="text-lg leading-none">&times;</span>
+                </button>
+            </div>
+        </div>
+
+        <x-modal name="confirm-bulk-destroy" maxWidth="md">
+            <div class="p-6">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">{{ __('Delete selected products?') }}</h3>
+                <p class="text-sm text-slate-500 mt-1">
+                    <span x-text="selected.length"></span> {{ __('produk beserta source, dokumen, dan knowledgenya akan dihapus selamanya.') }}
+                </p>
+                <div class="mt-6 flex justify-end gap-2">
+                    <button type="button" @click="$dispatch('close')"
+                            class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-white dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 text-sm font-medium transition-colors duration-200">
+                        {{ __('Cancel') }}
+                    </button>
+                    <button type="submit" form="bulk-destroy-form"
+                            class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        <x-icon name="trash" class="w-4 h-4" />
+                        {{ __('Yes, delete permanently') }}
+                    </button>
+                </div>
+            </div>
+        </x-modal>
     </div>
 </x-app-layout>
