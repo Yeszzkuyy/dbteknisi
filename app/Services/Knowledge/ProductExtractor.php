@@ -12,20 +12,24 @@ use RuntimeException;
  */
 class ProductExtractor
 {
-    public function extract(string $markdown): array
+    /**
+     * $context = ['title' => ..., 'url' => ...] dari metadata Firecrawl
+     * (judul halaman adalah bagian konten resmi, boleh dipakai).
+     */
+    public function extract(string $markdown, array $context = []): array
     {
-        $result = $this->callOnce($markdown);
+        $result = $this->callOnce($markdown, $context);
 
         // Model gratis kadang pulang kosong padahal konten ada: coba sekali lagi.
         if (!filled($result['brand']) && !filled($result['name'])
             && !filled($result['model']) && !filled($result['sku'])) {
-            $result = $this->callOnce($markdown);
+            $result = $this->callOnce($markdown, $context);
         }
 
         return $result;
     }
 
-    protected function callOnce(string $markdown): array
+    protected function callOnce(string $markdown, array $context = []): array
     {
         $key = (string) config('ai.providers.openrouter.key');
         if (!$key) {
@@ -36,6 +40,15 @@ class ProductExtractor
         if ($text === '') {
             throw new RuntimeException('Konten halaman kosong.');
         }
+
+        $hints = [];
+        if (filled($context['title'] ?? null)) {
+            $hints[] = 'Page title: '.mb_substr((string) $context['title'], 0, 300);
+        }
+        if (filled($context['url'] ?? null)) {
+            $hints[] = 'Page URL: '.mb_substr((string) $context['url'], 0, 300);
+        }
+        $hintText = $hints ? implode("\n", $hints)."\n\n" : '';
 
         $res = Http::withToken($key)
             ->timeout(120)
@@ -48,11 +61,11 @@ class ProductExtractor
                         'role' => 'system',
                         'content' => 'You extract official product facts from page content into JSON with keys: '
                             .'brand, name, model, sku, category, description, specifications. '
-                            .'RULES: use ONLY facts visible in the content. Never invent or guess. '
+                            .'RULES: use ONLY facts visible in the content, page title, or page URL. Never invent or guess. '
                             .'Missing or unclear field -> null. specifications is a concise plain-text spec list or null. '
                             .'Respond with JSON only.',
                     ],
-                    ['role' => 'user', 'content' => $text],
+                    ['role' => 'user', 'content' => $hintText.$text],
                 ],
             ]);
 

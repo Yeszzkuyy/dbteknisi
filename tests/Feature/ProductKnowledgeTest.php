@@ -487,4 +487,28 @@ class ProductKnowledgeTest extends TestCase
         $this->assertEquals(2, $calls);
         $this->assertEquals(ProductSource::STATUS_PUBLISHED, $source->status);
     }
+
+    public function test_extraction_sends_title_hint(): void
+    {
+        config()->set('ai.providers.openrouter.key', 'test-key');
+        $payload = ['brand' => 'Synology', 'name' => 'DS425+', 'model' => 'DS425+'];
+        $sent = null;
+        Http::fake([
+            'openrouter.ai/*' => function ($request) use (&$sent, $payload) {
+                $sent = $request->data();
+                return Http::response(['choices' => [['message' => ['content' => json_encode($payload)]]]]);
+            },
+        ]);
+
+        $extractor = app(\App\Services\Knowledge\ProductExtractor::class);
+        $result = $extractor->extract('Fitur NAS cepat.', [
+            'title' => 'DiskStation DS425+ | Synology Inc.',
+            'url' => 'https://www.synology.com/en-id/products/DS425+',
+        ]);
+
+        $this->assertEquals('Synology', $result['brand']);
+
+        $user = end($sent['messages'])['content'] ?? '';
+        $this->assertStringContainsString('Page title: DiskStation DS425+', $user);
+    }
 }
