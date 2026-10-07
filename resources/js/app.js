@@ -337,7 +337,15 @@ document.addEventListener('livewire:navigated', () => syncSidebarGroups());
 window.toast = function (message, ok = true, action = null) {
     const el = document.createElement('div');
     el.className = 'fixed bottom-6 right-6 z-[100] flex items-center gap-2 px-5 py-3 rounded-xl shadow-lg text-white transition-opacity ' + (ok ? 'bg-green-600' : 'bg-red-600');
-    el.textContent = message;
+    const icon = document.createElement('span');
+    icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = ok
+        ? '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 shrink-0"><circle cx="12" cy="12" r="8.5" /><path stroke-linecap="round" stroke-linejoin="round" d="m8.5 12.3 2.4 2.4 4.8-5" /></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 shrink-0"><circle cx="12" cy="12" r="8.5" /><path stroke-linecap="round" d="M9 9l6 6M15 9l-6 6" /></svg>';
+    el.appendChild(icon);
+    const text = document.createElement('span');
+    text.textContent = message;
+    el.appendChild(text);
     if (action && action.href && action.label) {
         const a = document.createElement('a');
         a.href = action.href;

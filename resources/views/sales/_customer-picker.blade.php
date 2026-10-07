@@ -76,5 +76,5 @@
         </template>
         <p x-show="entries.length === 0" class="px-4 py-3 text-sm text-slate-400">{{ __('No results.') }}</p>
     </div>
-    @if(!empty($hint))<p class="mt-1 text-xs text-slate-400">{{ $hint }}</p>@endif
 </div>
+@if(!empty($hint))<p class="mt-1 text-xs text-slate-400">{{ $hint }}</p>@endif

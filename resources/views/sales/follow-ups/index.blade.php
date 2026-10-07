@@ -138,7 +138,7 @@
                             <textarea name="source_sentence" rows="2" required maxlength="500"
                                       placeholder="{{ __('e.g. Visited PT Maju, demo CCTV 8 channels, they asked for a revised quote') }}"
                                       class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('source_sentence') }}</textarea>
-                            <x-icon-button icon="add" type="submit" title="Generate Draft" />
+                            <x-icon-button icon="sparkles" type="submit" title="Generate Draft with AI" />
                         </div>
                         @error('source_sentence') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>

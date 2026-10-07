@@ -212,6 +212,7 @@ class FollowUpFormTest extends TestCase
         $this->assertStringContainsString('Bahas harga index.', $html);
         // Opsi Daily Update terisi.
         $this->assertStringContainsString('Daily Update', $html);
+        $this->assertStringContainsString('Generate Draft with AI', $html);
         $this->assertStringContainsString('PT Index Penuh', $html);
         // Label opsi lead Daily Update (em-dash ter-escape JSON di source).
         $this->assertStringContainsString('PT Index Penuh \u2014 Cool', $html);
