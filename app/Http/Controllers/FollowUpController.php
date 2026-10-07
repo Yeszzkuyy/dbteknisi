@@ -39,11 +39,11 @@ class FollowUpController extends Controller
             ->limit(5)
             ->get();
 
-        // Opsi siap-pakai untuk glider di blok Daily Update (scoped PT).
-        $duCustomers = collect($this->customerOptions(auth()->user()))
-            ->map(fn ($label, $id) => ['value' => (string) $id, 'label' => $label])->values()->all();
+        // Opsi siap-pakai untuk picker di blok Daily Update (scoped PT).
+        $duCustomers = $this->customerOptions(auth()->user());
         $duLeads = $leads->map(fn ($lead) => [
-            'value' => (string) $lead->id,
+            'id' => (string) $lead->id,
+            'customer_id' => (string) $lead->customer_id,
             'label' => ($lead->customer->name ?? 'Lead #'.$lead->id).' — '.ucfirst($lead->status),
         ])->all();
 
