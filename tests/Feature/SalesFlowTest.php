@@ -37,7 +37,7 @@ class SalesFlowTest extends TestCase
             'customer_id' => $customer->id,
             'pt_group' => 'NTI',
             'segment' => 'vendor',
-            'status' => 'qualified',
+            'status' => 'hot',
         ]);
 
         if ($assignedTo) {
