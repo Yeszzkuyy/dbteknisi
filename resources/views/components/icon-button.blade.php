@@ -11,7 +11,7 @@
        as      : button | a            (default: button)
        href    : url, wajib bila as=a
        type    : submit | button ...    (default: button)
-        icon    : filter | reset | leads | add | import | back
+        icon    : filter | reset | leads | add | import | back | sparkles
                                         (filter & reset = PNG statis;
                                          lead aksi tabel = SVG; kosongkan + isi slot
                                          untuk ikon sendiri)
@@ -54,6 +54,7 @@ $btnClass = "relative inline-flex {$sizeClass} items-center justify-center overf
 $paths = [
     'leads' => '<path stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" />',
     'add' => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />',
+    'sparkles' => '<path stroke-linecap="round" stroke-linejoin="round" d="M9.9 15.5a2 2 0 0 0-1.4-1.4L3 12.6a.5.5 0 0 1 0-.9l5.5-1.4a2 2 0 0 0 1.4-1.4L11.4 3a.5.5 0 0 1 .9 0l1.5 5.9a2 2 0 0 0 1.4 1.4l5.9 1.5a.5.5 0 0 1 0 .9l-5.9 1.5a2 2 0 0 0-1.4 1.4l-1.5 5.9a.5.5 0 0 1-.9 0z" /><path stroke-linecap="round" d="M19 3v3M20.5 4.5h-3" />',
     'import' => '<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />',
     'back' => '<path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />',
 ];
