@@ -1,0 +1,187 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Customer;
+use App\Models\FollowUp;
+use App\Models\Lead;
+use App\Models\Meeting;
+use App\Models\User;
+use Database\Seeders\RoleAndPermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class FollowUpFormTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private function salesMgk(): User
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('sales-mgk');
+
+        return $user;
+    }
+
+    private function seedCustomers(): array
+    {
+        return [
+            'mgk' => Customer::create(['name' => 'PT MGK Client', 'pt_group' => 'MGK']),
+            'nti' => Customer::create(['name' => 'PT NTI Client', 'pt_group' => 'NTI']),
+            'general' => Customer::create(['name' => 'PT General Client', 'pt_group' => null]),
+        ];
+    }
+
+    public function test_create_page_scopes_customers_by_pt(): void
+    {
+        $sales = $this->salesMgk();
+        $this->seedCustomers();
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.create'))
+            ->assertOk()->getContent();
+
+        $this->assertStringContainsString('PT MGK Client (MGK)', $html);
+        $this->assertStringContainsString('PT General Client', $html);
+        $this->assertStringNotContainsString('PT NTI Client', $html);
+    }
+
+    public function test_plain_sales_and_admin_see_all_customers(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        $plain = User::factory()->create();
+        $plain->assignRole('sales');
+        $this->seedCustomers();
+
+        $html = $this->actingAs($plain)->get(route('sales.follow-ups.create'))
+            ->assertOk()->getContent();
+
+        foreach (['PT MGK Client', 'PT NTI Client', 'PT General Client'] as $name) {
+            $this->assertStringContainsString($name, $html);
+        }
+    }
+
+    public function test_store_rejects_customer_outside_user_pt(): void
+    {
+        $sales = $this->salesMgk();
+        $customers = $this->seedCustomers();
+
+        $this->actingAs($sales)->post(route('sales.follow-ups.store'), [
+            'customer_id' => $customers['nti']->id,
+            'description' => 'Coba NTI.',
+        ])->assertForbidden();
+    }
+
+    public function test_store_rejects_lead_and_meeting_from_other_customer(): void
+    {
+        $sales = $this->salesMgk();
+        $customers = $this->seedCustomers();
+        $otherLead = Lead::create([
+            'customer_id' => $customers['nti']->id,
+            'pt_group' => 'NTI',
+            'segment' => 'vendor',
+            'status' => 'cool',
+            'assigned_to' => $sales->id,
+        ]);
+        $otherMeeting = Meeting::create([
+            'customer_id' => $customers['nti']->id,
+            'meeting_date' => now()->toDateString(),
+            'notes' => 'Meeting NTI.',
+            'created_by' => $sales->id,
+        ]);
+
+        $this->actingAs($sales)->post(route('sales.follow-ups.store'), [
+            'customer_id' => $customers['mgk']->id,
+            'lead_id' => $otherLead->id,
+            'description' => 'Lead silang.',
+        ])->assertStatus(422);
+
+        $this->actingAs($sales)->post(route('sales.follow-ups.store'), [
+            'customer_id' => $customers['mgk']->id,
+            'meeting_id' => $otherMeeting->id,
+            'description' => 'Meeting silang.',
+        ])->assertStatus(422);
+    }
+
+    public function test_type_options_offer_only_contact_methods(): void
+    {
+        $sales = $this->salesMgk();
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.create'))
+            ->assertOk()->getContent();
+
+        foreach (['value="call"', 'value="whatsapp"', 'value="email"', 'value="note"'] as $option) {
+            $this->assertStringContainsString($option, $html);
+        }
+        $this->assertStringNotContainsString('value="meeting"', $html);
+        $this->assertStringNotContainsString('value="follow_up"', $html);
+    }
+
+    public function test_lead_options_show_unique_labels(): void
+    {
+        $sales = $this->salesMgk();
+        $customers = $this->seedCustomers();
+        Lead::create([
+            'customer_id' => $customers['mgk']->id,
+            'pt_group' => 'MGK',
+            'segment' => 'vendor',
+            'status' => 'cool',
+            'incoming_date' => now()->toDateString(),
+            'assigned_to' => $sales->id,
+        ]);
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.create'))
+            ->assertOk()->getContent();
+
+        $this->assertStringContainsString('Lead #', $html);
+    }
+
+    public function test_store_accepts_matching_relations(): void
+    {
+        $sales = $this->salesMgk();
+        $customers = $this->seedCustomers();
+        $lead = Lead::create([
+            'customer_id' => $customers['mgk']->id,
+            'pt_group' => 'MGK',
+            'segment' => 'vendor',
+            'status' => 'cool',
+            'assigned_to' => $sales->id,
+        ]);
+        $meeting = Meeting::create([
+            'customer_id' => $customers['mgk']->id,
+            'meeting_date' => now()->toDateString(),
+            'notes' => 'Kickoff.',
+            'created_by' => $sales->id,
+        ]);
+
+        $this->actingAs($sales)->post(route('sales.follow-ups.store'), [
+            'customer_id' => $customers['mgk']->id,
+            'lead_id' => $lead->id,
+            'meeting_id' => $meeting->id,
+            'type' => 'whatsapp',
+            'description' => 'Kirim penawaran.',
+        ])->assertRedirect(route('sales.follow-ups.index'));
+
+        $fu = FollowUp::first();
+        $this->assertSame($lead->id, $fu->lead_id);
+        $this->assertSame($meeting->id, $fu->meeting_id);
+    }
+
+    public function test_edit_page_renders_with_current_values(): void
+    {
+        $sales = $this->salesMgk();
+        $customers = $this->seedCustomers();
+        $fu = FollowUp::create([
+            'customer_id' => $customers['mgk']->id,
+            'description' => 'Follow up lama.',
+            'type' => 'call',
+            'created_by' => $sales->id,
+        ]);
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.edit', $fu))
+            ->assertOk()->getContent();
+
+        $this->assertStringContainsString('PT MGK Client (MGK)', $html);
+        $this->assertStringContainsString('Follow up lama.', $html);
+    }
+}
