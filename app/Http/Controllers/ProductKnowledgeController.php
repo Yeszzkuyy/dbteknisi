@@ -194,18 +194,26 @@ class ProductKnowledgeController extends Controller
             ->with('success', __('Produk ditolak, tidak masuk pencarian AI.'));
     }
 
-    public function destroy(Product $product): RedirectResponse
+    public function bulkDestroy(Request $request): RedirectResponse
     {
         $this->authorize('manage-admin');
 
-        $name = $product->displayName();
-        foreach ($product->sources()->pluck('id') as $sourceId) {
-            ProductSource::whereKey($sourceId)->delete();
+        $validated = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:100'],
+            'ids.*' => ['integer', 'exists:products,id'],
+        ]);
+
+        $count = 0;
+        foreach (Product::whereIn('id', $validated['ids'])->get() as $product) {
+            foreach ($product->sources()->pluck('id') as $sourceId) {
+                ProductSource::whereKey($sourceId)->delete();
+            }
+            $product->delete();
+            $count++;
         }
-        $product->delete();
 
         return redirect()->route('product-knowledge.index')
-            ->with('success', __('Product ":name" dihapus permanen.', ['name' => $name]));
+            ->with('success', __(':count produk dihapus permanen.', ['count' => $count]));
     }
 
     public function destroySource(ProductSource $source): RedirectResponse

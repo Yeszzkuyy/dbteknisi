@@ -29,11 +29,6 @@
                         </form>
                     @endif
                 @endif
-                <button type="button" x-data="" title="Delete product" aria-label="Delete product"
-                        @click="$dispatch('open-modal', 'confirm-destroy-product')"
-                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
-                    <x-icon name="trash" class="h-5 w-5" />
-                </button>
                 <x-icon-button as="a" icon="back" href="{{ route('product-knowledge.index') }}" title="Back" />
             </div>
         </div>
@@ -132,24 +127,5 @@
             </section>
         @endif
     </div>
-        <x-modal name="confirm-destroy-product" maxWidth="md">
-            <div class="p-6">
-                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">{{ __('Delete product permanently?') }}</h3>
-                <p class="text-sm text-slate-500 mt-1">{{ __('Sources, documents, dan knowledge produk ini ikut terhapus selamanya.') }}</p>
-                <div class="mt-6 flex justify-end gap-2">
-                    <button type="button" @click="$dispatch('close')"
-                            class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-white text-sm font-medium transition-colors duration-200">
-                        {{ __('Cancel') }}
-                    </button>
-                    <form action="{{ route('product-knowledge.destroy', $product) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium transition-colors duration-200">
-                            {{ __('Yes, delete permanently') }}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </x-modal>
     </div>
 </x-app-layout>

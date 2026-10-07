@@ -102,10 +102,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:manage-admin')->prefix('product-knowledge')->name('product-knowledge.')->group(function () {
         Route::get('/', [ProductKnowledgeController::class, 'index'])->name('index');
         Route::post('/import', [ProductKnowledgeController::class, 'import'])->name('import');
+        Route::delete('/products/bulk', [ProductKnowledgeController::class, 'bulkDestroy'])->name('bulk-destroy');
         Route::get('/products/{product}', [ProductKnowledgeController::class, 'show'])->name('show');
         Route::patch('/products/{product}', [ProductKnowledgeController::class, 'update'])->name('update');
         Route::patch('/products/{product}/publish', [ProductKnowledgeController::class, 'publish'])->name('publish');
-        Route::delete('/products/{product}', [ProductKnowledgeController::class, 'destroy'])->name('destroy');
         Route::delete('/sources/{source}', [ProductKnowledgeController::class, 'destroySource'])->name('sources.destroy');
         Route::patch('/products/{product}/reject', [ProductKnowledgeController::class, 'reject'])->name('reject');
         Route::post('/sources/{source}/refetch', [ProductKnowledgeController::class, 'refetch'])->name('refetch');

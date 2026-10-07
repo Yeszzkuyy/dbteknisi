@@ -526,21 +526,42 @@ class ProductKnowledgeTest extends TestCase
         app(\App\Services\Knowledge\ProductExtractor::class)->extract('konten');
     }
 
-    public function test_delete_product_cascades(): void
+    public function test_bulk_delete_products_cascades(): void
     {
         $admin = $this->admin();
         $this->actingAs($admin);
         $md = 'konten hapus';
         $this->scrapeFake($md);
-        [$source] = $this->importUrls(['https://vendor.com/hapus']);
-        $product = $source->fresh()->product;
-        $docId = $product->documents()->first()->id;
+        [$s1] = $this->importUrls(['https://vendor.com/hapus-1']);
+        [$s2] = $this->importUrls(['https://vendor.com/hapus-2']);
+        $p1 = $s1->fresh()->product;
+        $p2 = $s2->fresh()->product;
+        $docId = $p1->documents()->first()->id;
 
-        $this->delete(route('product-knowledge.destroy', $product))->assertRedirect();
-        $this->assertDatabaseMissing('products', ['id' => $product->id]);
-        $this->assertDatabaseMissing('product_sources', ['id' => $source->id]);
+        $this->delete(route('product-knowledge.bulk-destroy'), ['ids' => [$p1->id, $p2->id]])
+            ->assertRedirect();
+        $this->assertDatabaseMissing('products', ['id' => $p1->id]);
+        $this->assertDatabaseMissing('products', ['id' => $p2->id]);
+        $this->assertDatabaseMissing('product_sources', ['id' => $s1->id]);
         $this->assertDatabaseMissing('knowledge_documents', ['id' => $docId]);
         $this->assertEquals(0, \App\Models\KnowledgeChunk::where('document_id', $docId)->count());
+    }
+
+    public function test_bulk_delete_validates_and_forbids(): void
+    {
+        $this->actingAs($this->admin());
+        $this->delete(route('product-knowledge.bulk-destroy'), ['ids' => []])
+            ->assertSessionHasErrors('ids');
+        $this->delete(route('product-knowledge.bulk-destroy'), ['ids' => [999999]])
+            ->assertSessionHasErrors('ids.0');
+
+        Artisan::call('db:seed', ['--class' => 'RoleAndPermissionSeeder']);
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+        $product = Product::create(['name' => 'X']);
+        $this->actingAs($sales)->delete(route('product-knowledge.bulk-destroy'), ['ids' => [$product->id]])
+            ->assertForbidden();
+        $this->assertNotNull(Product::find($product->id));
     }
 
     public function test_delete_source_keeps_product(): void
@@ -557,16 +578,6 @@ class ProductKnowledgeTest extends TestCase
         $this->assertNotNull(Product::find($product->id));
     }
 
-    public function test_non_admin_cannot_delete(): void
-    {
-        Artisan::call('db:seed', ['--class' => 'RoleAndPermissionSeeder']);
-        $sales = User::factory()->create();
-        $sales->assignRole('sales');
-        $product = Product::create(['name' => 'X']);
-
-        $this->actingAs($sales)->delete(route('product-knowledge.destroy', $product))->assertForbidden();
-        $this->assertNotNull(Product::find($product->id));
-    }
 
     public function test_description_auto_filled_and_manual_kept(): void
     {
