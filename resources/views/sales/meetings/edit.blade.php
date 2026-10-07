@@ -82,9 +82,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Isi Meeting') }} <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Meeting Notes') }} <span class="text-red-500">*</span></label>
                     <textarea name="notes" rows="4" required
-                              placeholder="{{ __('Tuliskan isi meeting secara ringkas...') }}"
+                              placeholder="{{ __('Write a brief meeting note...') }}"
                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('notes', $meeting->notes) }}</textarea>
                     @error('notes') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>

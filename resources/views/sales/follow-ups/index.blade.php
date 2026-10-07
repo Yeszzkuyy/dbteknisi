@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">{{ __('Follow Up & Meeting') }}</h1>
-            <p class="text-slate-500 mt-1">{{ __('Pantau meeting dan tindak lanjut dengan customer.') }}</p>
+            <p class="text-slate-500 mt-1">{{ __('Track meetings and follow-ups with customers.') }}</p>
         </div>
         @can('manage-sales')
             <x-icon-button as="a" icon="add" href="{{ route('sales.follow-ups.create') }}" title="Add Follow Up" />

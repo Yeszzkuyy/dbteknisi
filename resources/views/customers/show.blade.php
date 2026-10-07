@@ -411,7 +411,7 @@
                             <x-section-header title="Invoice">
                                 @can('manage-admin')
                                     <x-add-button href="{{ route('admin.invoices.create', ['customer_id' => $customer->id]) }}">
-                                        {{ __('+ Buat Invoice') }}
+                                        {{ __('+ Create Invoice') }}
                                     </x-add-button>
                                 @endcan
                             </x-section-header>
@@ -455,7 +455,7 @@
                             <x-section-header title="Purchase Order">
                                 @can('manage-admin')
                                     <x-add-button href="{{ route('admin.pos.create', ['customer_id' => $customer->id]) }}">
-                                        {{ __('+ Buat PO') }}
+                                        {{ __('+ Create PO') }}
                                     </x-add-button>
                                 @endcan
                             </x-section-header>
@@ -497,10 +497,10 @@
                         </div>
 
                         <div>
-                            <x-section-header title="{{ __('Pembayaran') }}">
+                            <x-section-header title="{{ __('Payment') }}">
                                 @can('manage-admin')
                                     <x-add-button href="{{ route('admin.payments.create') }}">
-                                        {{ __('+ Catat Pembayaran') }}
+                                        {{ __('+ Record Payment') }}
                                     </x-add-button>
                                 @endcan
                             </x-section-header>
@@ -544,7 +544,7 @@
                             <x-section-header title="Meetings">
                                 @can('manage-sales')
                                     <x-add-button href="{{ route('sales.meetings.create', ['customer_id' => $customer->id]) }}">
-                                        {{ __('+ Catat Meeting') }}
+                                        {{ __('+ Log Meeting') }}
                                     </x-add-button>
                                 @endcan
                             </x-section-header>
@@ -560,7 +560,7 @@
                                             <a href="{{ route('sales.meetings.show', $meeting) }}"
                                                class="text-accent-600 hover:text-accent-800 text-sm">Detail</a>
                                         </div>
-                                        <p class="text-xs text-slate-400 mt-2">{{ __('oleh') }} {{ $meeting->creator?->name ?? '-' }}</p>
+                                        <p class="text-xs text-slate-400 mt-2">{{ __('by') }} {{ $meeting->creator?->name ?? '-' }}</p>
                                     </div>
                                 @endforeach
                             @else
@@ -572,7 +572,7 @@
                             <x-section-header title="Follow Up">
                                 @can('manage-sales')
                                     <x-add-button href="{{ route('sales.follow-ups.create', ['customer_id' => $customer->id]) }}">
-                                        {{ __('+ Tambah Follow Up') }}
+                                        {{ __('+ Add Follow Up') }}
                                     </x-add-button>
                                 @endcan
                             </x-section-header>
@@ -590,7 +590,7 @@
                                                             <span>· {{ $fu->follow_up_date->format('d M Y') }}</span>
                                                         @endif
                                                         @if($fu->meeting)
-                                                            <span>· {{ __('Terkait Meeting') }} {{ $fu->meeting->meeting_date->format('d M Y') }}</span>
+                                                            <span>· {{ __('Related Meeting') }} {{ $fu->meeting->meeting_date->format('d M Y') }}</span>
                                                         @endif
                                                     </div>
                                                 </div>

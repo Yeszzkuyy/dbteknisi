@@ -58,7 +58,7 @@ class SalesSchedule extends Model
             'visit' => __('Customer Visit'),
             'presentation' => __('Presentation'),
             'follow_up' => __('Follow-up'),
-            'quotation' => __('Penawaran'),
+            'quotation' => __('Quotation'),
             'internal' => __('Internal Meeting'),
             default => __('Other'),
         };
