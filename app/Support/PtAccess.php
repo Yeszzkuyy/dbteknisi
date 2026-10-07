@@ -30,6 +30,15 @@ class PtAccess
     }
 
     /**
+     * Sales-like: role sales atau salah satu sales-* (mis. sales-mgk).
+     * Dipakai untuk scoping own-lead yang sama seperti sales polos.
+     */
+    public static function isSalesLike(User $user): bool
+    {
+        return $user->hasRole('sales') || self::userPts($user) !== [];
+    }
+
+    /**
      * Boleh tulis data PT ini? super-admin / tanpa role PT / PT kosong = ya.
      */
     public static function canWritePt(User $user, ?string $ptGroup): bool

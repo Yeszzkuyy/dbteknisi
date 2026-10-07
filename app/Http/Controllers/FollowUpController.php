@@ -9,8 +9,10 @@ use App\Models\FollowUp;
 use App\Models\Lead;
 use App\Models\Meeting;
 use App\Services\SalesService;
+use App\Support\PtAccess;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class FollowUpController extends Controller
 {
@@ -29,24 +31,21 @@ class FollowUpController extends Controller
 
     public function create(Request $request)
     {
-        $customers = Customer::orderBy('name')->get(['id', 'name']);
-        $meetings = collect();
-
-        $customerId = $request->get('customer_id');
-        $meetingId = $request->get('meeting_id');
-        $leadId = $request->get('lead_id');
+        $customerId = $request->integer('customer_id') ?: null;
+        $meetingId = $request->integer('meeting_id') ?: null;
+        $leadId = $request->integer('lead_id') ?: null;
         if ($leadId && ($lead = Lead::find($leadId))) {
             $customerId = $lead->customer_id;
         }
-        $customer = $customerId ? Customer::withTrashed()->find($customerId) : null;
 
-        if ($customerId) {
-            $meetings = Meeting::where('customer_id', $customerId)->orderBy('meeting_date', 'desc')->get(['id', 'meeting_date']);
-        }
-
-        $leads = $this->leadOptions($customerId);
-
-        return view('sales.follow-ups.create', compact('customers', 'meetings', 'customerId', 'meetingId', 'customer', 'leads', 'leadId'));
+        return view('sales.follow-ups.create', [
+            'customerOptions' => $this->customerOptions(auth()->user()),
+            'leadItems' => $this->leadItems(auth()->user()),
+            'meetingItems' => $this->meetingItems(auth()->user()),
+            'customerId' => $customerId,
+            'meetingId' => $meetingId,
+            'leadId' => $leadId,
+        ]);
     }
 
     public function store(Request $request)
@@ -56,17 +55,13 @@ class FollowUpController extends Controller
             'lead_id' => 'nullable|exists:leads,id',
             'meeting_id' => 'nullable|exists:meetings,id',
             'description' => 'required|string',
-            'type' => 'nullable|in:'.implode(',', \App\Models\FollowUp::TYPES),
+            'type' => 'nullable|in:'.implode(',', array_merge(FollowUp::CONTACT_TYPES, FollowUp::LEGACY_TYPES)),
             'follow_up_date' => 'nullable|date',
             'next_follow_up_date' => 'nullable|date',
         ]);
 
+        $this->assertConsistentRelations($validated);
         $this->lockLeadLink($validated);
-
-        if (!empty($validated['lead_id'])) {
-            $lead = Lead::find($validated['lead_id']);
-            $validated['customer_id'] = $lead->customer_id;
-        }
 
         $this->salesService->createFollowUp($validated);
 
@@ -82,12 +77,21 @@ class FollowUpController extends Controller
 
     public function edit(FollowUp $followUp)
     {
-        $customers = Customer::orderBy('name')->get(['id', 'name']);
-        $meetings = Meeting::where('customer_id', $followUp->customer_id)
-            ->orderBy('meeting_date', 'desc')->get(['id', 'meeting_date']);
-        $leads = $this->leadOptions($followUp->customer_id);
+        $followUp->load('customer');
+        $options = $this->customerOptions(auth()->user());
+        if ($followUp->customer && !isset($options[$followUp->customer_id])) {
+            $options[$followUp->customer_id] = $this->customerLabel($followUp->customer);
+        }
 
-        return view('sales.follow-ups.edit', compact('followUp', 'customers', 'meetings', 'leads'));
+        return view('sales.follow-ups.edit', [
+            'followUp' => $followUp,
+            'customerOptions' => $options,
+            'leadItems' => $this->leadItems(auth()->user()),
+            'meetingItems' => $this->meetingItems(auth()->user()),
+            'customerId' => $followUp->customer_id,
+            'leadId' => $followUp->lead_id,
+            'meetingId' => $followUp->meeting_id,
+        ]);
     }
 
     public function update(Request $request, FollowUp $followUp)
@@ -97,17 +101,13 @@ class FollowUpController extends Controller
             'lead_id' => 'nullable|exists:leads,id',
             'meeting_id' => 'nullable|exists:meetings,id',
             'description' => 'required|string',
-            'type' => 'nullable|in:'.implode(',', \App\Models\FollowUp::TYPES),
+            'type' => 'nullable|in:'.implode(',', array_merge(FollowUp::CONTACT_TYPES, FollowUp::LEGACY_TYPES)),
             'follow_up_date' => 'nullable|date',
             'next_follow_up_date' => 'nullable|date',
         ]);
 
+        $this->assertConsistentRelations($validated);
         $this->lockLeadLink($validated);
-
-        if (!empty($validated['lead_id'])) {
-            $lead = Lead::find($validated['lead_id']);
-            $validated['customer_id'] = $lead->customer_id;
-        }
 
         $this->salesService->updateFollowUp($followUp, $validated);
 
@@ -155,16 +155,90 @@ class FollowUpController extends Controller
             ->with('success', __('Follow up ditunda.'));
     }
 
-    private function leadOptions(?int $customerId = null)
+    /**
+     * Customer yang boleh dipilih user ini: PT dari role sales-* plus
+     * customer tanpa PT (general). Tanpa role PT = semua (grandfather).
+     */
+    private function customerOptions($user): array
     {
-        $query = Lead::with('customer')->latest()->limit(100);
-        if (auth()->user()?->hasRole('sales') && !auth()->user()?->can('manage-marketing')) {
-            $query->where('assigned_to', auth()->id());
-        }
-        if ($customerId) {
-            $query->where('customer_id', $customerId);
+        $pts = PtAccess::userPts($user);
+
+        return Customer::query()
+            ->when($pts !== [], fn ($q) => $q->where(
+                fn ($w) => $w->whereIn('pt_group', $pts)->orWhereNull('pt_group')
+            ))
+            ->orderBy('name')
+            ->get(['id', 'name', 'pt_group'])
+            ->mapWithKeys(fn ($c) => [$c->id => $this->customerLabel($c)])
+            ->all();
+    }
+
+    private function customerLabel(Customer $customer): string
+    {
+        return $customer->name.($customer->pt_group ? " ({$customer->pt_group})" : '');
+    }
+
+    /**
+     * Lead untuk dropdown: label unik "Lead #id — status — tgl masuk".
+     * Sales-like hanya melihat lead miliknya sendiri.
+     */
+    private function leadItems($user): array
+    {
+        $query = Lead::with('customer')->latest()->limit(200);
+        if (PtAccess::isSalesLike($user) && !$user->can('manage-marketing')) {
+            $query->where('assigned_to', $user->id);
         }
 
-        return $query->get(['id', 'customer_id', 'status', 'assigned_to']);
+        return $query->get(['id', 'customer_id', 'status', 'incoming_date', 'assigned_to'])
+            ->map(fn ($lead) => [
+                'id' => (string) $lead->id,
+                'customer_id' => (string) $lead->customer_id,
+                'label' => "Lead #{$lead->id} — ".ucfirst($lead->status)
+                    .($lead->incoming_date ? ' — '.$lead->incoming_date->format('d M Y') : ''),
+            ])->all();
+    }
+
+    /**
+     * Meeting untuk dropdown: label unik "tgl — ringkasan".
+     */
+    private function meetingItems($user): array
+    {
+        $query = Meeting::latest('meeting_date')->limit(200);
+        if (PtAccess::isSalesLike($user) && !$user->can('manage-marketing')) {
+            $ownCustomerIds = Lead::where('assigned_to', $user->id)->pluck('customer_id');
+            $query->where(fn ($q) => $q
+                ->whereIn('customer_id', $ownCustomerIds)
+                ->orWhere('created_by', $user->id));
+        }
+
+        return $query->get(['id', 'customer_id', 'meeting_date', 'notes', 'user_needs'])
+            ->map(fn ($meeting) => [
+                'id' => (string) $meeting->id,
+                'customer_id' => (string) $meeting->customer_id,
+                'label' => $meeting->meeting_date->format('d M Y').' — '
+                    .Str::limit($meeting->notes ?: $meeting->user_needs ?: '-', 40),
+            ])->all();
+    }
+
+    /**
+     * Pastikan customer/lead/meeting saling terkait dan customer
+     * memang boleh ditulis user ini. Gagalkan, jangan diam-diam timpa.
+     */
+    private function assertConsistentRelations(array $validated): void
+    {
+        $customer = Customer::findOrFail($validated['customer_id']);
+        abort_unless(PtAccess::canWritePt(auth()->user(), $customer->pt_group), 403);
+
+        if (!empty($validated['lead_id'])) {
+            $lead = Lead::find($validated['lead_id']);
+            abort_if(!$lead || (int) $lead->customer_id !== (int) $validated['customer_id'],
+                422, __('Lead yang dipilih bukan milik customer ini.'));
+        }
+
+        if (!empty($validated['meeting_id'])) {
+            $meeting = Meeting::find($validated['meeting_id']);
+            abort_if(!$meeting || (int) $meeting->customer_id !== (int) $validated['customer_id'],
+                422, __('Meeting yang dipilih bukan milik customer ini.'));
+        }
     }
 }
