@@ -255,6 +255,9 @@
         .dark .text-slate-600,.dark .text-gray-600{color:var(--text-secondary)!important}
         .dark .text-slate-500,.dark .text-gray-500{color:var(--text-muted)!important}
         /* Teks tanpa class warna ikut var tema — jangan biarkan hitam bawaan browser di mode gelap */
+        /* Warna dasar halaman sepagi mungkin (sebelum CSS Vite tiba):
+           tanpa ini var(--bg) belum ada saat cat pertama -> putih sekilas di mode gelap. */
+        :root{--bg:#f1f5f9}html.dark{--bg:#1c2235}
         body{background-color:var(--bg)}
         html.dark body{background-color:var(--bg)!important;color:var(--text-primary)}
         .dark th.text-slate-500,.dark th.text-slate-600{color:var(--text-secondary)!important}
