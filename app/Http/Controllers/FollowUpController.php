@@ -41,14 +41,15 @@ class FollowUpController extends Controller
 
         // Opsi siap-pakai untuk picker di blok Daily Update (scoped PT).
         $duCustomers = $this->customerOptions(auth()->user());
+        $filterCustomers = $this->customerOptions(auth()->user(), false);
         $duLeads = $leads->map(fn ($lead) => [
             'id' => (string) $lead->id,
             'customer_id' => (string) $lead->customer_id,
-            'label' => ($lead->customer->name ?? 'Lead #'.$lead->id).' — '.ucfirst($lead->status),
+            'label' => "Lead #{$lead->id} — ".($lead->customer->name ?? '?').' — '.ucfirst($lead->status),
         ])->all();
 
         return $this->ajaxPartial($request, 'sales.follow-ups._table',
-            compact('followUps', 'meetings', 'customers', 'leads', 'drafts', 'duCustomers', 'duLeads'),
+            compact('followUps', 'meetings', 'customers', 'leads', 'drafts', 'duCustomers', 'duLeads', 'filterCustomers'),
             'sales.follow-ups.index');
     }
 
@@ -195,7 +196,7 @@ class FollowUpController extends Controller
      * Customer yang boleh dipilih user ini: PT dari role sales-* plus
      * customer tanpa PT (general). Tanpa role PT = semua (grandfather).
      */
-    private function customerOptions($user): array
+    private function customerOptions($user, bool $withPtSuffix = true): array
     {
         $pts = PtAccess::userPts($user);
 
@@ -205,13 +206,13 @@ class FollowUpController extends Controller
             ))
             ->orderBy('name')
             ->get(['id', 'name', 'pt_group'])
-            ->mapWithKeys(fn ($c) => [$c->id => $this->customerLabel($c)])
+            ->mapWithKeys(fn ($c) => [$c->id => $this->customerLabel($c, $withPtSuffix)])
             ->all();
     }
 
-    private function customerLabel(Customer $customer): string
+    private function customerLabel(Customer $customer, bool $withPtSuffix = true): string
     {
-        return $customer->name.($customer->pt_group ? " ({$customer->pt_group})" : '');
+        return $customer->name.($withPtSuffix && $customer->pt_group ? " ({$customer->pt_group})" : '');
     }
 
     /**

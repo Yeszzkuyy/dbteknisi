@@ -43,26 +43,36 @@
 
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Related Lead (optional)') }}</label>
-        <select name="lead_id" x-model="leadId" :disabled="!customerId"
-                class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 disabled:opacity-60">
-            <option value="">{{ __('No specific opportunity') }}</option>
-            <template x-for="lead in customerLeads" :key="lead.id">
-                <option :value="lead.id" x-text="lead.label"></option>
-            </template>
-        </select>
+        <div class="relative">
+            <select name="lead_id" x-model="leadId" :disabled="!customerId"
+                    class="w-full appearance-none rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 disabled:opacity-60 pr-10 text-sm">
+                <option value="">{{ __('No specific opportunity') }}</option>
+                <template x-for="lead in customerLeads" :key="lead.id">
+                    <option :value="lead.id" x-text="lead.label"></option>
+                </template>
+            </select>
+            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </span>
+        </div>
         <p class="mt-1 text-xs text-slate-400">{{ __('Links this follow-up to an opportunity. Auto-linked when the customer has exactly one of your active leads.') }}</p>
         @error('lead_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Related Meeting (optional)') }}</label>
-        <select name="meeting_id" x-model="meetingId" :disabled="!customerId"
-                class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 disabled:opacity-60">
-            <option value="">{{ __('No specific meeting') }}</option>
-            <template x-for="meeting in customerMeetings" :key="meeting.id">
-                <option :value="meeting.id" x-text="meeting.label"></option>
-            </template>
-        </select>
+        <div class="relative">
+            <select name="meeting_id" x-model="meetingId" :disabled="!customerId"
+                    class="w-full appearance-none rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 disabled:opacity-60 pr-10 text-sm">
+                <option value="">{{ __('No specific meeting') }}</option>
+                <template x-for="meeting in customerMeetings" :key="meeting.id">
+                    <option :value="meeting.id" x-text="meeting.label"></option>
+                </template>
+            </select>
+            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </span>
+        </div>
         <p class="mt-1 text-xs text-slate-400">{{ __('The earlier meeting this follow-up continues, if any.') }}</p>
         @error('meeting_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>

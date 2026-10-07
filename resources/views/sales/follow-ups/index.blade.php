@@ -20,13 +20,17 @@
             </div>
             <div>
                 <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Status') }}</label>
-                    <select name="overdue" onchange="this.form.requestSubmit()"
-                            class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                        <option value="">{{ __('Semua') }}</option>
-                        <option value="today" @selected(request('overdue') === 'today')>{{ __('Hari ini') }}</option>
-                        <option value="upcoming" @selected(request('overdue') === 'upcoming')>{{ __('Mendatang') }}</option>
-                        <option value="1" @selected(request('overdue') === '1')>{{ __('Jatuh tempo') }}</option>
-                    </select>
+                <x-glide-select name="overdue" label="Status"
+                    :options="[
+                        ['value' => 'today', 'label' => __('Hari ini')],
+                        ['value' => 'upcoming', 'label' => __('Mendatang')],
+                        ['value' => '1', 'label' => __('Jatuh tempo')],
+                    ]"
+                    :value="request('overdue', '')" :empty-label="__('Semua')" id="fu-status-glider" />
+                <script>
+                    document.getElementById('fu-status-glider')?.querySelector('input[type="hidden"]')
+                        ?.addEventListener('change', function () { this.form?.requestSubmit(); });
+                </script>
             </div>
             <div class="flex items-end gap-2">
                 <x-icon-button icon="filter" type="submit" title="Filter" />
@@ -58,9 +62,13 @@
                 <input type="hidden" name="form" value="meetings">
                 <div>
                     <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Cari Customer') }}</label>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="{{ __('Nama customer...') }}"
-                           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
+                    @include('sales._customer-picker', [
+                        'name' => 'search',
+                        'options' => $filterCustomers ?? [],
+                        'selected' => null,
+                        'placeholder' => __('Nama customer...'),
+                        'submitOnPick' => true,
+                    ])
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Dari Tanggal') }}</label>
