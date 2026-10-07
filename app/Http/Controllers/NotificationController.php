@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lead;
 use App\Models\User;
+use App\Notifications\FollowUpOverdueNotification;
 use App\Notifications\LeadAssignedNotification;
 use App\Notifications\NewLeadNotification;
 use Illuminate\Http\Request;
@@ -64,6 +65,12 @@ class NotificationController extends Controller
                 }
                 // Perbaiki URL baris lama (dulu leads.show) ke My Leads.
                 $data['url'] = LeadAssignedNotification::myLeadsUrl($data['customer'] ?? null);
+            }
+
+            // Reminder follow-up lama menunjuk ke halaman detail;
+            // arahkan ke daftar Follow Up (filter jatuh tempo).
+            if (($data['type'] ?? null) === 'followup') {
+                $data['url'] = FollowUpOverdueNotification::indexUrl();
             }
 
             // Notifikasi lead-baru untuk management yang nyasar ke user
