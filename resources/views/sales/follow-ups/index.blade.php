@@ -85,22 +85,39 @@
                 <h2 class="text-base font-semibold text-slate-800 dark:text-slate-100">{{ __('Daily Update') }}</h2>
                 <p class="text-xs text-slate-500 mt-0.5 mb-4">{{ __('Type one sentence, AI composes the draft from today follow-ups and history. Review before approving.') }}</p>
 
-                <form method="POST" action="{{ route('sales.meeting-drafts.generate') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <form method="POST" action="{{ route('sales.meeting-drafts.generate') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4"
+                      x-data="{
+                          duCustomerId: {{ json_encode(old('customer_id')) }},
+                          duLeadId: {{ json_encode(old('lead_id')) }},
+                          duLeads: {{ json_encode($duLeads ?? []) }},
+                          str(v) { return (v === null || v === undefined || v === '') ? null : String(v); },
+                          init() { this.duCustomerId = this.str(this.duCustomerId); this.duLeadId = this.str(this.duLeadId); },
+                          get duCustomerLeads() {
+                              return this.duLeads.filter((l) => String(l.customer_id) === String(this.duCustomerId));
+                          }
+                      }"
+                      @customer-picked.window="if ($event.detail.field === 'customer_id') { duCustomerId = $event.detail.id; duLeadId = null; }">
                     @csrf
                     <div>
                         <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Customer') }}</label>
-                        <x-glide-select name="customer_id" label="Customer"
-                            :options="$duCustomers ?? []"
-                            :value="old('customer_id', '')"
-                            placeholder="{{ __('Type customer name to search...') }}"
-                            required :error="$errors->first('customer_id')" />
+                        @include('sales._customer-picker', [
+                            'name' => 'customer_id',
+                            'options' => $duCustomers ?? [],
+                            'selected' => old('customer_id'),
+                            'placeholder' => __('Type customer name to search...'),
+                            'required' => true,
+                        ])
+                        @error('customer_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Related Lead (optional)') }}</label>
-                        <x-glide-select name="lead_id" label="Related lead"
-                            :options="$duLeads ?? []"
-                            :value="old('lead_id', '')"
-                            :empty-label="__('No specific lead')" />
+                        <select name="lead_id" x-model="duLeadId" :disabled="!duCustomerId"
+                                class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 disabled:opacity-60 text-sm">
+                            <option value="">{{ __('No specific lead') }}</option>
+                            <template x-for="lead in duCustomerLeads" :key="lead.id">
+                                <option :value="lead.id" x-text="lead.label"></option>
+                            </template>
+                        </select>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('What happened today? (one sentence)') }}</label>

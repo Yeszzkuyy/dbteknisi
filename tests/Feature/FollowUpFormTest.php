@@ -213,7 +213,8 @@ class FollowUpFormTest extends TestCase
         // Opsi Daily Update terisi.
         $this->assertStringContainsString('Daily Update', $html);
         $this->assertStringContainsString('PT Index Penuh', $html);
-        $this->assertStringContainsString('PT Index Penuh — Cool', $html);
+        // Label opsi lead Daily Update (em-dash ter-escape JSON di source).
+        $this->assertStringContainsString('PT Index Penuh \u2014 Cool', $html);
         // Follow Ups di atas Meetings.
         $followUpsPos = strpos($html, '>Follow Ups<');
         $meetingsPos = strpos($html, '>Meetings<');
