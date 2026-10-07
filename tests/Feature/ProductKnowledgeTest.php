@@ -483,8 +483,8 @@ class ProductKnowledgeTest extends TestCase
 
         [$source] = $this->importUrls(['https://vendor.com/retry']);
 
-        // Coba kedua berhasil -> langsung PUBLISHED.
-        $this->assertEquals(2, $calls);
+        // Voting: dicoba ulang sampai dapat yang lengkap -> PUBLISHED.
+        $this->assertGreaterThanOrEqual(2, $calls);
         $this->assertEquals(ProductSource::STATUS_PUBLISHED, $source->status);
     }
 

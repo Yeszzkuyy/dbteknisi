@@ -18,15 +18,54 @@ class ProductExtractor
      */
     public function extract(string $markdown, array $context = []): array
     {
-        $result = $this->callOnce($markdown, $context);
+        // Model gratis tidak stabil (konten sama, hasil bisa beda):
+        // coba maks 3 jendela, pakai yang paling lengkap.
+        $best = null;
+        $bestScore = -1;
 
-        // Model gratis kadang pulang kosong padahal konten ada: coba sekali lagi.
-        if (!filled($result['brand']) && !filled($result['name'])
-            && !filled($result['model']) && !filled($result['sku'])) {
-            $result = $this->callOnce($markdown, $context);
+        foreach ([12000, 4000, 1500] as $window) {
+            $piece = mb_substr(trim($markdown), 0, $window);
+            if ($piece === '') {
+                continue;
+            }
+
+            $candidate = $this->callOnce($piece, $context);
+            $score = $this->completeness($candidate);
+
+            if ($score > $bestScore) {
+                $best = $candidate;
+                $bestScore = $score;
+            }
+
+            if ($bestScore >= 4) {
+                break;
+            }
         }
 
-        return $result;
+        return $best ?? $this->blankResult();
+    }
+
+    protected function blankResult(): array
+    {
+        return [
+            'brand' => null, 'name' => null, 'model' => null, 'sku' => null,
+            'category' => null, 'description' => null, 'specifications' => null,
+        ];
+    }
+
+    /**
+     * Skor kelengkapan 0-7 untuk voting antar percobaan.
+     */
+    protected function completeness(array $result): int
+    {
+        $score = 0;
+        foreach (['brand', 'name', 'model', 'sku', 'category', 'description', 'specifications'] as $field) {
+            if (filled($result[$field] ?? null)) {
+                $score++;
+            }
+        }
+
+        return $score;
     }
 
     protected function callOnce(string $markdown, array $context = []): array
