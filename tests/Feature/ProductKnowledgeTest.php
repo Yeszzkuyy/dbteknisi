@@ -293,6 +293,22 @@ class ProductKnowledgeTest extends TestCase
         $this->assertStringContainsString('P520', $found);
     }
 
+    public function test_natural_question_finds_published_product(): void
+    {
+        $admin = $this->admin();
+        $this->actingAs($admin);
+        $md = 'konten Yeastar P560';
+        $this->scrapeFake($md);
+        $this->importUrls(['https://vendor.com/product/9']);
+
+        $tool = new GetProductKnowledge($admin);
+        $found = (string) $tool->handle(new \Laravel\Ai\Tools\Request(
+            ['query' => 'Berapa spesifikasi PBX Yeastar P560 untuk kantor?']
+        ));
+        $this->assertStringContainsString('P560', $found);
+        $this->assertStringContainsString('vendor.com', $found);
+    }
+
     public function test_invalid_url_rejected_by_validation(): void
     {
         $this->actingAs($this->admin());

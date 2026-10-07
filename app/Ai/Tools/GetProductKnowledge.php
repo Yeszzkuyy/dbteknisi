@@ -18,7 +18,9 @@ class GetProductKnowledge implements Tool
     public function description(): Stringable|string
     {
         return 'Mencari spesifikasi/informasi produk di Product Knowledge Base (hanya data PUBLISHED dari sumber resmi). '
-            .'Parameter: query (wajib), brand/model opsional sebagai filter. Read-only.';
+            .'Parameter query = KATA KUNCI (brand, model, SKU, fitur), BUKAN kalimat tanya. '
+            .'Contoh: "Yeastar P560", "DS425+ spesifikasi". '
+            .'Parameter brand/model opsional sebagai filter. Read-only.';
     }
 
     public function schema(JsonSchema $schema): array
@@ -28,6 +30,26 @@ class GetProductKnowledge implements Tool
             'brand' => $schema->string()->nullable()->description('Filter brand'),
             'model' => $schema->string()->nullable()->description('Filter model'),
         ];
+    }
+
+    /**
+     * Kata kunci alfanumerik tanpa stopwords (ID/EN). Aman untuk to_tsquery.
+     */
+    protected static function keywords(string $text): array
+    {
+        preg_match_all('/[a-z0-9]+/', mb_strtolower($text), $m);
+        $stop = ['apa', 'yang', 'dan', 'atau', 'untuk', 'dengan', 'dari', 'ini', 'itu',
+            'ada', 'adalah', 'bagaimana', 'berapa', 'dimana', 'kapan', 'siapa', 'tidak',
+            'saya', 'kami', 'tolong', 'mohon', 'bisa', 'apakah', 'the', 'and', 'for',
+            'with', 'what', 'how', 'please'];
+        $words = [];
+        foreach ($m[0] as $w) {
+            if (mb_strlen($w) >= 2 && !in_array($w, $stop, true) && !in_array($w, $words, true)) {
+                $words[] = $w;
+            }
+        }
+
+        return array_slice($words, 0, 10);
     }
 
     public function handle(Request $request): Stringable|string
@@ -45,17 +67,30 @@ class GetProductKnowledge implements Tool
             ->join('products', 'products.id', '=', 'knowledge_documents.product_id')
             ->where('knowledge_documents.status', KnowledgeDocument::STATUS_PUBLISHED)
             ->where('products.status', Product::STATUS_PUBLISHED);
-        $like = '%' . $query . '%';
+        // Pecah pertanyaan menjadi kata kunci: cocok SATU kata saja sudah cukup
+        // (AND membuat pertanyaan bahasa alami tak pernah cocok).
+        $words = self::keywords($query);
+        if ($words === []) {
+            return 'Query terlalu umum, sebutkan brand atau model produk.';
+        }
+
         $isPgsql = \Illuminate\Support\Facades\DB::getDriverName() === 'pgsql';
+        $tsQuery = implode(' | ', $words);
+
         $chunkQuery->where(fn ($w) => $w
-            ->where('knowledge_chunks.content', 'like', $like)
-            ->orWhere('products.brand', 'like', $like)
-            ->orWhere('products.name', 'like', $like)
-            ->orWhere('products.model', 'like', $like)
-            ->orWhere('products.sku', 'like', $like)
-            ->when($isPgsql, fn ($q) => $q->orWhereRaw(
-                "to_tsvector('simple', knowledge_chunks.content) @@ plainto_tsquery('simple', ?)",
-                [$query]
+            ->where(function ($ww) use ($words) {
+                foreach ($words as $word) {
+                    $like = '%' . $word . '%';
+                    $ww->orWhere('knowledge_chunks.content', 'like', $like)
+                        ->orWhere('products.brand', 'like', $like)
+                        ->orWhere('products.name', 'like', $like)
+                        ->orWhere('products.model', 'like', $like)
+                        ->orWhere('products.sku', 'like', $like);
+                }
+            })
+            ->when($isPgsql && $tsQuery !== '', fn ($q) => $q->orWhereRaw(
+                "to_tsvector('simple', knowledge_chunks.content) @@ to_tsquery('simple', ?)",
+                [$tsQuery]
             )));
 
         if ($brand !== '') {
@@ -65,8 +100,8 @@ class GetProductKnowledge implements Tool
             $chunkQuery->whereRaw('LOWER(products.model) = ?', [mb_strtolower($model)]);
         }
 
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
-            $chunkQuery->orderByRaw("ts_rank(to_tsvector('simple', knowledge_chunks.content), plainto_tsquery('simple', ?)) DESC", [$query]);
+        if ($isPgsql) {
+            $chunkQuery->orderByRaw("ts_rank(to_tsvector('simple', knowledge_chunks.content), to_tsquery('simple', ?)) DESC", [$tsQuery]);
         } else {
             $chunkQuery->latest('knowledge_chunks.id');
         }
