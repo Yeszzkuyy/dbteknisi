@@ -40,25 +40,31 @@
 
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Related Lead (optional)') }}</label>
-        <div id="fu-lead-glider">
-            <x-glide-select name="lead_id" label="Related lead"
-                :options="$initialLeadOptions"
-                :value="old('lead_id', $leadId ?? null)"
-                :empty-label="__('No specific opportunity')"
-                :error="$errors->first('lead_id')" />
+        <div x-show="customerId">
+            <div id="fu-lead-glider">
+                <x-glide-select name="lead_id" label="Related lead"
+                    :options="$initialLeadOptions"
+                    :value="old('lead_id', $leadId ?? null)"
+                    :empty-label="__('No specific opportunity')"
+                    :error="$errors->first('lead_id')" />
+            </div>
         </div>
+        <p x-show="!customerId" class="text-xs text-slate-400">{{ __('Select a customer first.') }}</p>
         <p class="mt-1 text-xs text-slate-400">{{ __('Links this follow-up to an opportunity. Auto-linked when the customer has exactly one of your active leads.') }}</p>
     </div>
 
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Related Meeting (optional)') }}</label>
-        <div id="fu-meet-glider">
-            <x-glide-select name="meeting_id" label="Related meeting"
-                :options="$initialMeetingOptions"
-                :value="old('meeting_id', $meetingId ?? null)"
-                :empty-label="__('No specific meeting')"
-                :error="$errors->first('meeting_id')" />
+        <div x-show="customerId">
+            <div id="fu-meet-glider">
+                <x-glide-select name="meeting_id" label="Related meeting"
+                    :options="$initialMeetingOptions"
+                    :value="old('meeting_id', $meetingId ?? null)"
+                    :empty-label="__('No specific meeting')"
+                    :error="$errors->first('meeting_id')" />
+            </div>
         </div>
+        <p x-show="!customerId" class="text-xs text-slate-400">{{ __('Select a customer first.') }}</p>
         <p class="mt-1 text-xs text-slate-400">{{ __('The earlier meeting this follow-up continues, if any.') }}</p>
     </div>
 
