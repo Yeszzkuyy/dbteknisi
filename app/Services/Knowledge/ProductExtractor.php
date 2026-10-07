@@ -14,6 +14,19 @@ class ProductExtractor
 {
     public function extract(string $markdown): array
     {
+        $result = $this->callOnce($markdown);
+
+        // Model gratis kadang pulang kosong padahal konten ada: coba sekali lagi.
+        if (!filled($result['brand']) && !filled($result['name'])
+            && !filled($result['model']) && !filled($result['sku'])) {
+            $result = $this->callOnce($markdown);
+        }
+
+        return $result;
+    }
+
+    protected function callOnce(string $markdown): array
+    {
         $key = (string) config('ai.providers.openrouter.key');
         if (!$key) {
             throw new RuntimeException('OPENROUTER_API_KEY belum dikonfigurasi.');

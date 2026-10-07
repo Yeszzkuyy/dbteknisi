@@ -459,4 +459,32 @@ class ProductKnowledgeTest extends TestCase
         $this->assertStringNotContainsString('cookies to personalize', strtolower($clean));
     }
 
+
+    public function test_extraction_retries_once_on_empty_result(): void
+    {
+        $this->actingAs($this->admin());
+        $calls = 0;
+        Http::fake([
+            'api.firecrawl.dev/v2/scrape' => Http::response(['success' => true, 'data' => [
+                'markdown' => 'konten retry '.str_repeat('konten resmi. ', 60),
+                'metadata' => [], 'links' => [],
+            ]]),
+            'openrouter.ai/*' => function () use (&$calls) {
+                $calls++;
+                $empty = $calls === 1;
+
+                return Http::response(['choices' => [['message' => ['content' => json_encode([
+                    'brand' => $empty ? null : 'B', 'name' => $empty ? null : 'N',
+                    'model' => $empty ? null : 'M', 'sku' => null,
+                    'category' => null, 'description' => null, 'specifications' => null,
+                ])]]]]);
+            },
+        ]);
+
+        [$source] = $this->importUrls(['https://vendor.com/retry']);
+
+        // Coba kedua berhasil -> langsung PUBLISHED.
+        $this->assertEquals(2, $calls);
+        $this->assertEquals(ProductSource::STATUS_PUBLISHED, $source->status);
+    }
 }
