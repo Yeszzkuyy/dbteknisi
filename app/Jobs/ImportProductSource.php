@@ -135,6 +135,9 @@ class ImportProductSource implements ShouldQueue
                         ]);
                     } else {
                         $source->forceFill(['status' => ProductSource::STATUS_NEEDS_REVIEW]);
+                        if (!$source->error) {
+                            $source->forceFill(['error' => 'Perlu review: identitas produk belum jelas dari halaman.']);
+                        }
                     }
                     $source->save();
 
