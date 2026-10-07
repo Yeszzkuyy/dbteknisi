@@ -266,4 +266,45 @@ class FollowUpFormTest extends TestCase
         $this->assertStringContainsString('data-glide-mount', $html);
         $this->assertStringContainsString('name="overdue"', $html);
     }
+
+    public function test_filter_partials_have_no_wrapper_id(): void
+    {
+        // Partial di-inject via innerHTML: kalau membawa id wrapper,
+        // tabel bersarang tiap submit filter.
+        $this->seed(\Database\Seeders\RoleAndPermissionSeeder::class);
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+
+        $res = $this->actingAs($sales)
+            ->getJson(route('sales.follow-ups.index', ['search' => 'x']))
+            ->assertOk();
+        $this->assertStringNotContainsString('id="followups-table"', $res->json('html'));
+
+        $res = $this->actingAs($sales)
+            ->getJson(route('sales.follow-ups.index', ['form' => 'meetings']))
+            ->assertOk();
+        $this->assertStringNotContainsString('id="meetings-table"', $res->json('html'));
+    }
+
+    public function test_full_page_has_single_table_wrapper_each(): void
+    {
+        $sales = $this->salesMgk();
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.index'))
+            ->assertOk()->getContent();
+
+        $this->assertSame(1, substr_count($html, 'id="followups-table"'));
+        $this->assertSame(1, substr_count($html, 'id="meetings-table"'));
+    }
+
+    public function test_filter_form_skips_glider_submit_guard(): void
+    {
+        // Guard glider mengunci tombol + overlay selamanya pada submit AJAX.
+        $sales = $this->salesMgk();
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.index'))
+            ->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-submit-guarded', $html);
+    }
 }

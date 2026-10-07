@@ -1,5 +1,4 @@
 {{-- Partial tabel: dipakai full view + refresh AJAX filter (tanpa reload). --}}
-<div id="followups-table" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
             <thead class="bg-slate-50 dark:bg-slate-700">
@@ -171,4 +170,3 @@
             {{ $followUps->links() }}
         </div>
     @endif
-</div>

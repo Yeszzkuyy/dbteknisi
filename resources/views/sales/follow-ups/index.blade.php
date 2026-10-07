@@ -11,7 +11,10 @@
 
     {{-- Search --}}
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 mb-6">
-        <form method="GET" data-ajax data-ajax-target="#followups-table" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {{-- data-submit-guarded manual: form ini AJAX (fetch tanpa reload), jadi
+             submit-guard glider dilewati — kalau tidak, overlay loading glider
+             tidak pernah hilang dan tombol terkunci selamanya. --}}
+        <form method="GET" data-ajax data-ajax-target="#followups-table" data-submit-guarded="ajax" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <label class="block text-xs font-medium text-slate-500 mb-1">{{ __('Cari Customer') }}</label>
                 <input type="text" name="search" value="{{ request('search') }}"
@@ -44,7 +47,9 @@
     {{-- Follow Ups section --}}
     <div class="mb-8" id="followups">
         <h2 class="text-lg font-semibold text-slate-800 mb-4">{{ __('Follow Ups') }}</h2>
-        @include('sales.follow-ups._table')
+        <div id="followups-table" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
+            @include('sales.follow-ups._table')
+        </div>
     </div>
 
     {{-- Meetings section --}}
@@ -183,7 +188,9 @@
             </div>
         @endcan
 
-        @include('sales.meetings._table', ['meetings' => $meetings ?? []])
+        <div id="meetings-table" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 overflow-hidden">
+            @include('sales.meetings._table', ['meetings' => $meetings ?? []])
+        </div>
     </div>
 
 </x-app-layout>

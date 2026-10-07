@@ -78,7 +78,8 @@ class SalesAjaxTest extends TestCase
 
         $res->assertOk()->assertJsonPath('ok', true);
         $this->assertStringContainsString('PT Filter Unik', $res->json('html'));
-        $this->assertStringContainsString('meetings-table', $res->json('html'));
+        // Partial tidak boleh membawa id wrapper (mencegah tabel bersarang).
+        $this->assertStringNotContainsString('id="meetings-table"', $res->json('html'));
     }
 
     public function test_followup_store_and_destroy_ajax(): void
