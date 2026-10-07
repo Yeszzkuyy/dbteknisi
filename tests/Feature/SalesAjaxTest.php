@@ -32,6 +32,7 @@ class SalesAjaxTest extends TestCase
             'customer_mode' => 'existing',
             'customer_id' => $customer->id,
             'meeting_date' => now()->toDateString(),
+            'notes' => 'Catatan meeting test',
         ]);
 
         $res->assertOk()

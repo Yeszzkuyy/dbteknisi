@@ -33,51 +33,15 @@
                         <dd class="font-medium text-slate-800">{{ $meeting->meeting_date->format('d M Y') }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs text-slate-400">{{ __('Peserta') }}</dt>
-                        <dd class="font-medium text-slate-800">
-                            @php
-                                $attendees = collect(preg_split('/[\r\n,;]+/', $meeting->participants ?? ''))
-                                    ->map(fn ($n) => trim($n))->filter()->values();
-                            @endphp
-                            @if($attendees->isEmpty())
-                                -
-                            @else
-                                <ol class="list-decimal list-inside space-y-1">
-                                    @foreach($attendees as $name)
-                                        <li>{{ $name }}</li>
-                                    @endforeach
-                                </ol>
-                            @endif
-                        </dd>
-                    </div>
-                    <div>
                         <dt class="text-xs text-slate-400">{{ __('Dicatat oleh') }}</dt>
                         <dd class="font-medium text-slate-800">{{ $meeting->creator?->name ?? '-' }}</dd>
                     </div>
                 </dl>
             </div>
 
-            {{-- User Needs --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Kebutuhan User') }}</h3>
-                <p class="text-slate-700 whitespace-pre-wrap">{{ $meeting->user_needs ?? '-' }}</p>
-            </div>
-
-            {{-- User Complaints --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Keluhan User') }}</h3>
-                <p class="text-slate-700 whitespace-pre-wrap">{{ $meeting->user_complaints ?? '-' }}</p>
-            </div>
-
-            {{-- Existing System --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Sistem Existing') }}</h3>
-                <p class="text-slate-700 whitespace-pre-wrap">{{ $meeting->existing_system ?? '-' }}</p>
-            </div>
-
             {{-- Notes --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Catatan') }}</h3>
+                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{{ __('Isi Meeting') }}</h3>
                 <p class="text-slate-700 whitespace-pre-wrap">{{ $meeting->notes ?? '-' }}</p>
             </div>
 

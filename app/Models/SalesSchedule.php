@@ -10,7 +10,7 @@ class SalesSchedule extends Model
     use SoftDeletes;
 
     public const TYPES = [
-        'meeting', 'call', 'visit', 'presentation', 'follow_up', 'internal', 'other',
+        'meeting', 'call', 'visit', 'presentation', 'follow_up', 'quotation', 'internal', 'other',
     ];
 
     public const STATUSES = ['scheduled', 'completed', 'cancelled', 'rescheduled'];
@@ -58,6 +58,7 @@ class SalesSchedule extends Model
             'visit' => __('Customer Visit'),
             'presentation' => __('Presentation'),
             'follow_up' => __('Follow-up'),
+            'quotation' => __('Penawaran'),
             'internal' => __('Internal Meeting'),
             default => __('Other'),
         };
