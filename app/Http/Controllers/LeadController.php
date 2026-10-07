@@ -86,9 +86,15 @@ class LeadController extends Controller
                 || ($lead->closed_at ?? $lead->updated_at)?->gte($weekStart))->values();
         }
 
+        // Kolom New (virtual, bukan status DB): lead yang di-assign ke sales
+        // tapi belum pernah digeser/diubah statusnya. won/lost tidak pernah New.
+        $newLeads = $leads->filter(fn ($lead) => $lead->acknowledged_at === null
+            && !in_array($lead->status, ['won', 'lost'], true))->values();
+        $leads = $leads->reject(fn ($lead) => $newLeads->contains($lead))->values();
+
         $statuses = self::STATUSES;
 
-        return view('leads.pipeline', compact('leads', 'statuses', 'showAllClosed', 'weekStart'));
+        return view('leads.pipeline', compact('leads', 'newLeads', 'statuses', 'showAllClosed', 'weekStart'));
     }
 
     private function authorizeLeadStatus(Lead $lead): void
@@ -131,6 +137,9 @@ class LeadController extends Controller
         if ($validated['status'] !== $lead->status) {
             $old = $lead->status;
             $payload = ['status' => $validated['status']];
+            if ($lead->acknowledged_at === null) {
+                $payload['acknowledged_at'] = now();
+            }
             if ($validated['status'] !== 'lost') {
                 $payload['lost_reason'] = null;
                 $payload['lost_note'] = null;
@@ -163,6 +172,9 @@ class LeadController extends Controller
 
             if ($old !== $change['status']) {
                 $payload = ['status' => $change['status']];
+                if ($lead->acknowledged_at === null) {
+                    $payload['acknowledged_at'] = now();
+                }
                 if ($change['status'] !== 'lost') {
                     $payload['lost_reason'] = null;
                     $payload['lost_note'] = null;

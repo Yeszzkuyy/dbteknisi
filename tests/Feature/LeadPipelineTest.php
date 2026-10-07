@@ -27,12 +27,21 @@ class LeadPipelineTest extends TestCase
     {
         $customer = Customer::create(['name' => 'PT Pipeline']);
 
-        return Lead::create(array_merge([
+        $lead = Lead::create(array_merge([
             'customer_id' => $customer->id,
             'pt_group' => 'NTI',
             'segment' => 'vendor',
             'status' => 'cool',
         ], $attributes));
+        // acknowledged_at bukan fillable: set eksplisit. Default = sudah
+        // ditangani agar test lama tetap di kolom status (bukan New).
+        $lead->forceFill([
+            'acknowledged_at' => array_key_exists('acknowledged_at', $attributes)
+                ? $attributes['acknowledged_at']
+                : now(),
+        ])->save();
+
+        return $lead->fresh();
     }
 
     public function test_pipeline_page_shows_own_leads_grouped_by_status(): void
@@ -77,6 +86,52 @@ class LeadPipelineTest extends TestCase
     {
         $this->actingAs($this->userWithRole('marketing'))
             ->get(route('leads.pipeline'))->assertForbidden();
+    }
+
+    public function test_newly_assigned_lead_appears_in_new_column(): void
+    {
+        $user = $this->userWithRole('sales');
+        $lead = $this->makeLead(['assigned_to' => $user->id, 'acknowledged_at' => null]);
+
+        $response = $this->actingAs($user)->get(route('leads.pipeline'))->assertOk();
+
+        $this->assertTrue($response->viewData('newLeads')->contains($lead));
+        $this->assertFalse($response->viewData('leads')->contains($lead));
+    }
+
+    public function test_moving_new_lead_out_acknowledges_it(): void
+    {
+        $user = $this->userWithRole('sales');
+        $lead = $this->makeLead(['assigned_to' => $user->id, 'acknowledged_at' => null]);
+
+        $this->actingAs($user)->patchJson(route('leads.batch-status'), [
+            'changes' => [['lead_id' => $lead->id, 'status' => 'warm']],
+        ])->assertOk();
+
+        $this->assertNotNull($lead->fresh()->acknowledged_at);
+
+        $response = $this->actingAs($user)->get(route('leads.pipeline'))->assertOk();
+        $this->assertFalse($response->viewData('newLeads')->contains($lead));
+        $this->assertSame(1, $response->viewData('leads')->where('status', 'warm')->count());
+    }
+
+    public function test_reassign_returns_lead_to_new_column(): void
+    {
+        $management = $this->userWithRole('management');
+        $first = User::factory()->create();
+        $first->assignRole('sales');
+        $second = User::factory()->create();
+        $second->assignRole('sales');
+        $lead = $this->makeLead(['assigned_to' => $first->id]);
+
+        $this->actingAs($management)
+            ->post(route('manage-sales.assign', $lead), ['assigned_to' => $second->id])
+            ->assertRedirect();
+
+        $this->assertNull($lead->fresh()->acknowledged_at);
+
+        $response = $this->actingAs($second)->get(route('leads.pipeline'))->assertOk();
+        $this->assertTrue($response->viewData('newLeads')->contains($lead));
     }
 
     public function test_management_sees_no_mixed_customers(): void

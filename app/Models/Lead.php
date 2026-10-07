@@ -47,6 +47,7 @@ class Lead extends Model
         'notes',
         'incoming_date',
         'assigned_to',
+        'acknowledged_at',
         'lost_reason',
         'lost_note',
         'closed_at',
@@ -56,6 +57,7 @@ class Lead extends Model
     protected $casts = [
         'incoming_date' => 'date',
         'assigned_at' => 'datetime',
+        'acknowledged_at' => 'datetime',
         'closed_at' => 'datetime',
     ];
 

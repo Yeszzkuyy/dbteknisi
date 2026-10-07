@@ -362,6 +362,8 @@ class ManageSalesController extends Controller
         $lead->assigned_to = $assignedTo;
         $lead->assigned_by = $assignedTo ? auth()->id() : null;
         $lead->assigned_at = $assignedTo ? now() : null;
+        // Assign (baru/reassign) = belum ditangani -> kembali ke kolom New pipeline.
+        $lead->acknowledged_at = $assignedTo ? null : $lead->acknowledged_at;
     }
 
     /**
