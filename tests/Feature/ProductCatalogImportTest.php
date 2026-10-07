@@ -120,6 +120,8 @@ class ProductCatalogImportTest extends TestCase
         // Antrean sync: anak langsung diproses -> 4 produk, masing-masing 1 model.
         // Tanpa Product gabungan multi-model.
         $this->assertEquals(4, Product::count());
+        // Anak valid langsung PUBLISHED otomatis.
+        $this->assertEquals(4, Product::where('status', 'published')->count());
         $this->assertEquals(
             ['P520', 'P550', 'P560', 'P570'],
             Product::orderBy('model')->pluck('model')->all()

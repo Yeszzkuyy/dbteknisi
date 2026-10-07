@@ -61,7 +61,7 @@
                                     </td>
                                     <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $source->product?->brand ?? '-' }}</td>
                                     <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $source->product?->model ?? '-' }}</td>
-                                    <td class="px-6 py-4"><x-status-badge :color="match($source->status) { 'success' => 'green', 'failed' => 'red', 'needs_review' => 'orange', 'duplicate' => 'slate', default => 'blue' }">{{ ucfirst(str_replace('_', ' ', $source->status)) }}</x-status-badge></td>
+                                    <td class="px-6 py-4"><x-status-badge :color="match($source->status) { 'published' => 'green', 'success' => 'green', 'failed' => 'red', 'needs_review' => 'orange', 'duplicate' => 'slate', default => 'blue' }">{{ ucfirst(str_replace('_', ' ', $source->status)) }}</x-status-badge></td>
                                 </tr>
                             @endforeach
                         </tbody>

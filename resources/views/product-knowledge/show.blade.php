@@ -6,24 +6,28 @@
                 <p class="text-sm text-slate-500 mt-1"><x-status-badge :color="match($product->status) { 'published' => 'green', 'approved' => 'blue', 'rejected' => 'red', default => 'orange' }">{{ ucfirst($product->status) }}</x-status-badge></p>
             </div>
             <div class="flex items-center gap-2">
-                @if(!in_array($product->status, ['published', 'rejected'], true))
-                    <form action="{{ route('product-knowledge.approve', $product) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" title="Approve & Publish" aria-label="Approve & Publish"
-                                class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-all duration-300 hover:scale-105 active:scale-95">
-                            <x-icon name="check-circle" class="h-5 w-5" />
-                        </button>
-                    </form>
-                    <form action="{{ route('product-knowledge.reject', $product) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" title="Reject" aria-label="Reject"
-                                onclick="return confirm('{{ __('Tolak produk ini? Tidak masuk pencarian AI.') }}')"
-                                class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
-                            <x-icon name="trash" class="h-5 w-5" />
-                        </button>
-                    </form>
+                @if($product->status !== 'published')
+                    @if($product->hasClearIdentity())
+                        <form action="{{ route('product-knowledge.publish', $product) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" title="Publish" aria-label="Publish"
+                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                <x-icon name="check-circle" class="h-5 w-5" />
+                            </button>
+                        </form>
+                    @endif
+                    @if($product->status !== 'rejected')
+                        <form action="{{ route('product-knowledge.reject', $product) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" title="Reject" aria-label="Reject"
+                                    onclick="return confirm('{{ __('Tolak produk ini? Tidak masuk pencarian AI.') }}')"
+                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                <x-icon name="trash" class="h-5 w-5" />
+                            </button>
+                        </form>
+                    @endif
                 @endif
                 <x-icon-button as="a" icon="back" href="{{ route('product-knowledge.index') }}" title="Back" />
             </div>
@@ -40,6 +44,46 @@
             <p class="mt-4 text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{{ $product->description ?? '-' }}</p>
         </section>
 
+        @if(!in_array($product->status, ['published'], true))
+            @php($reasons = $product->sources->where('status', 'needs_review')->pluck('error')->filter()->unique()->values())
+            @if($reasons->isNotEmpty())
+                <section class="rounded-2xl border border-orange-300 bg-orange-50 p-5 dark:border-orange-700 dark:bg-orange-900/20">
+                    <h2 class="text-lg font-bold text-orange-800 dark:text-orange-200">{{ __('Needs Review') }}</h2>
+                    <ul class="mt-2 list-disc list-inside text-sm text-orange-700 dark:text-orange-300">
+                        @foreach($reasons as $reason)
+                            <li>{{ $reason }}</li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">{{ __('Fix data') }}</h2>
+                <form action="{{ route('product-knowledge.update', $product) }}" method="POST" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    @csrf
+                    @method('PATCH')
+                    @foreach(['brand' => $product->brand, 'name' => $product->name, 'model' => $product->model, 'sku' => $product->sku, 'category' => $product->category] as $field => $value)
+                        <label class="block text-sm">
+                            <span class="font-semibold text-slate-500">{{ ucfirst($field) }}</span>
+                            <input type="text" name="{{ $field }}" value="{{ old($field, $value) }}"
+                                   class="mt-1 w-full px-4 py-2 border border-slate-300 rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100" />
+                        </label>
+                    @endforeach
+                    <label class="block text-sm sm:col-span-2">
+                        <span class="font-semibold text-slate-500">{{ __('Description') }}</span>
+                        <textarea name="description" rows="3"
+                                  class="mt-1 w-full px-4 py-2 border border-slate-300 rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">{{ old('description', $product->description) }}</textarea>
+                    </label>
+                    <div class="sm:col-span-2">
+                        <button type="submit"
+                                class="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-accent-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:scale-105 hover:bg-accent-500 hover:shadow-lg active:scale-95">
+                            <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" aria-hidden="true"></span>
+                            {{ __('Save') }}
+                        </button>
+                    </div>
+                </form>
+            </section>
+        @endif
+
         {{-- Sources --}}
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">{{ __('Sources') }}</h2>
@@ -51,7 +95,7 @@
                             <p class="text-xs text-slate-400 mt-1">{{ $source->source_type }} · {{ __('fetch') }}: {{ $source->last_fetched_at?->format('d M Y H:i') ?? '-' }} · v{{ $source->latestDocument?->version ?? '-' }}</p>
                             @if($source->error)<p class="text-xs text-red-600 mt-1">{{ $source->error }}</p>@endif
                         </div>
-                        <x-status-badge :color="match($source->status) { 'success' => 'green', 'failed' => 'red', 'needs_review' => 'orange', 'duplicate' => 'slate', default => 'blue' }">{{ ucfirst(str_replace('_', ' ', $source->status)) }}</x-status-badge>
+                        <x-status-badge :color="match($source->status) { 'published' => 'green', 'success' => 'green', 'failed' => 'red', 'needs_review' => 'orange', 'duplicate' => 'slate', default => 'blue' }">{{ ucfirst(str_replace('_', ' ', $source->status)) }}</x-status-badge>
                         <form action="{{ route('product-knowledge.refetch', $source) }}" method="POST">
                             @csrf
                             <button type="submit" title="Refetch" aria-label="Refetch"

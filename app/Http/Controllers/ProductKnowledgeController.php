@@ -112,7 +112,26 @@ class ProductKnowledgeController extends Controller
         return view('product-knowledge.show', compact('product'));
     }
 
-    public function approve(Product $product): RedirectResponse
+    public function update(Request $request, Product $product): RedirectResponse
+    {
+        $this->authorize('manage-admin');
+
+        $validated = $request->validate([
+            'brand' => ['nullable', 'string', 'max:255'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'model' => ['nullable', 'string', 'max:255'],
+            'sku' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:8000'],
+        ]);
+
+        $product->forceFill($validated)->save();
+
+        return redirect()->route('product-knowledge.show', $product)
+            ->with('success', __('Data produk diperbarui.'));
+    }
+
+    public function publish(Product $product): RedirectResponse
     {
         $this->authorize('manage-admin');
 

@@ -17,6 +17,7 @@ class ProductSource extends Model
     public const STATUS_FAILED = 'failed';
     public const STATUS_NEEDS_REVIEW = 'needs_review';
     public const STATUS_DUPLICATE = 'duplicate';
+    public const STATUS_PUBLISHED = 'published';
 
     protected $fillable = [
         'product_id', 'url', 'source_type', 'status', 'error',

@@ -45,11 +45,18 @@ class GetProductKnowledge implements Tool
             ->join('products', 'products.id', '=', 'knowledge_documents.product_id')
             ->where('knowledge_documents.status', KnowledgeDocument::STATUS_PUBLISHED)
             ->where('products.status', Product::STATUS_PUBLISHED);
-        if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
-            $chunkQuery->whereRaw("to_tsvector('simple', knowledge_chunks.content) @@ plainto_tsquery('simple', ?)", [$query]);
-        } else {
-            $chunkQuery->where('knowledge_chunks.content', 'like', '%' . $query . '%');
-        }
+        $like = '%' . $query . '%';
+        $isPgsql = \Illuminate\Support\Facades\DB::getDriverName() === 'pgsql';
+        $chunkQuery->where(fn ($w) => $w
+            ->where('knowledge_chunks.content', 'like', $like)
+            ->orWhere('products.brand', 'like', $like)
+            ->orWhere('products.name', 'like', $like)
+            ->orWhere('products.model', 'like', $like)
+            ->orWhere('products.sku', 'like', $like)
+            ->when($isPgsql, fn ($q) => $q->orWhereRaw(
+                "to_tsvector('simple', knowledge_chunks.content) @@ plainto_tsquery('simple', ?)",
+                [$query]
+            )));
 
         if ($brand !== '') {
             $chunkQuery->whereRaw('LOWER(products.brand) = ?', [mb_strtolower($brand)]);

@@ -101,7 +101,7 @@ class ProductKnowledgeTest extends TestCase
 
         [$source] = $this->importUrls(['https://vendor.com/product/1']);
 
-        $this->assertEquals(ProductSource::STATUS_SUCCESS, $source->status);
+        $this->assertEquals(ProductSource::STATUS_PUBLISHED, $source->status);
         $product = $source->fresh()->product;
         $this->assertNotNull($product);
         $this->assertEquals('Yeastar', $product->brand);
@@ -132,7 +132,7 @@ class ProductKnowledgeTest extends TestCase
 
         $this->assertEquals(ProductSource::STATUS_FAILED, $fail->status);
         $this->assertNotNull($fail->error);
-        $this->assertEquals(ProductSource::STATUS_SUCCESS, $ok->status);
+        $this->assertEquals(ProductSource::STATUS_PUBLISHED, $ok->status);
     }
 
     public function test_import_dispatches_one_job_per_url(): void
@@ -194,7 +194,7 @@ class ProductKnowledgeTest extends TestCase
         $this->assertEquals(ProductSource::STATUS_NEEDS_REVIEW, $source->status);
     }
 
-    public function test_review_approve_publish_and_retrieval(): void
+    public function test_valid_auto_publishes_and_retrieval(): void
     {
         $admin = $this->admin();
         $this->actingAs($admin);
@@ -204,16 +204,69 @@ class ProductKnowledgeTest extends TestCase
         [$source] = $this->importUrls(['https://vendor.com/product/9']);
         $product = $source->fresh()->product;
 
-        // Sebelum publish: tool tidak menemukan apa pun.
+        // Tanpa klik apa pun: produk + dokumen + source langsung PUBLISHED.
+        $this->assertEquals(Product::STATUS_PUBLISHED, $product->status);
+        $this->assertEquals('published', $product->documents()->first()->status);
+
         $tool = new GetProductKnowledge($admin);
-        $this->assertStringContainsString('Tidak ada', (string) $tool->handle(new \Laravel\Ai\Tools\Request(['query' => 'P560'])));
-
-        $this->patch(route('product-knowledge.approve', $product))->assertRedirect();
-        $this->assertEquals(Product::STATUS_PUBLISHED, $product->fresh()->status);
-
         $found = (string) $tool->handle(new \Laravel\Ai\Tools\Request(['query' => 'P560']));
         $this->assertStringContainsString('P560', $found);
         $this->assertStringContainsString('https:\/\/vendor.com\/product\/9', $found);
+    }
+
+    public function test_needs_review_fix_then_publish(): void
+    {
+        $admin = $this->admin();
+        $this->actingAs($admin);
+        Http::fake([
+            'api.firecrawl.dev/v1/scrape' => Http::response([
+                'success' => true,
+                'data' => ['markdown' => 'samar '.str_repeat('konten resmi. ', 60), 'metadata' => [], 'links' => []],
+            ]),
+            'openrouter.ai/*' => Http::response(['choices' => [['message' => ['content' => json_encode([
+                'brand' => null, 'name' => null, 'model' => null, 'sku' => null,
+                'category' => null, 'description' => null, 'specifications' => null,
+            ])]]]]),
+        ]);
+
+        [$source] = $this->importUrls(['https://vendor.com/samar-2']);
+        $product = $source->fresh()->product;
+
+        // Alasan tercatat, belum publish.
+        $this->assertEquals(ProductSource::STATUS_NEEDS_REVIEW, $source->fresh()->status);
+        $this->assertStringContainsString('Perlu review', (string) $source->fresh()->error);
+        $this->assertNotEquals(Product::STATUS_PUBLISHED, $product->status);
+
+        // Admin betulkan data lalu publish manual.
+        $this->patch(route('product-knowledge.update', $product), [
+            'brand' => 'Yeastar', 'name' => 'P-Series', 'model' => 'P520',
+        ])->assertRedirect();
+        $this->patch(route('product-knowledge.publish', $product))->assertRedirect();
+        $this->assertEquals(Product::STATUS_PUBLISHED, $product->fresh()->status);
+
+        $tool = new GetProductKnowledge($admin);
+        $found = (string) $tool->handle(new \Laravel\Ai\Tools\Request(['query' => 'P520']));
+        $this->assertStringContainsString('P520', $found);
+    }
+
+    public function test_invalid_url_rejected_by_validation(): void
+    {
+        $this->actingAs($this->admin());
+
+        $this->post(route('product-knowledge.import'), ['urls' => 'bukan-url'])
+            ->assertSessionHasErrors('urls');
+        $this->assertEquals(0, ProductSource::count());
+    }
+
+    public function test_sales_cannot_manage(): void
+    {
+        Artisan::call('db:seed', ['--class' => 'RoleAndPermissionSeeder']);
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+
+        $this->actingAs($sales)->get(route('product-knowledge.index'))->assertForbidden();
+        $this->actingAs($sales)->post(route('product-knowledge.import'), ['urls' => 'https://x.com/a'])
+            ->assertForbidden();
     }
 
     public function test_rejected_excluded_from_retrieval(): void
@@ -226,7 +279,7 @@ class ProductKnowledgeTest extends TestCase
         [$source] = $this->importUrls(['https://vendor.com/product/8']);
         $product = $source->fresh()->product;
 
-        $this->patch(route('product-knowledge.approve', $product))->assertRedirect();
+        $this->assertEquals(Product::STATUS_PUBLISHED, $product->fresh()->status);
         $this->patch(route('product-knowledge.reject', $product))->assertRedirect();
 
         $tool = new GetProductKnowledge($admin);
@@ -245,7 +298,7 @@ class ProductKnowledgeTest extends TestCase
         // Fetch ulang isi sama -> tanpa dokumen baru.
         ImportProductSource::dispatchSync($source->fresh()->id);
         $this->assertEquals(1, $source->fresh()->product->documents()->count());
-        $this->assertEquals(ProductSource::STATUS_SUCCESS, $source->fresh()->status);
+        $this->assertEquals(ProductSource::STATUS_PUBLISHED, $source->fresh()->status);
     }
 
     public function test_refetch_changed_creates_new_version(): void

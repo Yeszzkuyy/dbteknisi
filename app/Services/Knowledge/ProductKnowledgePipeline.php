@@ -156,6 +156,25 @@ class ProductKnowledgePipeline
         return array_slice($found, 0, (int) config('knowledge.firecrawl.crawl_limit'));
     }
 
+    /**
+     * Daftar identitas yang kurang jelas (untuk alasan NEEDS_REVIEW).
+     */
+    public function identityIssues(array $extracted): array
+    {
+        $issues = [];
+        if (!filled($extracted['name'] ?? null)) {
+            $issues[] = 'nama produk';
+        }
+        if (!filled($extracted['model'] ?? null) && !filled($extracted['sku'] ?? null)) {
+            $issues[] = 'model/SKU';
+        }
+        if (!filled($extracted['brand'] ?? null)) {
+            $issues[] = 'brand';
+        }
+
+        return $issues;
+    }
+
     public function detectSourceType(string $url): string
     {
         $lower = mb_strtolower($url);

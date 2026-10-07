@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\KnowledgeDocument;
 use App\Models\Product;
 use App\Models\ProductSource;
 use App\Services\Knowledge\FirecrawlService;
@@ -25,6 +26,48 @@ class ImportProductSource implements ShouldQueue
         public int $sourceId,
         public int $depth = 0,
     ) {}
+
+    /**
+     * Status akhir: jelas -> PUBLISHED otomatis, kecuali produk pernah
+     * di-reject admin (jangan hidupkan lagi diam-diam).
+     */
+    protected function resolveStatus(ProductSource $source, Product $product, ProductKnowledgePipeline $pipeline, array $extracted): void
+    {
+        if ($product->status === Product::STATUS_REJECTED) {
+            $source->forceFill([
+                'status' => ProductSource::STATUS_NEEDS_REVIEW,
+                'error' => 'Produk terkait pernah ditolak admin.',
+            ])->save();
+
+            return;
+        }
+
+        if ($product->hasClearIdentity()) {
+            $this->publishProduct($source, $product);
+
+            return;
+        }
+
+        $issues = $pipeline->identityIssues($extracted);
+        $source->forceFill([
+            'status' => ProductSource::STATUS_NEEDS_REVIEW,
+            'error' => 'Perlu review: '.implode(', ', $issues).' tidak jelas dari halaman.',
+        ])->save();
+    }
+
+    /**
+     * Identitas jelas -> PUBLISHED otomatis (produk + dokumen terbaru + source).
+     */
+    protected function publishProduct(ProductSource $source, Product $product): void
+    {
+        $product->forceFill(['status' => Product::STATUS_PUBLISHED])->save();
+
+        KnowledgeDocument::where('source_id', $source->id)
+            ->latest('version')->limit(1)
+            ->update(['status' => KnowledgeDocument::STATUS_PUBLISHED]);
+
+        $source->forceFill(['status' => ProductSource::STATUS_PUBLISHED])->save();
+    }
 
     /**
      * Katalog: tanpa Product record (jangan gabung banyak model),
@@ -91,14 +134,19 @@ class ImportProductSource implements ShouldQueue
 
             $extracted = $extractor->extract($markdown);
             [$product, ] = $pipeline->matchOrCreateProduct($extracted);
-            $pipeline->storeDocument($source, $product, $extracted, $markdown);
+
+            if ($pipeline->storeDocument($source, $product, $extracted, $markdown)) {
+                // Konten sama: tanpa versi baru.
+                $this->resolveStatus($source, $product, $pipeline, $extracted);
+
+                return;
+            }
 
             $source->forceFill([
                 'source_type' => $pipeline->detectSourceType($source->url),
-                'status' => $product->hasClearIdentity()
-                    ? ProductSource::STATUS_SUCCESS
-                    : ProductSource::STATUS_NEEDS_REVIEW,
             ])->save();
+
+            $this->resolveStatus($source, $product, $pipeline, $extracted);
         } catch (Throwable $e) {
             Log::warning('Import URL produk gagal', ['source_id' => $source->id, 'error' => $e->getMessage()]);
             $source->forceFill([
