@@ -45,6 +45,15 @@ class Project extends Model
         return $this->belongsTo(User::class, 'deleted_by');
     }
 
+    /**
+     * Owner bisnis untuk Trash: ikut owner customer-nya.
+     * withTrashed karena customer-nya sendiri bisa sedang di trash.
+     */
+    public function trashOwnerId(): ?int
+    {
+        return $this->customer()->withTrashed()->first()?->trashOwnerId();
+    }
+
     // Relasi ke AccountManager
     public function accountManager()
     {

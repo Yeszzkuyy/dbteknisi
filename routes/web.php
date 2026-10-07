@@ -285,16 +285,14 @@ Route::middleware('auth')->group(function () {
     // ============================================
     // ADMIN — Trash
     // ============================================
-    Route::middleware('permission:manage-admin')->group(function () {
+    // Modul Trash: gate view-trash, kepemilikan dijaga Policy di backend.
+    Route::middleware('permission:view-trash')->group(function () {
+        Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
         Route::patch('/trash/customers/{id}/restore', [TrashController::class, 'restoreCustomer'])->name('trash.restore-customer');
         Route::patch('/trash/projects/{id}/restore', [TrashController::class, 'restoreProject'])->name('trash.restore-project');
         Route::delete('/trash/customers/{id}/delete', [TrashController::class, 'destroyCustomer'])->name('trash.destroy-customer');
         Route::delete('/trash/projects/{id}/delete', [TrashController::class, 'destroyProject'])->name('trash.destroy-project');
         Route::delete('/trash/clear', [TrashController::class, 'clear'])->name('trash.clear');
-    });
-
-    Route::middleware('permission:view-admin|manage-admin|view-trash')->group(function () {
-        Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
     });
 
     // ============================================

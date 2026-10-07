@@ -34,11 +34,25 @@ class CustomerPolicy
 
     public function restore(User $user, Customer $customer): bool
     {
-        return $user->can('manage-admin');
+        return $this->ownsTrash($user, $customer);
     }
 
     public function forceDelete(User $user, Customer $customer): bool
     {
-        return $user->can('manage-admin');
+        return $this->ownsTrash($user, $customer);
+    }
+
+    /**
+     * Owner data ATAU super-admin. deleted_by tidak memberi hak.
+     */
+    private function ownsTrash(User $user, Customer $customer): bool
+    {
+        if ($user->hasRole('super-admin')) {
+            return true;
+        }
+
+        $owner = $customer->trashOwnerId();
+
+        return $owner !== null && (int) $owner === (int) $user->id;
     }
 }

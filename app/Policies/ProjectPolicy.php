@@ -38,11 +38,25 @@ class ProjectPolicy
 
     public function restore(User $user, Project $project): bool
     {
-        return $user->can('manage-admin');
+        return $this->ownsTrash($user, $project);
     }
 
     public function forceDelete(User $user, Project $project): bool
     {
-        return $user->can('manage-admin');
+        return $this->ownsTrash($user, $project);
+    }
+
+    /**
+     * Owner data (ikut owner customer) ATAU super-admin.
+     */
+    private function ownsTrash(User $user, Project $project): bool
+    {
+        if ($user->hasRole('super-admin')) {
+            return true;
+        }
+
+        $owner = $project->trashOwnerId();
+
+        return $owner !== null && (int) $owner === (int) $user->id;
     }
 }
