@@ -112,7 +112,16 @@ class ProductExtractor
             throw new RuntimeException('Ekstraksi gagal: HTTP '.$res->status());
         }
 
+        // OpenRouter kadang balas 200 berisi error upstream (limit gratis habis).
+        // Itu BUKAN hasil kosong: lempar agar job FAILED + antre ulang.
+        if ($res->json('error')) {
+            throw new RuntimeException('Ekstraksi gagal: '.mb_substr((string) ($res->json('error.message') ?? 'upstream error'), 0, 200));
+        }
+
         $json = $res->json('choices.0.message.content');
+        if (!is_string($json) || trim($json) === '') {
+            throw new RuntimeException('Ekstraksi gagal: respons model kosong.');
+        }
         $data = is_string($json) ? json_decode($json, true) : (array) $json;
 
         if (!is_array($data)) {

@@ -511,4 +511,18 @@ class ProductKnowledgeTest extends TestCase
         $user = end($sent['messages'])['content'] ?? '';
         $this->assertStringContainsString('Page title: DiskStation DS425+', $user);
     }
+
+    public function test_extraction_upstream_error_throws(): void
+    {
+        config()->set('ai.providers.openrouter.key', 'test-key');
+        Http::fake([
+            'openrouter.ai/*' => Http::response([
+                'id' => 'gen-1',
+                'error' => ['message' => 'Upstream error from Nvidia: ResourceExhausted'],
+            ], 200),
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        app(\App\Services\Knowledge\ProductExtractor::class)->extract('konten');
+    }
 }
