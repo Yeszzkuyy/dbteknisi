@@ -170,7 +170,10 @@ class ImportProductSource implements ShouldQueue
                 self::dispatch($pdf->id, 1);
             }
 
-            $extracted = $extractor->extract($markdown);
+            $extracted = $extractor->extract($markdown, [
+                'title' => $scraped['metadata']['title'] ?? null,
+                'url' => $source->url,
+            ]);
             [$product, ] = $pipeline->matchOrCreateProduct($extracted);
 
             if ($pipeline->storeDocument($source, $product, $extracted, $markdown)) {
