@@ -205,10 +205,9 @@ class ManageSalesController extends Controller
         $statusCounts = $mine()->selectRaw('status, count(*) as total')
             ->groupBy('status')->pluck('total', 'status');
         $statusPalette = [
-            'new' => '#3b82f6',
-            'contacted' => '#eab308',
-            'qualified' => '#a855f7',
-            'proposal' => '#f97316',
+            'cool' => '#3b82f6',
+            'warm' => '#eab308',
+            'hot' => '#f97316',
             'won' => '#22c55e',
             'lost' => '#ef4444',
         ];

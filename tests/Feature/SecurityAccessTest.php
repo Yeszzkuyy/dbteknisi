@@ -325,7 +325,7 @@ class SecurityAccessTest extends TestCase
         Storage::disk('private')->put('leads/1/data.xlsx', 'bukan-zip-asli');
 
         $customer = Customer::create(['name' => 'PT Lead']);
-        $lead = Lead::create(['customer_id' => $customer->id, 'status' => 'new']);
+        $lead = Lead::create(['customer_id' => $customer->id, 'status' => 'cool']);
         $doc = $lead->documents()->create([
             'file_name' => 'data.xlsx',
             'file_path' => 'leads/1/data.xlsx',

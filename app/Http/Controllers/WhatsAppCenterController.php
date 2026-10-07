@@ -472,7 +472,7 @@ class WhatsAppCenterController extends Controller
             'whatsapp_account_id' => $account->id,
             'segment' => $validated['segment'],
             'source' => 'whatsapp',
-            'status' => 'new',
+            'status' => 'cool',
             'kebutuhan' => $validated['kebutuhan'] ?? null,
             'incoming_date' => now()->toDateString(),
         ]);

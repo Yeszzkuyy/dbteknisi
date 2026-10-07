@@ -86,10 +86,9 @@
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium
                                     @switch($lead->status)
-                                        @case('new') bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 @break
-                                        @case('contacted') bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 @break
-                                        @case('qualified') bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 @break
-                                        @case('proposal') bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 @break
+                                        @case('cool') bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 @break
+                                        @case('warm') bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 @break
+                                        @case('hot') bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 @break
                                         @case('won') bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 @break
                                         @case('lost') bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 @break
                                         @default bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200

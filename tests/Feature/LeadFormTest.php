@@ -114,7 +114,7 @@ class LeadFormTest extends TestCase
         $this->assertNotNull($lead);
         $this->assertSame('system_integrator', $lead->segment);
         $this->assertSame('canvasing', $lead->source);
-        $this->assertSame('new', $lead->status);
+        $this->assertSame('cool', $lead->status);
         $this->assertSame('2026-08-24', $lead->incoming_date->toDateString());
         $this->assertSame('NTI', $lead->pt_group);
         $this->assertSame('info@ujicoba.id', $lead->customer->email);
@@ -131,7 +131,7 @@ class LeadFormTest extends TestCase
             'pt_group' => 'NTI',
             'segment' => 'vendor',
             'incoming_date' => now()->toDateString(),
-            'status' => 'new',
+            'status' => 'cool',
         ]);
         $customer->delete();
 
@@ -206,7 +206,7 @@ class LeadFormTest extends TestCase
             'pt_group' => 'NTI',
             'segment' => 'vendor',
             'incoming_date' => now()->toDateString(),
-            'status' => 'new',
+            'status' => 'cool',
         ]);
 
         $this->actingAs($this->marketingUser())
@@ -247,7 +247,7 @@ class LeadFormTest extends TestCase
             'pt_group' => 'NTI',
             'segment' => 'vendor',
             'incoming_date' => now()->toDateString(),
-            'status' => 'new',
+            'status' => 'cool',
         ]);
 
         $this->actingAs($user)->put(route('leads.update', $lead), [

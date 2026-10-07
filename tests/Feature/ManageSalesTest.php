@@ -31,7 +31,7 @@ class ManageSalesTest extends TestCase
             'customer_id' => $customer->id,
             'pt_group' => 'NTI',
             'segment' => 'end_user',
-            'status' => 'new',
+            'status' => 'cool',
             'incoming_date' => now()->toDateString(),
             'assigned_to' => $assignee?->id,
         ]);

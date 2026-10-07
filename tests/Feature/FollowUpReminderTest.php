@@ -32,7 +32,7 @@ class FollowUpReminderTest extends TestCase
             'customer_id' => $customer->id,
             'pt_group' => 'NTI',
             'segment' => 'vendor',
-            'status' => 'contacted',
+            'status' => 'warm',
             'assigned_to' => $sales->id,
         ]);
         $followUp = FollowUp::create([
