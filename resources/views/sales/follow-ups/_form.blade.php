@@ -1,26 +1,27 @@
 {{-- Form tambah/edit follow-up: customer searchable + lead/meeting ikut customer (tanpa reload). --}}
 @php($followUp = $followUp ?? null)
-<form action="{{ $action }}" method="POST" data-ajax class="space-y-6"
+@php($initialCustomer = (string) old('customer_id', $customerId ?? null))
+@php($initialLeadOptions = collect($leadItems)->where('customer_id', $initialCustomer)->map(fn ($l) => ['value' => $l['id'], 'label' => $l['label']])->values()->all())
+@php($initialMeetingOptions = collect($meetingItems)->where('customer_id', $initialCustomer)->map(fn ($m) => ['value' => $m['id'], 'label' => $m['label']])->values()->all())
+<form action="{{ $action }}" method="POST" data-ajax data-submit-guarded="ajax" class="space-y-6"
       x-data="{
           customerId: {{ json_encode(old('customer_id', $customerId ?? null)) }},
-          leadId: {{ json_encode(old('lead_id', $leadId ?? null)) }},
-          meetingId: {{ json_encode(old('meeting_id', $meetingId ?? null)) }},
           leads: {{ json_encode($leadItems) }},
           meetings: {{ json_encode($meetingItems) }},
           str(v) { return (v === null || v === undefined || v === '') ? null : String(v); },
-          init() {
-              this.customerId = this.str(this.customerId);
-              this.leadId = this.str(this.leadId);
-              this.meetingId = this.str(this.meetingId);
+          init() { this.customerId = this.str(this.customerId); },
+          toOpts(list) {
+              const cid = this.customerId ? String(this.customerId) : null;
+              return list.filter((x) => String(x.customer_id) === String(cid)).map((x) => ({ value: x.id, label: x.label }));
           },
-          get customerLeads() {
-              return this.leads.filter((l) => String(l.customer_id) === String(this.customerId));
-          },
-          get customerMeetings() {
-              return this.meetings.filter((m) => String(m.customer_id) === String(this.customerId));
+          refreshGliders() {
+              if (typeof window.__glideRemount !== 'function') return;
+              const mountOf = (id) => document.querySelector('#' + id + ' [data-glide-mount]');
+              window.__glideRemount(mountOf('fu-lead-glider'), this.toOpts(this.leads));
+              window.__glideRemount(mountOf('fu-meet-glider'), this.toOpts(this.meetings));
           }
       }"
-      @customer-picked.window="if ($event.detail.field === 'customer_id') { customerId = $event.detail.id; leadId = null; meetingId = null; }">
+      @customer-picked.window="if ($event.detail.field === 'customer_id') { customerId = $event.detail.id; refreshGliders(); }">
     @csrf
     @if(!empty($method)) @method($method) @endif
 
@@ -36,60 +37,39 @@
         ])
         @error('customer_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
-        </div>
-        <p class="mt-1 text-xs text-slate-400">{{ __('Pick a customer first — changing it resets Lead and Meeting below.') }}</p>
-        @error('customer_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-    </div>
 
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Related Lead (optional)') }}</label>
-        <div class="relative">
-            <select name="lead_id" x-model="leadId" :disabled="!customerId"
-                    class="w-full appearance-none rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 disabled:opacity-60 pr-10 text-sm">
-                <option value="">{{ __('No specific opportunity') }}</option>
-                <template x-for="lead in customerLeads" :key="lead.id">
-                    <option :value="lead.id" x-text="lead.label"></option>
-                </template>
-            </select>
-            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
-            </span>
+        <div id="fu-lead-glider">
+            <x-glide-select name="lead_id" label="Related lead"
+                :options="$initialLeadOptions"
+                :value="old('lead_id', $leadId ?? null)"
+                :empty-label="__('No specific opportunity')"
+                :error="$errors->first('lead_id')" />
         </div>
         <p class="mt-1 text-xs text-slate-400">{{ __('Links this follow-up to an opportunity. Auto-linked when the customer has exactly one of your active leads.') }}</p>
-        @error('lead_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Related Meeting (optional)') }}</label>
-        <div class="relative">
-            <select name="meeting_id" x-model="meetingId" :disabled="!customerId"
-                    class="w-full appearance-none rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 disabled:opacity-60 pr-10 text-sm">
-                <option value="">{{ __('No specific meeting') }}</option>
-                <template x-for="meeting in customerMeetings" :key="meeting.id">
-                    <option :value="meeting.id" x-text="meeting.label"></option>
-                </template>
-            </select>
-            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
-            </span>
+        <div id="fu-meet-glider">
+            <x-glide-select name="meeting_id" label="Related meeting"
+                :options="$initialMeetingOptions"
+                :value="old('meeting_id', $meetingId ?? null)"
+                :empty-label="__('No specific meeting')"
+                :error="$errors->first('meeting_id')" />
         </div>
         <p class="mt-1 text-xs text-slate-400">{{ __('The earlier meeting this follow-up continues, if any.') }}</p>
-        @error('meeting_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Contact Method') }}</label>
-        <select name="type"
-                class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-            <option value="">{{ __('Select method') }}</option>
-            @foreach(\App\Models\FollowUp::CONTACT_TYPES as $type)
-                <option value="{{ $type }}" @selected(old('type', $followUp?->type) === $type)>
-                    {{ \App\Models\FollowUp::typeLabel($type) }}
-                </option>
-            @endforeach
-        </select>
+        <x-glide-select name="type" label="Contact method"
+            :options="collect(\App\Models\FollowUp::CONTACT_TYPES)->map(fn ($t) => ['value' => $t, 'label' => \App\Models\FollowUp::typeLabel($t)])->all()"
+            :value="old('type', $followUp?->type)"
+            :empty-label="__('Select method')"
+            :error="$errors->first('type')" />
         <p class="mt-1 text-xs text-slate-400">{{ __('How you reached the customer.') }}</p>
-        @error('type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
     <div>
