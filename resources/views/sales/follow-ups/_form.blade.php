@@ -2,12 +2,12 @@
 @php($followUp = $followUp ?? null)
 <form action="{{ $action }}" method="POST" data-ajax class="space-y-6"
       x-data="{
-          customers: @json($customerOptions),
-          leads: @json($leadItems),
-          meetings: @json($meetingItems),
-          customerId: @json(old('customer_id', $customerId ?? null)),
-          leadId: @json(old('lead_id', $leadId ?? null)),
-          meetingId: @json(old('meeting_id', $meetingId ?? null)),
+          customers: {{ json_encode($customerOptions) }},
+          leads: {{ json_encode($leadItems) }},
+          meetings: {{ json_encode($meetingItems) }},
+          customerId: {{ json_encode(old('customer_id', $customerId ?? null)) }},
+          leadId: {{ json_encode(old('lead_id', $leadId ?? null)) }},
+          meetingId: {{ json_encode(old('meeting_id', $meetingId ?? null)) }},
           query: '',
           open: false,
           str(v) { return (v === null || v === undefined || v === '') ? null : String(v); },
