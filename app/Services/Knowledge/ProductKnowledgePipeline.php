@@ -142,7 +142,7 @@ class ProductKnowledgePipeline
                 continue;
             }
             $path = mb_strtolower((string) parse_url($link, PHP_URL_PATH));
-            if (preg_match('/\.(css|js|png|jpe?g|gif|svg|webp|ico|woff2?|mp4|zip)(\?|$)/', $path)) {
+            if (preg_match('/\.(css|js|png|jpe?g|gif|svg|webp|ico|woff2?|mp4|zip|pdf)(\?|$)/', $path)) {
                 continue;
             }
             if (preg_match('#/(blog|news|contact|about|support|help|login|cart|checkout|privacy|terms|sitemap)#', $path)) {
@@ -175,6 +175,35 @@ class ProductKnowledgePipeline
         return $issues;
     }
 
+    /**
+     * Link PDF se-host (maks 2): datasheet pendamping otomatis.
+     *
+     * @return string[]
+     */
+    public function discoverPdfLinks(string $pageUrl, array $links, int $max = 2): array
+    {
+        $host = strtolower((string) parse_url($pageUrl, PHP_URL_HOST));
+        $found = [];
+
+        foreach ($links as $link) {
+            if (!is_string($link) || !str_starts_with($link, 'http')) {
+                continue;
+            }
+            if (strtolower((string) parse_url($link, PHP_URL_HOST)) !== $host || $host === '') {
+                continue;
+            }
+            if (!preg_match('/\.pdf([?#]|$)/i', $link)) {
+                continue;
+            }
+            $found[] = strtok($link, '#');
+            if (count($found) >= $max) {
+                break;
+            }
+        }
+
+        return array_values(array_unique($found));
+    }
+
     public function detectSourceType(string $url): string
     {
         $lower = mb_strtolower($url);
@@ -198,9 +227,15 @@ class ProductKnowledgePipeline
         $lines = preg_split('/\R/', $markdown) ?: [];
         $kept = [];
 
+        // Sisa tembok cookie/privasi yang lolos filter Firecrawl.
+        $cookieWall = '/(we value your privacy|we use cookies|cookie policy|privacy statement|accept.*cookies|menyetujui.*cookie)/i';
+
         foreach ($lines as $line) {
             $line = trim($line);
             if ($line === '' || preg_match('/^(\[.*?\]\(.*?\)\s*)+$/', $line)) {
+                continue;
+            }
+            if (mb_strlen($line) < 200 && preg_match($cookieWall, $line)) {
                 continue;
             }
             $kept[] = $line;

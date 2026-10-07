@@ -31,13 +31,29 @@ class FirecrawlService
     /**
      * @return array{markdown:string,metadata:array,links:array}
      */
-    public function scrape(string $url): array
+    public function scrape(string $url, bool $fresh = false): array
     {
-        $res = $this->client()->post('/v1/scrape', [
+        $payload = [
             'url' => $url,
             'onlyMainContent' => true,
+            // Buang boilerplate (cookie wall, iklan, share widget) via LLM.
+            'onlyCleanContent' => true,
+            // Blokir iklan + popup cookie.
+            'blockAds' => true,
+            // Tunggu + scroll: muat konten lazy (tabel spesifikasi).
+            'waitFor' => (int) config('knowledge.firecrawl.wait_for'),
+            'actions' => [
+                ['type' => 'wait', 'milliseconds' => (int) config('knowledge.firecrawl.wait_for')],
+                ['type' => 'scroll', 'direction' => 'down'],
+            ],
             'formats' => ['markdown'],
-        ]);
+        ];
+
+        if ($fresh) {
+            $payload['maxAge'] = 0;
+        }
+
+        $res = $this->client()->post('/v2/scrape', $payload);
 
         $this->throwOnError($res, 'scrape');
         $data = (array) ($res->json('data') ?? []);
@@ -55,7 +71,7 @@ class FirecrawlService
      */
     public function extractStart(array $urls): string
     {
-        $res = $this->client()->post('/v1/extract', [
+        $res = $this->client()->post('/v2/extract', [
             'urls' => array_values($urls),
             'prompt' => 'Extract official product facts ONLY from the visible page content. '
                 .'Never invent brand, name, model, SKU, category, description, or specifications. '
@@ -86,7 +102,7 @@ class FirecrawlService
 
     public function extractStatus(string $jobId): array
     {
-        $res = $this->client()->get('/v1/extract/'.$jobId);
+        $res = $this->client()->get('/v2/extract/'.$jobId);
         $this->throwOnError($res, 'extract-status');
 
         return (array) $res->json();
@@ -97,7 +113,7 @@ class FirecrawlService
      */
     public function crawlStart(string $url, ?int $limit = null): string
     {
-        $res = $this->client()->post('/v1/crawl', [
+        $res = $this->client()->post('/v2/crawl', [
             'url' => $url,
             'limit' => $limit ?? (int) config('knowledge.firecrawl.crawl_limit'),
             'scrapeOptions' => ['onlyMainContent' => true, 'formats' => ['markdown']],
@@ -115,7 +131,7 @@ class FirecrawlService
 
     public function crawlStatus(string $jobId): array
     {
-        $res = $this->client()->get('/v1/crawl/'.$jobId);
+        $res = $this->client()->get('/v2/crawl/'.$jobId);
         $this->throwOnError($res, 'crawl-status');
 
         return (array) $res->json();

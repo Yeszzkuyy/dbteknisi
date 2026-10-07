@@ -25,6 +25,7 @@ class ImportProductSource implements ShouldQueue
     public function __construct(
         public int $sourceId,
         public int $depth = 0,
+        public bool $fresh = false,
     ) {}
 
     /**
@@ -109,7 +110,7 @@ class ImportProductSource implements ShouldQueue
         $source->forceFill(['status' => ProductSource::STATUS_PROCESSING, 'error' => null])->save();
 
         try {
-            $scraped = $firecrawl->scrape($source->url);
+            $scraped = $firecrawl->scrape($source->url, $this->fresh);
             $markdown = $pipeline->cleanContent($scraped['markdown']);
 
             // 1 URL bisa = banyak produk: temukan link produk se-host dulu.
@@ -152,6 +153,21 @@ class ImportProductSource implements ShouldQueue
 
                     return;
                 }
+            }
+
+            // Lampirkan datasheet PDF se-host (maks 2) sebagai source tambahan.
+            foreach ($pipeline->discoverPdfLinks($source->url, $scraped['links']) as $pdfUrl) {
+                if (ProductSource::where('url', $pdfUrl)->exists()) {
+                    continue;
+                }
+
+                $pdf = ProductSource::create([
+                    'url' => $pdfUrl,
+                    'source_type' => ProductSource::TYPE_DATASHEET,
+                    'status' => ProductSource::STATUS_QUEUED,
+                    'batch_id' => $source->batch_id,
+                ]);
+                self::dispatch($pdf->id, 1);
             }
 
             $extracted = $extractor->extract($markdown);

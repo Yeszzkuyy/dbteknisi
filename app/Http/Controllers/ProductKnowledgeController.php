@@ -124,7 +124,7 @@ class ProductKnowledgeController extends Controller
                 'status' => ProductSource::STATUS_QUEUED,
                 'batch_id' => $batchId,
             ]);
-            ImportProductSource::dispatch($source->id);
+            ImportProductSource::dispatch($source->id, 0, true);
         }
 
         return redirect()->route('product-knowledge.index', ['batch' => $batchId])

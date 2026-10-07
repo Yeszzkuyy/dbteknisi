@@ -37,7 +37,7 @@ class ProductKnowledgeTest extends TestCase
     private function scrapeFake(&$markdown, array $links = []): void
     {
         Http::fake([
-            'api.firecrawl.dev/v1/scrape' => function () use (&$markdown, $links) {
+            'api.firecrawl.dev/v2/scrape' => function () use (&$markdown, $links) {
                 // Padding > listing_threshold agar jalur halaman-produk, bukan crawl.
                 $body = $markdown."\n\n".str_repeat('Konten resmi produk. ', 40);
                 return Http::response([
@@ -114,7 +114,7 @@ class ProductKnowledgeTest extends TestCase
     {
         $this->actingAs($this->admin());
         Http::fake([
-            'api.firecrawl.dev/v1/scrape' => function ($request) {
+            'api.firecrawl.dev/v2/scrape' => function ($request) {
                 $url = $request->data()['url'] ?? '';
                 if (str_contains($url, '/gagal')) {
                     return Http::response(['error' => 'boom'], 500);
@@ -224,7 +224,7 @@ class ProductKnowledgeTest extends TestCase
     {
         $this->actingAs($this->admin());
         Http::fake([
-            'api.firecrawl.dev/v1/scrape' => Http::response([
+            'api.firecrawl.dev/v2/scrape' => Http::response([
                 'success' => true, 'data' => ['markdown' => 'halo dunia '.str_repeat('konten resmi. ', 60), 'metadata' => [], 'links' => []],
             ]),
             'openrouter.ai/*' => Http::response(['choices' => [['message' => ['content' => json_encode([
@@ -263,7 +263,7 @@ class ProductKnowledgeTest extends TestCase
         $admin = $this->admin();
         $this->actingAs($admin);
         Http::fake([
-            'api.firecrawl.dev/v1/scrape' => Http::response([
+            'api.firecrawl.dev/v2/scrape' => Http::response([
                 'success' => true,
                 'data' => ['markdown' => 'samar '.str_repeat('konten resmi. ', 60), 'metadata' => [], 'links' => []],
             ]),
@@ -384,4 +384,79 @@ class ProductKnowledgeTest extends TestCase
         // Versi lama tetap tercatat.
         $this->assertTrue($docs->first()->chunks()->exists());
     }
+
+    public function test_scrape_uses_quality_params(): void
+    {
+        $this->actingAs($this->admin());
+        $md = 'konten param';
+        $this->scrapeFake($md);
+        $this->importUrls(['https://vendor.com/param']);
+
+        \Illuminate\Support\Facades\Http::assertSent(function ($request) {
+            $payload = $request->data();
+            return ($request->url() === 'https://api.firecrawl.dev/v2/scrape')
+                && ($payload['waitFor'] ?? 0) > 0
+                && ($payload['blockAds'] ?? false) === true
+                && ($payload['onlyCleanContent'] ?? false) === true
+                && is_array($payload['actions'] ?? null);
+        });
+    }
+
+    public function test_pdf_datasheet_auto_attached(): void
+    {
+        $this->actingAs($this->admin());
+        Http::fake([
+            'api.firecrawl.dev/v2/scrape' => function ($request) {
+                $url = $request->data()['url'] ?? '';
+                if ($url === 'https://vendor.com/printer') {
+                    return Http::response(['success' => true, 'data' => [
+                        'markdown' => 'Printer X. '.str_repeat('konten resmi. ', 60),
+                        'metadata' => [],
+                        'links' => [
+                            'https://vendor.com/datasheet/x.pdf',
+                            'https://vendor.com/datasheet/y.pdf',
+                            'https://luar.com/z.pdf',
+                            'https://vendor.com/datasheet/kelebihan.pdf',
+                        ],
+                    ]]);
+                }
+
+                return Http::response(['success' => true, 'data' => [
+                    'markdown' => 'MODEL:PX100 datasheet. '.str_repeat('konten resmi. ', 60),
+                    'metadata' => [], 'links' => [],
+                ]]);
+            },
+            'openrouter.ai/*' => Http::response(['choices' => [['message' => ['content' => json_encode([
+                'brand' => 'Vendor', 'name' => 'Printer', 'model' => 'PX100', 'sku' => null,
+                'category' => 'Printer', 'description' => 'Printer.', 'specifications' => 'A4.',
+            ])]]]]),
+        ]);
+
+        $this->importUrls(['https://vendor.com/printer']);
+
+        // 2 PDF se-host (maks 2), luar host dibuang.
+        $pdfs = ProductSource::where('source_type', 'datasheet')->get();
+        $this->assertEquals(2, $pdfs->count());
+        $this->assertDatabaseMissing('product_sources', ['url' => 'https://luar.com/z.pdf']);
+        // PDF menempel ke produk yang sama.
+        $this->assertEquals(1, Product::count());
+    }
+
+    public function test_cookie_wall_lines_cleaned(): void
+    {
+        $pipeline = app(\App\Services\Knowledge\ProductKnowledgePipeline::class);
+
+        $clean = $pipeline->cleanContent(implode("\n", [
+            '# Yeastar P560',
+            'We value your privacy',
+            'We use cookies to personalize your use of our site.',
+            'IP PBX untuk 100 user.',
+        ]));
+
+        $this->assertStringContainsString('Yeastar P560', $clean);
+        $this->assertStringContainsString('100 user', $clean);
+        $this->assertStringNotContainsString('privacy', strtolower($clean));
+        $this->assertStringNotContainsString('cookies to personalize', strtolower($clean));
+    }
+
 }

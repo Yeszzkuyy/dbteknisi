@@ -5,6 +5,7 @@ return [
         'key' => env('FIRECRAWL_API_KEY'),
         'base_url' => env('FIRECRAWL_BASE_URL', 'https://api.firecrawl.dev'),
         'timeout' => (int) env('FIRECRAWL_TIMEOUT', 120),
+        'wait_for' => (int) env('FIRECRAWL_WAIT_FOR', 3000),
         // Batas aman crawl katalog agar tak menyedot seluruh website.
         'crawl_limit' => (int) env('FIRECRAWL_CRAWL_LIMIT', 10),
         // Markdown lebih pendek dari ini dianggap halaman listing -> crawl.

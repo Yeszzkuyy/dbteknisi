@@ -42,7 +42,7 @@ class ProductCatalogImportTest extends TestCase
     private function fakeAll(): void
     {
         Http::fake([
-            'api.firecrawl.dev/v1/scrape' => function ($request) {
+            'api.firecrawl.dev/v2/scrape' => function ($request) {
                 $url = $request->data()['url'] ?? '';
                 $md = $this->pages[$url] ?? $this->listingMarkdown;
                 $links = $url === 'https://www.yeastar.com/ip-pbx/' || $url === 'https://vendor.com/kosong'
@@ -55,8 +55,8 @@ class ProductCatalogImportTest extends TestCase
 
                 return Http::response(['success' => true, 'data' => ['markdown' => $md, 'metadata' => [], 'links' => $links]]);
             },
-            'api.firecrawl.dev/v1/crawl' => Http::response(['id' => 'crawl-1']),
-            'api.firecrawl.dev/v1/crawl/*' => Http::response([
+            'api.firecrawl.dev/v2/crawl' => Http::response(['id' => 'crawl-1']),
+            'api.firecrawl.dev/v2/crawl/*' => Http::response([
                 'status' => 'completed',
                 'data' => $this->crawlEmpty ? [] : array_map(
                     fn ($u) => ['metadata' => ['sourceURL' => $u]],
