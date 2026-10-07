@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="flex shrink-0 gap-2">
-                    @can('manage-sales')
+                    @can('update', $customer)
                         <a href="{{ route('customers.edit', $customer) }}"
                            class="flex-1 sm:flex-none text-center px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-accent-100 hover:bg-accent-200 text-accent-700 text-sm font-medium transition-all duration-200 hover:scale-[1.03]">
                             Edit Customer

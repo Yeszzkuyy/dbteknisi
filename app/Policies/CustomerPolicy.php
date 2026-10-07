@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Customer;
+use App\Support\PtAccess;
 
 class CustomerPolicy
 {
@@ -24,12 +25,14 @@ class CustomerPolicy
 
     public function update(User $user, Customer $customer): bool
     {
-        return $user->can('manage-sales');
+        return $user->can('manage-sales')
+            && PtAccess::canWritePt($user, $customer->pt_group);
     }
 
     public function delete(User $user, Customer $customer): bool
     {
-        return $user->can('manage-sales');
+        return $user->can('manage-sales')
+            && PtAccess::canWritePt($user, $customer->pt_group);
     }
 
     public function restore(User $user, Customer $customer): bool
@@ -53,6 +56,7 @@ class CustomerPolicy
 
         $owner = $customer->trashOwnerId();
 
-        return $owner !== null && (int) $owner === (int) $user->id;
+        return $owner !== null && (int) $owner === (int) $user->id
+            && PtAccess::canWritePt($user, $customer->pt_group);
     }
 }

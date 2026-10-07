@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Support\PtAccess;
 
 class ProjectPolicy
 {
@@ -56,7 +57,9 @@ class ProjectPolicy
         }
 
         $owner = $project->trashOwnerId();
+        $ptGroup = $project->customer()->withTrashed()->first()?->pt_group;
 
-        return $owner !== null && (int) $owner === (int) $user->id;
+        return $owner !== null && (int) $owner === (int) $user->id
+            && PtAccess::canWritePt($user, $ptGroup);
     }
 }

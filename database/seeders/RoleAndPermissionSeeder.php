@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\Lead;
 use App\Models\User;
 
 class RoleAndPermissionSeeder extends Seeder
@@ -65,6 +66,13 @@ class RoleAndPermissionSeeder extends Seeder
         // Divisi
         $mk('marketing', ['manage-marketing', 'view-marketing', ...$common]);
         $mk('sales', ['manage-sales', 'view-sales', 'view-admin', ...$common]);
+
+        // Sales per PT: izin sama dengan sales, tulis dibatasi PT-nya (PtAccess).
+        // Satu user boleh pegang banyak PT. Tanpa role PT = tanpa batas.
+        $salesPerms = ['manage-sales', 'view-sales', 'view-admin', ...$common];
+        foreach (Lead::PT_GROUPS as $pt) {
+            $mk('sales-'.strtolower($pt), $salesPerms);
+        }
         $mk('admin', ['manage-admin', 'view-admin', 'view-sales', ...$common]);
         $mk('technician', ['manage-technician', 'view-technician', ...$common]);
 

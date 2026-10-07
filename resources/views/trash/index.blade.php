@@ -60,6 +60,7 @@
                                 <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $customer->deleted_at->format('d M Y H:i') }}</td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2 whitespace-nowrap">
+                                        @can('restore', $customer)
                                         <form action="{{ route('trash.restore-customer', $customer->id) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
@@ -68,12 +69,15 @@
                                                 <x-icon name="restore" class="h-5 w-5" />
                                             </button>
                                         </form>
+                                        @endcan
+                                        @can('forceDelete', $customer)
                                         <button type="button" x-data=""
                                                 title="Delete permanently" aria-label="Delete permanently"
                                                 @click="$dispatch('open-modal', 'confirm-destroy-customer-{{ $customer->id }}')"
                                                 class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
                                             <x-icon name="trash" class="h-5 w-5" />
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -149,6 +153,7 @@
                                 <td class="px-6 py-4 text-slate-600 dark:text-slate-300">{{ $project->deleted_at->format('d M Y H:i') }}</td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2 whitespace-nowrap">
+                                        @can('restore', $project)
                                         <form action="{{ route('trash.restore-project', $project->id) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
@@ -157,12 +162,15 @@
                                                 <x-icon name="restore" class="h-5 w-5" />
                                             </button>
                                         </form>
+                                        @endcan
+                                        @can('forceDelete', $project)
                                         <button type="button" x-data=""
                                                 title="Delete permanently" aria-label="Delete permanently"
                                                 @click="$dispatch('open-modal', 'confirm-destroy-project-{{ $project->id }}')"
                                                 class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
                                             <x-icon name="trash" class="h-5 w-5" />
                                         </button>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
