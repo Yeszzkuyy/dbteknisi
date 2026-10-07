@@ -184,4 +184,54 @@ class FollowUpFormTest extends TestCase
         $this->assertStringContainsString('PT MGK Client (MGK)', $html);
         $this->assertStringContainsString('Follow up lama.', $html);
     }
+
+    public function test_index_renders_meetings_and_daily_update_content(): void
+    {
+        $this->seed(\Database\Seeders\RoleAndPermissionSeeder::class);
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+        $customer = Customer::create(['name' => 'PT Index Penuh', 'pt_group' => 'MGK']);
+        Meeting::create([
+            'customer_id' => $customer->id,
+            'meeting_date' => now()->toDateString(),
+            'notes' => 'Bahas harga index.',
+            'created_by' => $sales->id,
+        ]);
+        Lead::create([
+            'customer_id' => $customer->id,
+            'pt_group' => 'MGK',
+            'segment' => 'vendor',
+            'status' => 'cool',
+            'assigned_to' => $sales->id,
+        ]);
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.index'))
+            ->assertOk()->getContent();
+
+        // Tabel meetings terisi (bukan kosong seperti bug compact sebelumnya).
+        $this->assertStringContainsString('Bahas harga index.', $html);
+        // Opsi Daily Update terisi.
+        $this->assertStringContainsString('Daily Update', $html);
+        $this->assertStringContainsString('PT Index Penuh', $html);
+        $this->assertStringContainsString('PT Index Penuh — Cool', $html);
+        // Follow Ups di atas Meetings.
+        $followUpsPos = strpos($html, '>Follow Ups<');
+        $meetingsPos = strpos($html, '>Meetings<');
+        $this->assertNotFalse($followUpsPos);
+        $this->assertNotFalse($meetingsPos);
+        $this->assertLessThan($meetingsPos, $followUpsPos);
+    }
+
+    public function test_index_scopes_daily_update_customers_by_pt(): void
+    {
+        $sales = $this->salesMgk();
+        $this->seedCustomers();
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.index'))
+            ->assertOk()->getContent();
+
+        $this->assertStringContainsString('PT MGK Client (MGK)', $html);
+        $this->assertStringContainsString('PT General Client', $html);
+        $this->assertStringNotContainsString('PT NTI Client', $html);
+    }
 }
