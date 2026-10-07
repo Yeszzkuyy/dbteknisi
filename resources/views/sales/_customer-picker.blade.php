@@ -1,6 +1,7 @@
-{{-- Searchable customer picker (dipakai Add Follow Up, Daily Update, ...).
+{{-- Searchable customer picker (Add Follow Up, Daily Update, filter Meetings, ...).
      Params: $name, $options ([id => label]), $selected = null,
-             $placeholder = null, $required = false, $hint = null.
+             $placeholder = null, $required = false, $hint = null,
+             $submitOnPick = false (mode filter: pilih = isi teks + submit form).
      Memancarkan event `customer-picked` {id, field} tiap ganti pilihan. --}}
 @once
 <style>
@@ -13,6 +14,7 @@
 <div x-data="{
         options: {{ json_encode($options ?? []) }},
         field: {{ json_encode($name) }},
+        submitOnPick: {{ json_encode(!empty($submitOnPick)) }},
         selectedId: {{ json_encode($selected ?? null) }},
         query: '',
         open: false,
@@ -24,6 +26,10 @@
                 this.$nextTick(() => this.$dispatch('customer-picked', { id: null, field: this.field }));
             }
             this.query = this.selectedId ? (this.options[this.selectedId] ?? '') : '';
+            if (this.submitOnPick) {
+                const el = this.$el.querySelector('input[type=text]');
+                if (el && el.value) this.query = el.value;
+            }
         },
         get entries() {
             const q = this.query.toLowerCase().trim();
@@ -34,23 +40,32 @@
             this.query = label;
             this.open = false;
             this.$dispatch('customer-picked', { id: String(id), field: this.field });
+            if (this.submitOnPick) this.$el.closest('form')?.requestSubmit();
         },
         clear() {
             this.selectedId = null;
             this.query = '';
             this.open = true;
             this.$dispatch('customer-picked', { id: null, field: this.field });
+            if (this.submitOnPick) this.$el.closest('form')?.requestSubmit();
         }
     }" class="relative">
-    <input type="hidden" name="{{ $name }}" :value="selectedId">
+    @if(empty($submitOnPick))
+        <input type="hidden" name="{{ $name }}" :value="selectedId">
+    @endif
     <input type="text" x-model="query" @focus="open = true" @input="open = true"
            @keydown.escape="open = false" @blur="setTimeout(() => open = false, 150)"
            placeholder="{{ $placeholder ?? __('Search customer...') }}" autocomplete="off"
+           @if(!empty($submitOnPick)) name="{{ $name }}" value="{{ request($name, '') }}" @endif
            @if(!empty($required)) required @endif
-           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 pr-10">
+           class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500 pr-16">
+    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+             :style="{ transform: open ? 'rotate(180deg)' : '', transition: 'transform 200ms cubic-bezier(0.23,1,0.32,1)' }"><path d="m6 9 6 6 6-6" /></svg>
+    </span>
     <button type="button" x-show="selectedId" @mousedown.prevent="clear()"
             title="{{ __('Change customer') }}" aria-label="{{ __('Change customer') }}"
-            class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-lg leading-none text-slate-400 hover:text-red-500 transition">&times;</button>
+            class="absolute right-8 top-1/2 -translate-y-1/2 rounded-lg px-1 py-1 text-lg leading-none text-slate-400 hover:text-red-500 transition">&times;</button>
     <div x-cloak :data-open="open ? '1' : '0'"
          class="fu-combo-menu absolute z-20 mt-1 w-full bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-xl shadow-lg max-h-60 overflow-y-auto divide-y divide-slate-200 dark:divide-slate-700">
         <template x-for="[id, label] in entries" :key="id">

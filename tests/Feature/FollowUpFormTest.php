@@ -235,4 +235,35 @@ class FollowUpFormTest extends TestCase
         $this->assertStringContainsString('PT General Client', $html);
         $this->assertStringNotContainsString('PT NTI Client', $html);
     }
+
+    public function test_meetings_text_search_still_filters_table(): void
+    {
+        $this->seed(\Database\Seeders\RoleAndPermissionSeeder::class);
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+        $customer = Customer::create(['name' => 'PT Cari Meeting', 'pt_group' => null]);
+        Meeting::create([
+            'customer_id' => $customer->id,
+            'meeting_date' => now()->toDateString(),
+            'notes' => 'Catatan unik xyz.',
+            'created_by' => $sales->id,
+        ]);
+
+        $res = $this->actingAs($sales)
+            ->getJson(route('sales.follow-ups.index', ['form' => 'meetings', 'search' => 'Cari Meeting']))
+            ->assertOk();
+
+        $this->assertStringContainsString('Catatan unik xyz.', $res->json('html'));
+    }
+
+    public function test_index_uses_glider_for_status_filter(): void
+    {
+        $sales = $this->salesMgk();
+
+        $html = $this->actingAs($sales)->get(route('sales.follow-ups.index'))
+            ->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-glide-mount', $html);
+        $this->assertStringContainsString('name="overdue"', $html);
+    }
 }
