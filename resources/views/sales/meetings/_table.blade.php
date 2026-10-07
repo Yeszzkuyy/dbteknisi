@@ -6,8 +6,8 @@
                 <tr>
                     <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Customer</th>
                     <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Tanggal') }}</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Peserta') }}</th>
-                    <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Kebutuhan (ringkas)') }}</th>
+                    <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Aksi') }}</th>
+                    <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Isi Meeting') }}</th>
                     <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">Follow Up</th>
                     <th class="px-6 py-4 text-center text-xs font-medium text-slate-500 dark:text-slate-200 uppercase">{{ __('Aksi') }}</th>
                 </tr>
@@ -22,11 +22,8 @@
                         <td class="px-6 py-4 text-slate-700 dark:text-slate-200 whitespace-nowrap">
                             {{ $meeting->meeting_date->format('d M Y') }}
                         </td>
-                        <td class="px-6 py-4 text-slate-600 dark:text-slate-300">
-                            {{ $meeting->participants ?? '-' }}
-                        </td>
                         <td class="px-6 py-4 text-slate-600 dark:text-slate-300 max-w-xs truncate">
-                            {{ Str::limit($meeting->user_needs, 80) ?? '-' }}
+                            {{ Str::limit($meeting->notes, 80) ?? '-' }}
                         </td>
                         <td class="px-6 py-4 text-center">
                             <span class="inline-flex px-3 py-1 rounded-full text-sm font-semibold

@@ -56,7 +56,7 @@ class MeetingController extends Controller
             'user_needs' => 'nullable|string',
             'user_complaints' => 'nullable|string',
             'existing_system' => 'nullable|string',
-            'notes' => 'nullable|string',
+            'notes' => 'required|string',
         ]);
 
         if ($validated['customer_mode'] === 'new') {
@@ -107,7 +107,7 @@ class MeetingController extends Controller
             'user_needs' => 'nullable|string',
             'user_complaints' => 'nullable|string',
             'existing_system' => 'nullable|string',
-            'notes' => 'nullable|string',
+            'notes' => 'required|string',
         ]);
 
         if ($validated['customer_mode'] === 'new') {

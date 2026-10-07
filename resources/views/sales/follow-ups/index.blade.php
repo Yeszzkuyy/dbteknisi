@@ -1,8 +1,8 @@
 <x-app-layout>
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">{{ __('Follow Up Customer') }}</h1>
-            <p class="text-slate-500 mt-1">{{ __('Pantau tindak lanjut dengan customer.') }}</p>
+            <h1 class="text-3xl font-bold text-slate-800">{{ __('Follow Up & Meeting') }}</h1>
+            <p class="text-slate-500 mt-1">{{ __('Pantau meeting dan tindak lanjut dengan customer.') }}</p>
         </div>
         @can('manage-sales')
             <x-icon-button as="a" icon="add" href="{{ route('sales.follow-ups.create') }}" title="Add Follow Up" />
@@ -37,6 +37,20 @@
         </form>
     </div>
 
-    {{-- Table --}}
-    @include('sales.follow-ups._table')
+    {{-- Meetings section --}}
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-slate-800">{{ __('Meetings') }}</h2>
+            @can('manage-sales')
+                <x-icon-button as="a" icon="add" href="{{ route('sales.meetings.create') }}" title="Add Meeting" />
+            @endcan
+        </div>
+        @include('sales.meetings._table', ['meetings' => $meetings ?? []])
+    </div>
+
+    {{-- Follow Ups section --}}
+    <div>
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">{{ __('Follow Ups') }}</h2>
+        @include('sales.follow-ups._table')
+    </div>
 </x-app-layout>

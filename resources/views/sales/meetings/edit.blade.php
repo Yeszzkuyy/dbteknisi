@@ -81,68 +81,12 @@
                     <x-datepicker name="meeting_date" required value="{{ old('meeting_date', $meeting->meeting_date->format('Y-m-d')) }}"></x-datepicker>
                 </div>
 
-                <div data-attendees>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Peserta') }}</label>
-                    @php
-                        $attendeeLines = array_pad(array_values(collect(preg_split('/[\r\n,;]+/', old('participants', $meeting->participants ?? '')))->map(fn ($n) => trim($n))->filter()->all()), 5, '');
-                    @endphp
-                    <div class="space-y-2" data-attendee-rows>
-                        @for($i = 0; $i < 5; $i++)
-                            <div class="flex items-center gap-3">
-                                <span class="w-5 shrink-0 text-sm text-slate-500">{{ $i + 1 }}.</span>
-                                <input type="text" data-attendee value="{{ $attendeeLines[$i] }}"
-                                       placeholder="{{ __('Nama peserta...') }}"
-                                       class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">
-                            </div>
-                        @endfor
-                    </div>
-                    <button type="button" data-attendees-add
-                            class="mt-2 px-4 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-white text-sm font-medium transition">
-                        {{ __('+ Tambah Peserta') }}
-                    </button>
-                    <input type="hidden" name="participants" data-attendees-value value="{{ old('participants', $meeting->participants) }}">
-                    <script>
-                        document.querySelectorAll('[data-attendees]').forEach(function (box) {
-                            var rows = box.querySelector('[data-attendee-rows]');
-                            box.querySelector('[data-attendees-add]').addEventListener('click', function () {
-                                var n = rows.children.length + 1;
-                                var row = document.createElement('div');
-                                row.className = 'flex items-center gap-3';
-                                row.innerHTML = '<span class="w-5 shrink-0 text-sm text-slate-500">' + n + '.</span>' +
-                                    '<input type="text" data-attendee placeholder="{{ __('Nama peserta...') }}" class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">';
-                                rows.appendChild(row);
-                                row.querySelector('input').focus();
-                            });
-                            box.closest('form').addEventListener('submit', function () {
-                                var names = Array.prototype.map.call(box.querySelectorAll('[data-attendee]'), function (el) { return el.value.trim(); }).filter(Boolean);
-                                box.querySelector('[data-attendees-value]').value = names.join('\n');
-                            });
-                        });
-                    </script>
-                </div>
-
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Kebutuhan User') }}</label>
-                    <textarea name="user_needs" rows="3"
-                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('user_needs', $meeting->user_needs) }}</textarea>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Keluhan User') }}</label>
-                    <textarea name="user_complaints" rows="3"
-                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('user_complaints', $meeting->user_complaints) }}</textarea>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Sistem Existing') }}</label>
-                    <textarea name="existing_system" rows="3"
-                              class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('existing_system', $meeting->existing_system) }}</textarea>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Catatan Lain') }}</label>
-                    <textarea name="notes" rows="2"
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Isi Meeting') }} <span class="text-red-500">*</span></label>
+                    <textarea name="notes" rows="4" required
+                              placeholder="{{ __('Tuliskan isi meeting secara ringkas...') }}"
                               class="w-full rounded-xl border-slate-300 focus:border-accent-500 focus:ring-accent-500">{{ old('notes', $meeting->notes) }}</textarea>
+                    @error('notes') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="flex gap-3 pt-2">
