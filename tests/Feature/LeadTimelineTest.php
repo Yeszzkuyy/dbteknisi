@@ -77,6 +77,7 @@ class LeadTimelineTest extends TestCase
             'customer_id' => $lead->customer_id,
             'lead_id' => $lead->id,
             'meeting_date' => now()->toDateString(),
+            'notes' => 'Catatan meeting test',
         ])->assertOk();
 
         $this->assertDatabaseHas('lead_activities', [
@@ -115,6 +116,7 @@ class LeadTimelineTest extends TestCase
             'customer_mode' => 'existing',
             'customer_id' => $customer->id,
             'meeting_date' => now()->toDateString(),
+            'notes' => 'Catatan meeting test',
         ])->assertOk();
 
         $this->assertDatabaseCount('lead_activities', 0);

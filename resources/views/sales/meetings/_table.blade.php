@@ -74,7 +74,7 @@
             </tbody>
         </table>
     </div>
-    @if($meetings->hasPages())
+    @if(!is_array($meetings) && $meetings->hasPages())
         <div class="p-4 border-t border-slate-200 dark:border-slate-600">
             {{ $meetings->links() }}
         </div>
