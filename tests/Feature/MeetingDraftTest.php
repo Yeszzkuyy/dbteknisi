@@ -54,7 +54,7 @@ class MeetingDraftTest extends TestCase
                 'customer_id' => $customer->id,
                 'source_sentence' => 'Kunjungan PT Draft Uji, demo CCTV, minta revisi penawaran',
             ])
-            ->assertRedirect(route('sales.meetings.index'));
+            ->assertRedirect(route('sales.follow-ups.index'));
 
         $draft = MeetingDraft::first();
         $this->assertNotNull($draft);
@@ -102,7 +102,7 @@ class MeetingDraftTest extends TestCase
                 'existing_system' => null,
                 'notes' => null,
             ])
-            ->assertRedirect(route('sales.meetings.index'));
+            ->assertRedirect(route('sales.follow-ups.index'));
 
         $this->assertSame('approved', $draft->fresh()->status);
         $meeting = Meeting::first();
@@ -124,7 +124,7 @@ class MeetingDraftTest extends TestCase
 
         $this->actingAs($sales)
             ->post(route('sales.meeting-drafts.discard', $draft))
-            ->assertRedirect(route('sales.meetings.index'));
+            ->assertRedirect(route('sales.follow-ups.index'));
 
         $this->assertSame('discarded', $draft->fresh()->status);
         $this->assertSame(0, Meeting::count());
@@ -186,12 +186,21 @@ class MeetingDraftTest extends TestCase
         $this->assertFalse($done->notifications()->where('type', DailyMeetingReminderNotification::class)->exists());
     }
 
-    public function test_index_shows_daily_update_section(): void
+    public function test_old_meetings_menu_redirects_to_follow_ups(): void
     {
         $sales = $this->loginAs('sales');
 
         $this->actingAs($sales)
             ->get(route('sales.meetings.index'))
+            ->assertRedirect(route('sales.follow-ups.index'));
+    }
+
+    public function test_follow_ups_page_shows_daily_update_section(): void
+    {
+        $sales = $this->loginAs('sales');
+
+        $this->actingAs($sales)
+            ->get(route('sales.follow-ups.index'))
             ->assertOk()
             ->assertSee('Daily Update', false);
     }

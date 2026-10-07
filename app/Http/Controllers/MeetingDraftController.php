@@ -46,7 +46,7 @@ class MeetingDraftController extends Controller
         ]);
 
         return redirect()
-            ->route('sales.meetings.index')
+            ->route('sales.follow-ups.index')
             ->with('success', __('Draft ready. Please review and approve.'));
     }
 
@@ -72,7 +72,7 @@ class MeetingDraftController extends Controller
         $meetingDraft->update(['status' => MeetingDraft::STATUS_APPROVED]);
 
         return redirect()
-            ->route('sales.meetings.index')
+            ->route('sales.follow-ups.index')
             ->with('success', __('Meeting logged.'));
     }
 
@@ -82,7 +82,7 @@ class MeetingDraftController extends Controller
         $meetingDraft->update(['status' => MeetingDraft::STATUS_DISCARDED]);
 
         return redirect()
-            ->route('sales.meetings.index')
+            ->route('sales.follow-ups.index')
             ->with('success', __('Draft discarded.'));
     }
 

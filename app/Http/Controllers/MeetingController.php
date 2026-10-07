@@ -18,16 +18,11 @@ class MeetingController extends Controller
 
     public function index(Request $request)
     {
-        $meetings = $this->salesService->getMeetings($request->only(['search', 'date_from', 'date_to', 'customer_id', 'lead_id']));
-        $customers = Customer::orderBy('name')->get(['id', 'name']);
-        $leads = $this->leadOptions(null);
-        $drafts = MeetingDraft::pending()->ownedBy(auth()->id())
-            ->with(['customer:id,name', 'lead:id,customer_id,status'])
-            ->latest()
-            ->limit(5)
-            ->get();
-
-        return $this->ajaxPartial($request, 'sales.meetings._table', compact('meetings', 'drafts', 'customers', 'leads'), 'sales.meetings.index');
+        // Menu Tracker Meeting sudah digabung ke Follow Up:
+        // semua akses halaman lama diteruskan ke sana (query filter ikut).
+        return redirect()->route('sales.follow-ups.index', $request->only([
+            'search', 'date_from', 'date_to', 'customer_id', 'lead_id',
+        ]));
     }
 
     public function create(Request $request)
@@ -76,8 +71,7 @@ class MeetingController extends Controller
 
         $this->salesService->createMeeting($validated);
 
-        return $this->ajaxOrRedirect($request, 'sales.meetings.index',
-            __('Meeting berhasil dicatat.'), ['redirect' => route('sales.meetings.index')]);
+        return $this->meetingsRedirect($request, __('Meeting berhasil dicatat.'));
     }
 
     public function show(Meeting $meeting)
@@ -127,15 +121,30 @@ class MeetingController extends Controller
 
         $this->salesService->updateMeeting($meeting, $validated);
 
-        return $this->ajaxOrRedirect($request, 'sales.meetings.index',
-            __('Meeting berhasil diupdate.'), ['redirect' => route('sales.meetings.index')]);
+        return $this->meetingsRedirect($request, __('Meeting berhasil diupdate.'));
     }
 
     public function destroy(Request $request, Meeting $meeting)
     {
         $this->salesService->deleteMeeting($meeting);
 
-        return $this->ajaxOrRedirect($request, 'sales.meetings.index', __('Meeting berhasil dihapus.'));
+        return $this->meetingsRedirect($request, __('Meeting berhasil dihapus.'));
+    }
+
+    /**
+     * Kembali ke halaman gabungan Follow Up, langsung ke section Meetings.
+     */
+    private function meetingsRedirect(Request $request, string $message)
+    {
+        $target = route('sales.follow-ups.index').'#meetings';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            session()->flash('success', $message);
+
+            return response()->json(['ok' => true, 'message' => $message, 'redirect' => $target]);
+        }
+
+        return redirect()->to($target)->with('success', $message);
     }
 
     private function leadOptions(?int $customerId = null)
@@ -148,6 +157,6 @@ class MeetingController extends Controller
             $query->where('customer_id', $customerId);
         }
 
-        return $query->get(['id', 'customer_id', 'status', 'assigned_to']);
+        return $query->get(['id', 'customer_id', 'status', 'incoming_date', 'assigned_to']);
     }
 }
