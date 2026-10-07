@@ -27,7 +27,7 @@ class DailyMeetingReminderNotification extends Notification
             'title' => __('Daily meeting update'),
             'customer' => $notifiable->name,
             'preview' => __('You have activity today but no meeting logged yet.'),
-            'url' => route('sales.meetings.index'),
+            'url' => route('sales.follow-ups.index'),
         ];
     }
 
@@ -36,7 +36,7 @@ class DailyMeetingReminderNotification extends Notification
         return [
             'title' => __('Daily meeting update'),
             'body' => __('You have activity today but no meeting logged yet.'),
-            'url' => route('sales.meetings.index'),
+            'url' => route('sales.follow-ups.index'),
         ];
     }
 }

@@ -37,7 +37,7 @@ class SalesAjaxTest extends TestCase
 
         $res->assertOk()
             ->assertJsonPath('ok', true)
-            ->assertJsonPath('redirect', route('sales.meetings.index'));
+            ->assertJsonPath('redirect', route('sales.follow-ups.index').'#meetings');
 
         $this->assertDatabaseHas('meetings', ['customer_id' => $customer->id]);
         $this->assertTrue(session()->has('success'));
@@ -74,7 +74,7 @@ class SalesAjaxTest extends TestCase
         // kalau tidak scopeToOwnLeads memang menyembunyikannya dari sales.
         Meeting::create(['customer_id' => $customer->id, 'meeting_date' => now(), 'created_by' => $sales->id]);
 
-        $res = $this->actingAs($sales)->getJson(route('sales.meetings.index', ['search' => 'Filter Unik']));
+        $res = $this->actingAs($sales)->getJson(route('sales.follow-ups.index', ['form' => 'meetings', 'search' => 'Filter Unik']));
 
         $res->assertOk()->assertJsonPath('ok', true);
         $this->assertStringContainsString('PT Filter Unik', $res->json('html'));
@@ -122,6 +122,6 @@ class SalesAjaxTest extends TestCase
 
         $this->actingAs($sales)
             ->delete(route('sales.meetings.destroy', $meeting))
-            ->assertRedirect(route('sales.meetings.index'));
+            ->assertRedirect(route('sales.follow-ups.index').'#meetings');
     }
 }

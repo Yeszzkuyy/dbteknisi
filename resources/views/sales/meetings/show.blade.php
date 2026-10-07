@@ -12,10 +12,7 @@
                         Edit
                     </a>
                 @endcan
-                <a href="{{ route('sales.meetings.index') }}"
-                   class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
-                    {{ __('Kembali') }}
-                </a>
+                <x-icon-button as="a" icon="back" href="{{ route('sales.follow-ups.index') }}" title="Back" />
             </div>
         </div>
 

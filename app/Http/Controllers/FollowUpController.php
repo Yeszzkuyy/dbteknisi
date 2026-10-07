@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\FollowUp;
 use App\Models\Lead;
 use App\Models\Meeting;
+use App\Models\MeetingDraft;
 use App\Services\SalesService;
 use App\Support\PtAccess;
 use Carbon\Carbon;
@@ -24,7 +25,19 @@ class FollowUpController extends Controller
     {
         $followUps = $this->salesService->getFollowUps($request->only(['search', 'customer_id', 'lead_id', 'overdue']));
         $meetings = $this->salesService->getMeetings($request->only(['search', 'customer_id', 'lead_id', 'date_from', 'date_to']));
+
+        // Filter section Meetings via AJAX: refresh hanya tabel meetings.
+        if (($request->ajax() || $request->wantsJson()) && $request->get('form') === 'meetings') {
+            return response()->json(['ok' => true, 'html' => view('sales.meetings._table', compact('meetings'))->render()]);
+        }
+
         $customers = Customer::orderBy('name')->get(['id', 'name']);
+        $leads = $this->leadOptions();
+        $drafts = MeetingDraft::pending()->ownedBy(auth()->id())
+            ->with(['customer:id,name', 'lead:id,customer_id,status'])
+            ->latest()
+            ->limit(5)
+            ->get();
 
         return $this->ajaxPartial($request, 'sales.follow-ups._table', compact('followUps'), 'sales.follow-ups.index');
     }
@@ -153,6 +166,19 @@ class FollowUpController extends Controller
 
         return redirect()->route('sales.follow-ups.index')
             ->with('success', __('Follow up ditunda.'));
+    }
+
+    /**
+     * Opsi lead untuk blok Daily Update (model, sama seperti halaman meeting lama).
+     */
+    private function leadOptions()
+    {
+        $query = Lead::with('customer')->latest()->limit(100);
+        if (PtAccess::isSalesLike(auth()->user()) && !auth()->user()->can('manage-marketing')) {
+            $query->where('assigned_to', auth()->id());
+        }
+
+        return $query->get(['id', 'customer_id', 'status', 'assigned_to']);
     }
 
     /**
