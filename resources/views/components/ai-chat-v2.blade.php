@@ -24,8 +24,8 @@
             :style="triggerStyle()"
             :aria-expanded="open"
             aria-label="{{ __('Toggle 3DY AI') }}"
-            class="aiv2-launcher fixed z-[1000] flex h-14 w-14 touch-none items-center justify-center rounded-full bg-gradient-to-br from-accent-400 via-accent-600 to-accent-700 text-white shadow-xl shadow-accent-600/40 ring-4 ring-accent-500/20 transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 active:scale-95 motion-reduce:transform-none">
-        <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" /></svg>
+            class="aiv2-launcher fixed z-[1000] flex h-14 w-14 touch-none items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-xl shadow-indigo-600/40 ring-4 ring-violet-500/20 transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 active:scale-95 motion-reduce:transform-none">
+        <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 15.5A2 2 0 0 0 8.5 14L2.4 12.4a.5.5 0 0 1 0-.9L8.5 9.9A2 2 0 0 0 9.9 8.5l1.6-6.1a.5.5 0 0 1 1 0l1.6 6.1a2 2 0 0 0 1.4 1.4l6.1 1.6a.5.5 0 0 1 0 1l-6.1 1.6a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z" /><path d="M20 3v4M22 5h-4" /></svg>
     </button>
 
     {{-- Chat window (menempel launcher + offset manual via header) --}}
@@ -37,46 +37,46 @@
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
          :style="chatStyle()"
-          class="fixed z-[1000] flex h-[560px] max-h-[calc(100dvh-8rem)] w-[332px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800"
-         role="dialog" aria-modal="false" aria-label="3DY AI">
+          class="fixed z-[1000] flex h-[560px] max-h-[calc(100dvh-8rem)] w-[332px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-white/10 dark:bg-zinc-900"
+          role="dialog" aria-modal="false" aria-label="3DY AI">
         {{-- Header (gagang geser offset; tombol di dalamnya tetap diklik biasa) --}}
         <div @pointerdown="dragStart($event, 'chat')"
              @pointermove="dragMove($event, 'chat')"
              @pointerup="dragEnd($event, 'chat')"
              @pointercancel="dragCancel()"
-             class="flex cursor-grab touch-none select-none items-center gap-2.5 border-b border-slate-200 bg-gradient-to-r from-accent-700 via-accent-600 to-accent-500 px-4 py-3 text-white active:cursor-grabbing dark:border-slate-700">
-            <span class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20" aria-hidden="true">
-                <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /></svg>
+             class="flex cursor-grab touch-none select-none items-center gap-2.5 border-b border-slate-200 bg-white px-4 py-3 text-slate-800 active:cursor-grabbing dark:border-white/10 dark:bg-zinc-900 dark:text-white">
+            <span class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 15.5A2 2 0 0 0 8.5 14L2.4 12.4a.5.5 0 0 1 0-.9L8.5 9.9A2 2 0 0 0 9.9 8.5l1.6-6.1a.5.5 0 0 1 1 0l1.6 6.1a2 2 0 0 0 1.4 1.4l6.1 1.6a.5.5 0 0 1 0 1l-6.1 1.6a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z" /></svg>
                 <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
                     <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75 motion-reduce:animate-none"></span>
-                    <span class="relative inline-flex h-3 w-3 rounded-full border-2 border-accent-600 bg-green-400"></span>
+                    <span class="relative inline-flex h-3 w-3 rounded-full border-2 border-white bg-green-400 dark:border-zinc-900"></span>
                 </span>
             </span>
             <span class="min-w-0 flex-1 leading-tight">
                 <span class="block truncate text-sm font-bold">3DY AI</span>
-                <span class="block truncate text-xs text-white/80" x-text="activeTitle()">{{ __('Online') }}</span>
+                <span class="block truncate text-xs text-slate-500 dark:text-white/60" x-text="activeTitle()">{{ __('Online') }}</span>
             </span>
             <button type="button" @click="toggleList()" aria-label="{{ __('Daftar percakapan') }}" title="{{ __('Daftar percakapan') }}"
-                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                    class="rounded-lg p-1.5 transition hover:bg-slate-900/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 dark:hover:bg-white/10 dark:focus-visible:ring-white/60">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
             </button>
             <button type="button" @click="newChat()" :disabled="busy" aria-label="{{ __('Percakapan baru') }}" title="{{ __('Percakapan baru') }}"
-                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 disabled:opacity-40">
+                    class="rounded-lg p-1.5 transition hover:bg-slate-900/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 disabled:opacity-40 dark:hover:bg-white/10 dark:focus-visible:ring-white/60">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14" /></svg>
             </button>
             <button type="button" @click="minimize()" aria-label="{{ __('Minimize chat') }}" title="{{ __('Minimize chat') }}"
-                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                    class="rounded-lg p-1.5 transition hover:bg-slate-900/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 dark:hover:bg-white/10 dark:focus-visible:ring-white/60">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14" /></svg>
             </button>
             <button type="button" @click="closeChat()" aria-label="{{ __('Tutup chat') }}" title="{{ __('Tutup dan mulai baru') }}"
-                    class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                    class="rounded-lg p-1.5 transition hover:bg-slate-900/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 dark:hover:bg-white/10 dark:focus-visible:ring-white/60">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
             </button>
         </div>
 
         {{-- Messages --}}
         <div x-show="!showList" x-ref="msgs"
-             class="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 px-4 py-4 dark:bg-slate-900/60"
+             class="min-h-0 flex-1 space-y-3 overflow-y-auto bg-zinc-50 px-4 py-4 dark:bg-zinc-950"
              aria-live="polite" aria-label="{{ __('Riwayat percakapan') }}">
             <template x-if="!messages.length && !busy">
                 <div class="py-6 text-center">
@@ -91,15 +91,15 @@
                 </div>
             </template>
             <template x-for="m in messages" :key="m.id">
-                <div :class="m.role === 'user' ? 'flex justify-end' : 'flex items-end justify-start gap-2'">
+                <div class="aiv2-msg" :class="m.role === 'user' ? 'flex justify-end' : 'flex items-end justify-start gap-2'">
                     <template x-if="m.role !== 'user'">
-                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-400 to-accent-700 text-white" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /></svg>
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 15.5A2 2 0 0 0 8.5 14L2.4 12.4a.5.5 0 0 1 0-.9L8.5 9.9A2 2 0 0 0 9.9 8.5l1.6-6.1a.5.5 0 0 1 1 0l1.6 6.1a2 2 0 0 0 1.4 1.4l6.1 1.6a.5.5 0 0 1 0 1l-6.1 1.6a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z" /></svg>
                         </span>
                     </template>
                     <div :class="m.role === 'user'
-                            ? 'max-w-[80%] rounded-2xl rounded-br-md bg-accent-600 px-3.5 py-2.5 text-sm text-white'
-                            : 'max-w-[85%] rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'">
+                            ? 'max-w-[80%] rounded-2xl rounded-tr-md bg-gradient-to-r from-indigo-600 to-violet-600 px-3.5 py-2.5 text-sm text-white shadow-[0_8px_24px_-4px_rgba(99,102,241,0.4)]'
+                            : 'max-w-[85%] rounded-2xl rounded-tl-md border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-zinc-800/90 dark:text-zinc-100'">
                         <template x-if="m.role === 'user'">
                             <p class="whitespace-pre-wrap break-words" x-text="m.content"></p>
                         </template>
@@ -112,7 +112,7 @@
             </template>
             <template x-if="busy">
                 <div class="flex items-end justify-start gap-2">
-                    <div class="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800" role="status" aria-label="{{ __('AI sedang mengetik') }}">
+                    <div class="flex items-center gap-1.5 rounded-2xl rounded-tl-md border border-slate-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-zinc-800/90" role="status" aria-label="{{ __('AI sedang mengetik') }}">
                         <span class="aiv2-dot"></span><span class="aiv2-dot"></span><span class="aiv2-dot"></span>
                     </div>
                 </div>
@@ -130,7 +130,7 @@
 
         {{-- Conversation list --}}
         <div x-show="showList"
-             class="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-slate-50 px-3 py-3 dark:bg-slate-900/60"
+             class="min-h-0 flex-1 space-y-1.5 overflow-y-auto bg-zinc-50 px-3 py-3 dark:bg-zinc-950"
              aria-label="{{ __('Daftar percakapan') }}">
             <button type="button" @click="newChat()" :disabled="busy || loadingConvo"
                     class="w-full rounded-xl bg-accent-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-accent-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 disabled:opacity-50">
@@ -156,16 +156,16 @@
         </div>
 
         {{-- Input --}}
-        <div x-show="!showList" class="border-t border-slate-200 bg-white px-3.5 py-3 dark:border-slate-700 dark:bg-slate-800">
+        <div x-show="!showList" class="border-t border-slate-200 bg-white px-3.5 py-3 dark:border-white/10 dark:bg-zinc-900">
             <div class="flex items-end gap-2">
                 <textarea x-ref="input" x-model="draft" rows="1" maxlength="2000"
                           @input="resize()" @keydown.enter="onEnter($event)"
                           :placeholder="busy ? '{{ __('Menunggu jawaban...') }}' : '{{ __('Tulis pesan...') }}'"
                           aria-label="{{ __('Tulis pesan untuk 3DY AI') }}"
-                          class="max-h-[120px] min-h-[40px] flex-1 resize-none rounded-xl border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-accent-500 focus:ring-accent-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200"></textarea>
+                          class="max-h-[120px] min-h-[40px] flex-1 resize-none rounded-xl border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-indigo-500 focus:ring-indigo-500 dark:border-white/10 dark:bg-zinc-800/70 dark:text-zinc-100"></textarea>
                 <button type="button" @click="send()" :disabled="!canSend()"
                         aria-label="{{ __('Kirim pesan') }}"
-                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-600 text-white shadow-sm transition hover:bg-accent-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
                     <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4 20-7z" /></svg>
                 </button>
             </div>
@@ -174,9 +174,12 @@
 </div>
 
 <style>
-.aiv2-dot { width: 7px; height: 7px; border-radius: 9999px; background: rgb(var(--accent-500)); animation: aiv2-typing 1.2s infinite ease-in-out; }
+.aiv2-dot { width: 8px; height: 8px; border-radius: 9999px; background: rgb(161 161 170); animation: aiv2-typing .8s infinite ease-in-out; }
+.dark .aiv2-dot { background: rgba(255 255 255 / .6); }
 .aiv2-dot:nth-child(2) { animation-delay: .15s; } .aiv2-dot:nth-child(3) { animation-delay: .3s; }
-@keyframes aiv2-typing { 0%,60%,100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-4px); opacity: 1; } }
+@keyframes aiv2-typing { 0%,60%,100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-4px); opacity: 1; } }
+.aiv2-msg { animation: aiv2-msg-in .35s cubic-bezier(.22,1,.36,1); }
+@keyframes aiv2-msg-in { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
 .aiv2-md { font-size: .875rem; line-height: 1.5; }
 .aiv2-md p { margin: .25rem 0; } .aiv2-md p:first-child { margin-top: 0; } .aiv2-md p:last-child { margin-bottom: 0; }
 .aiv2-md ul, .aiv2-md ol { margin: .25rem 0; padding-left: 1.1rem; } .aiv2-md ul { list-style: disc; } .aiv2-md ol { list-style: decimal; }
@@ -188,7 +191,7 @@
 .aiv2-md th, .aiv2-md td { padding: .35rem .6rem; border: 1px solid rgb(226 232 240); text-align: left; }
 .dark .aiv2-md th, .dark .aiv2-md td { border-color: rgb(51 65 85); }
 .aiv2-md th { background: rgb(var(--accent-500) / .08); font-weight: 700; }
-@media (prefers-reduced-motion: reduce) { .aiv2-dot { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .aiv2-dot, .aiv2-msg { animation: none !important; } }
 </style>
 
 <script>
