@@ -63,7 +63,7 @@
             <a href="{{ route('sales.schedules.create', ['lead_id' => $lead->id]) }}" title="{{ __('Add schedule') }}" aria-label="{{ __('Add schedule') }}"
                class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-blue-100 hover:bg-blue-200 text-blue-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">
                 <x-icon name="calendar" class="h-5 w-5" />
-                {{ __('Schedule') }}
+                {{ __('Create Schedule') }}
             </a>
             @if($activeTechRequest)
                 <a href="{{ route('sales.technical-requests.show', $activeTechRequest) }}" title="{{ __('View technical request') }}" aria-label="{{ __('View technical request') }}"
@@ -75,7 +75,7 @@
                 <a href="{{ route('sales.technical-requests.create', ['lead_id' => $lead->id]) }}" title="{{ __('Request technical team') }}" aria-label="{{ __('Request technical team') }}"
                    class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-green-100 hover:bg-green-200 text-green-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
                     <x-icon name="tools" class="h-5 w-5" />
-                    {{ __('Technician') }}
+                    {{ __('Request Technician') }}
                 </a>
             @endif
             <a href="{{ route('sales.proposals.create', ['lead_id' => $lead->id]) }}" title="{{ $completedTechRequest ? __('Add proposal (technical result ready)') : __('Add proposal') }}" aria-label="{{ __('Add proposal') }}"
