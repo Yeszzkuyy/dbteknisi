@@ -1,10 +1,10 @@
 <x-app-layout>
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
             <h1 class="text-3xl font-bold text-slate-800">{{ __('Detail Lead') }}: {{ $lead->customer?->name ?? '-' }}</h1>
             <p class="text-slate-500 mt-1">{{ __('Informasi lengkap lead / opportunity') }}</p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex flex-wrap items-center gap-2">
             @php
                 $canConvert = auth()->user()?->can('manage-marketing')
                     || ((int) $lead->assigned_to === (int) auth()->id() && auth()->user()?->can('manage-sales'))
@@ -12,36 +12,39 @@
                     || auth()->user()?->can('manage-admin');
             @endphp
             @if($canConvert && !in_array($lead->status, ['won', 'lost']))
-                    <button type="button"
-                            onclick="openConvertModal()"
-                            class="px-4 py-2.5 rounded-xl bg-green-100 hover:bg-green-200 text-green-700 text-sm font-medium transition">
-                        {{ __('Konversi ke Project') }}
-                    </button>
-                @endif
+                <button type="button"
+                        onclick="openConvertModal()"
+                        title="{{ __('Convert to Project') }}" aria-label="{{ __('Convert to Project') }}"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                    <x-icon name="briefcase" class="h-5 w-5" />
+                </button>
+            @endif
             @can('manage-marketing')
                 <a href="{{ route('leads.edit', $lead) }}"
-                   class="px-4 py-2.5 rounded-xl bg-accent-600 hover:bg-accent-700 text-white text-sm font-medium transition">
-                    Edit
+                   title="{{ __('Edit lead') }}" aria-label="{{ __('Edit lead') }}"
+                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                    <x-icon name="edit" class="h-5 w-5" />
                 </a>
-                <form action="{{ route('leads.destroy', $lead) }}" method="POST" class="inline">
+                <form action="{{ route('leads.destroy', $lead) }}" method="POST" class="inline-flex">
                     @csrf @method('DELETE')
                     <button type="submit"
                             onclick="return confirm('{{ __('Hapus lead ini?') }}')"
-                            class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition">
-                        {{ __('Hapus') }}
+                            title="{{ __('Delete lead') }}" aria-label="{{ __('Delete lead') }}"
+                            class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                        <x-icon name="trash" class="h-5 w-5" />
                     </button>
                 </form>
             @endcan
             @if(auth()->user()->can('view-sales') || auth()->user()->can('manage-sales'))
                 <a href="{{ route('leads.pipeline') }}"
-                   class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium transition">
-                    {{ __('Kembali ke Pipeline') }}
+                   title="{{ __('Back to Pipeline') }}" aria-label="{{ __('Back to Pipeline') }}"
+                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                    <x-icon name="view-columns" class="h-5 w-5" />
                 </a>
             @endif
-            <a href="{{ (auth()->user()->can('view-marketing') || auth()->user()->can('manage-marketing')) ? route('leads.index') : route('sales.my-leads') }}"
-               class="px-4 py-2.5 rounded-xl bg-accent-500 text-white hover:bg-accent-600 dark:bg-accent-600 dark:hover:bg-accent-700 text-sm font-medium transition">
-                {{ __('Kembali') }}
-            </a>
+            <x-icon-button as="a" icon="back"
+                href="{{ (auth()->user()->can('view-marketing') || auth()->user()->can('manage-marketing')) ? route('leads.index') : route('sales.my-leads') }}"
+                title="{{ __('Back') }}" />
         </div>
     </div>
 
