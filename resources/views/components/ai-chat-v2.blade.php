@@ -65,7 +65,7 @@
                     class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14" /></svg>
             </button>
-            <button type="button" @click="closeChat()" aria-label="{{ __('Tutup chat') }}" title="{{ __('Tutup dan bersihkan draf') }}"
+            <button type="button" @click="closeChat()" aria-label="{{ __('Tutup chat') }}" title="{{ __('Tutup dan mulai baru') }}"
                     class="rounded-lg p-1.5 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
             </button>
@@ -261,10 +261,15 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             this.$nextTick(() => { this.scrollBottom(); this.$refs.input?.focus({ preventScroll: true }); });
         },
         minimize() { this.open = false; },
-        // × = selesai: tutup + buang draf belum terkirim + kembali ke
-        // tampilan pesan. Riwayat & percakapan aktif tetap dipertahankan.
+        // × = selesai: tutup + reset jendela penuh (pesan, draf, ID
+        // percakapan dilepas) sehingga buka berikutnya mulai baru.
+        // Data di server TIDAK dihapus — riwayat tetap ada di daftar
+        // percakapan & halaman AI.
         closeChat() {
-            this.open = false; this.draft = ''; this.error = ''; this.showList = false;
+            this.open = false; this.messages = []; this.lastUserText = '';
+            this.conversationId = null; this.showList = false;
+            this.draft = ''; this.error = '';
+            try { localStorage.removeItem(this.key()); } catch (e) {}
             this.$nextTick(() => this.resize());
         },
         // --- Geser launcher (satu-satunya yang draggable). Pola: threshold
