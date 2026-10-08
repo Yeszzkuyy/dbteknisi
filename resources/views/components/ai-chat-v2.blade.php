@@ -200,9 +200,10 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
         __inited: false,
         // Posisi launcher (tersimpan per user) + offset manual jendela
         // dari jangkarnya (tersimpan per user). Jendela = jangkar + offset.
+        // Gandeng dua arah: geser jendela ikut menggeser launcher.
         pos: null, chatOff: null,
         dragging: false, dragWhich: null, moved: false, suppressUntil: 0,
-        sx: 0, sy: 0, ox: 0, oy: 0, ax: 0, ay: 0,
+        sx: 0, sy: 0, ox: 0, oy: 0, bx: 0, by: 0,
         quicks: @js([__('Jelaskan data server saya'), __('Bantu analisis masalah'), __('Buatkan kode Laravel'), __('Jelaskan konsep jaringan')]),
         key() { return '3dy.ai.v2.conv.' + this.uid; },
         posKey() { return '3dy.ai.v2.pos.' + this.uid; },
@@ -342,8 +343,8 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             if (which === 'chat') {
                 const g = this.chatGeom();
                 if (!g) { this.dragging = false; this.dragWhich = null; return; }
-                const a = this.anchorGeom();
-                this.ox = g.left; this.oy = g.top; this.ax = a.left; this.ay = a.top;
+                const p = this.triggerPos();
+                this.ox = g.left; this.oy = g.top; this.bx = p.left; this.by = p.top;
             } else {
                 const p = this.triggerPos();
                 this.ox = p.left; this.oy = p.top;
@@ -360,9 +361,9 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             if (Math.hypot(e.clientX - this.sx, e.clientY - this.sy) > 10) this.moved = true;
             if (!this.moved) return;
             if (which === 'chat') {
-                const g = this.anchorGeom();
-                const p = this.clamp({ left: this.ox + e.clientX - this.sx, top: this.oy + e.clientY - this.sy }, g.w, g.h);
-                this.chatOff = { dx: Math.round(p.left - g.left), dy: Math.round(p.top - g.top) };
+                // Gandeng: delta pointer yang sama diterapkan ke launcher —
+                // jendela otomatis ikut karena dihitung dari jangkarnya.
+                this.pos = this.clamp({ left: this.bx + e.clientX - this.sx, top: this.by + e.clientY - this.sy }, 56, 56);
             } else {
                 this.pos = this.clamp({ left: this.ox + e.clientX - this.sx, top: this.oy + e.clientY - this.sy }, 56, 56);
             }
@@ -375,10 +376,7 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             // Telan klik sintetis susulan (lambat di HP/WebView) tanpa timer race.
             // Hanya relevan untuk launcher (header tak punya aksi klik).
             if (which === 'launcher') this.suppressUntil = Date.now() + 600;
-            try {
-                if (which === 'chat') localStorage.setItem(this.chatOffKey(), JSON.stringify(this.chatOff));
-                else localStorage.setItem(this.posKey(), JSON.stringify(this.triggerPos()));
-            } catch (err) {}
+            try { localStorage.setItem(this.posKey(), JSON.stringify(this.triggerPos())); } catch (err) {}
         },
         dragCancel() { this.dragging = false; this.dragWhich = null; },
         guardClick(e) {
