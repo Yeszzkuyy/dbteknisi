@@ -490,35 +490,6 @@
                         <dd class="mt-1 text-sm font-medium text-slate-900 dark:text-slate-100">{{ $lead->customer?->company ?? $lead->customer?->name ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Masuk by') }}</dt>
-                        <dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{{ $lead->source ? \App\Http\Controllers\LeadController::label($lead->source) : '-' }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Sales Penanganan') }}</dt>
-                        <dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{{ $lead->assignee?->name ?? '-' }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Segment') }}</dt>
-                        <dd class="mt-1 text-sm font-medium text-slate-900 dark:text-slate-100">{{ $lead->segment ? \App\Http\Controllers\LeadController::label($lead->segment) : '-' }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Partner') }}</dt>
-                        <dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">
-                            @if($lead->partner)
-                                <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-                                    <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ \App\Models\Partner::TYPE_DOTS[$lead->partner->type] ?? '#94a3b8' }}"></span>
-                                    {{ $lead->partner->name }} ({{ __(\App\Models\Partner::TYPES[$lead->partner->type] ?? $lead->partner->type) }})
-                                </span>
-                            @else
-                                -
-                            @endif
-                        </dd>
-                    </div>
-                    <div>
-                        <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Tanggal Masuk') }}</dt>
-                        <dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{{ $lead->incoming_date ? $lead->incoming_date->format('d M Y') : '-' }}</dd>
-                    </div>
-                    <div>
                         <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Dibuat pada') }}</dt>
                         <dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{{ $lead->created_at?->format('d M Y H:i') ?? '-' }}</dd>
                     </div>
@@ -626,6 +597,7 @@
                 </div>
             </section>
 
+            @if($documents->isNotEmpty())
             <section aria-labelledby="card-instalasi" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5">
                 <h2 id="card-instalasi" class="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
                     <x-icon name="building" class="h-5 w-5 text-slate-400" />
@@ -634,9 +606,6 @@
                 </h2>
                 <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ __('Dokumen dari project terkait customer ini (diunggah Tim Teknisi)') }}</p>
                 <div class="mt-3">
-                    @if($documents->isEmpty())
-                        <p class="text-slate-500">{{ __('Belum ada dokumentasi instalasi untuk customer ini.') }}</p>
-                    @else
                         <div class="grid grid-cols-1 gap-3">
                             @foreach($documents as $doc)
                                 <div class="border border-slate-200 dark:border-slate-600 rounded-xl p-4 hover:shadow-md transition">
@@ -675,9 +644,9 @@
                                 </div>
                             @endforeach
                         </div>
-                    @endif
                 </div>
             </section>
+            @endif
         </aside>
     </div>
 </x-app-layout>
