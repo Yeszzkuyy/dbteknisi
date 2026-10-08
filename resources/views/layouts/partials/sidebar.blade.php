@@ -431,6 +431,12 @@
                                 <x-icon name="book" class="h-5 w-5 shrink-0" />
                                 <span>Knowledge Base</span>
                             </a>
+                            <a wire:navigate.hover href="{{ route('product-knowledge.index') }}"
+                               aria-current="{{ request()->routeIs('product-knowledge*') ? 'page' : 'false' }}"
+                               class="{{ $navLink }} {{ request()->routeIs('product-knowledge*') ? $navActive : $navInactive }}">
+                                <x-icon name="book" class="h-5 w-5 shrink-0" />
+                                <span>Product KB</span>
+                            </a>
                         @endcan
 
                         {{-- Admin Panel (Super Admin only) --}}

@@ -18,6 +18,7 @@ use App\Http\Controllers\MeetingDraftController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficeAssistantController;
+use App\Http\Controllers\ProductKnowledgeController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PocController;
 use App\Http\Controllers\ProfileController;
@@ -93,6 +94,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [KnowledgeBaseController::class, 'store'])->name('store');
         Route::post('/sync', [KnowledgeBaseController::class, 'sync'])->name('sync');
         Route::delete('/{document}', [KnowledgeBaseController::class, 'destroy'])->name('destroy');
+    });
+
+    // ============================================
+    // PRODUCT KNOWLEDGE BASE (AI / RAG) — Admin only
+    // ============================================
+    Route::middleware('permission:manage-admin')->prefix('product-knowledge')->name('product-knowledge.')->group(function () {
+        Route::get('/', [ProductKnowledgeController::class, 'index'])->name('index');
+        Route::post('/import', [ProductKnowledgeController::class, 'import'])->name('import');
+        Route::delete('/products/bulk', [ProductKnowledgeController::class, 'bulkDestroy'])->name('bulk-destroy');
+        Route::get('/products/{product}', [ProductKnowledgeController::class, 'show'])->name('show');
+        Route::patch('/products/{product}', [ProductKnowledgeController::class, 'update'])->name('update');
+        Route::patch('/products/{product}/publish', [ProductKnowledgeController::class, 'publish'])->name('publish');
+        Route::delete('/sources/{source}', [ProductKnowledgeController::class, 'destroySource'])->name('sources.destroy');
+        Route::patch('/products/{product}/reject', [ProductKnowledgeController::class, 'reject'])->name('reject');
+        Route::post('/sources/{source}/refetch', [ProductKnowledgeController::class, 'refetch'])->name('refetch');
     });
 
     // ============================================
