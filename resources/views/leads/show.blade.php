@@ -28,7 +28,7 @@
                 <form action="{{ route('leads.destroy', $lead) }}" method="POST" class="inline-flex">
                     @csrf @method('DELETE')
                     <button type="submit"
-                            onclick="return confirm('{{ __('Hapus lead ini?') }}')"
+                            onclick="return confirm('{{ __('Delete this lead?') }}')"
                             title="{{ __('Delete lead') }}" aria-label="{{ __('Delete lead') }}"
                             class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
                         <x-icon name="trash" class="h-5 w-5" />
@@ -53,36 +53,19 @@
         $techRequests = $techRequests ?? collect();
         $activeTechRequest = $activeTechRequest ?? null;
         $proposalsList = $proposalsList ?? collect();
-        $completedTechRequest = $techRequests->first(fn ($r) => $r->status === 'completed');
         $sentProposal = $proposalsList->first(fn ($p) => in_array($p->status, ['sent', 'viewed']));
         $upcomingSchedules = $upcomingSchedules ?? collect();
         $pastSchedules = $pastSchedules ?? collect();
     @endphp
-    @if($canSalesWrite)
+    @if($canSalesWrite && ($activeTechRequest || $sentProposal))
         <div class="flex flex-wrap items-center gap-2 mb-4">
-            <a href="{{ route('sales.schedules.create', ['lead_id' => $lead->id]) }}" title="{{ __('Add schedule') }}" aria-label="{{ __('Add schedule') }}"
-               class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-blue-100 hover:bg-blue-200 text-blue-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">
-                <x-icon name="calendar" class="h-5 w-5" />
-                {{ __('Create Schedule') }}
-            </a>
             @if($activeTechRequest)
                 <a href="{{ route('sales.technical-requests.show', $activeTechRequest) }}" title="{{ __('View technical request') }}" aria-label="{{ __('View technical request') }}"
                    class="inline-flex min-w-0 items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-amber-100 hover:bg-amber-200 text-amber-800 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20">
                     <x-icon name="tools" class="h-5 w-5 shrink-0" />
                     <span class="truncate">{{ \App\Models\TechnicalRequest::statusLabel($activeTechRequest->status) }} • {{ $activeTechRequest->title }}</span>
                 </a>
-            @else
-                <a href="{{ route('sales.technical-requests.create', ['lead_id' => $lead->id]) }}" title="{{ __('Request technical team') }}" aria-label="{{ __('Request technical team') }}"
-                   class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-green-100 hover:bg-green-200 text-green-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
-                    <x-icon name="tools" class="h-5 w-5" />
-                    {{ __('Request Technician') }}
-                </a>
             @endif
-            <a href="{{ route('sales.proposals.create', ['lead_id' => $lead->id]) }}" title="{{ $completedTechRequest ? __('Add proposal (technical result ready)') : __('Add proposal') }}" aria-label="{{ __('Add proposal') }}"
-               class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
-                <x-icon name="receipt" class="h-5 w-5" />
-                {{ __('Proposal') }}
-            </a>
             @if($sentProposal)
                 <a href="{{ route('sales.proposals.show', $sentProposal) }}" title="{{ __('View proposal') }}" aria-label="{{ __('View proposal') }}"
                    class="inline-flex min-w-0 items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-green-100 hover:bg-green-200 text-green-800 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
@@ -291,7 +274,9 @@
                                 </p>
                             </div>
                             <a href="{{ route('sales.schedules.show', $schedule) }}" title="{{ __('View details') }}" aria-label="{{ __('View details') }}"
-                               class="shrink-0 px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">{{ __('Detail') }}</a>
+                               class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                <x-icon name="eye" class="h-5 w-5" />
+                            </a>
                         </div>
                     @empty
                         <p class="text-slate-500">{{ __('Belum ada jadwal untuk lead ini.') }}</p>
@@ -324,7 +309,9 @@
                                 <p class="mt-1 text-xs text-slate-500">Rp {{ number_format($proposal->grand_total, 0, ',', '.') }}</p>
                             </div>
                             <a href="{{ route('sales.proposals.show', $proposal) }}" title="{{ __('View details') }}" aria-label="{{ __('View details') }}"
-                               class="shrink-0 px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">{{ __('Detail') }}</a>
+                               class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                <x-icon name="eye" class="h-5 w-5" />
+                            </a>
                         </div>
                     @empty
                         <p class="text-slate-500">{{ __('Belum ada penawaran untuk lead ini.') }}</p>
@@ -367,7 +354,9 @@
                             </div>
                             @if($item['url'])
                                 <a href="{{ $item['url'] }}" title="{{ __('View details') }}" aria-label="{{ __('View details') }}"
-                                   class="shrink-0 px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">{{ __('Detail') }}</a>
+                                   class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                    <x-icon name="eye" class="h-5 w-5" />
+                                </a>
                             @endif
                         </div>
                     @empty
@@ -425,7 +414,7 @@
                 <div class="mt-3 space-y-2">
                     @forelse($lead->tasks->sortByDesc('created_at') as $task)
                         <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
-                            <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-indigo-50 text-indigo-700">
+                            <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
                                 {{ \App\Models\LeadTask::statusLabel($task->status) }}
                             </span>
                             <div class="flex-1 min-w-0">
@@ -460,7 +449,7 @@
                 <div class="mt-3 space-y-2">
                     @forelse($techRequests as $tech)
                         <div class="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
-                            <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-amber-100 text-amber-800">
+                            <span class="mt-0.5 inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
                                 {{ \App\Models\TechnicalRequest::statusLabel($tech->status) }}
                             </span>
                             <div class="flex-1 min-w-0">
@@ -474,7 +463,9 @@
                                 @endif
                             </div>
                             <a href="{{ route('sales.technical-requests.show', $tech) }}" title="{{ __('View details') }}" aria-label="{{ __('View details') }}"
-                               class="shrink-0 px-3 py-1.5 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition">{{ __('Detail') }}</a>
+                               class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                <x-icon name="eye" class="h-5 w-5" />
+                            </a>
                         </div>
                     @empty
                         <p class="text-slate-500">{{ __('Belum ada technical request untuk lead ini.') }}</p>
@@ -584,31 +575,31 @@
                                     {{ \App\Models\LeadDocument::categoryLabel($doc->category) }}
                                 </span>
                                 <div class="flex items-center gap-2 shrink-0">
-                                    <button type="button" title="{{ __('Lihat') }}" aria-label="{{ __('Lihat') }}"
+                                    <button type="button" title="{{ __('View') }}" aria-label="{{ __('View') }}"
                                             data-url="{{ route('leads.attachments.show', [$lead, $doc]) }}"
                                             data-filename="{{ $doc->file_name }}"
                                             data-mime="{{ $doc->mime_type }}"
                                             onclick="openPreviewModal(this.dataset.url, this.dataset.filename, this.dataset.mime)"
-                                            class="p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                            class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                         </svg>
                                     </button>
                                     <a href="{{ route('leads.attachments.download', [$lead, $doc]) }}" title="Download" aria-label="Download"
-                                       class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                       class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
                                         </svg>
                                     </a>
                                     @can('manage-marketing')
                                         <form action="{{ route('leads.attachments.destroy', [$lead, $doc]) }}" method="POST"
-                                              onsubmit="return confirm('{{ __('Yakin hapus lampiran ini?') }}')" class="inline-flex">
+                                              onsubmit="return confirm('{{ __('Delete this attachment?') }}')" class="inline-flex">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" title="{{ __('Hapus') }}" aria-label="{{ __('Hapus') }}"
-                                                    class="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                            <button type="submit" title="{{ __('Delete') }}" aria-label="{{ __('Delete') }}"
+                                                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-105 active:scale-95">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
                                                 </svg>
                                             </button>
@@ -617,7 +608,7 @@
                                     @can('manage-marketing')
                                         <form action="{{ route('leads.attachments.category', [$lead, $doc]) }}" method="POST" class="inline-flex">
                                             @csrf @method('PATCH')
-                                            <select name="category" onchange="this.form.submit()" title="{{ __('Kategori dokumen') }}"
+                                            <select name="category" onchange="this.form.submit()" title="{{ __('Document category') }}"
                                                     class="rounded-lg border-slate-300 text-xs text-slate-600 focus:border-accent-500 focus:ring-accent-500">
                                                 <option value="">{{ __('Tanpa kategori') }}</option>
                                                 @foreach(\App\Models\LeadDocument::CATEGORIES as $category)
