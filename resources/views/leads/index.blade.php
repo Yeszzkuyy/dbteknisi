@@ -145,7 +145,7 @@
                                                  class="block h-5 w-5" />
                                             <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                         </a>
-                                        <form action="{{ route('leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('{{ __('Hapus lead ini?') }}')" class="inline">
+                                        <form action="{{ route('leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('{{ __('Hapus lead ini?') }}')" class="inline shrink-0">
                                             @csrf @method('DELETE')
                                             <button type="submit" title="{{ __('Hapus lead') }}"
                                                     class="group/btn shrink-0 relative overflow-hidden p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
