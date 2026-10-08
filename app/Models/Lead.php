@@ -26,6 +26,15 @@ class Lead extends Model
         };
     }
 
+    /**
+     * Label status untuk area sales: lead entry ('cool') tampil sebagai
+     * 'New' agar tidak rancu. Nilai DB tetap 'cool'.
+     */
+    public static function salesStatusLabel(?string $status): string
+    {
+        return $status === 'cool' ? __('New') : ucfirst((string) $status);
+    }
+
     public const PT_COLORS = [
         'NTI' => 'bg-sky-500 text-white',
         'MGK' => 'bg-blue-900 text-white',
