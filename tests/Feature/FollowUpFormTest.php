@@ -215,7 +215,8 @@ class FollowUpFormTest extends TestCase
         $this->assertStringContainsString('Generate Draft with AI', $html);
         $this->assertStringContainsString('PT Index Penuh', $html);
         // Label opsi lead Daily Update (em-dash ter-escape JSON di source).
-        $this->assertStringContainsString('PT Index Penuh \u2014 Cool', $html);
+        // Lead entry ('cool') tampil sebagai 'New' di area sales.
+        $this->assertStringContainsString('PT Index Penuh \u2014 New', $html);
         // Follow Ups di atas Meetings.
         $followUpsPos = strpos($html, '>Follow Ups<');
         $meetingsPos = strpos($html, '>Meetings<');

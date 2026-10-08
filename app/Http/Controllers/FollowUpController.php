@@ -45,7 +45,7 @@ class FollowUpController extends Controller
         $duLeads = $leads->map(fn ($lead) => [
             'id' => (string) $lead->id,
             'customer_id' => (string) $lead->customer_id,
-            'label' => "Lead #{$lead->id} — ".($lead->customer->name ?? '?').' — '.ucfirst($lead->status),
+            'label' => "Lead #{$lead->id} — ".($lead->customer->name ?? '?').' — '.Lead::salesStatusLabel($lead->status),
         ])->all();
 
         return $this->ajaxPartial($request, 'sales.follow-ups._table',
@@ -230,7 +230,7 @@ class FollowUpController extends Controller
             ->map(fn ($lead) => [
                 'id' => (string) $lead->id,
                 'customer_id' => (string) $lead->customer_id,
-                'label' => "Lead #{$lead->id} — ".ucfirst($lead->status)
+                'label' => "Lead #{$lead->id} — ".Lead::salesStatusLabel($lead->status)
                     .($lead->incoming_date ? ' — '.$lead->incoming_date->format('d M Y') : ''),
             ])->all();
     }

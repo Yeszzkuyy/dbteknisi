@@ -105,7 +105,11 @@ class SalesService
 
         $this->scopeToOwnLeads($query);
 
-        return $query->latest('follow_up_date')->paginate(15);
+        // Customer terbaru selalu di atas, lalu tanggal follow-up terbaru.
+        return $query->orderBy(
+            Customer::select('created_at')->whereColumn('customers.id', 'follow_ups.customer_id'),
+            'desc'
+        )->latest('follow_up_date')->paginate(15);
     }
 
     public function createFollowUp(array $data): FollowUp

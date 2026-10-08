@@ -45,6 +45,9 @@
                                     $fuWaMessage = 'Halo ' . ($fu->customer?->contact_person ?: ($fu->customer?->name ?? ''))
                                         . ', izin follow up "' . Str::limit($fu->description, 60) . '".';
                                     $fuWaLink = $fu->customer?->waLink($fuWaMessage);
+                                    $fuMailLink = $fu->customer?->email
+                                        ? 'mailto:'.$fu->customer->email.'?subject='.rawurlencode(__('Follow up: :name', ['name' => $fu->customer?->name ?? ''])).'&body='.rawurlencode(Str::limit($fu->description, 200))
+                                        : null;
                                 @endphp
                                 @if($fuWaLink)
                                     <a href="{{ $fuWaLink }}" target="_blank"
@@ -56,6 +59,20 @@
                                         </svg>
                                     </a>
                                 @endif
+                                @if($fuMailLink)
+                                    <a href="{{ $fuMailLink }}"
+                                       title="{{ __('Send Email') }}"
+                                       aria-label="{{ __('Send Email') }} {{ $fu->customer?->name }}"
+                                       class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100 text-sky-700 transition hover:bg-sky-200 dark:bg-sky-500/10 dark:text-sky-300 dark:hover:bg-sky-500/20">
+                                        <x-icon name="mail" class="h-4 w-4" />
+                                    </a>
+                                @endif
+                                <a href="{{ route('sales.meetings.create', array_filter(['customer_id' => $fu->customer_id, 'lead_id' => $fu->lead_id])) }}"
+                                   title="{{ __('Create Meeting') }}"
+                                   aria-label="{{ __('Create Meeting') }} {{ $fu->customer?->name }}"
+                                   class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700 transition hover:bg-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">
+                                    <x-icon name="calendar" class="h-4 w-4" />
+                                </a>
                                 <x-dropdown align="right" width="w-52">
                                     <x-slot name="trigger">
                                         <button type="button"
@@ -79,11 +96,6 @@
                                             </a>
                                         @endcan
                                         <div class="my-1 border-t border-slate-200 dark:border-slate-600"></div>
-                                        <a href="{{ route('sales.meetings.create', array_filter(['customer_id' => $fu->customer_id, 'lead_id' => $fu->lead_id])) }}"
-                                           class="flex w-full items-center gap-3 px-4 py-1.5 text-start text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
-                                            <x-icon name="calendar" class="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
-                                            {{ __('Create Meeting') }}
-                                        </a>
                                         @can('manage-sales')
                                             @if($fu->completed_at)
                                                 <form action="{{ route('sales.follow-ups.reopen', $fu) }}"
