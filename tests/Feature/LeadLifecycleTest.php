@@ -27,6 +27,27 @@ class LeadLifecycleTest extends TestCase
         return $user;
     }
 
+    public function test_multirole_management_can_assign_lead_to_sales(): void
+    {
+        // Regresi: akun multi-role (management+sales) assign via Manage Sales
+        // harus redirect + sukses, sama seperti single-role management.
+        $this->seed(RoleAndPermissionSeeder::class);
+        $mgmt = User::factory()->create();
+        $mgmt->assignRole(['management', 'sales']);
+        $sales = User::factory()->create();
+        $sales->assignRole('sales');
+        $lead = Lead::create([
+            'customer_id' => Customer::create(['name' => 'PT Multi Role', 'contact_person' => 'QA'])->id,
+        ]);
+
+        $this->actingAs($mgmt)->post(route('manage-sales.assign', $lead), ['assigned_to' => $sales->id])
+            ->assertRedirect(route('manage-sales.index'))
+            ->assertSessionHas('success');
+
+        $this->assertSame($sales->id, $lead->fresh()->assigned_to);
+        $this->assertTrue($sales->notifications()->where('type', 'App\Notifications\LeadAssignedNotification')->exists());
+    }
+
     public function test_full_lifecycle_marketing_to_won(): void
     {
         $marketing = $this->userWithRole('marketing');
