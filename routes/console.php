@@ -10,6 +10,8 @@ Artisan::command('inspire', function () {
 
 Schedule::command('schedules:remind')->everyMinute();
 Schedule::command('followups:remind')->daily();
+Schedule::command('meetings:remind-daily')->dailyAt('17:00');
+Schedule::command('proposals:expire')->dailyAt('01:30');
 
 // ponytail: worker ringan tiap menit agar notifikasi antre (mis. NewLeadNotification) terkirim
 // tanpa proses supervisor; database driver atomic sehingga overlap antar worker aman

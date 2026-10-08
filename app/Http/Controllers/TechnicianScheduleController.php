@@ -45,8 +45,8 @@ class TechnicianScheduleController extends Controller
 
     public function jadwal(Request $request)
     {
-        $technicians = User::orderBy('name')->get(['id', 'name']);
-        $projects = Project::whereNotNull('project_name')->orderBy('project_name')->get(['id', 'project_name']);
+        $technicians = User::orderBy('name')->limit(200)->get(['id', 'name']);
+        $projects = Project::whereNotNull('project_name')->orderBy('project_name')->limit(200)->get(['id', 'project_name']);
         $connected = $this->google->isApiReachable();
 
         return view('teknisi.jadwal', compact('technicians', 'projects', 'connected'));

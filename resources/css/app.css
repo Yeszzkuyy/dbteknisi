@@ -4,6 +4,30 @@
 @import './themes/accent/emerald.css';
 @import './sidebar-nav.css';
 
+/* Fallback metrik font web (anti-FOUT shift): Arial lokal diskala agar
+   kotak teks ≈ font asli selama font Bunny belum tiba. Angka dari metrik
+   hhea + lebar rata-rata aktual file woff2 (bukan tebakan). */
+@font-face {
+    font-family: 'PJSFallback';
+    src: local('Arial');
+    ascent-override: 103.8%;
+    descent-override: 22.2%;
+    line-gap-override: 0%;
+    size-adjust: 103.63%;
+    font-weight: 400 800;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Exo2Fallback';
+    src: local('Arial');
+    ascent-override: 99.9%;
+    descent-override: 20.1%;
+    line-gap-override: 0%;
+    size-adjust: 99.34%;
+    font-weight: 400 800;
+    font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

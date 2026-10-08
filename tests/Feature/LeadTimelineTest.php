@@ -41,7 +41,7 @@ class LeadTimelineTest extends TestCase
             'customer_id' => $customer->id,
             'pt_group' => 'NTI',
             'segment' => 'vendor',
-            'status' => 'new',
+            'status' => 'cool',
             'assigned_to' => $assignee?->id,
             'incoming_date' => '2026-09-01',
         ]);
@@ -52,7 +52,7 @@ class LeadTimelineTest extends TestCase
         $user = $this->marketingUser();
         $lead = $this->makeLead();
 
-        $this->actingAs($user)->patch(route('leads.update-status', $lead), ['status' => 'contacted'])
+        $this->actingAs($user)->patch(route('leads.update-status', $lead), ['status' => 'warm'])
             ->assertNoContent();
 
         $this->assertDatabaseHas('lead_activities', [
@@ -77,6 +77,7 @@ class LeadTimelineTest extends TestCase
             'customer_id' => $lead->customer_id,
             'lead_id' => $lead->id,
             'meeting_date' => now()->toDateString(),
+            'notes' => 'Catatan meeting test',
         ])->assertOk();
 
         $this->assertDatabaseHas('lead_activities', [
@@ -115,6 +116,7 @@ class LeadTimelineTest extends TestCase
             'customer_mode' => 'existing',
             'customer_id' => $customer->id,
             'meeting_date' => now()->toDateString(),
+            'notes' => 'Catatan meeting test',
         ])->assertOk();
 
         $this->assertDatabaseCount('lead_activities', 0);

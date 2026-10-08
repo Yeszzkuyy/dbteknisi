@@ -102,7 +102,7 @@
                         <span class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white" x-text="$store.notif.unread"></span>
                     </template>
                 </button>
-                <div x-show="open" @click.away="open = false"
+                <div x-show="open" x-cloak @click.away="open = false"
                      class="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-slate-200 dark:border-zinc-800 py-2 z-50 origin-top-right">
                     <div class="flex items-center justify-between px-4 py-1.5 border-b border-slate-100 dark:border-zinc-800">
                         <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ __('Notifikasi') }}</span>
@@ -142,7 +142,7 @@
                 {{-- Toast kecil: lead baru belum di-assign (khusus management) --}}
                 @can('manage-sales-leads')
                 <template x-teleport="body">
-                    <div x-show="$store.notif.toast"
+                    <div x-show="$store.notif.toast" x-cloak
                          x-transition.opacity.duration.300ms
                          class="fixed bottom-4 right-4 z-[100]">
                         <div class="flex items-center gap-2.5 rounded-lg bg-white dark:bg-zinc-900 shadow-lg border border-slate-200 dark:border-zinc-800 py-2.5 px-3.5">
@@ -178,7 +178,7 @@
             </button>
 
             {{-- Dropdown Menu --}}
-            <div x-show="open"
+            <div x-show="open" x-cloak
                  @click.away="open = false"
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95 -translate-y-1"

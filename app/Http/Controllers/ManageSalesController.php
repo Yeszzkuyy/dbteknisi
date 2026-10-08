@@ -71,7 +71,7 @@ class ManageSalesController extends Controller
             'kebutuhan' => 'nullable|string|max:2000',
             'solusi' => 'nullable|string|max:2000',
             'progress_notes' => 'nullable|string|max:2000',
-            'notes' => 'nullable',
+            'notes' => 'nullable|string|max:5000',
             'pt_group' => 'nullable|in:NTI,MGK,TPS,WANI',
             'assigned_to' => 'nullable|exists:users,id',
         ]);
@@ -205,10 +205,9 @@ class ManageSalesController extends Controller
         $statusCounts = $mine()->selectRaw('status, count(*) as total')
             ->groupBy('status')->pluck('total', 'status');
         $statusPalette = [
-            'new' => '#3b82f6',
-            'contacted' => '#eab308',
-            'qualified' => '#a855f7',
-            'proposal' => '#f97316',
+            'cool' => '#3b82f6',
+            'warm' => '#eab308',
+            'hot' => '#f97316',
             'won' => '#22c55e',
             'lost' => '#ef4444',
         ];
@@ -237,7 +236,25 @@ class ManageSalesController extends Controller
             ->mapWithKeys(fn ($pt) => [$pt => (float) ($incomeRows[$pt] ?? 0)]);
         $incomeTotal = $incomeMonth->sum();
 
-        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal', 'weekStart', 'weekEnd', 'incomeMonth', 'incomeTotal'));
+        // Ringkasan agenda sales milik sendiri (jadwal saya: PIC/creator/lead saya).
+        $ownSchedules = fn ($q) => $q->where(function ($w) {
+            $w->where('sales_schedules.assigned_to', auth()->id())
+                ->orWhere('sales_schedules.created_by', auth()->id())
+                ->orWhereHas('lead', fn ($l) => $l->where('assigned_to', auth()->id()));
+        });
+        $scheduleSummary = [
+            'today' => \App\Models\SalesSchedule::where($ownSchedules)
+                ->whereDate('start_at', today())->whereNotIn('status', ['completed', 'cancelled'])->count(),
+            'upcoming' => \App\Models\SalesSchedule::where($ownSchedules)
+                ->where('start_at', '>=', now()->startOfDay())->whereNotIn('status', ['completed', 'cancelled'])->count(),
+            'completed' => \App\Models\SalesSchedule::where($ownSchedules)->where('status', 'completed')->count(),
+            'cancelled' => \App\Models\SalesSchedule::where($ownSchedules)->where('status', 'cancelled')->count(),
+        ];
+        $scheduleTypes = \App\Models\SalesSchedule::where($ownSchedules)
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->selectRaw('type, count(*) as total')->groupBy('type')->pluck('total', 'type');
+
+        return view('sales.dashboard', compact('kpi', 'dueFollowUps', 'weekMeetings', 'myTasks', 'donutSales', 'funnelTotal', 'weekStart', 'weekEnd', 'incomeMonth', 'incomeTotal', 'scheduleSummary', 'scheduleTypes'));
     }
 
     public function myLeads(Request $request)
@@ -253,33 +270,37 @@ class ManageSalesController extends Controller
 
     public function exportMyLeads(Request $request)
     {
-        $leads = $this->myLeadsQuery($request)
-            ->with(['customer'])
-            ->withMax('followUps as last_follow_up_at', 'follow_up_date')
-            ->get();
-
         $filename = 'my-leads-'.now()->format('Ymd-Hi').'.csv';
 
-        return response()->streamDownload(function () use ($leads) {
+        // Streaming per 1000 baris (chunkById + eager per chunk):
+        // memori tetap datar berapa pun jumlah lead.
+        return response()->streamDownload(function () use ($request) {
             $handle = fopen('php://output', 'w');
             fwrite($handle, "\xEF\xBB\xBF"); // BOM agar Excel baca UTF-8.
             fputcsv($handle, ['Customer', 'PT', 'PIC', 'Telepon', 'Status', 'Kebutuhan', 'Solusi', 'Progres', 'Tgl Masuk', 'Jml Meeting', 'Jml Follow Up', 'Follow Up Terakhir']);
-            foreach ($leads as $lead) {
-                fputcsv($handle, [
-                    $lead->customer?->name ?? '-',
-                    $lead->pt_group ?? '-',
-                    $lead->customer?->contact_person ?? '-',
-                    $lead->customer?->phone ?? $lead->customer?->whatsapp ?? '-',
-                    ucfirst($lead->status),
-                    $lead->kebutuhan ?? '-',
-                    $lead->solusi ?? '-',
-                    $lead->progress_notes ?? '-',
-                    $lead->incoming_date?->format('Y-m-d') ?? '-',
-                    $lead->meetings_count,
-                    $lead->follow_ups_count,
-                    $lead->last_follow_up_at ?? '-',
-                ]);
-            }
+            $this->myLeadsQuery($request)
+                ->with(['customer'])
+                ->withMax('followUps as last_follow_up_at', 'follow_up_date')
+                ->chunk(1000, function ($leads) use ($handle) {
+                    foreach ($leads as $lead) {
+                        // Cegah CSV formula injection: sel yang diawali = + - @ dinetralkan.
+                        $safe = fn ($value) => is_string($value) && preg_match('/^[=+\-@]/', $value) ? "'".$value : $value;
+                        fputcsv($handle, [
+                            $safe($lead->customer?->name ?? '-'),
+                            $safe($lead->pt_group ?? '-'),
+                            $safe($lead->customer?->contact_person ?? '-'),
+                            $safe($lead->customer?->phone ?? $lead->customer?->whatsapp ?? '-'),
+                            $safe(ucfirst($lead->status)),
+                            $safe($lead->kebutuhan ?? '-'),
+                            $safe($lead->solusi ?? '-'),
+                            $safe($lead->progress_notes ?? '-'),
+                            $lead->incoming_date?->format('Y-m-d') ?? '-',
+                            $lead->meetings_count,
+                            $lead->follow_ups_count,
+                            $lead->last_follow_up_at ?? '-',
+                        ]);
+                    }
+                });
             fclose($handle);
         }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
@@ -341,6 +362,8 @@ class ManageSalesController extends Controller
         $lead->assigned_to = $assignedTo;
         $lead->assigned_by = $assignedTo ? auth()->id() : null;
         $lead->assigned_at = $assignedTo ? now() : null;
+        // Assign (baru/reassign) = belum ditangani -> kembali ke kolom New pipeline.
+        $lead->acknowledged_at = $assignedTo ? null : $lead->acknowledged_at;
     }
 
     /**

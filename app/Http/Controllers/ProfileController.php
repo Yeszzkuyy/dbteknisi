@@ -74,10 +74,10 @@ class ProfileController extends Controller
     }
 
     /**
-     * Simpan avatar sebagai persegi 512px (cover, tengah) agar tajam
-     * di semua ukuran tampil (36–112px). GIF disimpan asli agar
-     * animasi tidak rusak; gambar kecil (<=512px) juga disimpan asli
-     * supaya tidak blur karena upscale.
+     * Simpan avatar sebagai persegi 256px (cover, tengah): cukup untuk
+     * semua ukuran tampil (36–112px, retina 2x = 224px). GIF disimpan
+     * asli agar animasi tidak rusak; gambar kecil (<=256px) juga
+     * disimpan asli supaya tidak blur karena upscale.
      */
     private function storeNormalizedAvatar(UploadedFile $file): string
     {
@@ -95,7 +95,9 @@ class ProfileController extends Controller
         };
 
         if ($src === false) {
-            return $file->store('avatars', 'public');
+            // finfo bilang gambar tapi GD tak bisa parse (= korup/polyglot):
+            // tolak, jangan simpan mentah ke public.
+            abort(422, __('File gambar tidak valid atau rusak.'));
         }
 
         // Koreksi orientasi EXIF (foto HP) sebelum crop.
@@ -113,20 +115,20 @@ class ProfileController extends Controller
         $h = imagesy($src);
         $side = min($w, $h);
 
-        if ($side <= 512) {
+        if ($side <= 256) {
             imagedestroy($src);
 
             return $file->store('avatars', 'public');
         }
 
-        $dst = imagecreatetruecolor(512, 512);
+        $dst = imagecreatetruecolor(256, 256);
 
         if (in_array($mime, ['image/png', 'image/webp'], true)) {
             imagealphablending($dst, false);
             imagesavealpha($dst, true);
         }
 
-        imagecopyresampled($dst, $src, 0, 0, (int) (($w - $side) / 2), (int) (($h - $side) / 2), 512, 512, $side, $side);
+        imagecopyresampled($dst, $src, 0, 0, (int) (($w - $side) / 2), (int) (($h - $side) / 2), 256, 256, $side, $side);
         imagedestroy($src);
 
         $ext = $mime === 'image/png' ? 'png' : ($mime === 'image/webp' ? 'webp' : 'jpg');

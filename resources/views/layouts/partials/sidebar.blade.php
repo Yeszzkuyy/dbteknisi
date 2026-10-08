@@ -6,6 +6,7 @@
 
     $dashboardActive = request()->routeIs('dashboard*');
     $customerActive = request()->routeIs('customers*');
+    $monitoringActive = request()->routeIs('monitoring.index');
     $managementActive = request()->routeIs('manage-sales*') || request()->routeIs('manage.*');
     $technicianActive = request()->routeIs('projects*') || request()->routeIs('teknisi.*');
     $marketingActive = (request()->routeIs(['leads*', 'partners*', 'marketing.dashboard', 'whatsapp-center*']) && !request()->routeIs('leads.pipeline'));
@@ -25,8 +26,9 @@
     $salesItems = array_values(array_filter([
         $canViewSales ? ['route' => route('sales.dashboard'), 'match' => 'sales.dashboard', 'label' => 'Dashboard', 'dot' => 'bg-violet-400'] : null,
         $canViewSales ? ['route' => route('sales.my-leads'), 'match' => 'sales.my-leads', 'label' => 'My Leads', 'dot' => 'bg-amber-400'] : null,
-        $canViewSales ? ['route' => route('sales.meetings.index'), 'match' => 'sales.meetings.*', 'label' => 'Meeting', 'dot' => 'bg-blue-400'] : null,
         $canViewSales ? ['route' => route('sales.follow-ups.index'), 'match' => 'sales.follow-ups.*', 'label' => 'Follow Up', 'dot' => 'bg-green-400'] : null,
+        (auth()->user()->can('manage-inside-sales') || $canViewSales) ? ['route' => route('sales.schedules.index'), 'match' => 'sales.schedules.*', 'label' => 'Schedule', 'dot' => 'bg-teal-400'] : null,
+        (auth()->user()->can('manage-inside-sales') || $canViewSales) ? ['route' => route('sales.proposals.index'), 'match' => 'sales.proposals.*', 'label' => 'Proposal', 'dot' => 'bg-lime-400'] : null,
         $canViewSales ? ['route' => route('sales.pocs.index'), 'match' => 'sales.pocs.*', 'label' => 'POC/Demo', 'dot' => 'bg-orange-400'] : null,
         $canViewSales ? ['route' => route('leads.pipeline'), 'match' => 'leads.pipeline', 'label' => 'Pipeline', 'dot' => 'bg-sky-400'] : null,
         $hasSalesProject ? ['route' => route('projects.index'), 'match' => 'projects*', 'label' => 'Project', 'dot' => 'bg-cyan-400'] : null,
@@ -97,6 +99,15 @@
                         <x-icon name="users" class="h-5 w-5 shrink-0" />
                         <span>Customer</span>
                     </a>
+                    {{-- Monitoring lintas divisi: management, ceo, super-admin (via Gate::before) --}}
+                    @can('view-monitoring')
+                        <a wire:navigate.hover href="{{ route('monitoring.index') }}"
+                           aria-current="{{ $monitoringActive ? 'page' : 'false' }}"
+                           class="{{ $navLink }} {{ $monitoringActive ? $navActive : $navInactive }}">
+                            <x-icon name="chart-bar" class="h-5 w-5 shrink-0" />
+                            <span>Monitoring</span>
+                        </a>
+                    @endcan
                     {{-- AI Assistant SENGAJA full reload (tanpa wire:navigate):
                          halaman chat stateful; morph berisiko merusak riwayat/ketikan. --}}
                     <a href="{{ route('ai.assistant.index') }}"
@@ -419,6 +430,12 @@
                                class="{{ $navLink }} {{ request()->routeIs('knowledge-base*') ? $navActive : $navInactive }}">
                                 <x-icon name="book" class="h-5 w-5 shrink-0" />
                                 <span>Knowledge Base</span>
+                            </a>
+                            <a wire:navigate.hover href="{{ route('product-knowledge.index') }}"
+                               aria-current="{{ request()->routeIs('product-knowledge*') ? 'page' : 'false' }}"
+                               class="{{ $navLink }} {{ request()->routeIs('product-knowledge*') ? $navActive : $navInactive }}">
+                                <x-icon name="book" class="h-5 w-5 shrink-0" />
+                                <span>Product KB</span>
                             </a>
                         @endcan
 

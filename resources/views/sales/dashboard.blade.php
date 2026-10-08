@@ -37,7 +37,7 @@
                 </span>
             </div>
         </a>
-        <a href="{{ route('sales.meetings.index', ['date_from' => $weekStart ?? null, 'date_to' => $weekEnd ?? null]) }}"
+        <a href="{{ route('sales.follow-ups.index', ['date_from' => $weekStart ?? null, 'date_to' => $weekEnd ?? null]) }}"
            class="relative h-full flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-5 hover:shadow transition">
             <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-indigo-500/5"></div>
             <div class="relative flex items-start justify-between gap-2">
@@ -89,6 +89,33 @@
                 </span>
             </div>
         </a>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mb-6">
+        <div class="flex flex-wrap items-end justify-between gap-2 mb-4">
+            <div>
+                <h2 class="font-semibold text-slate-700 dark:text-slate-200">{{ __('Jadwal Saya') }}</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400">{{ __('Ringkasan agenda sales Anda.') }}</p>
+            </div>
+            <a href="{{ route('sales.schedules.index') }}" class="text-sm font-medium text-accent-600 hover:text-accent-500">{{ __('Lihat agenda') }}</a>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            @foreach(['today' => __('Today'), 'upcoming' => __('Upcoming'), 'completed' => __('Completed'), 'cancelled' => __('Cancelled')] as $key => $label)
+                <div class="rounded-xl border border-slate-200 dark:border-slate-600 px-4 py-3">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ $label }}</p>
+                    <p class="mt-1.5 text-2xl font-extrabold text-slate-800 dark:text-white">{{ $scheduleSummary[$key] ?? 0 }}</p>
+                </div>
+            @endforeach
+        </div>
+        @if(($scheduleTypes ?? collect())->isNotEmpty())
+            <div class="flex flex-wrap gap-2 mt-3">
+                @foreach($scheduleTypes as $type => $total)
+                    <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-800">
+                        {{ \App\Models\SalesSchedule::typeLabel($type) }}: {{ $total }}
+                    </span>
+                @endforeach
+            </div>
+        @endif
     </div>
 
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-600 p-6 mb-6" data-reveal>

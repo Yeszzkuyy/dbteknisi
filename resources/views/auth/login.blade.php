@@ -363,6 +363,9 @@
                         aria-hidden="true"
                         loading="eager"
                         decoding="async"
+                        fetchpriority="high"
+                        width="1024"
+                        height="1024"
                     >
                 </picture>
             </aside>
@@ -464,9 +467,6 @@
                     </button>
                 </form>
 
-                @if (Route::has('register'))
-                    <p class="foot" style="--i:5">Not registered yet? <a class="login-link" href="{{ route('register') }}">Create an account</a></p>
-                @endif
             </div>
         </section>
     </main>

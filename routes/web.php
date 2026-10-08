@@ -14,9 +14,11 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadTaskController;
 use App\Http\Controllers\ManageSalesController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\MeetingDraftController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficeAssistantController;
+use App\Http\Controllers\ProductKnowledgeController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PocController;
 use App\Http\Controllers\ProfileController;
@@ -25,8 +27,11 @@ use App\Http\Controllers\ProjectDocumentController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectSupportController;
 use App\Http\Controllers\ProjectTaskController;
+use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\PushSubscriptionController;
+use App\Http\Controllers\SalesScheduleController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\TechnicalRequestController;
 use App\Http\Controllers\TechnicianDashboardController;
 use App\Http\Controllers\TechnicianScheduleController;
 use App\Http\Controllers\TrashController;
@@ -73,7 +78,10 @@ Route::middleware('auth')->group(function () {
     // AI ASSISTANT (OfficeAssistant)
     // ============================================
     Route::get('/ai/assistant', [OfficeAssistantController::class, 'index'])->name('ai.assistant.index');
-    Route::post('/ai/assistant', [OfficeAssistantController::class, 'send'])->name('ai.assistant.send');
+    // LLM berbayar + upload 30MB: throttle agar tidak di-spam.
+    Route::post('/ai/assistant', [OfficeAssistantController::class, 'send'])
+        ->middleware('throttle:30,1')
+        ->name('ai.assistant.send');
     Route::get('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'showConversation'])->name('ai.assistant.conversations.show');
     Route::patch('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'renameConversation'])->name('ai.assistant.conversations.rename');
     Route::delete('/ai/assistant/conversations/{conversation}', [OfficeAssistantController::class, 'destroyConversation'])->name('ai.assistant.conversations.destroy');
@@ -86,6 +94,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [KnowledgeBaseController::class, 'store'])->name('store');
         Route::post('/sync', [KnowledgeBaseController::class, 'sync'])->name('sync');
         Route::delete('/{document}', [KnowledgeBaseController::class, 'destroy'])->name('destroy');
+    });
+
+    // ============================================
+    // PRODUCT KNOWLEDGE BASE (AI / RAG) — Admin only
+    // ============================================
+    Route::middleware('permission:manage-admin')->prefix('product-knowledge')->name('product-knowledge.')->group(function () {
+        Route::get('/', [ProductKnowledgeController::class, 'index'])->name('index');
+        Route::post('/import', [ProductKnowledgeController::class, 'import'])->name('import');
+        Route::delete('/products/bulk', [ProductKnowledgeController::class, 'bulkDestroy'])->name('bulk-destroy');
+        Route::get('/products/{product}', [ProductKnowledgeController::class, 'show'])->name('show');
+        Route::patch('/products/{product}', [ProductKnowledgeController::class, 'update'])->name('update');
+        Route::patch('/products/{product}/publish', [ProductKnowledgeController::class, 'publish'])->name('publish');
+        Route::delete('/sources/{source}', [ProductKnowledgeController::class, 'destroySource'])->name('sources.destroy');
+        Route::patch('/products/{product}/reject', [ProductKnowledgeController::class, 'reject'])->name('reject');
+        Route::post('/sources/{source}/refetch', [ProductKnowledgeController::class, 'refetch'])->name('refetch');
     });
 
     // ============================================
@@ -129,6 +152,57 @@ Route::middleware('auth')->group(function () {
 
         // Follow Up create with optional pre-selected customer/meeting
         Route::get('follow-ups/create/{customer?}', [FollowUpController::class, 'create'])->name('follow-ups.create-with-customer');
+
+        // AI daily meeting drafts (generate → approve/discard)
+        Route::post('meeting-drafts', [MeetingDraftController::class, 'generate'])->name('meeting-drafts.generate');
+        Route::post('meeting-drafts/{meetingDraft}/approve', [MeetingDraftController::class, 'approve'])->name('meeting-drafts.approve');
+        Route::post('meeting-drafts/{meetingDraft}/discard', [MeetingDraftController::class, 'discard'])->name('meeting-drafts.discard');
+    });
+
+    // ============================================
+    // SALES FLOW — Jadwal Sales, Technical Request, Proposal
+    // Tulis: sales & inside-sales. Aksi teknisi di blok manage-technician.
+    // ============================================
+    Route::middleware('permission:manage-sales|manage-inside-sales')->prefix('sales')->name('sales.')->group(function () {
+        Route::get('schedules/create', [SalesScheduleController::class, 'create'])->name('schedules.create');
+        Route::post('schedules', [SalesScheduleController::class, 'store'])->name('schedules.store');
+        Route::get('schedules/{schedule}/edit', [SalesScheduleController::class, 'edit'])->name('schedules.edit');
+        Route::put('schedules/{schedule}', [SalesScheduleController::class, 'update'])->name('schedules.update');
+        Route::post('schedules/{schedule}/complete', [SalesScheduleController::class, 'complete'])->name('schedules.complete');
+        Route::post('schedules/{schedule}/cancel', [SalesScheduleController::class, 'cancel'])->name('schedules.cancel');
+
+        Route::get('technical-requests/create', [TechnicalRequestController::class, 'create'])->name('technical-requests.create');
+        Route::post('technical-requests', [TechnicalRequestController::class, 'store'])->name('technical-requests.store');
+        Route::post('technical-requests/{technicalRequest}/cancel', [TechnicalRequestController::class, 'cancel'])->name('technical-requests.cancel');
+
+        Route::get('proposals/create', [ProposalController::class, 'create'])->name('proposals.create');
+        Route::post('proposals', [ProposalController::class, 'store'])->name('proposals.store');
+        Route::get('proposals/{proposal}/edit', [ProposalController::class, 'edit'])->name('proposals.edit');
+        Route::put('proposals/{proposal}', [ProposalController::class, 'update'])->name('proposals.update');
+        Route::post('proposals/{proposal}/ready', [ProposalController::class, 'markReady'])->name('proposals.ready');
+        Route::post('proposals/{proposal}/send', [ProposalController::class, 'send'])->name('proposals.send');
+        Route::post('proposals/{proposal}/viewed', [ProposalController::class, 'markViewed'])->name('proposals.viewed');
+        Route::post('proposals/{proposal}/revise', [ProposalController::class, 'revise'])->name('proposals.revise');
+        Route::post('proposals/{proposal}/respond', [ProposalController::class, 'respond'])->name('proposals.respond');
+        Route::post('proposals/{proposal}/cancel', [ProposalController::class, 'cancel'])->name('proposals.cancel');
+    });
+
+    Route::middleware('permission:view-sales|manage-sales|manage-inside-sales|manage-technician')->prefix('sales')->name('sales.')->group(function () {
+        Route::get('schedules', [SalesScheduleController::class, 'index'])->name('schedules.index');
+        Route::get('schedules/{schedule}', [SalesScheduleController::class, 'show'])->name('schedules.show');
+        Route::get('technical-requests/{technicalRequest}', [TechnicalRequestController::class, 'show'])->name('technical-requests.show');
+        Route::get('technical-requests/{technicalRequest}/attachment', [TechnicalRequestController::class, 'downloadAttachment'])->name('technical-requests.attachment');
+        Route::get('proposals', [ProposalController::class, 'index'])->name('proposals.index');
+        Route::get('proposals/{proposal}', [ProposalController::class, 'show'])->name('proposals.show');
+        Route::get('proposals/{proposal}/preview', [ProposalController::class, 'preview'])->name('proposals.preview');
+    });
+
+    Route::middleware('permission:manage-technician')->prefix('sales')->name('sales.')->group(function () {
+        Route::post('technical-requests/{technicalRequest}/review', [TechnicalRequestController::class, 'review'])->name('technical-requests.review');
+        Route::post('technical-requests/{technicalRequest}/assign', [TechnicalRequestController::class, 'assign'])->name('technical-requests.assign');
+        Route::post('technical-requests/{technicalRequest}/progress', [TechnicalRequestController::class, 'progress'])->name('technical-requests.progress');
+        Route::post('technical-requests/{technicalRequest}/result', [TechnicalRequestController::class, 'result'])->name('technical-requests.result');
+        Route::post('technical-requests/{technicalRequest}/complete', [TechnicalRequestController::class, 'complete'])->name('technical-requests.complete');
     });
 
     Route::middleware('permission:view-sales|manage-sales')->prefix('sales')->name('sales.')->group(function () {
@@ -227,16 +301,14 @@ Route::middleware('auth')->group(function () {
     // ============================================
     // ADMIN — Trash
     // ============================================
-    Route::middleware('permission:manage-admin')->group(function () {
+    // Modul Trash: gate view-trash, kepemilikan dijaga Policy di backend.
+    Route::middleware('permission:view-trash')->group(function () {
+        Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
         Route::patch('/trash/customers/{id}/restore', [TrashController::class, 'restoreCustomer'])->name('trash.restore-customer');
         Route::patch('/trash/projects/{id}/restore', [TrashController::class, 'restoreProject'])->name('trash.restore-project');
         Route::delete('/trash/customers/{id}/delete', [TrashController::class, 'destroyCustomer'])->name('trash.destroy-customer');
         Route::delete('/trash/projects/{id}/delete', [TrashController::class, 'destroyProject'])->name('trash.destroy-project');
         Route::delete('/trash/clear', [TrashController::class, 'clear'])->name('trash.clear');
-    });
-
-    Route::middleware('permission:view-admin|manage-admin|view-trash')->group(function () {
-        Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
     });
 
     // ============================================
@@ -261,6 +333,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/payments/create', [AdminController::class, 'paymentsCreate'])->name('payments.create');
         Route::post('/payments', [AdminController::class, 'paymentsStore'])->name('payments.store');
         Route::delete('/payments/{payment}', [AdminController::class, 'paymentsDestroy'])->name('payments.destroy');
+        // Bukti transfer memuat nomor rekening — hanya manage-admin (bukan view-only).
+        Route::get('/payments/{payment}/proof', [AdminController::class, 'paymentsProof'])->name('payments.proof');
     });
 
     Route::middleware('permission:view-admin|manage-admin')->prefix('admin')->name('admin.')->group(function () {
@@ -270,7 +344,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/pos/{purchaseOrder}', [AdminController::class, 'posShow'])->name('pos.show');
         Route::get('/payments', [AdminController::class, 'paymentsIndex'])->name('payments.index');
         Route::get('/payments/{payment}', [AdminController::class, 'paymentsShow'])->name('payments.show');
-        Route::get('/payments/{payment}/proof', [AdminController::class, 'paymentsProof'])->name('payments.proof');
     });
 
     // ============================================
@@ -283,7 +356,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
         Route::get('/leads/import', [LeadController::class, 'importForm'])->name('leads.import');
-        Route::post('/leads/import', [LeadController::class, 'import'])->name('leads.import.execute');
+        // Parse xlsx di memori: throttle agar tidak di-DoS.
+        Route::post('/leads/import', [LeadController::class, 'import'])
+            ->middleware('throttle:6,1')
+            ->name('leads.import.execute');
 
         // Data Partner (supplier, vendor, kontraktor, partner, distributor)
         Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
@@ -359,6 +435,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{account}/contacts', [WhatsAppCenterController::class, 'saveContact'])->name('contact-save');
             Route::post('/{account}/simulate', [WhatsAppCenterController::class, 'simulate'])->name('simulate');
             Route::put('/{account}/credentials', [WhatsAppCenterController::class, 'updateCredentials'])->name('credentials');
+            Route::put('/{account}/bot-settings', [WhatsAppCenterController::class, 'updateBotSettings'])->name('bot-settings');
         });
     });
 
@@ -463,4 +540,5 @@ require __DIR__.'/auth.php';
 // Webhook gateway WhatsApp (dipanggil provider/gateway). CSRF dikecualikan
 // di bootstrap/app.php lewat validateCsrfTokens(except: ['api/whatsapp/webhook']).
 Route::get('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'verifyWebhook']);
-Route::post('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'webhook']);
+Route::post('/api/whatsapp/webhook', [WhatsAppCenterController::class, 'webhook'])
+    ->middleware('throttle:60,1');

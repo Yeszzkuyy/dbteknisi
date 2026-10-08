@@ -47,7 +47,7 @@ class LeadLifecycleTest extends TestCase
         ])->assertRedirect(route('leads.index'));
         $lead = Lead::whereHas('customer', fn ($q) => $q->where('name', 'PT Lifecycle'))->first();
         $this->assertNotNull($lead);
-        $this->assertSame('new', $lead->status);
+        $this->assertSame('cool', $lead->status);
         // management diberi tahu (belum di-assign)
         $this->assertTrue($mgmt->notifications()->where('type', 'App\Notifications\NewLeadNotification')->exists());
 
@@ -96,7 +96,7 @@ class LeadLifecycleTest extends TestCase
         $this->assertTrue($sales->notifications()->where('type', 'App\Notifications\LeadTaskNotification')->exists());
 
         // 7. Proposal stage + dokumen kategori proposal
-        $this->actingAs($sales)->patch(route('leads.update-status', $lead), ['status' => 'proposal'])
+        $this->actingAs($sales)->patch(route('leads.update-status', $lead), ['status' => 'hot'])
             ->assertNoContent();
         \Illuminate\Support\Facades\Storage::fake('private');
         \Illuminate\Support\Facades\Storage::disk('private')->put('leads/1/q.pdf', 'isi');
@@ -129,7 +129,7 @@ class LeadLifecycleTest extends TestCase
     {
         $marketing = $this->userWithRole('marketing');
         $customer = Customer::create(['name' => 'PT Gagal']);
-        $lead = Lead::create(['customer_id' => $customer->id, 'pt_group' => 'NTI', 'segment' => 'vendor', 'status' => 'proposal']);
+        $lead = Lead::create(['customer_id' => $customer->id, 'pt_group' => 'NTI', 'segment' => 'vendor', 'status' => 'hot']);
 
         $this->actingAs($marketing)->patch(route('leads.update-status', $lead), ['status' => 'lost'])
             ->assertNoContent();

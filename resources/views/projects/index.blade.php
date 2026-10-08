@@ -73,10 +73,8 @@
                                        title="{{ __('Detail project') }}"
                                        aria-label="{{ __('Detail project') }}"
                                        class="group/btn relative overflow-hidden p-2 rounded-lg bg-accent-50 hover:bg-accent-100 text-accent-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
-                                        <img src="{{ asset('icons/lead-view.svg') }}" alt="" loading="lazy"
-                                             class="block h-5 w-5 group-hover/btn:hidden" />
-                                        <img src="{{ asset('icons/lead-view.gif') }}" alt="" loading="lazy"
-                                             class="hidden h-5 w-5 group-hover/btn:block" />
+                                        <img src="{{ asset('icons/lead-view.svg') }}" alt="" loading="lazy" decoding="async" width="20" height="20"
+                                             class="block h-5 w-5" />
                                         <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                     </a>
                                     @can('manage-technician')
@@ -84,10 +82,8 @@
                                            title="{{ __('Edit project') }}"
                                            aria-label="{{ __('Edit project') }}"
                                            class="group/btn relative overflow-hidden p-2 rounded-lg bg-accent-100 hover:bg-accent-200 text-accent-700 transition-all duration-300 hover:scale-110 hover:shadow-md active:scale-95">
-                                            <img src="{{ asset('icons/lead-edit.svg') }}" alt="" loading="lazy"
-                                                 class="block h-5 w-5 group-hover/btn:hidden" />
-                                            <img src="{{ asset('icons/lead-edit.gif') }}" alt="" loading="lazy"
-                                                 class="hidden h-5 w-5 group-hover/btn:block" />
+                                            <img src="{{ asset('icons/lead-edit.svg') }}" alt="" loading="lazy" decoding="async" width="20" height="20"
+                                                 class="block h-5 w-5" />
                                             <span class="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 ease-out group-hover/btn:translate-x-full" aria-hidden="true"></span>
                                         </a>
                                     @endcan
@@ -103,6 +99,7 @@
                     @endforelse
                 </tbody>
             </table>
+        <div class="mt-4">{{ $projects->links() }}</div>
         </div>
     </div>
 </div>

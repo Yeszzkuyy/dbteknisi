@@ -9,7 +9,14 @@ class FollowUp extends Model
 {
     use SoftDeletes;
 
-    public const TYPES = ['follow_up', 'call', 'whatsapp', 'email', 'meeting', 'note'];
+    /**
+     * Pilihan cara menghubungi yang ditawarkan di form (tanpa 'follow_up'
+     * dan 'meeting' yang tumpang tindih dengan nama menu/fitur).
+     * Nilai lama tetap valid dibaca, tapi tidak ditawarkan lagi.
+     */
+    public const CONTACT_TYPES = ['call', 'whatsapp', 'email', 'note'];
+
+    public const LEGACY_TYPES = ['follow_up', 'meeting'];
 
     protected $fillable = [
         'customer_id',

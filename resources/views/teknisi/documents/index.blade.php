@@ -57,6 +57,7 @@
                     @endforelse
                 </tbody>
             </table>
+        <div class="mt-4">{{ $documents->links() }}</div>
         </div>
     </div>
 </div>
