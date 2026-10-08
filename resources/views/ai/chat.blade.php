@@ -311,7 +311,7 @@
         .ai-header-new:hover{border-color:rgb(var(--accent-300) / 1);color:rgb(var(--accent-700) / 1);background:rgb(var(--accent-50) / 1)}
         .dark .ai-header-new:hover{color:rgb(var(--accent-200) / 1);background:rgb(var(--accent-600) / .15)}
         .ai-header-new svg{width:1rem;height:1rem}
-        .ai-conversation{display:flex;min-height:0;flex:1;flex-direction:column;gap:1.4rem;overflow-y:auto;overflow-x:hidden;padding:clamp(1rem,3vw,2.25rem) clamp(1rem,5vw,5rem) 1rem}
+        .ai-conversation{display:flex;min-height:0;flex:1;flex-direction:column;gap:.75rem;overflow-y:auto;overflow-x:hidden;padding:clamp(.75rem,2vw,1.25rem) clamp(1rem,5vw,5rem) 1rem}
         .ai-message{width:100%;max-width:58rem;margin:0 auto}
         .ai-assistant-row{display:flex;align-items:flex-start;gap:.8rem}
         .ai-message-avatar{width:1.8rem;height:1.8rem;margin-top:.05rem;border-radius:.55rem}
@@ -319,7 +319,7 @@
         .ai-message-author{margin-bottom:.35rem;color:var(--text-secondary);font-size:.73rem;font-weight:700}
         .ai-message-body .md{color:var(--text-primary);font-size:.9rem;line-height:1.65}
         .ai-user-row{display:flex;justify-content:flex-end}
-        .ai-user-bubble{width:fit-content;max-width:min(60%,30rem);padding:.7rem .95rem;border:1px solid rgb(var(--accent-400) / .22);border-radius:1rem 1rem .25rem 1rem;color:var(--text-primary);background:rgb(var(--accent-50) / 1);font-size:.9rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+        .ai-user-bubble{width:fit-content;max-width:min(60%,30rem);padding:.55rem .95rem;border:1px solid rgb(var(--accent-400) / .22);border-radius:1rem 1rem .25rem 1rem;color:var(--text-primary);background:rgb(var(--accent-50) / 1);font-size:.9rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
         .dark .ai-user-bubble{border-color:rgb(var(--accent-400) / .22);color:rgb(var(--accent-100) / 1);background:rgb(var(--accent-600) / .18)}
         .ai-sources,.ai-message-files{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.65rem}
         .ai-source-chip,.ai-file-chip{display:inline-flex;align-items:center;gap:.35rem;max-width:100%;padding:.25rem .5rem;border:1px solid var(--card-border);border-radius:.45rem;color:var(--text-secondary);background:var(--card-bg-hover);font-size:.7rem}
