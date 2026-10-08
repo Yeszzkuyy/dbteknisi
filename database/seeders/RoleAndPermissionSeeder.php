@@ -143,5 +143,10 @@ class RoleAndPermissionSeeder extends Seeder
         // === 5. Kembalikan super-admin yang hilang akibat wipe (kolom role=guest tapi tadinya super-admin) ===
         User::whereIn('id', $prevSuperAdmins)->get()
             ->each(fn (User $u) => $u->hasRole('super-admin') ?: $u->assignRole('super-admin'));
+
+        // Forget di AWAL saja tidak cukup: seeder tidak transaksional — request web
+        // yang datang di tengah (saat roles/permissions ke-reset) bisa meng-cache
+        // kondisi setengah jadi selama 24 jam → user kehilangan menu/403 padahal DB benar.
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }
