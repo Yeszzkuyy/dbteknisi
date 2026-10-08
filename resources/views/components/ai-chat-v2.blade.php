@@ -279,8 +279,11 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             return { left: window.innerWidth - 24 - 56, top: window.innerHeight - 24 - 56 };
         },
         triggerStyle() {
+            // WAJIB object (bukan string): :style string menimpa seluruh
+            // atribut style sehingga display:none milik x-show terhapus —
+            // jendela/bubble bisa nongol sendiri habis digeser.
             const p = this.triggerPos();
-            return `left:${p.left}px;top:${p.top}px;`;
+            return { left: `${p.left}px`, top: `${p.top}px` };
         },
         chatGeom() {
             const vw = window.innerWidth, vh = window.innerHeight;
@@ -292,9 +295,12 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             return { left, top, w, h };
         },
         chatStyle() {
+            // Object form (lihat triggerStyle): aman terhadap x-show.
+            // Sisa right/bottom saat pindah desktop↔mobile diabaikan browser
+            // (over-constrained LTR) — width/height selalu di-set eksplisit.
             const g = this.chatGeom();
-            if (!g) return `left:12px;right:12px;top:64px;bottom:12px;width:auto;`;
-            return `left:${g.left}px;top:${g.top}px;width:${g.w}px;height:${g.h}px;`;
+            if (!g) return { left: '12px', right: '12px', top: '64px', bottom: '12px', width: 'auto', height: 'auto' };
+            return { left: `${g.left}px`, top: `${g.top}px`, width: `${g.w}px`, height: `${g.h}px` };
         },
         dragStart(e) {
             if (e.pointerType === 'mouse' && e.button !== undefined && e.button !== 0) return;
