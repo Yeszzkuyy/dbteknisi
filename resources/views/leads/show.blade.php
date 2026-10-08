@@ -1,7 +1,17 @@
 <x-app-layout>
     <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800">{{ __('Detail Lead') }}: {{ $lead->customer?->name ?? '-' }}</h1>
+            <h1 class="text-3xl font-bold text-slate-800">{{ __('Detail Lead') }}:
+                @canany(['view-customer', 'view-sales', 'manage-sales'])
+                    @if($lead->customer)
+                        <a href="{{ route('customers.show', $lead->customer) }}" class="text-accent-600 hover:text-accent-500 hover:underline">{{ $lead->customer->name }}</a>
+                    @else
+                        -
+                    @endif
+                @else
+                    {{ $lead->customer?->name ?? '-' }}
+                @endcanany
+            </h1>
             <p class="text-slate-500 mt-1">{{ __('Informasi lengkap lead / opportunity') }}</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
@@ -102,6 +112,17 @@
                     <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ \App\Models\Partner::TYPE_DOTS[$lead->partner->type] ?? '#94a3b8' }}"></span>
                     {{ $lead->partner->name }}
                 </span>
+            @endif
+            @php
+                $doneFollowUps = $lead->followUps->whereNotNull('completed_at');
+                $nextFollowUp = $lead->followUps->whereNull('completed_at')->whereNotNull('next_follow_up_date')->sortBy('next_follow_up_date')->first();
+                $isFuOverdue = $nextFollowUp && $nextFollowUp->next_follow_up_date->lt(today());
+            @endphp
+            @if($doneFollowUps->isNotEmpty())
+                <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">{{ __('Done') }}</span>
+            @endif
+            @if($nextFollowUp)
+                <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold {{ $isFuOverdue ? 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' }}">{{ __('FU') }}: {{ $nextFollowUp->next_follow_up_date->format('d M Y') }}{{ $isFuOverdue ? ' • ' . __('Overdue') : '' }}</span>
             @endif
         </div>
         <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
@@ -290,6 +311,9 @@
                         <x-icon name="receipt" class="h-5 w-5 text-slate-400" />
                         {{ __('Penawaran') }}
                         <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">{{ $proposalsList->count() }}</span>
+                        @if($proposalsList->isNotEmpty())
+                            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Rp {{ number_format($proposalsList->sum('grand_total'), 0, ',', '.') }}</span>
+                        @endif
                     </h2>
                     @if($canSalesWrite)
                         <a href="{{ route('sales.proposals.create', ['lead_id' => $lead->id]) }}" title="{{ __('Add proposal') }}" aria-label="{{ __('Add proposal') }}"
@@ -516,7 +540,20 @@
                     </div>
                     <div>
                         <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('No WA') }}</dt>
-                        <dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{{ $lead->customer?->whatsapp ?? '-' }}</dd>
+                        @php($waLink = $lead->customer?->waLink() ?? null)
+                        <dd class="mt-1 flex items-center gap-2 text-sm text-slate-900 dark:text-slate-100">
+                            @if($waLink)
+                                <a href="{{ $waLink }}" target="_blank" rel="noopener" class="hover:underline">{{ $lead->customer->whatsapp }}</a>
+                                <a href="{{ $waLink }}" target="_blank" rel="noopener" title="WhatsApp" aria-label="WhatsApp"
+                                   class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true">
+                                        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m5.83 14.12c-.25.7-1.45 1.33-2.02 1.42-.52.08-1.17.12-1.89-.12-.44-.15-1-.39-1.71-.75-3.03-1.39-5-4.63-5.15-4.84-.15-.21-1.23-1.64-1.23-3.13 0-1.49.78-2.22 1.06-2.52.28-.3.61-.38.81-.38l.58.01c.19.01.44-.07.69.53.25.61.86 2.11.94 2.26.08.15.13.33.03.53-.1.2-.15.33-.3.51l-.45.53c-.15.15-.31.31-.13.61.18.3.8 1.32 1.71 2.14 1.18 1.06 2.17 1.39 2.48 1.55.3.15.48.13.66-.08l1.1-1.28c.2-.26.42-.22.71-.13.3.09 1.9.9 2.23 1.06.38.2.53.44.5.65-.27.69-.52.98-.73 1.23"/>
+                                    </svg>
+                                </a>
+                            @else
+                                {{ $lead->customer?->whatsapp ?? '-' }}
+                            @endif
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-xs font-semibold text-slate-400 uppercase tracking-wide">{{ __('Email') }}</dt>
