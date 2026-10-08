@@ -1,8 +1,9 @@
 {{-- 3DY AI Chat V2: floating assistant (pengganti ai-assistant lama).
-      Launcher bisa digeser (posisi tersimpan per user di localStorage);
-      jendela chat selalu menempel di samping launcher. Berbicara ke
-      endpoint existing POST ai.assistant.send. File lama
-      components/ai-assistant.blade.php dipertahankan tapi tidak di-mount. --}}
+      Launcher bisa digeser (posisi tersimpan per user); jendela menempel
+      di samping launcher dengan offset manual via header (ikut pindah
+      saat launcher digeser). Berbicara ke endpoint existing
+      POST ai.assistant.send. File lama components/ai-assistant.blade.php
+      dipertahankan tapi tidak di-mount. --}}
 @auth
 @php($v2Convos = auth()->user()->conversations()->latest('updated_at')->take(20)->get(['id', 'title', 'updated_at'])->map(fn ($c) => ['id' => $c->id, 'title' => $c->title ?: __('Percakapan baru'), 'updated_at' => $c->updated_at?->toISOString()])->values()->all())
 @persist('ai-chat-v2')
@@ -17,9 +18,9 @@
             x-transition:enter="transition ease-out duration-150"
             x-transition:enter-start="opacity-0 scale-90"
             x-transition:enter-end="opacity-100 scale-100"
-            @pointerdown="dragStart($event)"
-            @pointermove="dragMove($event)"
-            @pointerup="dragEnd($event)"
+            @pointerdown="dragStart($event, 'launcher')"
+            @pointermove="dragMove($event, 'launcher')"
+            @pointerup="dragEnd($event, 'launcher')"
             @pointercancel="dragCancel()"
             @click.capture.stop="guardClick($event)"
             :style="triggerStyle()"
@@ -29,7 +30,7 @@
         <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" /></svg>
     </button>
 
-    {{-- Chat window (selalu menempel launcher) --}}
+    {{-- Chat window (menempel launcher + offset manual via header) --}}
     <div x-show="open" x-cloak
          x-transition:enter="transition ease-out duration-150"
          x-transition:enter-start="opacity-0 scale-95 translate-y-2"
@@ -40,8 +41,12 @@
          :style="chatStyle()"
          class="fixed z-[1000] flex h-[560px] max-h-[calc(100dvh-8rem)] w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800"
          role="dialog" aria-modal="false" aria-label="3DY AI">
-        {{-- Header --}}
-        <div class="flex items-center gap-2.5 border-b border-slate-200 bg-gradient-to-r from-accent-700 via-accent-600 to-accent-500 px-4 py-3 text-white dark:border-slate-700">
+        {{-- Header (gagang geser offset; tombol di dalamnya tetap diklik biasa) --}}
+        <div @pointerdown="dragStart($event, 'chat')"
+             @pointermove="dragMove($event, 'chat')"
+             @pointerup="dragEnd($event, 'chat')"
+             @pointercancel="dragCancel()"
+             class="flex cursor-grab touch-none select-none items-center gap-2.5 border-b border-slate-200 bg-gradient-to-r from-accent-700 via-accent-600 to-accent-500 px-4 py-3 text-white active:cursor-grabbing dark:border-slate-700">
             <span class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20" aria-hidden="true">
                 <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /></svg>
                 <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
@@ -195,13 +200,15 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
         messages: [], draft: '', conversationId: null, lastUserText: '',
         convos: initialConvos || [], showList: false, loadingConvo: false,
         __inited: false,
-        // Posisi launcher (tersimpan per user). Jendela selalu menempel launcher.
-        pos: null,
-        dragging: false, moved: false, suppressUntil: 0,
-        sx: 0, sy: 0, ox: 0, oy: 0,
+        // Posisi launcher (tersimpan per user) + offset manual jendela
+        // dari jangkarnya (tersimpan per user). Jendela = jangkar + offset.
+        pos: null, chatOff: null,
+        dragging: false, dragWhich: null, moved: false, suppressUntil: 0,
+        sx: 0, sy: 0, ox: 0, oy: 0, ax: 0, ay: 0,
         quicks: @js([__('Jelaskan data server saya'), __('Bantu analisis masalah'), __('Buatkan kode Laravel'), __('Jelaskan konsep jaringan')]),
         key() { return '3dy.ai.v2.conv.' + this.uid; },
         posKey() { return '3dy.ai.v2.pos.' + this.uid; },
+        chatOffKey() { return '3dy.ai.v2.chatoff.' + this.uid; },
         init() {
             // Idempoten: aman bila x-init jalan ulang habis morph Livewire.
             if (this.__inited) return;
@@ -210,8 +217,12 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
                 const saved = JSON.parse(localStorage.getItem(this.posKey()) || 'null');
                 if (saved && typeof saved.left === 'number') this.pos = saved;
             } catch (e) {}
+            try {
+                const savedOff = JSON.parse(localStorage.getItem(this.chatOffKey()) || 'null');
+                if (savedOff && typeof savedOff.dx === 'number') this.chatOff = savedOff;
+            } catch (e) {}
             // Bersih-bersih key posisi jendela mandiri (era jendela draggable) —
-            // jendela kini selalu menempel launcher.
+            // kini jendela = jangkar + offset.
             try { localStorage.removeItem('3dy.ai.v2.chatpos.' + this.uid); } catch (e) {}
             try { this.conversationId = localStorage.getItem(this.key()) || null; } catch (e) { this.conversationId = null; }
             // ID simpanan yang sudah tak ada di daftar (mis. dihapus dari halaman AI) dibuang.
@@ -276,8 +287,10 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             try { localStorage.removeItem(this.key()); } catch (e) {}
             this.$nextTick(() => this.resize());
         },
-        // --- Geser launcher (satu-satunya yang draggable). Pola: threshold
-        // 10px, klik tertelan bila habis drag; keyboard (detail 0) membuka.
+        // --- Geser: launcher pindah jangkar, header jendela set offset.
+        // Pola: threshold 10px, klik launcher tertelan bila habis drag;
+        // keyboard (detail 0) selalu membuka.
+        isNarrow() { return window.innerWidth < 640; },
         clamp(p, w, h) {
             const vw = window.innerWidth, vh = window.innerHeight;
             return {
@@ -299,7 +312,7 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             const p = this.triggerPos();
             return { left: `${p.left}px`, top: `${p.top}px` };
         },
-        chatGeom() {
+        anchorGeom() {
             const vw = window.innerWidth, vh = window.innerHeight;
             if (vw < 640) return null;
             const w = Math.min(400, vw - 24), h = Math.min(560, vh - 24);
@@ -307,6 +320,13 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             const left = (p.left + 56 + 12 + w <= vw) ? p.left + 56 + 12 : Math.max(p.left - 12 - w, 12);
             const top = Math.min(Math.max(p.top + 56 - h, 12), vh - h - 12);
             return { left, top, w, h };
+        },
+        chatGeom() {
+            const g = this.anchorGeom();
+            if (!g) return null;
+            if (!this.chatOff) return g;
+            const p = this.clamp({ left: g.left + this.chatOff.dx, top: g.top + this.chatOff.dy }, g.w, g.h);
+            return { ...p, w: g.w, h: g.h };
         },
         chatStyle() {
             // Object form (lihat triggerStyle): aman terhadap x-show.
@@ -316,35 +336,53 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             if (!g) return { left: '12px', right: '12px', top: '64px', bottom: '12px', width: 'auto', height: 'auto' };
             return { left: `${g.left}px`, top: `${g.top}px`, width: `${g.w}px`, height: `${g.h}px` };
         },
-        dragStart(e) {
+        dragStart(e, which) {
+            if (which === 'chat' && (this.isNarrow() || e.target?.closest?.('button'))) return;
             if (e.pointerType === 'mouse' && e.button !== undefined && e.button !== 0) return;
-            this.dragging = true; this.moved = false;
+            this.dragging = true; this.dragWhich = which; this.moved = false;
             this.sx = e.clientX; this.sy = e.clientY;
-            const p = this.triggerPos();
-            this.ox = p.left; this.oy = p.top;
+            if (which === 'chat') {
+                const g = this.chatGeom();
+                if (!g) { this.dragging = false; this.dragWhich = null; return; }
+                const a = this.anchorGeom();
+                this.ox = g.left; this.oy = g.top; this.ax = a.left; this.ay = a.top;
+            } else {
+                const p = this.triggerPos();
+                this.ox = p.left; this.oy = p.top;
+            }
             e.currentTarget.setPointerCapture?.(e.pointerId);
         },
-        dragMove(e) {
-            if (!this.dragging) {
+        dragMove(e, which) {
+            if (!this.dragging || this.dragWhich !== which) {
                 // Pengaman: pointermove tiba dengan tombol ditekan di atas
                 // launcher tetapi dragStart() terlewat — mulai dari sini.
-                if ((e.buttons & 1) && e.target?.closest?.('.aiv2-launcher')) this.dragStart(e);
+                if (which === 'launcher' && (e.buttons & 1) && e.target?.closest?.('.aiv2-launcher')) this.dragStart(e, which);
                 return;
             }
             if (Math.hypot(e.clientX - this.sx, e.clientY - this.sy) > 10) this.moved = true;
             if (!this.moved) return;
-            this.pos = this.clamp({ left: this.ox + e.clientX - this.sx, top: this.oy + e.clientY - this.sy }, 56, 56);
+            if (which === 'chat') {
+                const g = this.anchorGeom();
+                const p = this.clamp({ left: this.ox + e.clientX - this.sx, top: this.oy + e.clientY - this.sy }, g.w, g.h);
+                this.chatOff = { dx: Math.round(p.left - g.left), dy: Math.round(p.top - g.top) };
+            } else {
+                this.pos = this.clamp({ left: this.ox + e.clientX - this.sx, top: this.oy + e.clientY - this.sy }, 56, 56);
+            }
         },
-        dragEnd(e) {
-            if (!this.dragging) return;
-            this.dragging = false;
+        dragEnd(e, which) {
+            if (!this.dragging || this.dragWhich !== which) return;
+            this.dragging = false; this.dragWhich = null;
             const dx = (e.clientX ?? this.sx) - this.sx, dy = (e.clientY ?? this.sy) - this.sy;
             if (!this.moved && Math.hypot(dx, dy) <= 10) return;
             // Telan klik sintetis susulan (lambat di HP/WebView) tanpa timer race.
-            this.suppressUntil = Date.now() + 600;
-            try { localStorage.setItem(this.posKey(), JSON.stringify(this.triggerPos())); } catch (err) {}
+            // Hanya relevan untuk launcher (header tak punya aksi klik).
+            if (which === 'launcher') this.suppressUntil = Date.now() + 600;
+            try {
+                if (which === 'chat') localStorage.setItem(this.chatOffKey(), JSON.stringify(this.chatOff));
+                else localStorage.setItem(this.posKey(), JSON.stringify(this.triggerPos()));
+            } catch (err) {}
         },
-        dragCancel() { this.dragging = false; },
+        dragCancel() { this.dragging = false; this.dragWhich = null; },
         guardClick(e) {
             if (e && e.detail === 0) { this.openChat(); return; }
             if (this.dragging || this.moved || Date.now() < this.suppressUntil) return;
