@@ -12,12 +12,10 @@
      class="ai-chat-v2-root"
      @keydown.escape.window="minimize()"
      @resize.window="clampAll()">
-    {{-- Launcher (draggable — geser untuk pindah, klik untuk buka) --}}
+    {{-- Launcher ala komik: selalu tampil (tokohnya), jendela = balon
+         ucapannya. Klik = toggle buka/tutup. --}}
     <button type="button"
-            x-show="!open" x-cloak
-            x-transition:enter="transition ease-out duration-150"
-            x-transition:enter-start="opacity-0 scale-90"
-            x-transition:enter-end="opacity-100 scale-100"
+            x-cloak
             @pointerdown="dragStart($event, 'launcher')"
             @pointermove="dragMove($event, 'launcher')"
             @pointerup="dragEnd($event, 'launcher')"
@@ -25,7 +23,7 @@
             @click.capture.stop="guardClick($event)"
             :style="triggerStyle()"
             :aria-expanded="open"
-            aria-label="{{ __('Buka 3DY AI') }}"
+            aria-label="{{ __('Toggle 3DY AI') }}"
             class="aiv2-launcher fixed z-[1000] flex h-14 w-14 touch-none items-center justify-center rounded-full bg-gradient-to-br from-accent-400 via-accent-600 to-accent-700 text-white shadow-xl shadow-accent-600/40 ring-4 ring-accent-500/20 transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 active:scale-95 motion-reduce:transform-none">
         <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" /></svg>
     </button>
@@ -384,9 +382,13 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
         },
         dragCancel() { this.dragging = false; this.dragWhich = null; },
         guardClick(e) {
-            if (e && e.detail === 0) { this.openChat(); return; }
+            // Toggle ala komik: klik bubble saat terbuka = minimize.
+            // Keyboard Enter/Space (detail 0) selalu toggle; klik habis
+            // drag tetap ditelan.
+            const toggle = () => { this.open ? this.minimize() : this.openChat(); };
+            if (e && e.detail === 0) { toggle(); return; }
             if (this.dragging || this.moved || Date.now() < this.suppressUntil) return;
-            this.openChat();
+            toggle();
         },
         newChat() {
             this.messages = []; this.error = ''; this.lastUserText = '';
