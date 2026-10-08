@@ -359,15 +359,16 @@
         // Hover pill meluncur ala template (SharedLayoutBg): satu pill
         // selebar nav mengikuti item yang di-hover. Tanpa :scope (rapuh di
         // sebagian browser) — keanggotaan dicek via nav.contains. Class
-        // html.sb-pill diset hanya setelah bind sukses, sehingga CSS yang
-        // mentransparankan hover bawaan tak pernah jalan tanpa pill.
+        // html.sb-pill/js dipasang ulang tiap panggilan (bukan sekali saja)
+        // karena morph wire:navigate menimpa atribut <html> — nav di-persist
+        // sehingga guard pillBound tetap '1' antar navigasi.
         function initHoverPill(){
             var nav=document.getElementById('sidebar-navigation');if(!nav)return;
+            document.documentElement.classList.add('js','sb-pill');
             if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
             var pill=nav.querySelector(':scope > .sb-hover-pill');
             if(!pill){pill=document.createElement('span');pill.className='sb-hover-pill';pill.setAttribute('aria-hidden','true');nav.append(pill);}
             if(nav.dataset.pillBound)return;nav.dataset.pillBound='1';
-            document.documentElement.classList.add('sb-pill');
             function place(el){
                 var x=0,y=0,node=el;
                 while(node&&node!==nav){x+=node.offsetLeft;y+=node.offsetTop;node=node.offsetParent;}
@@ -534,7 +535,12 @@
             links.forEach(function(a){
                 var p;try{p=new URL(a.href,window.location.origin).pathname.replace(/\/+$/,'')||'/';}catch(e){return;}
                 if(p!==here&&here.indexOf(p+'/')!==0)return;
-                if(p.length>bestLen){bestLen=p.length;best=a;}
+                // Header grup dan sub-item pertama URL-nya SAMA (landing grup = item pertama),
+                // header selalu muncul duluan di DOM. Saat panjang sama, menangkan sub-item
+                // agar highlight submenu pertama tidak hilang (header ikut nyala via grup di bawah).
+                var isSub=!!a.closest('.sb-sub-item');
+                var bestIsSub=!!(best&&best.closest('.sb-sub-item'));
+                if(p.length>bestLen||(p.length===bestLen&&isSub&&!bestIsSub)){bestLen=p.length;best=a;}
             });
             links.forEach(function(a){
                 var head=a.closest('.sb-head');
