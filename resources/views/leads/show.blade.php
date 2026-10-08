@@ -60,20 +60,34 @@
     @endphp
     @if($canSalesWrite)
         <div class="flex flex-wrap items-center gap-2 mb-4">
-            <x-icon-button as="a" icon="add" href="{{ route('sales.schedules.create', ['lead_id' => $lead->id]) }}" title="{{ __('Add schedule') }}" />
+            <a href="{{ route('sales.schedules.create', ['lead_id' => $lead->id]) }}" title="{{ __('Add schedule') }}" aria-label="{{ __('Add schedule') }}"
+               class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-blue-100 hover:bg-blue-200 text-blue-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20">
+                <x-icon name="calendar" class="h-5 w-5" />
+                {{ __('Schedule') }}
+            </a>
             @if($activeTechRequest)
-                <a href="{{ route('sales.technical-requests.show', $activeTechRequest) }}"
-                   class="px-3 py-2 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 font-medium transition">
-                    {{ \App\Models\TechnicalRequest::statusLabel($activeTechRequest->status) }} • {{ $activeTechRequest->title }}
+                <a href="{{ route('sales.technical-requests.show', $activeTechRequest) }}" title="{{ __('View technical request') }}" aria-label="{{ __('View technical request') }}"
+                   class="inline-flex min-w-0 items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-amber-100 hover:bg-amber-200 text-amber-800 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20">
+                    <x-icon name="tools" class="h-5 w-5 shrink-0" />
+                    <span class="truncate">{{ \App\Models\TechnicalRequest::statusLabel($activeTechRequest->status) }} • {{ $activeTechRequest->title }}</span>
                 </a>
             @else
-                <x-icon-button as="a" icon="add" href="{{ route('sales.technical-requests.create', ['lead_id' => $lead->id]) }}" title="{{ __('Request technical team') }}" />
+                <a href="{{ route('sales.technical-requests.create', ['lead_id' => $lead->id]) }}" title="{{ __('Request technical team') }}" aria-label="{{ __('Request technical team') }}"
+                   class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-green-100 hover:bg-green-200 text-green-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
+                    <x-icon name="tools" class="h-5 w-5" />
+                    {{ __('Technician') }}
+                </a>
             @endif
-            <x-icon-button as="a" icon="add" href="{{ route('sales.proposals.create', ['lead_id' => $lead->id]) }}" title="{{ $completedTechRequest ? __('Add proposal (technical result ready)') : __('Add proposal') }}" />
+            <a href="{{ route('sales.proposals.create', ['lead_id' => $lead->id]) }}" title="{{ $completedTechRequest ? __('Add proposal (technical result ready)') : __('Add proposal') }}" aria-label="{{ __('Add proposal') }}"
+               class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20">
+                <x-icon name="receipt" class="h-5 w-5" />
+                {{ __('Proposal') }}
+            </a>
             @if($sentProposal)
-                <a href="{{ route('sales.proposals.show', $sentProposal) }}"
-                   class="px-3 py-2 text-xs rounded-lg bg-green-100 hover:bg-green-200 text-green-800 font-medium transition">
-                    {{ $sentProposal->proposal_number }} • {{ \App\Models\Proposal::statusLabel($sentProposal->status) }}
+                <a href="{{ route('sales.proposals.show', $sentProposal) }}" title="{{ __('View proposal') }}" aria-label="{{ __('View proposal') }}"
+                   class="inline-flex min-w-0 items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium bg-green-100 hover:bg-green-200 text-green-800 transition-all duration-300 hover:scale-105 active:scale-95 dark:bg-green-500/10 dark:text-green-300 dark:hover:bg-green-500/20">
+                    <x-icon name="receipt" class="h-5 w-5 shrink-0" />
+                    <span class="truncate">{{ $sentProposal->proposal_number }} • {{ \App\Models\Proposal::statusLabel($sentProposal->status) }}</span>
                 </a>
             @endif
         </div>
