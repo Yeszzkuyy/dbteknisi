@@ -315,16 +315,28 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             const vw = window.innerWidth, vh = window.innerHeight;
             if (vw < 640) return null;
             const w = Math.min(400, vw - 24), h = Math.min(560, vh - 24);
-            const p = this.triggerPos();
-            const left = (p.left + 56 + 12 + w <= vw) ? p.left + 56 + 12 : Math.max(p.left - 12 - w, 12);
+            const p = this.triggerPos(), GAP = 16;
+            const left = (p.left + 56 + GAP + w <= vw) ? p.left + 56 + GAP : Math.max(p.left - GAP - w, 12);
             const top = Math.min(Math.max(p.top + 56 - h, 12), vh - h - 12);
             return { left, top, w, h };
         },
         chatGeom() {
             const g = this.anchorGeom();
             if (!g) return null;
-            if (!this.chatOff) return g;
-            const p = this.clamp({ left: g.left + this.chatOff.dx, top: g.top + this.chatOff.dy }, g.w, g.h);
+            const GAP = 16, BS = 56;
+            let p = { left: g.left, top: g.top };
+            if (this.chatOff) p = { left: g.left + this.chatOff.dx, top: g.top + this.chatOff.dy };
+            // Tegakkan jarak: bubble tak boleh tumpuk/terlalu rapat dengan
+            // jendela (mis. offset lama) — dorong ke sisi terdekat.
+            const b = this.triggerPos();
+            const vOverlap = p.top < b.top + BS && b.top < p.top + g.h;
+            if (vOverlap) {
+                const gapR = p.left - (b.left + BS), gapL = b.left - (p.left + g.w);
+                if (gapR < GAP && gapL < GAP) {
+                    p = { ...p, left: (p.left + g.w / 2 >= b.left + BS / 2) ? b.left + BS + GAP : b.left - GAP - g.w };
+                }
+            }
+            p = this.clamp(p, g.w, g.h);
             return { ...p, w: g.w, h: g.h };
         },
         chatStyle() {
