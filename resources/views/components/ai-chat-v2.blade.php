@@ -181,6 +181,10 @@
 .aiv2-md pre { overflow-x: auto; background: rgb(15 23 42 / .9); color: #e2e8f0; border-radius: .6rem; padding: .6rem .75rem; margin: .4rem 0; font-size: .78rem; }
 .aiv2-md pre code { background: transparent; padding: 0; }
 .aiv2-md a { color: rgb(var(--accent-600)); text-decoration: underline; }
+.aiv2-md table { display: block; width: fit-content; max-width: 100%; margin: .5rem 0; overflow-x: auto; border-collapse: collapse; font-size: .8rem; white-space: nowrap; }
+.aiv2-md th, .aiv2-md td { padding: .35rem .6rem; border: 1px solid rgb(226 232 240); text-align: left; }
+.dark .aiv2-md th, .dark .aiv2-md td { border-color: rgb(51 65 85); }
+.aiv2-md th { background: rgb(var(--accent-500) / .08); font-weight: 700; }
 @media (prefers-reduced-motion: reduce) { .aiv2-dot { animation: none !important; } }
 </style>
 
