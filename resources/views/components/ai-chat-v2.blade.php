@@ -37,7 +37,7 @@
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
          :style="chatStyle()"
-         class="fixed z-[1000] flex h-[560px] max-h-[calc(100dvh-8rem)] w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800"
+          class="fixed z-[1000] flex h-[560px] max-h-[calc(100dvh-8rem)] w-[332px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800"
          role="dialog" aria-modal="false" aria-label="3DY AI">
         {{-- Header (gagang geser offset; tombol di dalamnya tetap diklik biasa) --}}
         <div @pointerdown="dragStart($event, 'chat')"
@@ -314,7 +314,7 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
         anchorGeom() {
             const vw = window.innerWidth, vh = window.innerHeight;
             if (vw < 640) return null;
-            const w = Math.min(400, vw - 24), h = Math.min(560, vh - 24);
+            const w = Math.min(332, vw - 24), h = Math.min(560, vh - 24);
             const p = this.triggerPos(), GAP = 16;
             const left = (p.left + 56 + GAP + w <= vw) ? p.left + 56 + GAP : Math.max(p.left - GAP - w, 12);
             const top = Math.min(Math.max(p.top + 56 - h, 12), vh - h - 12);

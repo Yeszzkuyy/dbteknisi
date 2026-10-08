@@ -312,7 +312,7 @@
         .dark .ai-header-new:hover{color:rgb(var(--accent-200) / 1);background:rgb(var(--accent-600) / .15)}
         .ai-header-new svg{width:1rem;height:1rem}
         .ai-conversation{display:flex;min-height:0;flex:1;flex-direction:column;gap:.75rem;overflow-y:auto;overflow-x:hidden;padding:clamp(.75rem,2vw,1.25rem) clamp(1rem,5vw,5rem) 1rem}
-        .ai-message{width:100%;max-width:58rem;margin:0 auto}
+        .ai-message{width:100%;max-width:46rem;margin:0 auto}
         .ai-assistant-row{display:flex;align-items:flex-start;gap:.8rem}
         .ai-message-avatar{width:1.8rem;height:1.8rem;margin-top:.05rem;border-radius:.55rem}
         .ai-message-body{min-width:0;flex:1}
@@ -334,7 +334,7 @@
         .ai-suggestions button{padding:.5rem .7rem;border:1px solid var(--card-border);border-radius:.6rem;color:var(--text-secondary);background:var(--card-bg);font-size:.72rem;cursor:pointer}
         .ai-suggestions button:hover{border-color:rgb(var(--accent-300) / 1);color:rgb(var(--accent-700) / 1);background:rgb(var(--accent-50) / 1)}
         .dark .ai-suggestions button:hover{color:rgb(var(--accent-200) / 1);background:rgb(var(--accent-600) / .15)}
-        .ai-thinking{max-width:58rem;margin:0 auto;width:100%}
+        .ai-thinking{max-width:46rem;margin:0 auto;width:100%}
         .ai-thinking-body{display:flex;align-items:center;gap:.28rem;height:1.8rem;padding:0 .75rem;border:1px solid var(--card-border);border-radius:.65rem;background:var(--card-bg-hover)}
         .ai-thinking-body span,.ai-loading-history span{width:.35rem;height:.35rem;border-radius:9999px;background:var(--text-muted);animation:ai-pulse 1.15s infinite ease-in-out}
         .ai-thinking-body span:nth-child(2),.ai-loading-history span:nth-child(2){animation-delay:.15s}
@@ -345,7 +345,7 @@
         .ai-jump{position:absolute;right:1.5rem;bottom:8rem;display:inline-flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem;border:1px solid var(--card-border);border-radius:9999px;color:var(--text-secondary);background:var(--card-bg);box-shadow:var(--shadow-lift);cursor:pointer}
         .ai-jump:hover{color:var(--text-primary);background:var(--card-bg-hover)}
         .ai-jump svg{width:1rem;height:1rem}
-        .ai-composer-area{width:100%;max-width:58rem;margin:0 auto;padding:.5rem clamp(1rem,5vw,5rem) max(.8rem, env(safe-area-inset-bottom))}
+        .ai-composer-area{width:100%;max-width:46rem;margin:0 auto;padding:.5rem clamp(1rem,5vw,5rem) max(.8rem, env(safe-area-inset-bottom))}
         .ai-error{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.55rem;padding:.55rem .75rem;border:1px solid rgba(248,113,113,.4);border-radius:.6rem;color:#b91c1c;background:rgba(254,226,226,.85);font-size:.78rem}
         .dark .ai-error{color:#fecaca;background:rgba(127,29,29,.45)}
         .ai-error button{border:0;color:inherit;background:transparent;font-size:1.1rem;line-height:1;cursor:pointer}
