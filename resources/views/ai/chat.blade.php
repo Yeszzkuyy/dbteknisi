@@ -325,9 +325,9 @@
         .ai-message{width:100%;max-width:80rem;margin:0 auto}
         .ai-assistant-row{display:flex;align-items:flex-start;gap:.9rem}
         .ai-message-avatar{width:2.4rem;height:2.4rem;margin-top:0;border-radius:.7rem}
-        .ai-message-body{min-width:0;flex:1}
+        .ai-message-body{min-width:0;flex:0 1 auto;max-width:100%}
         .ai-message-author{margin-bottom:.35rem;color:var(--text-secondary);font-size:.73rem;font-weight:700}
-        .ai-message-body .md{color:var(--text-primary);font-size:.9rem;line-height:1.65}
+        .ai-message-body .md{color:var(--text-primary);font-size:.9rem;line-height:1.65;overflow-wrap:anywhere}
         .ai-user-row{display:flex;justify-content:flex-end;align-items:flex-start;gap:.75rem;min-height:0}
         .ai-user-text{align-self:flex-start;height:auto;min-height:0;max-width:min(80%,48rem);padding-top:.2rem;color:var(--text-primary);font-size:.9rem;line-height:1.55;text-align:right;white-space:normal;overflow-wrap:anywhere}
         .ai-user-msg{display:inline-block;max-width:100%;white-space:pre-wrap;padding:.45rem .85rem;border-radius:1rem 1rem .25rem 1rem;background:rgb(var(--accent-50) / 1);border:1px solid rgb(var(--accent-400) / .22)}
