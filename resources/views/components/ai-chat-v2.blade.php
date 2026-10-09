@@ -418,9 +418,14 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             if (e.shiftKey) return;
             e.preventDefault(); this.send();
         },
-        // Samakan dengan backend: buang karakter nol-lebar + pangkas
-        // ujung agar bubble optimistik tak menggelembung.
-        cleanText() { return (this.draft || '').replace(/[\u200B\uFEFF\u00AD]/gu, '').trim(); },
+        // Samakan dengan backend cleanMessage(): buang karakter tak
+        // terlihat + pangkas spasi unicode di kedua ujung.
+        cleanText() {
+            return (this.draft || '')
+                .replace(/[\u200B-\u200D\u2060\uFEFF\u00AD\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/gu, '')
+                .replace(/^[\s\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+|[\s\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+$/gu, '')
+                .trim();
+        },
         canSend() { return this.cleanText().length > 0 && !this.busy && !this.loadingConvo; },
         nowTime() {
             const t = new Date();

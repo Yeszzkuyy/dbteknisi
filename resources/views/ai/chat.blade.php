@@ -472,9 +472,15 @@
                     event.preventDefault();
                     this.send();
                 },
-                // Samakan dengan backend: buang karakter nol-lebar + pangkas
-                // ujung agar bubble optimistik tak menggelembung.
-                cleanText() { return (this.draft || '').replace(/[\u200B\uFEFF\u00AD]/gu, '').trim(); },
+                // Samakan dengan backend cleanMessage(): buang karakter
+                // tak terlihat (nol-lebar, kontrol) + pangkas spasi unicode
+                // di kedua ujung agar bubble optimistik tidak menggelembung.
+                cleanText() {
+                    return (this.draft || '')
+                        .replace(/[\u200B-\u200D\u2060\uFEFF\u00AD\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/gu, '')
+                        .replace(/^[\s\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+|[\s\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+$/gu, '')
+                        .trim();
+                },
                 renderMarkdown(content) {
                     try {
                         return window.DOMPurify.sanitize(window.marked.parse(content ?? '', { breaks: true }));
@@ -698,6 +704,10 @@
                         this.conversationId = data.conversation_id;
                         this.upsertConversation(data.conversation);
                         this.setUrl(this.conversationId);
+                        // Bubble optimistik tampil dari draft mentah; ganti ke
+                        // teks bersih yang benar-benar dikirim (antispasi aneh).
+                        const mine = this.messages.find(message => message.id === tempId);
+                        if (mine) mine.content = text;
                         this.messages.push({ id: `${data.conversation_id}-${Date.now()}`, role: 'assistant', content: data.message, sources: data.sources ?? [], attachments: [] });
                         this.scrollToBottom(true);
                     } catch (error) {
