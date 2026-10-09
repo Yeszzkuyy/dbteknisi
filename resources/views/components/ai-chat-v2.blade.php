@@ -5,7 +5,7 @@
       POST ai.assistant.send. File lama components/ai-assistant.blade.php
       dipertahankan tapi tidak di-mount. --}}
 @auth
-@php($v2Convos = auth()->user()->conversations()->latest('updated_at')->take(20)->get(['id', 'title', 'updated_at'])->map(fn ($c) => ['id' => $c->id, 'title' => $c->title ?: __('Percakapan baru'), 'updated_at' => $c->updated_at?->toISOString()])->values()->all())
+@php($v2Convos = auth()->user()->conversations()->latest('updated_at')->take(20)->get(['id', 'title', 'updated_at'])->map(fn ($c) => ['id' => $c->id, 'title' => \App\Services\ConversationTitle::smart($c->title), 'updated_at' => $c->updated_at?->toISOString()])->values()->all())
 @persist('ai-chat-v2')
 <div x-data="aiChatV2(@js(auth()->id()), @js(route('ai.assistant.send')), @js(url('/ai/assistant/conversations')), @js($v2Convos))"
      x-init="init()"

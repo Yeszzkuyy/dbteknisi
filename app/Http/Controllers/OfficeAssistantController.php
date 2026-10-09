@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Ai\Agents\OfficeAssistant;
 use App\Rules\SecureFile;
+use App\Services\ConversationTitle;
 use App\Support\KnowledgeBaseCitations;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -215,7 +216,7 @@ class OfficeAssistantController extends Controller
     {
         return [
             'id' => $conversation->id,
-            'title' => $conversation->title ?: __('Percakapan baru'),
+            'title' => ConversationTitle::smart($conversation->title),
             'updated_at' => $conversation->updated_at?->toISOString(),
         ];
     }
