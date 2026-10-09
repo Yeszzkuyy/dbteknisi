@@ -1,9 +1,15 @@
 <x-app-layout>
     @php
+        $chatUser = auth()->user();
         $chatInit = [
             'conversationId' => $conversation?->id,
             'conversations' => $conversations ?? [],
             'messages' => $messages ?? [],
+            'user' => [
+                'name' => $chatUser?->name ?? '',
+                'initial' => strtoupper(mb_substr($chatUser?->name ?? '?', 0, 1)),
+                'photo' => $chatUser?->avatar ? asset('storage/' . $chatUser->avatar) : null,
+            ],
         ];
     @endphp
     <script>window.chatInit = @json($chatInit);</script>
@@ -141,7 +147,7 @@
 
                         <template x-if="msg.role === 'user'">
                             <div class="ai-user-row">
-                                <div class="ai-user-bubble">
+                                <div class="ai-user-text">
                                     <div x-show="msg.content" x-text="msg.content"></div>
                                     <div class="ai-message-files" x-show="msg.attachments && msg.attachments.length" x-cloak>
                                         <template x-for="file in msg.attachments" :key="file.name">
@@ -154,6 +160,10 @@
                                         </template>
                                     </div>
                                 </div>
+                                <span class="ai-user-avatar" aria-hidden="true">
+                                    <img x-show="userPhoto" :src="userPhoto" :alt="userName" loading="lazy" decoding="async">
+                                    <span x-show="!userPhoto" x-text="userInitial"></span>
+                                </span>
                             </div>
                         </template>
                     </article>
@@ -318,9 +328,11 @@
         .ai-message-body{min-width:0;flex:1}
         .ai-message-author{margin-bottom:.35rem;color:var(--text-secondary);font-size:.73rem;font-weight:700}
         .ai-message-body .md{color:var(--text-primary);font-size:.9rem;line-height:1.65}
-        .ai-user-row{display:flex;justify-content:flex-end;text-align:right}
-        .ai-user-bubble{display:inline-block;max-width:75%;padding:.5rem 1rem;border:1px solid rgb(var(--accent-400) / .22);border-radius:1rem 1rem .25rem 1rem;color:var(--text-primary);background:rgb(var(--accent-50) / 1);font-size:.9rem;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
-        .dark .ai-user-bubble{border-color:rgb(var(--accent-400) / .22);color:rgb(var(--accent-100) / 1);background:rgb(var(--accent-600) / .18)}
+        .ai-user-row{display:flex;justify-content:flex-end;align-items:flex-start;gap:.6rem}
+        .ai-user-text{max-width:min(75%,38rem);padding-top:.2rem;color:var(--text-primary);font-size:.9rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+        .ai-user-avatar{display:inline-flex;align-items:center;justify-content:center;width:1.8rem;height:1.8rem;flex:none;overflow:hidden;border-radius:.55rem;color:#fff;background:rgb(var(--accent-600) / 1);font-size:.75rem;font-weight:700}
+        .dark .ai-user-avatar{background:rgb(var(--accent-500) / .85)}
+        .ai-user-avatar img{width:100%;height:100%;object-fit:cover}
         .ai-sources,.ai-message-files{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.65rem}
         .ai-source-chip,.ai-file-chip{display:inline-flex;align-items:center;gap:.35rem;max-width:100%;padding:.25rem .5rem;border:1px solid var(--card-border);border-radius:.45rem;color:var(--text-secondary);background:var(--card-bg-hover);font-size:.7rem}
         .ai-source-chip svg,.ai-file-chip svg{width:.8rem;height:.8rem;flex:none}
@@ -390,7 +402,7 @@
             .ai-history-close,.ai-mobile-history{display:inline-flex}
             .ai-history-backdrop{position:absolute;inset:0;z-index:30;background:rgba(15,23,42,.42)}
             .ai-header-new{padding:.5rem}.ai-header-new span{display:none}
-            .ai-conversation{padding:1rem .8rem}.ai-composer-area{padding-left:.8rem;padding-right:.8rem}.ai-user-bubble{max-width:88%}
+            .ai-conversation{padding:1rem .8rem}.ai-composer-area{padding-left:.8rem;padding-right:.8rem}.ai-user-text{max-width:88%}
             .ai-jump{right:.8rem;bottom:8rem}
         }
         @media(prefers-reduced-motion:reduce){.ai-thinking-body span,.ai-loading-history span{animation:none;opacity:.6}.ai-history,.ai-spin{transition:none;animation:none}}
@@ -402,6 +414,9 @@
                 conversationId: window.chatInit?.conversationId ?? null,
                 conversations: window.chatInit?.conversations ?? [],
                 messages: window.chatInit?.messages ?? [],
+                userName: window.chatInit?.user?.name ?? '',
+                userInitial: window.chatInit?.user?.initial ?? '?',
+                userPhoto: window.chatInit?.user?.photo ?? null,
                 draft: '',
                 attachments: [],
                 busy: false,
