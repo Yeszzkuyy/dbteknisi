@@ -49,4 +49,17 @@ class ConversationTitle
 
         return (string) preg_replace('/[\x{200B}\x{FEFF}\x{00AD}\x{0000}-\x{0008}\x{000B}\x{000C}\x{000E}-\x{001F}\x{007F}]/u', '', $text);
     }
+
+    /**
+     * Bersihkan teks pesan dari pengguna sebelum dikirim/disimpan:
+     * buang karakter nol-lebar di mana saja, pangkas spasi/newline
+     * (termasuk unicode) di kedua ujung. Isi tengah (enter antar
+     * baris, kode) tidak disentuh.
+     */
+    public static function cleanMessage(?string $text): string
+    {
+        $text = (string) preg_replace('/[\x{200B}\x{FEFF}\x{00AD}\x{0000}-\x{0008}\x{000B}\x{000C}\x{000E}-\x{001F}\x{007F}]/u', '', (string) $text);
+
+        return (string) preg_replace('/^[\s\x{00A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{202F}\x{205F}\x{3000}]+|[\s\x{00A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{202F}\x{205F}\x{3000}]+$/u', '', $text);
+    }
 }

@@ -88,6 +88,10 @@ class OfficeAssistantController extends Controller
 
     public function send(Request $request): JsonResponse
     {
+        // Normalisasi dulu agar pesan berisi spasi tak terlihat / baris
+        // kosong di ujung tidak lolos validasi dan tidak tersimpan.
+        $request->merge(['message' => ConversationTitle::cleanMessage($request->input('message'))]);
+
         $validated = $request->validate([
             'message' => ['nullable', 'string', 'max:2000', 'required_without:attachments'],
             'conversation_id' => ['nullable', 'string'],

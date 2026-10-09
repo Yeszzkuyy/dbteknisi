@@ -255,7 +255,7 @@
                               @keydown.enter="onEnter($event)"></textarea>
 
                     <span class="ai-listening" x-show="listening" x-cloak>{{ __('Mendengarkan…') }}</span>
-                    <button type="submit" class="ai-send" :disabled="busy || (!draft.trim() && !attachments.length)" aria-label="{{ __('Kirim pesan') }}" :title="busy ? '{{ __('Mengirim…') }}' : '{{ __('Kirim pesan') }}'">
+                    <button type="submit" class="ai-send" :disabled="busy || (!cleanText() && !attachments.length)" aria-label="{{ __('Kirim pesan') }}" :title="busy ? '{{ __('Mengirim…') }}' : '{{ __('Kirim pesan') }}'">
                         <svg x-show="!busy" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                             <path d="M3.4 20.6 21.5 12 3.4 3.4 3.4 10l12.9 2L3.4 14z" />
                         </svg>
@@ -472,6 +472,9 @@
                     event.preventDefault();
                     this.send();
                 },
+                // Samakan dengan backend: buang karakter nol-lebar + pangkas
+                // ujung agar bubble optimistik tak menggelembung.
+                cleanText() { return (this.draft || '').replace(/[\u200B\uFEFF\u00AD]/gu, '').trim(); },
                 renderMarkdown(content) {
                     try {
                         return window.DOMPurify.sanitize(window.marked.parse(content ?? '', { breaks: true }));
@@ -660,7 +663,7 @@
                     this.listening = false;
                 },
                 async send() {
-                    const text = this.draft.trim();
+                    const text = this.cleanText();
                     if ((!text && !this.attachments.length) || this.busy) return;
 
                     const pendingAttachments = this.attachments.map(attachment => ({ ...attachment }));

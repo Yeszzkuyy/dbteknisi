@@ -418,7 +418,10 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             if (e.shiftKey) return;
             e.preventDefault(); this.send();
         },
-        canSend() { return this.draft.trim().length > 0 && !this.busy && !this.loadingConvo; },
+        // Samakan dengan backend: buang karakter nol-lebar + pangkas
+        // ujung agar bubble optimistik tak menggelembung.
+        cleanText() { return (this.draft || '').replace(/[\u200B\uFEFF\u00AD]/gu, '').trim(); },
+        canSend() { return this.cleanText().length > 0 && !this.busy && !this.loadingConvo; },
         nowTime() {
             const t = new Date();
             return String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
@@ -442,7 +445,7 @@ function aiChatV2(uid, sendUrl, showUrl, initialConvos) {
             };
         },
         async send() {
-            const text = this.draft.trim();
+            const text = this.cleanText();
             if (!text || this.busy || this.loadingConvo) return;
             this.draft = ''; this.error = '';
             this.lastUserText = text;
