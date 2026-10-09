@@ -330,10 +330,10 @@
         .ai-message-body .md{color:var(--text-primary);font-size:.9rem;line-height:1.65;overflow-wrap:anywhere}
         .ai-user-row{display:flex;justify-content:flex-end;align-items:flex-start;gap:.75rem;min-height:0}
         .ai-user-text{align-self:flex-start;height:auto;min-height:0;max-width:min(80%,48rem);padding-top:.2rem;color:var(--text-primary);font-size:.9rem;line-height:1.55;text-align:right;white-space:normal;overflow-wrap:anywhere}
-        .ai-user-msg{display:inline-block;max-width:100%;white-space:pre-wrap;padding:.45rem .85rem;border-radius:1rem 1rem .25rem 1rem;background:rgb(var(--accent-50) / 1);border:1px solid rgb(var(--accent-400) / .22)}
-        .dark .ai-user-msg{background:rgb(var(--accent-600) / .18);border-color:rgb(var(--accent-400) / .22);color:rgb(var(--accent-100) / 1)}
-        .ai-message-body:has(.md){padding:.7rem .9rem;border-radius:.25rem 1rem 1rem 1rem;background:var(--card-bg-hover);border:1px solid var(--card-border)}
-        .dark .ai-message-body:has(.md){background:rgb(39 39 42 / .6);border-color:rgb(255 255 255 / .1)}
+        .ai-user-msg{display:inline-block;max-width:100%;white-space:pre-wrap;padding:.45rem .85rem;border-radius:1rem 1rem .25rem 1rem;background:rgb(var(--accent-100) / 1);border:1px solid rgb(var(--accent-300) / .5)}
+        .dark .ai-user-msg{background:rgb(var(--accent-500) / .3);border-color:rgb(var(--accent-400) / .35);color:rgb(var(--accent-100) / 1)}
+        .ai-message-body:has(.md){padding:.7rem .9rem;border-radius:.25rem 1rem 1rem 1rem;background:rgb(148 163 184 / .16);border:1px solid rgb(148 163 184 / .3)}
+        .dark .ai-message-body:has(.md){background:rgb(255 255 255 / .08);border-color:rgb(255 255 255 / .14)}
         .ai-user-avatar{display:inline-flex;align-items:center;justify-content:center;width:2.4rem;height:2.4rem;flex:none;overflow:hidden;border-radius:.7rem;color:#fff;background:rgb(var(--accent-600) / 1);font-size:.95rem;font-weight:700}
         .dark .ai-user-avatar{background:rgb(var(--accent-500) / .85)}
         .ai-user-avatar img{width:100%;height:100%;object-fit:cover}
