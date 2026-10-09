@@ -51,4 +51,26 @@ class ConversationTitleTest extends TestCase
     {
         $this->assertSame('Jadwal 😊 Kerja', ConversationTitle::smart('  Jadwal 😊 Kerja  '));
     }
+
+    public function test_clean_content_normalizes_exotic_spaces(): void
+    {
+        // U+202F (spasi sempit AI) → spasi biasa.
+        $this->assertSame(
+            'mencari detail customer',
+            ConversationTitle::cleanContent("mencari\u{202F}detail\u{202F}customer")
+        );
+    }
+
+    public function test_clean_content_removes_zero_width_chars(): void
+    {
+        $this->assertSame('tes', ConversationTitle::cleanContent("t\u{200B}es"));
+        $this->assertSame('tes', ConversationTitle::cleanContent("\u{FEFF}tes"));
+    }
+
+    public function test_clean_content_keeps_legit_whitespace(): void
+    {
+        // NBSP (anti-pisah angka) + newline poisoning dipertahankan.
+        $this->assertSame("Rp\u{00A0}1.000", ConversationTitle::cleanContent("Rp\u{00A0}1.000"));
+        $this->assertSame("baris satu\nbaris dua", ConversationTitle::cleanContent("baris satu\nbaris dua"));
+    }
 }

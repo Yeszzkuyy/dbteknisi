@@ -37,4 +37,16 @@ class ConversationTitle
             ? mb_substr($cut, 0, $space)
             : $cut;
     }
+
+    /**
+     * Bersihkan spasi/karakter tak terlihat dari isi pesan untuk
+     * ditampilkan. NBSP, joiner Arab, dan spasi legitim lain sengaja
+     * dipertahankan (ada gunanya). Database tidak diubah.
+     */
+    public static function cleanContent(?string $content): string
+    {
+        $text = str_replace(["\u{202F}", "\u{2007}"], ' ', (string) $content);
+
+        return (string) preg_replace('/[\x{200B}\x{FEFF}\x{00AD}\x{0000}-\x{0008}\x{000B}\x{000C}\x{000E}-\x{001F}\x{007F}]/u', '', $text);
+    }
 }

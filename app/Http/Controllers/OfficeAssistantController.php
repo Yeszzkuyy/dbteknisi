@@ -260,7 +260,7 @@ class OfficeAssistantController extends Controller
             ->map(fn ($message) => [
                 'id' => $message->id,
                 'role' => $message->role,
-                'content' => $message->content,
+                'content' => ConversationTitle::cleanContent($message->content),
                 'sources' => $message->role === 'assistant'
                     ? KnowledgeBaseCitations::resolve(($message->meta ?? [])['citations'] ?? [])
                     : [],
