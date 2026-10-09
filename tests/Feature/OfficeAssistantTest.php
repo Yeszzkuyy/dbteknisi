@@ -249,4 +249,17 @@ class OfficeAssistantTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors('message');
     }
+
+    public function test_user_message_text_keeps_template_whitespace_out_of_layout(): void
+    {
+        $this->actingUser();
+
+        $html = $this->get(route('ai.assistant.index'))->assertOk()->getContent();
+
+        // Indentasi markup tidak boleh ikut tampil: wadah teks user normal,
+        // hanya isi pesan (ai-user-msg) yang pre-wrap.
+        $this->assertStringContainsString('class="ai-user-msg"', $html);
+        $this->assertMatchesRegularExpression('/\.ai-user-text\{[^}]*white-space:normal/', $html);
+        $this->assertMatchesRegularExpression('/\.ai-user-msg\{white-space:pre-wrap\}/', $html);
+    }
 }

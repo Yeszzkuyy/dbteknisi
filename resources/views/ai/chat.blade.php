@@ -148,7 +148,7 @@
                         <template x-if="msg.role === 'user'">
                             <div class="ai-user-row">
                                 <div class="ai-user-text">
-                                    <div x-show="msg.content" x-text="msg.content"></div>
+                                    <div class="ai-user-msg" x-show="msg.content" x-text="msg.content"></div>
                                     <div class="ai-message-files" x-show="msg.attachments && msg.attachments.length" x-cloak>
                                         <template x-for="file in msg.attachments" :key="file.name">
                                             <span class="ai-file-chip">
@@ -329,7 +329,8 @@
         .ai-message-author{margin-bottom:.35rem;color:var(--text-secondary);font-size:.73rem;font-weight:700}
         .ai-message-body .md{color:var(--text-primary);font-size:.9rem;line-height:1.65}
         .ai-user-row{display:flex;justify-content:flex-end;align-items:flex-start;gap:.6rem;min-height:0}
-        .ai-user-text{align-self:flex-start;height:auto;min-height:0;max-width:min(75%,38rem);padding-top:.2rem;color:var(--text-primary);font-size:.9rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+        .ai-user-text{align-self:flex-start;height:auto;min-height:0;max-width:min(75%,38rem);padding-top:.2rem;color:var(--text-primary);font-size:.9rem;line-height:1.55;text-align:right;white-space:normal;overflow-wrap:anywhere}
+        .ai-user-msg{white-space:pre-wrap}
         .ai-user-avatar{display:inline-flex;align-items:center;justify-content:center;width:1.8rem;height:1.8rem;flex:none;overflow:hidden;border-radius:.55rem;color:#fff;background:rgb(var(--accent-600) / 1);font-size:.75rem;font-weight:700}
         .dark .ai-user-avatar{background:rgb(var(--accent-500) / .85)}
         .ai-user-avatar img{width:100%;height:100%;object-fit:cover}
