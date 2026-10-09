@@ -260,6 +260,6 @@ class OfficeAssistantTest extends TestCase
         // hanya isi pesan (ai-user-msg) yang pre-wrap.
         $this->assertStringContainsString('class="ai-user-msg"', $html);
         $this->assertMatchesRegularExpression('/\.ai-user-text\{[^}]*white-space:normal/', $html);
-        $this->assertMatchesRegularExpression('/\.ai-user-msg\{white-space:pre-wrap\}/', $html);
+        $this->assertMatchesRegularExpression('/\.ai-user-msg\{[^}]*white-space:pre-wrap/', $html);
     }
 }

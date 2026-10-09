@@ -98,8 +98,8 @@
                         </span>
                     </template>
                     <div :class="m.role === 'user'
-                            ? 'max-w-[80%] rounded-2xl rounded-br-md bg-accent-600 px-3.5 py-2.5 text-sm text-white'
-                            : 'max-w-[85%] rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'">
+                            ? 'max-w-[80%] rounded-2xl rounded-br-md border border-accent-400/25 bg-accent-50 px-3.5 py-2.5 text-sm text-slate-800 dark:bg-accent-600/20 dark:text-accent-100'
+                            : 'max-w-[85%] rounded-2xl rounded-bl-md border border-slate-200 bg-slate-100 px-3.5 py-2.5 text-sm text-slate-700 dark:border-white/10 dark:bg-zinc-800/80 dark:text-zinc-200'">
                         <template x-if="m.role === 'user'">
                             <p class="whitespace-pre-wrap break-words" x-text="m.content"></p>
                         </template>
